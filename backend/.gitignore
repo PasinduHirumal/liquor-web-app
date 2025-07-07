@@ -1,4 +1,4 @@
 #
 node_modules
 .env 
-
+liquor_config_firebase.json

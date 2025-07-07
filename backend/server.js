@@ -2,9 +2,12 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
+import  initializeFirebase from "./src/config/firebase.config.js";
 
 dotenv.config();
 
+// connect DB
+initializeFirebase();
 
 const app = express();
 app.use(express.json({ limit: '100mb' }));
