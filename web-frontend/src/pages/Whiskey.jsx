@@ -6,11 +6,11 @@ function Whiskey() {
   const whiskeyList = liquorsByCategory["Whiskey"];
   
   if (!whiskeyList || whiskeyList.length === 0) {
-    return <div className="container mt-4"><h2>No Whiskey available</h2></div>;
+    return <div className="container mt-5 pt-4 text-center"><h2>No Whiskey available</h2></div>;
   }
 
   return (
-    <div className="container mt-4">
+    <div className="container mt-5 pt-4">
       <h2 className="mb-4">Whiskey Collection</h2>
       <div className="row">
         {whiskeyList.map((item, index) => (

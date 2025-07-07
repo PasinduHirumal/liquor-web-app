@@ -9,6 +9,7 @@ import Beer from './pages/Beer';
 import Wine from './pages/Wine';
 import Gin from './pages/Gin';
 import Rum from './pages/Rum';
+import AllProducts from './pages/AllProducts';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="/wine" element={<Wine />} />
         <Route path="/gin" element={<Gin />} />
         <Route path="/rum" element={<Rum />} />
+        <Route path="/products" element={<AllProducts />} />
       </Routes>
       <Footer />
     </Router>

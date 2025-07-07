@@ -4,13 +4,13 @@ import LiquorCard from '../components/LiquorCard';
 
 function Wine() {
   const wineList = liquorsByCategory["Wine"];
-  
+
   if (!wineList || wineList.length === 0) {
-    return <div className="container mt-4"><h2>No wine available</h2></div>;
+    return <div className="container mt-5 pt-4 text-center"><h2>No wine available</h2></div>;
   }
 
   return (
-    <div className="container mt-4">
+    <div className="container mt-5 pt-4">
       <h2 className="mb-4">Wine Collection</h2>
       <div className="row">
         {wineList.map((item, index) => (

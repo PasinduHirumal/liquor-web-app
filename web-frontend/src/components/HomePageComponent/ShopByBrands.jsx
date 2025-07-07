@@ -1,22 +1,33 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { liquorsByBrand } from '../../data/data';
 
 const ShopByBrands = () => {
-    const brandLogos = Object.keys(liquorsByBrand)
-        .slice(0, 6)
-        .map((brand) => ({
-            name: brand,
-            image: liquorsByBrand[brand][0].brandImage,
-        }));
+    const [showAll, setShowAll] = useState(false);
+
+    const allBrands = Object.keys(liquorsByBrand).map((brand) => ({
+        name: brand,
+        image: liquorsByBrand[brand][0]?.brandImage || '',
+    }));
+
+    const visibleBrands = showAll ? allBrands : allBrands.slice(0, 6);
+
+    const handleToggle = () => setShowAll((prev) => !prev);
 
     return (
         <section className="my-5">
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <h3 className="fw-bold">SHOP BY BRAND</h3>
-                <a href="/brands" className="btn btn-outline-danger btn-sm">View More</a>
+                {allBrands.length > 6 && (
+                    <button
+                        onClick={handleToggle}
+                        className="btn btn-outline-danger btn-sm"
+                    >
+                        {showAll ? 'Show Less' : 'View More'}
+                    </button>
+                )}
             </div>
             <div className="row g-4 text-center">
-                {brandLogos.map((brand) => (
+                {visibleBrands.map((brand) => (
                     <div className="col-4 col-md-2" key={brand.name}>
                         <img
                             src={brand.image}

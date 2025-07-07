@@ -6,11 +6,11 @@ function Rum() {
   const rumList = liquorsByCategory["Rum"];
   
   if (!rumList || rumList.length === 0) {
-    return <div className="container mt-4"><h2>No Rum available</h2></div>;
+    return <div className="container mt-5 pt-4 text-center"><h2>No Rum available</h2></div>;
   }
 
   return (
-    <div className="container mt-4">
+    <div className="container mt-5 pt-4">
       <h2 className="mb-4">Rum Collection</h2>
       <div className="row">
         {rumList.map((item, index) => (
