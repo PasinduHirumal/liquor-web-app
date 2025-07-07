@@ -4,6 +4,8 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import  initializeFirebase from "./src/config/firebase.config.js";
 
+import authRoutes from "./src/routes/auth.routes.js"
+
 dotenv.config();
 
 // connect DB
@@ -16,7 +18,7 @@ app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000", cred
 app.use(cookieParser());
 
 //Routes
-//app.use("/api/auth", authRoutes);
+app.use("/api/auth", authRoutes);
 
 
 //  Route handler for the root path
