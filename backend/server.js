@@ -3,7 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import initializeFirebase from "./src/config/firebase.config.js";
-import corsOptions from "./src/config/cors.config.js";
+//import corsOptions from "./src/config/cors.config.js";
 
 import authRoutes from "./src/routes/auth.routes.js"
 
@@ -13,13 +13,13 @@ dotenv.config();
 initializeFirebase();
 
 const app = express();
-app.use(cors(corsOptions));
+app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000", credentials: true }));
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use(cookieParser());
 
 // Handle preflight requests
-app.options('*', cors(corsOptions));
+//app.options('*', cors(corsOptions));
 
 //Routes
 app.use("/api/auth", authRoutes);

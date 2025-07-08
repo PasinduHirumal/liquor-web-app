@@ -11,7 +11,7 @@ const corsOptions = {
             "http://localhost:4000", // If you have multiple frontend ports
             process.env.PRODUCTION_WEB_URL, // Production web URL
             // Add more web origins as needed
-        ];
+        ].filter(Boolean);
 
         // Check if the origin is in the allowed list
         if (allowedOrigins.includes(origin)) {

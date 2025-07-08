@@ -7,7 +7,7 @@ const validateUser = (req, res, next) => {
     password: Joi.string().min(6).max(128).required(),
     firstName: Joi.string().min(2).max(50).required(),
     lastName: Joi.string().min(2).max(50).required(),
-    phone: Joi.string().pattern(/^(?:\+?\d{9,15})$/).min(9).trim().required(),
+    phone: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).min(10).max(18).trim().required(),
     addresses: Joi.array().items(Joi.string()).default([]),
     role: Joi.string().valid('user', 'admin', 'super_admin').default('user'),
     googleId: Joi.string().allow('').default(''),
