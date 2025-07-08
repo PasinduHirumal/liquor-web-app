@@ -6,6 +6,8 @@ const validateUser = (req, res, next) => {
     username: Joi.string().min(2).max(50).required(),
     email: Joi.string().email().lowercase().required(),
     password: Joi.string().min(6).max(128).required(),
+    phone: Joi.string().pattern(/^(?:\+?\d{9,15})$/).min(9).trim().required(),
+    addresses: Joi.array().items(Joi.string()).default([]),
     role: Joi.string().valid('user', 'admin').default('user'),
     googleId: Joi.string().allow('').default(''),
 
@@ -55,6 +57,8 @@ const validateUserUpdate = (req, res, next) => {
     username: Joi.string().min(2).max(50).optional(),
     email: Joi.string().email().lowercase().optional(),
     password: Joi.string().min(6).max(128).optional(),
+    phone: Joi.string().pattern(/^(?:\+?\d{9,15})$/).min(9).trim().optional(),
+    addresses: Joi.array().items(Joi.string()).optional(),
     role: Joi.string().valid('customer', 'manager', 'owner').optional(),
     googleId: Joi.string().allow('').optional(),
     

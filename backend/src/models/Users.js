@@ -6,6 +6,8 @@ class User {
         this.username = data.username;
         this.email = data.email;
         this.password = data.password;
+        this.phone = data.phone;
+        this.addresses = data.addresses;
         this.role = data.role;
         this.googleId = data.googleId;
 
