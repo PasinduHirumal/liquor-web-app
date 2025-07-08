@@ -3,13 +3,15 @@ import Joi from 'joi';
 // CREATE VALIDATOR - With defaults
 const validateUser = (req, res, next) => {
   const schema = Joi.object({
-    username: Joi.string().min(2).max(50).required(),
     email: Joi.string().email().lowercase().required(),
     password: Joi.string().min(6).max(128).required(),
+    firstName: Joi.string().min(2).max(50).required(),
+    lastName: Joi.string().min(2).max(50).required(),
     phone: Joi.string().pattern(/^(?:\+?\d{9,15})$/).min(9).trim().required(),
     addresses: Joi.array().items(Joi.string()).default([]),
-    role: Joi.string().valid('user', 'admin').default('user'),
+    role: Joi.string().valid('user', 'admin', 'super_admin').default('user'),
     googleId: Joi.string().allow('').default(''),
+    isActive: Joi.boolean().default(true),
 
     verifyOtp: Joi.string().allow('').default(''),
     verifyOtpExpiredAt: Joi.alternatives().try(
@@ -54,13 +56,15 @@ const validateUser = (req, res, next) => {
 // UPDATE VALIDATOR - NO defaults, all fields optional
 const validateUserUpdate = (req, res, next) => {
   const schema = Joi.object({
-    username: Joi.string().min(2).max(50).optional(),
     email: Joi.string().email().lowercase().optional(),
     password: Joi.string().min(6).max(128).optional(),
+    firstName: Joi.string().min(2).max(50).optional(),
+    lastName: Joi.string().min(2).max(50).optional(),
     phone: Joi.string().pattern(/^(?:\+?\d{9,15})$/).min(9).trim().optional(),
     addresses: Joi.array().items(Joi.string()).optional(),
     role: Joi.string().valid('customer', 'manager', 'owner').optional(),
     googleId: Joi.string().allow('').optional(),
+    isActive: Joi.boolean().optional(),
     
     verifyOtp: Joi.string().allow('').optional(),
     verifyOtpExpiredAt: Joi.alternatives().try(
