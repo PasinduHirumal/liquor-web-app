@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { axiosInstance } from "../lib/axios";
 
 const LoginForm = () => {
-    const [loginMethod, setLoginMethod] = useState("email"); // "email" or "phone"
+    const [loginMethod, setLoginMethod] = useState("email");
     const [formData, setFormData] = useState({
         email: "",
         phone: "",
@@ -25,13 +25,11 @@ const LoginForm = () => {
         setError("");
         setResponse(null);
 
-        if (loginMethod === "email" && !formData.email.trim()) {
-            setError("Email is required.");
-            return;
-        }
+        const credential = loginMethod === "email" ? formData.email.trim() : formData.phone.trim();
+        const credentialLabel = loginMethod === "email" ? "Email" : "Phone number";
 
-        if (loginMethod === "phone" && !formData.phone.trim()) {
-            setError("Phone number is required.");
+        if (!credential) {
+            setError(`${credentialLabel} is required.`);
             return;
         }
 
@@ -47,11 +45,9 @@ const LoginForm = () => {
                 password: formData.password
             };
 
-            if (loginMethod === "email") {
-                dataToSend.email = formData.email.trim();
-            } else {
-                dataToSend.phone = formData.phone.trim();
-            }
+            loginMethod === "email"
+                ? (dataToSend.email = credential)
+                : (dataToSend.phone = credential);
 
             const res = await axiosInstance.post("/auth/login", dataToSend);
             setResponse(res.data);
@@ -66,43 +62,32 @@ const LoginForm = () => {
 
     return (
         <div className="container mt-5 d-flex justify-content-center">
-            <div style={{ maxWidth: "400px", width: "100%" }}>
+            <div style={{ maxWidth: "420px", width: "100%" }}>
                 <h3 className="mb-4 text-center">🔐 Admin Login</h3>
 
-                <div className="mb-3">
-                    <label className="form-label">Login Method</label>
-                    <div className="form-check">
-                        <input
-                            className="form-check-input"
-                            type="radio"
-                            name="loginMethod"
-                            id="emailRadio"
-                            value="email"
-                            checked={loginMethod === "email"}
-                            onChange={() => setLoginMethod("email")}
-                        />
-                        <label className="form-check-label" htmlFor="emailRadio">
+                {/* Tabs for selecting method */}
+                <ul className="nav nav-tabs mb-3">
+                    <li className="nav-item">
+                        <button
+                            className={`nav-link ${loginMethod === "email" ? "active" : ""}`}
+                            onClick={() => setLoginMethod("email")}
+                        >
                             Email
-                        </label>
-                    </div>
-                    <div className="form-check">
-                        <input
-                            className="form-check-input"
-                            type="radio"
-                            name="loginMethod"
-                            id="phoneRadio"
-                            value="phone"
-                            checked={loginMethod === "phone"}
-                            onChange={() => setLoginMethod("phone")}
-                        />
-                        <label className="form-check-label" htmlFor="phoneRadio">
+                        </button>
+                    </li>
+                    <li className="nav-item">
+                        <button
+                            className={`nav-link ${loginMethod === "phone" ? "active" : ""}`}
+                            onClick={() => setLoginMethod("phone")}
+                        >
                             Phone
-                        </label>
-                    </div>
-                </div>
+                        </button>
+                    </li>
+                </ul>
 
+                {/* Form */}
                 <form onSubmit={handleSubmit} autoComplete="on">
-                    {loginMethod === "email" && (
+                    {loginMethod === "email" ? (
                         <div className="mb-3">
                             <label className="form-label">Email <span className="text-danger">*</span></label>
                             <input
@@ -116,9 +101,7 @@ const LoginForm = () => {
                                 autoFocus
                             />
                         </div>
-                    )}
-
-                    {loginMethod === "phone" && (
+                    ) : (
                         <div className="mb-3">
                             <label className="form-label">Phone <span className="text-danger">*</span></label>
                             <input
@@ -136,10 +119,9 @@ const LoginForm = () => {
                         </div>
                     )}
 
+                    {/* Password Field */}
                     <div className="mb-3">
-                        <label className="form-label">
-                            Password <span className="text-danger">*</span>
-                        </label>
+                        <label className="form-label">Password <span className="text-danger">*</span></label>
                         <input
                             type="password"
                             name="password"
@@ -156,6 +138,7 @@ const LoginForm = () => {
                     </button>
                 </form>
 
+                {/* Response & Errors */}
                 {response && (
                     <div className="alert alert-success mt-3" role="alert">
                         ✅ {response.message}
