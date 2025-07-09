@@ -1,25 +1,25 @@
-import UserService from '../services/user.service.js';
+import AdminUserService from '../services/adminUsers.service.js';
 import generateToken from '../utils/createToken.js';
 
-const userService = new UserService();
+const adminService = new AdminUserService();
 
 const register = async (req, res) => {
     try {
         const { email, phone } = req.body;
 
-        const userByEmail  = await userService.findByEmail(email);
-        const userByPhone = await userService.findByPhone(phone);
+        const userByEmail  = await adminService.findByEmail(email);
+        const userByPhone = await adminService.findByPhone(phone);
 
         if (userByEmail || userByPhone) {
             return res.status(400).json({ success: false, message: "User already exists" });
         }
 
-        const user = await userService.create(req.body);
+        const user = await adminService.create(req.body);
 
         // block password displaying
         user.password = undefined;
 
-        return res.status(201).json({ success: true, message: "User registered successfully", data: user });
+        return res.status(201).json({ success: true, message: "Admin account registered successfully", data: user });
     } catch (error) {
         console.error('Registration error:', error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
@@ -36,9 +36,9 @@ const login = async (req, res) => {
     
         let user;
         if (email !== undefined) {
-            user = await userService.findByEmail(email);
+            user = await adminService.findByEmail(email);
         } else if (phone !== undefined) {
-            user = await userService.findByPhone(phone);
+            user = await adminService.findByPhone(phone);
         }
         
         if (!user) {
@@ -52,6 +52,10 @@ const login = async (req, res) => {
 
         if (!user.isAccountVerified) {
             return res.status(400).json({ success: false, message: "Your account is not verified" });
+        }
+
+        if (!user.isAdminAccepted) {
+            return res.status(400).json({ success: false, message: "Your account is at pending" });
         }
 
         // create JWT token
@@ -94,7 +98,7 @@ const logout = async (req, res) => {
 
 const checkAuth = async (req, res) => {
   try {
-    const user = await userService.findById(req.user.id);
+    const user = await adminService.findById(req.user.id);
 
     const userData = {
         id: user.id,
@@ -112,4 +116,4 @@ const checkAuth = async (req, res) => {
 
 
 
-export { register, login, logout, checkAuth, };
+export { register, login, logout, checkAuth };

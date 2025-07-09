@@ -1,5 +1,5 @@
 
-class Users {
+class AdminUsers {
     constructor (id, data) {
         this.id = id;
 
@@ -8,10 +8,11 @@ class Users {
         this.firstName = data.firstName;
         this.lastName = data.lastName;
         this.phone = data.phone;
-        this.addresses = data.addresses;
+
         this.role = data.role;
         this.googleId = data.googleId;
         this.isActive = data.isActive;
+        this.isAdminAccepted = data.isAdminAccepted;
 
         this.verifyOtp = data.verifyOtp;
         this.verifyOtpExpiredAt = data.verifyOtpExpiredAt;
@@ -27,4 +28,4 @@ class Users {
 
 
 
-export default Users;
+export default AdminUsers;

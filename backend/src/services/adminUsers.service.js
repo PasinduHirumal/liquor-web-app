@@ -1,12 +1,12 @@
 import bcrypt from "bcryptjs"
 import initializeFirebase from "../config/firebase.config.js";
-import Users from "../models/Users.js"
+import AdminUsers from "../models/AdminUsers.js"
 
 const { db } = initializeFirebase();
 
-class UserService {
+class AdminUserService {
     constructor () {
-        this.collection = db.collection('users');
+        this.collection = db.collection('admin_users');
     }
 
     async findById(id) {
@@ -17,7 +17,7 @@ class UserService {
             }
         
             const userData = userDoc.data();
-            return new Users(userDoc.id, userData);
+            return new AdminUsers(userDoc.id, userData);
         } catch (error) {
             throw error;
         }
@@ -32,7 +32,7 @@ class UserService {
             }
 
             const userDoc = userRef.docs[0];
-            return new Users(userDoc.id, userDoc.data());
+            return new AdminUsers(userDoc.id, userDoc.data());
         } catch (error) {
             throw error;
         }
@@ -47,7 +47,7 @@ class UserService {
             }
 
             const userDoc = userRef.docs[0];
-            return new Users(userDoc.id, userDoc.data());
+            return new AdminUsers(userDoc.id, userDoc.data());
         } catch (error) {
             throw error;
         }
@@ -62,7 +62,7 @@ class UserService {
             }
 
             const userDoc = userRef.docs[0];
-            return new Users(userDoc.id, userDoc.data());
+            return new AdminUsers(userDoc.id, userDoc.data());
         } catch (error) {
             throw error;
         }
@@ -76,7 +76,7 @@ class UserService {
                 return [];
             }
 
-            return usersRef.docs.map(doc => new Users(doc.id, doc.data()));
+            return usersRef.docs.map(doc => new AdminUsers(doc.id, doc.data()));
         } catch (error) {
             throw error;
         }
@@ -92,7 +92,7 @@ class UserService {
                 updatedAt: new Date().toISOString()
             });
 
-            return new Users(userRef.id, userData);
+            return new AdminUsers(userRef.id, userData);
         } catch (error) {
             console.error('Error creating user:', error);
             throw error;
@@ -145,4 +145,4 @@ class UserService {
     }
 }
 
-export default UserService;
+export default AdminUserService;
