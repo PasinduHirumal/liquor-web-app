@@ -54,6 +54,11 @@ const LoginForm = () => {
 
             const res = await axiosInstance.post("/auth/login", dataToSend);
             setResponse(res.data);
+
+            // ✅ Redirect to homepage after a short delay
+            setTimeout(() => {
+                navigate("/");
+            }, 1000);
         } catch (err) {
             setError(
                 err.response?.data?.message || "Network or server error. Please try again."
@@ -122,7 +127,6 @@ const LoginForm = () => {
                         </div>
                     )}
 
-                    {/* Password Field */}
                     <div className="mb-3">
                         <label className="form-label">Password <span className="text-danger">*</span></label>
                         <input
@@ -141,13 +145,14 @@ const LoginForm = () => {
                     </button>
                 </form>
 
-                {/* Response & Errors */}
+                {/* Success Message */}
                 {response && (
                     <div className="alert alert-success mt-3" role="alert">
-                        ✅ {response.message}
+                        ✅ {response.message} Redirecting...
                     </div>
                 )}
 
+                {/* Error Message */}
                 {error && (
                     <div className="alert alert-danger mt-3" role="alert">
                         ❌ {error}
