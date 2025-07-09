@@ -3,6 +3,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import initializeFirebase from "./src/config/firebase.config.js";
+import { initializeDefaultSuperAdmin } from "./src/initialize/defaultSuperAdminAccount.js";
 //import corsOptions from "./src/config/cors.config.js";
 
 import authRoutes from "./src/routes/auth.routes.js"
@@ -11,6 +12,10 @@ dotenv.config();
 
 // connect DB
 initializeFirebase();
+
+initializeDefaultSuperAdmin().then(() => {
+  console.log('✅ Server initialization completed.....\n');
+});
 
 const app = express();
 app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000", credentials: true }));
@@ -27,7 +32,7 @@ app.use("/api/auth", authRoutes);
 
 //  Route handler for the root path
 app.get('/', (req, res) => {
-  res.send('Server is running...!');
+  res.send('✅ Server is running...!');
 });
 
 // Error handling middleware
@@ -37,4 +42,4 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));

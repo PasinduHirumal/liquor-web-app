@@ -1,3 +1,6 @@
+import dotenv from 'dotenv';
+dotenv.config();
+
 // Configure CORS for both web and mobile
 const corsOptions = {
     origin: function (origin, callback) {
