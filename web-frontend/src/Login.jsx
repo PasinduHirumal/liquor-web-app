@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { axiosInstance } from "../lib/axios";
 
 const LoginForm = () => {
@@ -37,7 +36,6 @@ const LoginForm = () => {
             const res = await axiosInstance.post("/auth/login", dataToSend);
 
             setResponse(res.data);
-            // Optionally clear form here: setFormData({email: "", phone: "", password: ""});
         } catch (err) {
             setError(
                 err.response?.data?.message || "Network or server error. Please try again."

@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { axiosInstance } from "../lib/axios";
 
 const RegisterForm = () => {
     const [formData, setFormData] = useState({
@@ -33,10 +34,9 @@ const RegisterForm = () => {
                 phone: formData.phone.trim(),
             };
 
-            const res = await axios.post("http://localhost:5000/api/auth/register", payload);
+            const res = await axiosInstance.post("/auth/register", payload);
 
             setResponse(res.data);
-            // Optionally reset form: setFormData({ email: "", password: "", firstName: "", lastName: "", phone: "" });
         } catch (error) {
             if (error.response?.data?.errors) {
                 setErrors(error.response.data.errors);
