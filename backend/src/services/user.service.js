@@ -68,6 +68,20 @@ class UserService {
         }
     }
 
+    async findAll() {
+        try {
+            const usersRef = await this.collection.get();
+
+            if (usersRef.empty) {
+                return [];
+            }
+
+            return usersRef.docs.map(doc => new Users(doc.id, doc.data()));
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async create(userData) {
         try {
             const salt = await bcrypt.genSalt(10);
@@ -87,6 +101,47 @@ class UserService {
 
     async comparePassword(plainPassword, hashedPassword) {
         return await bcrypt.compare(plainPassword, hashedPassword);
+    }
+
+    async updateById(id, updateData) {
+        try {
+            const userDoc = await this.collection.doc(id).get();
+
+            if (!userDoc.exists) {
+                return false;
+            }
+
+            // Hash password if it's being updated
+            if (updateData.password) {
+                const salt = await bcrypt.genSalt(10);
+                updateData.password = await bcrypt.hash(updateData.password, salt);
+            }
+            
+            updateData.updatedAt = new Date().toISOString();
+        
+            await this.collection.doc(id).update(updateData);
+        
+            const updatedUser = await this.findById(id);
+            return updatedUser;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async deleteById(id) {
+        try {
+            const userDoc = await this.collection.doc(id).get();
+
+            if (!userDoc.exists) {
+                return false;
+            }
+
+            await this.collection.doc(id).delete();
+            return true;
+        } catch (error) {
+            console.error('Error deleting user:', error);
+            throw error;
+        }
     }
 }
 
