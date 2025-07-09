@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { axiosInstance } from "../lib/axios";
 
 const LoginForm = () => {
     const [formData, setFormData] = useState({
@@ -33,9 +34,7 @@ const LoginForm = () => {
             if (formData.phone) dataToSend.phone = formData.phone.trim();
             dataToSend.password = formData.password;
 
-            const res = await axios.post("http://localhost:5000/api/auth/login", dataToSend, {
-                withCredentials: true,
-            });
+            const res = await axiosInstance.post("/auth/login", dataToSend);
 
             setResponse(res.data);
             // Optionally clear form here: setFormData({email: "", phone: "", password: ""});
