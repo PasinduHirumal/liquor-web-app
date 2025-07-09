@@ -1,7 +1,10 @@
 import React, { useState } from "react";
 import { axiosInstance } from "../lib/axios";
+import { useNavigate } from "react-router-dom";
 
 const LoginForm = () => {
+    const navigate = useNavigate();
+
     const [loginMethod, setLoginMethod] = useState("email");
     const [formData, setFormData] = useState({
         email: "",
@@ -150,6 +153,17 @@ const LoginForm = () => {
                         ❌ {error}
                     </div>
                 )}
+
+                {/* Register Prompt */}
+                <div className="text-center mt-4">
+                    <span>Don't have an account? </span>
+                    <button
+                        className="btn btn-link p-0 align-baseline"
+                        onClick={() => navigate("/register")}
+                    >
+                        Register here
+                    </button>
+                </div>
             </div>
         </div>
     );
