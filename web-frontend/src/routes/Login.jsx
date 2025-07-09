@@ -43,11 +43,7 @@ const LoginForm = () => {
 
         try {
             setLoading(true);
-
-            const dataToSend = {
-                password: formData.password
-            };
-
+            const dataToSend = { password: formData.password };
             loginMethod === "email"
                 ? (dataToSend.email = credential)
                 : (dataToSend.phone = credential);
@@ -55,46 +51,41 @@ const LoginForm = () => {
             const res = await axiosInstance.post("/auth/login", dataToSend);
             setResponse(res.data);
 
-            // ✅ Redirect to homepage after a short delay
-            setTimeout(() => {
-                navigate("/");
-            }, 1000);
+            setTimeout(() => navigate("/"), 1000);
         } catch (err) {
-            setError(
-                err.response?.data?.message || "Network or server error. Please try again."
-            );
+            setError(err.response?.data?.message || "Network or server error. Please try again.");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="container mt-5 d-flex justify-content-center">
-            <div style={{ maxWidth: "420px", width: "100%" }}>
-                <h3 className="mb-4 text-center">🔐 Admin Login</h3>
+        <div className="login-container d-flex align-items-center justify-content-center">
+            <div className="card p-4 shadow login-card">
+                <h3 className="mb-4 text-center text-primary">🔐 Admin Login</h3>
 
-                {/* Tabs for selecting method */}
-                <ul className="nav nav-tabs mb-3">
-                    <li className="nav-item">
+                {/* Method Switch */}
+                <div className="d-flex justify-content-center mb-3">
+                    <div className="btn-group gap-1" role="group" aria-label="Login Method Switch">
                         <button
-                            className={`nav-link ${loginMethod === "email" ? "active" : ""}`}
+                            type="button"
+                            className={`btn ${loginMethod === "email" ? "btn-primary" : "btn-outline-primary"}`}
                             onClick={() => setLoginMethod("email")}
                         >
                             Email
                         </button>
-                    </li>
-                    <li className="nav-item">
                         <button
-                            className={`nav-link ${loginMethod === "phone" ? "active" : ""}`}
+                            type="button"
+                            className={`btn ${loginMethod === "phone" ? "btn-primary" : "btn-outline-primary"}`}
                             onClick={() => setLoginMethod("phone")}
                         >
                             Phone
                         </button>
-                    </li>
-                </ul>
+                    </div>
+                </div>
 
                 {/* Form */}
-                <form onSubmit={handleSubmit} autoComplete="on">
+                <form onSubmit={handleSubmit}>
                     {loginMethod === "email" ? (
                         <div className="mb-3">
                             <label className="form-label">Email <span className="text-danger">*</span></label>
@@ -121,7 +112,7 @@ const LoginForm = () => {
                                 placeholder="+947XXXXXXXX"
                                 autoComplete="tel"
                                 pattern="^\+\d{1,3}\d{4,14}$"
-                                title="Phone number must include country code, e.g. +947XXXXXXXX"
+                                title="Phone number must include country code"
                                 autoFocus
                             />
                         </div>
@@ -145,25 +136,24 @@ const LoginForm = () => {
                     </button>
                 </form>
 
-                {/* Success Message */}
+                {/* Success */}
                 {response && (
-                    <div className="alert alert-success mt-3" role="alert">
+                    <div className="alert alert-success mt-3 animate__animated animate__fadeIn">
                         ✅ {response.message} Redirecting...
                     </div>
                 )}
 
-                {/* Error Message */}
+                {/* Error */}
                 {error && (
-                    <div className="alert alert-danger mt-3" role="alert">
+                    <div className="alert alert-danger mt-3 animate__animated animate__fadeIn">
                         ❌ {error}
                     </div>
                 )}
 
-                {/* Register Prompt */}
                 <div className="text-center mt-4">
-                    <span>Don't have an account? </span>
+                    Don't have an account?{" "}
                     <button
-                        className="btn btn-link p-0 align-baseline"
+                        className="btn btn-link p-0 text-decoration-none"
                         onClick={() => navigate("/register")}
                     >
                         Register here

@@ -42,7 +42,6 @@ const RegisterForm = () => {
             const res = await axiosInstance.post("/auth/register", payload);
             setResponse(res.data);
 
-            // Redirect to login page after short delay
             setTimeout(() => {
                 navigate("/login");
             }, 1500);
@@ -58,11 +57,11 @@ const RegisterForm = () => {
     };
 
     return (
-        <div className="container mt-5 d-flex justify-content-center">
-            <div style={{ maxWidth: "400px", width: "100%" }}>
-                <h3 className="mb-4 text-center">📝 Admin Registration</h3>
+        <div className="register-container d-flex justify-content-center align-items-center">
+            <div className="card shadow p-4 register-card">
+                <h3 className="mb-4 text-center text-primary">📝 Admin Registration</h3>
 
-                <form onSubmit={handleSubmit} className="mt-3" autoComplete="on">
+                <form onSubmit={handleSubmit} autoComplete="on">
                     <div className="mb-3">
                         <label className="form-label">Email <span className="text-danger">*</span></label>
                         <input
@@ -72,7 +71,6 @@ const RegisterForm = () => {
                             value={formData.email}
                             onChange={handleChange}
                             required
-                            autoComplete="email"
                         />
                     </div>
 
@@ -86,7 +84,6 @@ const RegisterForm = () => {
                             onChange={handleChange}
                             minLength="6"
                             required
-                            autoComplete="new-password"
                         />
                     </div>
 
@@ -99,7 +96,6 @@ const RegisterForm = () => {
                             value={formData.firstName}
                             onChange={handleChange}
                             required
-                            autoComplete="given-name"
                         />
                     </div>
 
@@ -112,7 +108,6 @@ const RegisterForm = () => {
                             value={formData.lastName}
                             onChange={handleChange}
                             required
-                            autoComplete="family-name"
                         />
                     </div>
 
@@ -128,40 +123,34 @@ const RegisterForm = () => {
                             pattern="^\+\d{1,3}\d{4,14}$"
                             title="Phone number must include country code, e.g. +947XXXXXXXX"
                             required
-                            autoComplete="tel"
                         />
                     </div>
 
-                    <button type="submit" className="btn btn-success w-100" disabled={loading}>
+                    <button type="submit" className="btn btn-primary w-100" disabled={loading}>
                         {loading ? "Registering..." : "Register"}
                     </button>
                 </form>
 
-                {/* Success Message */}
                 {response && (
-                    <div className="alert alert-success mt-3" role="alert">
+                    <div className="alert alert-success mt-3 animate__animated animate__fadeIn">
                         ✅ {response.message} Redirecting to login...
                     </div>
                 )}
 
-                {/* Error Messages */}
                 {errors.length > 0 && (
-                    <div className="alert alert-danger mt-3" role="alert">
+                    <div className="alert alert-danger mt-3 animate__animated animate__fadeIn">
                         <ul className="mb-0">
                             {errors.map((err, idx) => (
-                                <li key={idx}>
-                                    <strong>{err.field ? `${err.field}: ` : ""}</strong>{err.message}
-                                </li>
+                                <li key={idx}><strong>{err.field ? `${err.field}: ` : ""}</strong>{err.message}</li>
                             ))}
                         </ul>
                     </div>
                 )}
 
-                {/* Redirect to Login */}
-                <div className="text-center mt-4">
+                <div className="text-center mt-3">
                     Already have an account?{" "}
                     <button
-                        className="btn btn-link p-0"
+                        className="btn btn-link p-0 text-decoration-none"
                         onClick={() => navigate("/login")}
                     >
                         Login here
