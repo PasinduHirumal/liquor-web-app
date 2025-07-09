@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../lib/axios";
+import { FaEye, FaEyeSlash } from "react-icons/fa"; // 👈 Add this if using react-icons
 
 const RegisterForm = () => {
     const navigate = useNavigate();
@@ -16,6 +17,7 @@ const RegisterForm = () => {
     const [response, setResponse] = useState(null);
     const [errors, setErrors] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false); // 👈 New state
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -62,6 +64,7 @@ const RegisterForm = () => {
                 <h3 className="mb-4 text-center text-primary">📝 Admin Registration</h3>
 
                 <form onSubmit={handleSubmit} autoComplete="on">
+                    {/* Email */}
                     <div className="mb-3">
                         <label className="form-label">Email <span className="text-danger">*</span></label>
                         <input
@@ -74,19 +77,31 @@ const RegisterForm = () => {
                         />
                     </div>
 
+                    {/* Password with toggle */}
                     <div className="mb-3">
                         <label className="form-label">Password (min 6 chars) <span className="text-danger">*</span></label>
-                        <input
-                            type="password"
-                            name="password"
-                            className="form-control"
-                            value={formData.password}
-                            onChange={handleChange}
-                            minLength="6"
-                            required
-                        />
+                        <div className="input-group">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                className="form-control"
+                                value={formData.password}
+                                onChange={handleChange}
+                                minLength="6"
+                                required
+                            />
+                            <button
+                                type="button"
+                                className="btn border"
+                                onClick={() => setShowPassword(!showPassword)}
+                                tabIndex={-1}
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                        </div>
                     </div>
 
+                    {/* First Name */}
                     <div className="mb-3">
                         <label className="form-label">First Name <span className="text-danger">*</span></label>
                         <input
@@ -99,6 +114,7 @@ const RegisterForm = () => {
                         />
                     </div>
 
+                    {/* Last Name */}
                     <div className="mb-3">
                         <label className="form-label">Last Name <span className="text-danger">*</span></label>
                         <input
@@ -111,6 +127,7 @@ const RegisterForm = () => {
                         />
                     </div>
 
+                    {/* Phone */}
                     <div className="mb-3">
                         <label className="form-label">Phone <span className="text-danger">*</span></label>
                         <input
@@ -131,12 +148,14 @@ const RegisterForm = () => {
                     </button>
                 </form>
 
+                {/* Success Message */}
                 {response && (
                     <div className="alert alert-success mt-3 animate__animated animate__fadeIn">
                         ✅ {response.message} Redirecting to login...
                     </div>
                 )}
 
+                {/* Error Messages */}
                 {errors.length > 0 && (
                     <div className="alert alert-danger mt-3 animate__animated animate__fadeIn">
                         <ul className="mb-0">
@@ -147,6 +166,7 @@ const RegisterForm = () => {
                     </div>
                 )}
 
+                {/* Redirect to Login */}
                 <div className="text-center mt-3">
                     Already have an account?{" "}
                     <button

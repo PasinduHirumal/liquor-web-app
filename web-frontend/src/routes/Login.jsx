@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import { axiosInstance } from "../lib/axios";
 import { useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const LoginForm = () => {
     const navigate = useNavigate();
 
+    const [showPassword, setShowPassword] = useState(false);
     const [loginMethod, setLoginMethod] = useState("email");
     const [formData, setFormData] = useState({
         email: "",
@@ -120,15 +122,25 @@ const LoginForm = () => {
 
                     <div className="mb-3">
                         <label className="form-label">Password <span className="text-danger">*</span></label>
-                        <input
-                            type="password"
-                            name="password"
-                            className="form-control"
-                            value={formData.password}
-                            onChange={handleChange}
-                            required
-                            autoComplete="current-password"
-                        />
+                        <div className="input-group">
+                            <input
+                                type={showPassword ? "text" : "password"}
+                                name="password"
+                                className="form-control"
+                                value={formData.password}
+                                onChange={handleChange}
+                                required
+                                autoComplete="current-password"
+                            />
+                            <button
+                                type="button"
+                                className="btn border"
+                                onClick={() => setShowPassword(!showPassword)}
+                                tabIndex={-1}
+                            >
+                                {showPassword ? <FaEyeSlash /> : <FaEye />}
+                            </button>
+                        </div>
                     </div>
 
                     <button type="submit" className="btn btn-primary w-100" disabled={loading}>
