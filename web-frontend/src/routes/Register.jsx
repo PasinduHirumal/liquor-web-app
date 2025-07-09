@@ -63,6 +63,37 @@ const RegisterForm = () => {
             <div className="card shadow p-4 register-card">
                 <h3 className="mb-4 text-center text-primary">📝 Admin Registration</h3>
 
+                {/* First Name & Last Name */}
+                <div className="row mb-3">
+                    <div className="col-md-6 mb-3 mb-md-0">
+                        <label className="form-label">
+                            First Name <span className="text-danger">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="firstName"
+                            className="form-control"
+                            value={formData.firstName}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div className="col-md-6">
+                        <label className="form-label">
+                            Last Name <span className="text-danger">*</span>
+                        </label>
+                        <input
+                            type="text"
+                            name="lastName"
+                            className="form-control"
+                            value={formData.lastName}
+                            onChange={handleChange}
+                            required
+                        />
+                    </div>
+                </div>
+
                 <form onSubmit={handleSubmit} autoComplete="on">
                     {/* Email */}
                     <div className="mb-3">
@@ -70,6 +101,7 @@ const RegisterForm = () => {
                         <input
                             type="email"
                             name="email"
+                            placeholder="Enter your email"
                             className="form-control"
                             value={formData.email}
                             onChange={handleChange}
@@ -84,6 +116,7 @@ const RegisterForm = () => {
                             <input
                                 type={showPassword ? "text" : "password"}
                                 name="password"
+                                placeholder="Enter your password"
                                 className="form-control"
                                 value={formData.password}
                                 onChange={handleChange}
@@ -101,31 +134,6 @@ const RegisterForm = () => {
                         </div>
                     </div>
 
-                    {/* First Name */}
-                    <div className="mb-3">
-                        <label className="form-label">First Name <span className="text-danger">*</span></label>
-                        <input
-                            type="text"
-                            name="firstName"
-                            className="form-control"
-                            value={formData.firstName}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    {/* Last Name */}
-                    <div className="mb-3">
-                        <label className="form-label">Last Name <span className="text-danger">*</span></label>
-                        <input
-                            type="text"
-                            name="lastName"
-                            className="form-control"
-                            value={formData.lastName}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
 
                     {/* Phone */}
                     <div className="mb-3">
