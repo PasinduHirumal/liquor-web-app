@@ -4,9 +4,9 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import initializeFirebase from "./src/config/firebase.config.js";
 import { initializeDefaultSuperAdmin } from "./src/initialize/defaultSuperAdminAccount.js";
-//import corsOptions from "./src/config/cors.config.js";
 
-import authRoutes from "./src/routes/auth.routes.js"
+import authRoutes from "./src/routes/auth.routes.js";
+import verifyRoutes from "./src/routes/verify.routes.js";
 
 dotenv.config();
 
@@ -23,12 +23,9 @@ app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use(cookieParser());
 
-// Handle preflight requests
-//app.options('*', cors(corsOptions));
-
-//Routes
+//Routes 
 app.use("/api/auth", authRoutes);
-
+app.use("/api/verify", verifyRoutes);
 
 //  Route handler for the root path
 app.get('/', (req, res) => {
