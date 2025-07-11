@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { axiosInstance } from "../lib/axios";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -17,6 +17,13 @@ const LoginForm = () => {
     const [response, setResponse] = useState(null);
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        setFormData({ email: "", phone: "", password: "" });
+        setShowPassword(false);
+        setError("");
+        setResponse(null);
+    }, [loginMethod]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -126,6 +133,7 @@ const LoginForm = () => {
                             <input
                                 type={showPassword ? "text" : "password"}
                                 name="password"
+                                placeholder="Enter your password"
                                 className="form-control"
                                 value={formData.password}
                                 onChange={handleChange}
