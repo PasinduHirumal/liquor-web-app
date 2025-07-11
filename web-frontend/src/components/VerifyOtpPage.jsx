@@ -22,11 +22,10 @@ const VerifyOtpPage = () => {
     useEffect(() => {
         if (!email) {
             navigate("/register");
-        } else {
-            localStorage.setItem("otpEmail", email);
-            sendOtp(); // auto-send on mount
+            return;
         }
-    }, [email, navigate]);
+        sendOtp();
+    }, []); // run only once on mount
 
     // Countdown logic
     useEffect(() => {
@@ -67,6 +66,7 @@ const VerifyOtpPage = () => {
             setMessage(res.data.message || "OTP has been sent.");
             inputRef.current?.focus();
         } catch (err) {
+            console.error("Send OTP error:", err.response || err.message || err);
             setError(err.response?.data?.message || "Failed to send OTP.");
         } finally {
             setLoading(false);
