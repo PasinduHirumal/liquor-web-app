@@ -1,6 +1,6 @@
 import AdminUserService from '../services/adminUsers.service.js';
 import generateToken from '../utils/createToken.js';
-import ROLES from '../enums/Roles.js';
+import ADMIN_ROLES from '../enums/adminRoles.js';
 
 const adminService = new AdminUserService();
 
@@ -9,9 +9,9 @@ const getAllAdmins = async (req, res) => {
         const admins = await adminService.findAll();
 
         const rolePriority = {
-            [ROLES.SUPER_ADMIN]: 3,
-            [ROLES.ADMIN]: 2,
-            [ROLES.USER]: 1
+            [ADMIN_ROLES.SUPER_ADMIN]: 3,
+            [ADMIN_ROLES.ADMIN]: 2,
+            [ADMIN_ROLES.PENDING]: 1
         };
 
         const sortedUsers = admins.length > 0
@@ -24,6 +24,10 @@ const getAllAdmins = async (req, res) => {
             }
 
             return (a.firstName || '').localeCompare(b.firstName || '');
+            })
+            .map(admin => {
+                const { password, ...adminWithoutPassword } = admin;
+                return adminWithoutPassword;
             })
         : [];
 
@@ -40,12 +44,12 @@ const updateAdmin = async (req, res) => {
         const currentUserId = req.user.id;
 
         // Only allow users to update their own profile unless admin
-        if (req.user.role !== ROLES.SUPER_ADMIN && currentUserId !== adminIdToUpdate) {
+        if (req.user.role !== ADMIN_ROLES.SUPER_ADMIN && currentUserId !== adminIdToUpdate) {
             return res.status(403).json({ success: false, message: 'Not authorized to update this admin' });
         }
         
         // Don't allow role change unless admin
-        if (req.body.role && req.user.role !== ROLES.SUPER_ADMIN) {
+        if (req.body.role && req.user.role !== ADMIN_ROLES.SUPER_ADMIN) {
             delete req.body.role;
         }
 
@@ -65,7 +69,7 @@ const updateAdmin = async (req, res) => {
         }
 
         if (updatedAdmin.isAdminAccepted) {
-            updatedAdmin = await adminService.updateById(admin.id, { role: ROLES.ADMIN });
+            updatedAdmin = await adminService.updateById(admin.id, { role: ADMIN_ROLES.ADMIN });
             if (!updatedAdmin) {
                 return res.status(400).json({ success: false, message: "Failed to update admin"});
             }
