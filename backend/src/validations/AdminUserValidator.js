@@ -62,10 +62,11 @@ const validateAdminUserUpdate = (req, res, next) => {
     firstName: Joi.string().min(2).max(50).optional(),
     lastName: Joi.string().min(2).max(50).optional(),
     phone: Joi.string().pattern(/^(?:\+?\d{9,15})$/).min(9).trim().optional(),
-    addresses: Joi.array().items(Joi.string()).optional(),
+    
     role: Joi.string().valid('customer', 'manager', 'owner').optional(),
     googleId: Joi.string().allow('').optional(),
     isActive: Joi.boolean().optional(),
+    isAdminAccepted: Joi.boolean().optional(),
     
     verifyOtp: Joi.string().allow('').optional(),
     verifyOtpExpiredAt: Joi.alternatives().try(
