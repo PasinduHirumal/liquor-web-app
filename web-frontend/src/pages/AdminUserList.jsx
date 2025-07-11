@@ -8,10 +8,8 @@ const AdminUserList = () => {
 
   const fetchAdmins = async () => {
     try {
-      const response = await axiosInstance.get('/admin/getAll', {
-        withCredentials: true
-      });
-      setAdmins(response.data.admins || []);
+      const response = await axiosInstance.get('/admin/getAll');
+      setAdmins(response.data.data || []); // ✅ fixed key
     } catch (error) {
       console.error('Error fetching admin users:', error);
       toast.error(error?.response?.data?.message || 'Failed to fetch admin users');
@@ -26,7 +24,8 @@ const AdminUserList = () => {
 
   return (
     <div className="container-fluid px-4 py-3">
-      <h3 className="mb-4">Admin Users</h3>
+      <h3 className="mb-4 text-center">Admin User List</h3>
+
       {loading ? (
         <p>Loading...</p>
       ) : admins.length === 0 ? (
@@ -44,11 +43,12 @@ const AdminUserList = () => {
                 <th scope="col">Role</th>
                 <th scope="col">Is Active</th>
                 <th scope="col">Verified</th>
+                <th scope="col">Admin Accepted</th>
               </tr>
             </thead>
             <tbody>
               {admins.map((admin, index) => (
-                <tr key={admin._id} className="text-center">
+                <tr key={admin.id} className="text-center">
                   <th scope="row">{index + 1}</th>
                   <td className="text-start">{admin.email}</td>
                   <td>{admin.firstName}</td>
@@ -57,6 +57,7 @@ const AdminUserList = () => {
                   <td className="text-capitalize">{admin.role}</td>
                   <td>{admin.isActive ? 'Yes' : 'No'}</td>
                   <td>{admin.isAccountVerified ? 'Yes' : 'No'}</td>
+                  <td>{admin.isAdminAccepted ? 'Yes' : 'No'}</td>
                 </tr>
               ))}
             </tbody>
