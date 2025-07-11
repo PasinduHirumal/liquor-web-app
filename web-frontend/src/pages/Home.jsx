@@ -1,37 +1,41 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../lib/axios";
 
-const Home = () => {
+const Navbar = () => {
     const navigate = useNavigate();
-    const [error, setError] = React.useState("");
 
     const handleLogout = async () => {
-        setError("");
         try {
             await axiosInstance.post("/auth/logout");
+            toast.success("Logged out successfully");
             navigate("/login");
         } catch (err) {
-            setError(err.response?.data?.message || "Logout failed. Try again.");
+            toast.error(err.response?.data?.message || "Logout failed. Try again.");
         }
     };
 
     return (
-        <div className="container mt-4" style={{ maxWidth: "600px" }}>
-            <h1>Welcome Home!</h1>
-            <p>You have successfully registered and logged in.</p>
-
-            <button onClick={handleLogout} className="btn btn-danger mt-3">
-                Logout
-            </button>
-
-            {error && (
-                <div className="alert alert-danger mt-3" role="alert">
-                    ❌ {error}
-                </div>
-            )}
-        </div>
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
+            <Link className="navbar-brand" to="/">
+                🏠 Home
+            </Link>
+            <div className="collapse navbar-collapse">
+                <ul className="navbar-nav ms-auto">
+                    <li className="nav-item">
+                        <Link to="/admin-users" className="nav-link">
+                            👥 Admin Users
+                        </Link>
+                    </li>
+                    <li className="nav-item">
+                        <button className="btn btn-danger ms-3" onClick={handleLogout}>
+                            Logout
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
     );
 };
 
-export default Home;
+export default Navbar;

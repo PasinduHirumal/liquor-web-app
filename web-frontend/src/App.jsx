@@ -4,24 +4,18 @@ import LoginForm from "./routes/Login";
 import RegisterForm from "./routes/Register";
 import Home from "./pages/Home";
 import VerifyOtpPage from "./components/VerifyOtpPage";
+import AdminUserList from "./components/AdminUserList";
 
 function App() {
   return (
     <Router>
       <Routes>
-        {/* Home page */}
-        <Route path="/" element={<Home />} />
-
-        {/* Default redirect to login */}
-        <Route path="/login" element={<LoginForm />} />
-
-        {/* Register page */}
-        <Route path="/register" element={<RegisterForm />} />
-        
-        <Route path="/verify-otp" element={<VerifyOtpPage />} />
-
-        {/* Redirect unknown routes to login */}
         <Route path="*" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<Home />} />
+        <Route path="/login" element={<LoginForm />} />
+        <Route path="/register" element={<RegisterForm />} />
+        <Route path="/verify-otp" element={<VerifyOtpPage />} />
+        <Route path="/admin-users" element={<AdminUserList />} />
       </Routes>
     </Router>
   );
