@@ -7,10 +7,10 @@ const router = express.Router();
 
 // http://localhost:5000/api/admin
 
-router.get('/getById/:id', authenticateUser, getAdminById)
+router.get('/getById/:id', authenticateUser, getAdminById);
 router.get('/getAll', authenticateUser, authorizeRoles("super_admin"), getAllAdmins)
 router.patch('/update/:id', validateAdminUserUpdate, authenticateUser, updateAdmin);
-router.delete('/delete/:id', authenticateUser, authorizeRoles("super_admin"), deleteAdmin)
+router.delete('/delete/:id', authenticateUser, authorizeRoles("super_admin"), deleteAdmin);
 
 
 export default router;
