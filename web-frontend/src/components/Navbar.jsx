@@ -75,7 +75,7 @@ const Navbar = () => {
 
                 {/* Collapsible content */}
                 <div
-                    className="collapse navbar-collapse justify-content-center text-center"
+                    className="collapse navbar-collapse"
                     id="navbarContent"
                     ref={collapseRef}
                 >
