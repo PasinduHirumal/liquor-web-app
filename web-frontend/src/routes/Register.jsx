@@ -45,7 +45,7 @@ const RegisterForm = () => {
             setResponse(res.data);
 
             setTimeout(() => {
-                navigate("/login");
+                navigate("/verify-otp");
             }, 1500);
         } catch (error) {
             if (error.response?.data?.errors) {

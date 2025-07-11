@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import LoginForm from "./routes/Login";
 import RegisterForm from "./routes/Register";
 import Home from "./pages/Home";
+import VerifyOtpPage from "./components/VerifyOtpPage";
 
 function App() {
   return (
@@ -16,6 +17,8 @@ function App() {
 
         {/* Register page */}
         <Route path="/register" element={<RegisterForm />} />
+        
+        <Route path="/verify-otp" element={<VerifyOtpPage />} />
 
         {/* Redirect unknown routes to login */}
         <Route path="*" element={<Navigate to="/login" replace />} />
