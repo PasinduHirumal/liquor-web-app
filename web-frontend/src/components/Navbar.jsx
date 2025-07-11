@@ -12,29 +12,46 @@ const Navbar = () => {
     };
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
-            <NavLink to="/" className="navbar-brand" end>
-                🏠 Home
-            </NavLink>
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+            <div className="container-fluid px-4">
+                {/* Brand */}
+                <NavLink to="/" className="navbar-brand" end>
+                    🍷 Liquor Web App
+                </NavLink>
 
-            <div className="collapse navbar-collapse">
-                <ul className="navbar-nav ms-auto">
-                    <li className="nav-item">
-                        <NavLink
-                            to="/admin-users"
-                            className={({ isActive }) =>
-                                "nav-link" + (isActive ? " active" : "")
-                            }
-                        >
-                            👥 Admin Users
-                        </NavLink>
-                    </li>
-                    <li className="nav-item">
-                        <button className="btn btn-danger ms-3" onClick={handleLogout}>
-                            Logout
-                        </button>
-                    </li>
-                </ul>
+                {/* Toggler for mobile */}
+                <button
+                    className="navbar-toggler"
+                    type="button"
+                    data-bs-toggle="collapse"
+                    data-bs-target="#navbarContent"
+                    aria-controls="navbarContent"
+                    aria-expanded="false"
+                    aria-label="Toggle navigation"
+                >
+                    <span className="navbar-toggler-icon"></span>
+                </button>
+
+                {/* Collapsible content */}
+                <div className="collapse navbar-collapse" id="navbarContent">
+                    <ul className="navbar-nav ms-auto align-items-lg-center">
+                        <li className="nav-item">
+                            <NavLink
+                                to="/admin-users"
+                                className={({ isActive }) =>
+                                    "nav-link" + (isActive ? " active" : "")
+                                }
+                            >
+                                👥 Admin Users
+                            </NavLink>
+                        </li>
+                        <li className="nav-item mt-2 mt-lg-0">
+                            <button className="btn btn-danger ms-lg-3" onClick={handleLogout}>
+                                Logout
+                            </button>
+                        </li>
+                    </ul>
+                </div>
             </div>
         </nav>
     );

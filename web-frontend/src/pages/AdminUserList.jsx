@@ -9,7 +9,7 @@ const AdminUserList = () => {
   const fetchAdmins = async () => {
     try {
       const response = await axiosInstance.get('/admin/getAll');
-      setAdmins(response.data.data || []); // ✅ fixed key
+      setAdmins(response.data.data || []);
     } catch (error) {
       console.error('Error fetching admin users:', error);
       toast.error(error?.response?.data?.message || 'Failed to fetch admin users');
@@ -31,9 +31,9 @@ const AdminUserList = () => {
       ) : admins.length === 0 ? (
         <p>No admin users found.</p>
       ) : (
-        <div className="table-responsive shadow-sm rounded">
+        <div className="table-responsive shadow-sm rounded border border-secondary" style={{ maxHeight: '460px', overflowY: 'auto' }}>
           <table className="table table-hover table-bordered align-middle mb-0">
-            <thead className="table-dark text-center">
+            <thead className="table-dark text-center sticky-top">
               <tr>
                 <th scope="col">#</th>
                 <th scope="col">Email</th>
@@ -46,9 +46,9 @@ const AdminUserList = () => {
                 <th scope="col">Admin Accepted</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody className="text-center">
               {admins.map((admin, index) => (
-                <tr key={admin.id} className="text-center">
+                <tr key={admin.id}>
                   <th scope="row">{index + 1}</th>
                   <td className="text-start">{admin.email}</td>
                   <td>{admin.firstName}</td>
