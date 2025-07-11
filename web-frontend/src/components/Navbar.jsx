@@ -1,6 +1,6 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import useAuthStore from "../stores/authStore"; // adjust path as necessary
+import { NavLink, useNavigate } from "react-router-dom";
+import useAuthStore from "../stores/authStore";
 
 const Navbar = () => {
     const navigate = useNavigate();
@@ -13,15 +13,21 @@ const Navbar = () => {
 
     return (
         <nav className="navbar navbar-expand-lg navbar-dark bg-dark px-4">
-            <Link className="navbar-brand" to="/">
+            <NavLink to="/" className="navbar-brand" end>
                 🏠 Home
-            </Link>
+            </NavLink>
+
             <div className="collapse navbar-collapse">
                 <ul className="navbar-nav ms-auto">
                     <li className="nav-item">
-                        <Link to="/admin-users" className="nav-link">
+                        <NavLink
+                            to="/admin-users"
+                            className={({ isActive }) =>
+                                "nav-link" + (isActive ? " active" : "")
+                            }
+                        >
                             👥 Admin Users
-                        </Link>
+                        </NavLink>
                     </li>
                     <li className="nav-item">
                         <button className="btn btn-danger ms-3" onClick={handleLogout}>

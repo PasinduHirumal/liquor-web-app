@@ -1,10 +1,9 @@
 import React from "react";
-import Navbar from "../components/Navbar";
 
 const Home = () => {
 
     return (
-        <div>
+        <div className="container-fluid px-4 py-3">
             <h1>home</h1>
         </div>
     );

@@ -1,15 +1,15 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import ToastProvider from "./components/ToastProvider";
 
 import LoginForm from "./routes/Login";
-import RegisterForm from "./routes/Register";
-import Home from "./pages/Home";
+import RegisterForm from "./pages/Register";
+import Home from "./routes/Home";
 import VerifyOtpPage from "./components/VerifyOtpPage";
-import AdminUserList from "./components/AdminUserList";
-
-import useAuthStore from "./stores/authStore";
-import ToastProvider from "./components/ToastProvider";
+import AdminUserList from "./pages/AdminUserList";
 import Navbar from "./components/Navbar";
+import useAuthStore from "./stores/authStore";
+
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuthStore();
@@ -32,7 +32,7 @@ function App() {
       <ToastProvider />
 
       {isAuthenticated && <Navbar />}
-      
+
       <Routes>
         <Route path="*" element={<Navigate to="/" replace />} />
 

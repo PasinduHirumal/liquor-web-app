@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../lib/axios";
-import { FaEye, FaEyeSlash } from "react-icons/fa"; // 👈 Add this if using react-icons
+import { FaEye, FaEyeSlash } from "react-icons/fa";
+import toast from "react-hot-toast";
 
 const RegisterForm = () => {
     const navigate = useNavigate();
@@ -14,22 +15,16 @@ const RegisterForm = () => {
         phone: ""
     });
 
-    const [response, setResponse] = useState(null);
-    const [errors, setErrors] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [showPassword, setShowPassword] = useState(false); // 👈 New state
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        setErrors([]);
-        setResponse(null);
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setErrors([]);
-        setResponse(null);
         setLoading(true);
 
         try {
@@ -42,7 +37,8 @@ const RegisterForm = () => {
             };
 
             const res = await axiosInstance.post("/auth/register", payload);
-            setResponse(res.data);
+
+            toast.success(res.data.message || "Registered successfully!");
 
             localStorage.setItem("otpEmail", payload.email);
 
@@ -51,9 +47,11 @@ const RegisterForm = () => {
             }, 1500);
         } catch (error) {
             if (error.response?.data?.errors) {
-                setErrors(error.response.data.errors);
+                error.response.data.errors.forEach(err => {
+                    toast.error(`${err.field ? `${err.field}: ` : ""}${err.message}`);
+                });
             } else {
-                setErrors([{ message: error.response?.data?.message || "Network or server error" }]);
+                toast.error(error.response?.data?.message || "Network or server error");
             }
         } finally {
             setLoading(false);
@@ -65,38 +63,38 @@ const RegisterForm = () => {
             <div className="card shadow p-4 register-card">
                 <h3 className="mb-4 text-center text-primary">📝 Admin Registration</h3>
 
-                {/* First Name & Last Name */}
-                <div className="row mb-3">
-                    <div className="col-md-6 mb-3 mb-md-0">
-                        <label className="form-label">
-                            First Name <span className="text-danger">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            name="firstName"
-                            className="form-control"
-                            value={formData.firstName}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div className="col-md-6">
-                        <label className="form-label">
-                            Last Name <span className="text-danger">*</span>
-                        </label>
-                        <input
-                            type="text"
-                            name="lastName"
-                            className="form-control"
-                            value={formData.lastName}
-                            onChange={handleChange}
-                            required
-                        />
-                    </div>
-                </div>
-
                 <form onSubmit={handleSubmit} autoComplete="on">
+                    {/* First Name & Last Name */}
+                    <div className="row mb-3">
+                        <div className="col-md-6 mb-3 mb-md-0">
+                            <label className="form-label">
+                                First Name <span className="text-danger">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                name="firstName"
+                                className="form-control"
+                                value={formData.firstName}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+
+                        <div className="col-md-6">
+                            <label className="form-label">
+                                Last Name <span className="text-danger">*</span>
+                            </label>
+                            <input
+                                type="text"
+                                name="lastName"
+                                className="form-control"
+                                value={formData.lastName}
+                                onChange={handleChange}
+                                required
+                            />
+                        </div>
+                    </div>
+
                     {/* Email */}
                     <div className="mb-3">
                         <label className="form-label">Email <span className="text-danger">*</span></label>
@@ -136,7 +134,6 @@ const RegisterForm = () => {
                         </div>
                     </div>
 
-
                     {/* Phone */}
                     <div className="mb-3">
                         <label className="form-label">Phone <span className="text-danger">*</span></label>
@@ -157,24 +154,6 @@ const RegisterForm = () => {
                         {loading ? "Registering..." : "Register"}
                     </button>
                 </form>
-
-                {/* Success Message */}
-                {response && (
-                    <div className="alert alert-success mt-3 animate__animated animate__fadeIn">
-                        ✅ {response.message} Redirecting to login...
-                    </div>
-                )}
-
-                {/* Error Messages */}
-                {errors.length > 0 && (
-                    <div className="alert alert-danger mt-3 animate__animated animate__fadeIn">
-                        <ul className="mb-0">
-                            {errors.map((err, idx) => (
-                                <li key={idx}><strong>{err.field ? `${err.field}: ` : ""}</strong>{err.message}</li>
-                            ))}
-                        </ul>
-                    </div>
-                )}
 
                 {/* Redirect to Login */}
                 <div className="text-center mt-3">
