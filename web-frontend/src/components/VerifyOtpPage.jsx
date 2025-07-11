@@ -5,24 +5,25 @@ import { axiosInstance } from "../lib/axios";
 const VerifyOtpPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
-
-    // Get email from route state or localStorage fallback
     const email = location.state?.email || localStorage.getItem("otpEmail");
 
     const [otp, setOtp] = useState("");
     const [message, setMessage] = useState("");
     const [error, setError] = useState("");
-    const [timeLeft, setTimeLeft] = useState(150); // 2 mins 30 secs
+    const [timeLeft, setTimeLeft] = useState(0); // Start with 0
     const [resending, setResending] = useState(false);
+    const [otpSent, setOtpSent] = useState(false);
 
+    // Redirect if email is missing
     useEffect(() => {
-        // Redirect back to registration if no email found
         if (!email) {
             navigate("/register");
         }
     }, [email, navigate]);
 
+    // Countdown timer
     useEffect(() => {
+        if (timeLeft === 0) return;
         const timer = setInterval(() => {
             setTimeLeft(prev => {
                 if (prev <= 1) {
@@ -32,14 +33,30 @@ const VerifyOtpPage = () => {
                 return prev - 1;
             });
         }, 1000);
-
         return () => clearInterval(timer);
-    }, []);
+    }, [timeLeft]);
 
     const formatTime = (seconds) => {
         const min = Math.floor(seconds / 60);
         const sec = seconds % 60;
         return `${min}:${sec < 10 ? "0" : ""}${sec}`;
+    };
+
+    const sendOtp = async () => {
+        setMessage("");
+        setError("");
+        setResending(true);
+
+        try {
+            await axiosInstance.post("/verify/sendVerifyOtp", { email });
+            setOtpSent(true);
+            setTimeLeft(150); // Start timer
+            setMessage("OTP has been sent to your email.");
+        } catch (err) {
+            setError(err.response?.data?.message || "Failed to send OTP.");
+        } finally {
+            setResending(false);
+        }
     };
 
     const handleVerify = async (e) => {
@@ -50,29 +67,10 @@ const VerifyOtpPage = () => {
         try {
             const res = await axiosInstance.post("/verify/verifyEmail", { email, otp });
             setMessage(res.data.message);
-
-            // Clear stored email on success
             localStorage.removeItem("otpEmail");
-
             setTimeout(() => navigate("/login"), 2000);
         } catch (err) {
-            setError(err.response?.data?.message || "Verification failed");
-        }
-    };
-
-    const handleResend = async () => {
-        setMessage("");
-        setError("");
-        setResending(true);
-
-        try {
-            await axiosInstance.post("/verify/sendVerifyOtp", { email });
-            setMessage("OTP resent successfully.");
-            setTimeLeft(150); // restart countdown
-        } catch (err) {
-            setError(err.response?.data?.message || "Failed to resend OTP.");
-        } finally {
-            setResending(false);
+            setError(err.response?.data?.message || "Verification failed.");
         }
     };
 
@@ -81,44 +79,57 @@ const VerifyOtpPage = () => {
             <div className="card shadow p-4" style={{ maxWidth: 500, width: "100%" }}>
                 <h4 className="text-center mb-3">🔐 Email Verification</h4>
 
-                {/* Description & Email Display */}
-                <p className="text-center text-muted mb-3">
-                    We've sent a 6-digit verification code to <strong>{email}</strong>. Please check your inbox and enter the OTP below.
+                {/* Email Display */}
+                <p className="text-center text-muted">
+                    To verify your identity, we will send a code to <strong>{email}</strong>.
                 </p>
 
-                <form onSubmit={handleVerify}>
-                    <div className="mb-3">
-                        <label className="form-label">Enter OTP</label>
-                        <input
-                            type="text"
-                            className="form-control"
-                            value={otp}
-                            onChange={(e) => setOtp(e.target.value)}
-                            placeholder="Enter 6-digit code"
-                            maxLength="6"
-                            required
-                        />
+                {/* Send OTP Section */}
+                {!otpSent && (
+                    <div className="text-center">
+                        <button className="btn btn-primary" onClick={sendOtp} disabled={resending}>
+                            {resending ? "Sending..." : "Send OTP"}
+                        </button>
                     </div>
+                )}
 
-                    <button type="submit" className="btn btn-success w-100">Verify</button>
-                </form>
+                {/* OTP Form */}
+                {otpSent && (
+                    <>
+                        <form onSubmit={handleVerify} className="mt-4">
+                            <div className="mb-3">
+                                <label className="form-label">Enter OTP</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    value={otp}
+                                    onChange={(e) => setOtp(e.target.value)}
+                                    placeholder="Enter 6-digit code"
+                                    maxLength="6"
+                                    required
+                                />
+                            </div>
 
-                {/* Time Remaining */}
-                <div className="text-center mt-3">
-                    Time remaining: <strong>{formatTime(timeLeft)}</strong>
-                </div>
+                            <button type="submit" className="btn btn-success w-100">Verify</button>
+                        </form>
 
-                {/* Resend OTP Button */}
-                <div className="text-center mt-3">
-                    Didn’t get the code?{" "}
-                    <button
-                        className="btn btn-link p-0"
-                        onClick={handleResend}
-                        disabled={timeLeft > 0 || resending}
-                    >
-                        {resending ? "Sending..." : "Resend OTP"}
-                    </button>
-                </div>
+                        {/* Timer */}
+                        <div className="text-center mt-3">
+                            {timeLeft > 0 ? (
+                                <>
+                                    Time remaining: <strong>{formatTime(timeLeft)}</strong>
+                                </>
+                            ) : (
+                                <div>
+                                    Didn't receive the code?{" "}
+                                    <button className="btn btn-link p-0" onClick={sendOtp}>
+                                        Resend OTP
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </>
+                )}
 
                 {/* Messages */}
                 {message && <div className="alert alert-success mt-3">{message}</div>}
