@@ -44,8 +44,10 @@ const RegisterForm = () => {
             const res = await axiosInstance.post("/auth/register", payload);
             setResponse(res.data);
 
+            localStorage.setItem("otpEmail", payload.email);
+
             setTimeout(() => {
-                navigate("/verify-otp");
+                navigate("/verify-otp", { state: { email: payload.email } });
             }, 1500);
         } catch (error) {
             if (error.response?.data?.errors) {
