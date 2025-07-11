@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { axiosInstance } from "../lib/axios";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
+import useAuthStore from "../stores/authStore";
 
 const LoginForm = () => {
     const navigate = useNavigate();
@@ -14,58 +14,53 @@ const LoginForm = () => {
         password: ""
     });
 
-    const [response, setResponse] = useState(null);
-    const [error, setError] = useState("");
-    const [loading, setLoading] = useState(false);
+    const login = useAuthStore((state) => state.login);
+    const loading = useAuthStore((state) => state.loading);
+    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+    const resetError = useAuthStore((state) => state.resetError);
 
     useEffect(() => {
         setFormData({ email: "", phone: "", password: "" });
         setShowPassword(false);
-        setError("");
-        setResponse(null);
+        resetError();
     }, [loginMethod]);
+
+    useEffect(() => {
+        if (isAuthenticated) {
+            navigate("/");
+        }
+    }, [isAuthenticated, navigate]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
-        setError("");
-        setResponse(null);
+        resetError();
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError("");
-        setResponse(null);
 
         const credential = loginMethod === "email" ? formData.email.trim() : formData.phone.trim();
         const credentialLabel = loginMethod === "email" ? "Email" : "Phone number";
 
         if (!credential) {
-            setError(`${credentialLabel} is required.`);
+            useAuthStore.setState({ error: `${credentialLabel} is required.` });
             return;
         }
 
         if (!formData.password) {
-            setError("Password is required.");
+            useAuthStore.setState({ error: "Password is required." });
             return;
         }
 
-        try {
-            setLoading(true);
-            const dataToSend = { password: formData.password };
-            loginMethod === "email"
-                ? (dataToSend.email = credential)
-                : (dataToSend.phone = credential);
+        const dataToSend = {
+            password: formData.password,
+            ...(loginMethod === "email"
+                ? { email: credential }
+                : { phone: credential })
+        };
 
-            const res = await axiosInstance.post("/auth/login", dataToSend);
-            setResponse(res.data);
-
-            setTimeout(() => navigate("/"), 1000);
-        } catch (err) {
-            setError(err.response?.data?.message || "Network or server error. Please try again.");
-        } finally {
-            setLoading(false);
-        }
+        await login(dataToSend);
     };
 
     return (
@@ -155,20 +150,6 @@ const LoginForm = () => {
                         {loading ? "Logging in..." : "Login"}
                     </button>
                 </form>
-
-                {/* Success */}
-                {response && (
-                    <div className="alert alert-success mt-3 animate__animated animate__fadeIn">
-                        ✅ {response.message} Redirecting...
-                    </div>
-                )}
-
-                {/* Error */}
-                {error && (
-                    <div className="alert alert-danger mt-3 animate__animated animate__fadeIn">
-                        ❌ {error}
-                    </div>
-                )}
 
                 <div className="text-center mt-4">
                     Don't have an account?{" "}
