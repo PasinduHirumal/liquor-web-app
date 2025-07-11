@@ -4,6 +4,23 @@ import ADMIN_ROLES from '../enums/adminRoles.js';
 
 const adminService = new AdminUserService();
 
+const getAdminById = async (req, res) => {
+    try {
+        const admin = await adminService.findById(req.params.id);
+        if (!admin) {
+            return res.status(404).json({ success: false, message: "Admin not found"});
+        }
+
+        // Remove password before sending user
+        admin.password = undefined;
+
+        return res.status(200).json({ success: true, message: "Admin found: ", data: admin});
+    } catch (error) {
+        console.error("Get admin by id error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
 const getAllAdmins = async (req, res) => {
 	try {
         const admins = await adminService.findAll();
@@ -45,7 +62,7 @@ const updateAdmin = async (req, res) => {
 
         // Only allow users to update their own profile unless admin
         if (req.user.role !== ADMIN_ROLES.SUPER_ADMIN && currentUserId !== adminIdToUpdate) {
-            return res.status(403).json({ success: false, message: 'Not authorized to update this admin' });
+            return res.status(403).json({ success: false, message: "Not authorized to update" });
         }
         
         // Don't allow role change unless admin
@@ -97,4 +114,28 @@ const updateAdmin = async (req, res) => {
     }
 };
 
-export { updateAdmin, getAllAdmins }
+const deleteAdmin = async (req, res) => {
+	try {
+        const adminIdToDelete = req.params.id;
+        const currentAdminId = req.user.id;
+
+        // Only allow users to delete their own profile unless admin
+        if (req.user.role !== ADMIN_ROLES.SUPER_ADMIN && currentAdminId !== adminIdToDelete) {
+            return res.status(403).json({ success: false, message: "Not authorized to delete" });
+        }
+
+        const adminToDelete = await adminService.findById(adminIdToDelete);
+        if (!adminToDelete) {
+            return res.status(404).json({ success: false, message: "Admin not found"});
+        }
+
+        await adminService.deleteById(adminIdToDelete);
+        
+        return res.status(200).json({ success: true, message: "Admin deleted successfully" });
+    } catch (error) {
+        console.error("Delete admin error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+export { updateAdmin, getAllAdmins, deleteAdmin, getAdminById }
