@@ -8,7 +8,7 @@ const validateUser = (req, res, next) => {
     firstName: Joi.string().min(2).max(50).required(),
     lastName: Joi.string().min(2).max(50).required(),
     phone: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).min(10).max(18).trim().required(),
-    idNumber: Joi.string().min(12).max(12).required(),
+    nic_number: Joi.string().min(12).max(12).required(),
     dateOfBirth: Joi.alternatives().try(
       Joi.date(),
       Joi.string().isoDate(),
@@ -70,7 +70,7 @@ const validateUserUpdate = (req, res, next) => {
     firstName: Joi.string().min(2).max(50).optional(),
     lastName: Joi.string().min(2).max(50).optional(),
     phone: Joi.string().pattern(/^(?:\+?\d{9,15})$/).min(9).trim().optional(),
-    idNumber: Joi.string().min(12).max(12).optional(),
+    nic_number: Joi.string().min(12).max(12).optional(),
     dateOfBirth: Joi.alternatives().try(
       Joi.date(),
       Joi.string().isoDate(),

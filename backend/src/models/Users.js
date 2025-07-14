@@ -8,7 +8,7 @@ class Users {
         this.firstName = data.firstName;
         this.lastName = data.lastName;
         this.phone = data.phone;
-        this.idNumber = data.idNumber;
+        this.nic_number = data.nic_number;
         this.dateOfBirth = data.dateOfBirth;
 
         this.addresses = data.addresses;
