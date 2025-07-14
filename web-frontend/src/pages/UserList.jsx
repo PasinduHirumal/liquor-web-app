@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { axiosInstance } from '../lib/axios';
 import UserFilter from '../components/userList/UserFilter';
+import DeleteUserButton from '../components/userList/DeleteUserButton';
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
@@ -10,7 +11,6 @@ const UserList = () => {
     const [error, setError] = useState(null);
     const [filter, setFilter] = useState({ isActive: '', isAccountCompleted: '' });
 
-    // Fetch users with optional filtering
     const fetchUsers = useCallback(async () => {
         setLoading(true);
         setError(null);
@@ -36,7 +36,6 @@ const UserList = () => {
         fetchUsers();
     }, [fetchUsers]);
 
-    // Handle filter change (only one filter allowed at a time per backend)
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
 
@@ -55,11 +54,10 @@ const UserList = () => {
     return (
         <div className="d-flex justify-content-center mt-5 pt-4">
             <div className="container" style={{ maxWidth: 900 }}>
-                <div className="card shadow-sm">
+                <div className="card border-0">
                     <div className="card-body">
                         <h2 className="card-title text-center mb-4">User List</h2>
 
-                        {/* Render filter component */}
                         <UserFilter
                             filter={filter}
                             onFilterChange={handleFilterChange}
@@ -88,7 +86,7 @@ const UserList = () => {
                                 )}
 
                                 {users.length > 0 ? (
-                                    <div className="table-responsive">
+                                    <div className="table-responsive border rounded-3" style={{ maxHeight: '360px', overflowY: 'auto' }}>
                                         <table className="table table-bordered table-hover text-center align-middle mb-0">
                                             <thead className="table-light">
                                                 <tr>
@@ -98,6 +96,7 @@ const UserList = () => {
                                                     <th scope="col">Role</th>
                                                     <th scope="col">Active</th>
                                                     <th scope="col">Account Completed</th>
+                                                    <th scope="col">Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
@@ -111,6 +110,12 @@ const UserList = () => {
                                                             <td>{user.role || '-'}</td>
                                                             <td>{user.isActive ? '✅' : '❌'}</td>
                                                             <td>{user.isAccountCompleted ? '✅' : '❌'}</td>
+                                                            <td>
+                                                                <DeleteUserButton
+                                                                    userId={user.id || user._id}
+                                                                    onSuccess={fetchUsers}
+                                                                />
+                                                            </td>
                                                         </tr>
                                                     );
                                                 })}
