@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { axiosInstance } from '../lib/axios';
 import toast from 'react-hot-toast';
+import DeleteAdminButton from '../components/DeleteAdminButton';
 
 const AdminUserList = () => {
   const [admins, setAdmins] = useState([]);
@@ -16,6 +17,10 @@ const AdminUserList = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleDeleteSuccess = (deletedId) => {
+    setAdmins((prev) => prev.filter((admin) => admin.id !== deletedId));
   };
 
   useEffect(() => {
@@ -35,15 +40,16 @@ const AdminUserList = () => {
           <table className="table table-hover table-bordered align-middle mb-0">
             <thead className="table-dark text-center sticky-top">
               <tr>
-                <th scope="col">#</th>
-                <th scope="col">Email</th>
-                <th scope="col">First Name</th>
-                <th scope="col">Last Name</th>
-                <th scope="col">Phone</th>
-                <th scope="col">Role</th>
-                <th scope="col">Is Active</th>
-                <th scope="col">Verified</th>
-                <th scope="col">Admin Accepted</th>
+                <th>#</th>
+                <th>Email</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>Phone</th>
+                <th>Role</th>
+                <th>Is Active</th>
+                <th>Verified</th>
+                <th>Admin Accepted</th>
+                <th>Actions</th>
               </tr>
             </thead>
             <tbody className="text-center">
@@ -58,6 +64,9 @@ const AdminUserList = () => {
                   <td>{admin.isActive ? 'Yes' : 'No'}</td>
                   <td>{admin.isAccountVerified ? 'Yes' : 'No'}</td>
                   <td>{admin.isAdminAccepted ? 'Yes' : 'No'}</td>
+                  <td>
+                    <DeleteAdminButton adminId={admin.id} onSuccess={handleDeleteSuccess} />
+                  </td>
                 </tr>
               ))}
             </tbody>
