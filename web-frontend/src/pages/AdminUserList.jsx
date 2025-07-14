@@ -42,8 +42,7 @@ const AdminUserList = () => {
               <tr>
                 <th>#</th>
                 <th>Email</th>
-                <th>First Name</th>
-                <th>Last Name</th>
+                <th>Full Name</th>
                 <th>Phone</th>
                 <th>Role</th>
                 <th>Is Active</th>
@@ -57,8 +56,7 @@ const AdminUserList = () => {
                 <tr key={admin.id}>
                   <th scope="row">{index + 1}</th>
                   <td className="text-start">{admin.email}</td>
-                  <td>{admin.firstName}</td>
-                  <td>{admin.lastName}</td>
+                  <td className="text-start">{admin.firstName} {admin.lastName}</td>
                   <td>{admin.phone}</td>
                   <td className="text-capitalize">{admin.role}</td>
                   <td>{admin.isActive ? 'Yes' : 'No'}</td>
