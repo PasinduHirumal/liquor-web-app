@@ -1,5 +1,10 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import ToastProvider from "./common/ToastProvider";
 
 import Login from "./routes/Login";
@@ -7,17 +12,23 @@ import Register from "./routes/Register";
 import Home from "./routes/Home";
 import VerifyOtpPage from "./components/VerifyOtpPage";
 import AdminUserList from "./pages/AdminList";
-import Navbar from "./components/Navbar";
-import useAuthStore from "./stores/adminAuthStore";
 import UserList from "./pages/UserList";
+import AdminProfile from "./pages/AdminProfile";
+import Navbar from "./components/Navbar";
 
+import useAuthStore from "./stores/adminAuthStore";
 
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuthStore();
 
   if (loading) return <div>Loading...</div>;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  return children;
+  return (
+    <>
+      <Navbar />
+      {children}
+    </>
+  );
 };
 
 function App() {
@@ -31,12 +42,8 @@ function App() {
   return (
     <Router>
       <ToastProvider />
-
-      {isAuthenticated && <Navbar />}
-
       <Routes>
-        <Route path="*" element={<Navigate to="/" replace />} />
-
+        {/* Public Routes */}
         <Route
           path="/login"
           element={isAuthenticated ? <Navigate to="/" replace /> : <Login />}
@@ -72,6 +79,17 @@ function App() {
             </ProtectedRoute>
           }
         />
+        <Route
+          path="/profile/:id"
+          element={
+            <ProtectedRoute>
+              <AdminProfile />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* Catch-all Route */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Router>
   );
