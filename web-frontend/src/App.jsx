@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
-import ToastProvider from "./components/ToastProvider";
+import ToastProvider from "./common/ToastProvider";
 
 import LoginForm from "./routes/Login";
 import RegisterForm from "./pages/Register";
