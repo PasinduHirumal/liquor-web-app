@@ -6,7 +6,6 @@ const VerifyOtpPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Get email from location state or localStorage
     const email = location.state?.email || localStorage.getItem("otpEmail");
 
     const [otp, setOtp] = useState("");
@@ -18,16 +17,14 @@ const VerifyOtpPage = () => {
 
     const inputRef = useRef(null);
 
-    // Redirect if email not found
     useEffect(() => {
         if (!email) {
             navigate("/register");
             return;
         }
         sendOtp();
-    }, []); // run only once on mount
+    }, []);
 
-    // Countdown logic
     useEffect(() => {
         if (!timeLeft) return;
 
@@ -61,7 +58,7 @@ const VerifyOtpPage = () => {
             const res = await axiosInstance.post("/verify/sendVerifyOtp", { email });
 
             setOtpSent(true);
-            setTimeLeft(150); // reset 2.5 min timer
+            setTimeLeft(150); // 2.5 minutes
             setOtp("");
             setMessage(res.data.message || "OTP has been sent.");
             inputRef.current?.focus();
@@ -77,6 +74,7 @@ const VerifyOtpPage = () => {
         e.preventDefault();
         setError("");
         setMessage("");
+        setLoading(true);
 
         try {
             const res = await axiosInstance.post("/verify/verifyEmail", { email, otp });
@@ -86,6 +84,8 @@ const VerifyOtpPage = () => {
             setTimeout(() => navigate("/login"), 2000);
         } catch (err) {
             setError(err.response?.data?.message || "Verification failed.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -95,8 +95,16 @@ const VerifyOtpPage = () => {
                 <h4 className="text-center mb-3">🔐 Email Verification</h4>
 
                 <p className="text-center text-muted">
-                    A verification code has been sent to <strong>{email}</strong>
+                    A verification code will be sent to <strong>{email}</strong>
                 </p>
+
+                {/* Loading status for OTP sending */}
+                {loading && !otpSent && (
+                    <div className="text-center my-2">
+                        <div className="spinner-border text-primary" role="status" />
+                        <p className="mt-2">Sending OTP...</p>
+                    </div>
+                )}
 
                 {/* OTP Input Form */}
                 {otpSent && (
@@ -117,15 +125,16 @@ const VerifyOtpPage = () => {
                                     maxLength="6"
                                     required
                                     autoFocus
+                                    disabled={loading}
                                 />
                             </div>
 
                             <button
                                 type="submit"
                                 className="btn btn-success w-100"
-                                disabled={otp.length !== 6}
+                                disabled={otp.length !== 6 || loading}
                             >
-                                Verify
+                                {loading ? "Verifying..." : "Verify"}
                             </button>
                         </form>
 
