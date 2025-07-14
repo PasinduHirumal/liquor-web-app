@@ -9,8 +9,8 @@ import {
 import ToastProvider from "./common/ToastProvider";
 
 import LoginForm from "./routes/Login";
-import RegisterForm from "./pages/Register";
 import Home from "./routes/Home";
+import Register from "./routes/register";
 import VerifyOtpPage from "./components/VerifyOtpPage";
 import AdminUserList from "./pages/AdminList";
 import Navbar from "./components/Navbar";
@@ -54,7 +54,7 @@ function App() {
         />
         <Route
           path="/register"
-          element={isAuthenticated ? <Navigate to="/" replace /> : <RegisterForm />}
+          element={isAuthenticated ? <Navigate to="/" replace /> : <Register />}
         />
 
         {/* Protected Routes */}

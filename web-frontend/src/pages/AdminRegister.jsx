@@ -4,7 +4,7 @@ import { axiosInstance } from "../lib/axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import toast from "react-hot-toast";
 
-const RegisterForm = () => {
+const AdminRegister = () => {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -170,4 +170,4 @@ const RegisterForm = () => {
     );
 };
 
-export default RegisterForm;
+export default AdminRegister;
