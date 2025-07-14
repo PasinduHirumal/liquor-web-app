@@ -1,33 +1,30 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../lib/axios";
+import toast from "react-hot-toast";
 
 const VerifyOtpPage = () => {
     const location = useLocation();
     const navigate = useNavigate();
 
-    // Get email from location state or localStorage
     const email = location.state?.email || localStorage.getItem("otpEmail");
 
     const [otp, setOtp] = useState("");
-    const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
     const [timeLeft, setTimeLeft] = useState(0);
     const [loading, setLoading] = useState(false);
     const [otpSent, setOtpSent] = useState(false);
+    const [sendError, setSendError] = useState(false);
 
     const inputRef = useRef(null);
 
-    // Redirect if email not found
     useEffect(() => {
         if (!email) {
             navigate("/register");
             return;
         }
         sendOtp();
-    }, []); // run only once on mount
+    }, []);
 
-    // Countdown logic
     useEffect(() => {
         if (!timeLeft) return;
 
@@ -53,21 +50,21 @@ const VerifyOtpPage = () => {
     const sendOtp = async () => {
         if (!email || loading) return;
 
-        setMessage("");
-        setError("");
         setLoading(true);
-
+        setSendError(false);
         try {
             const res = await axiosInstance.post("/verify/sendVerifyOtp", { email });
 
             setOtpSent(true);
-            setTimeLeft(150); // reset 2.5 min timer
+            setTimeLeft(150);
             setOtp("");
-            setMessage(res.data.message || "OTP has been sent.");
             inputRef.current?.focus();
+
+            toast.success(res.data.message || "OTP has been sent.");
         } catch (err) {
             console.error("Send OTP error:", err.response || err.message || err);
-            setError(err.response?.data?.message || "Failed to send OTP.");
+            setSendError(true);
+            toast.error(err.response?.data?.message || "Failed to send OTP.");
         } finally {
             setLoading(false);
         }
@@ -75,17 +72,19 @@ const VerifyOtpPage = () => {
 
     const handleVerify = async (e) => {
         e.preventDefault();
-        setError("");
-        setMessage("");
+        setLoading(true);
 
         try {
             const res = await axiosInstance.post("/verify/verifyEmail", { email, otp });
-            setMessage(res.data.message || "Email verified successfully.");
+
+            toast.success(res.data.message || "Email verified successfully.");
             localStorage.removeItem("otpEmail");
 
             setTimeout(() => navigate("/login"), 2000);
         } catch (err) {
-            setError(err.response?.data?.message || "Verification failed.");
+            toast.error(err.response?.data?.message || "Verification failed.");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -95,10 +94,32 @@ const VerifyOtpPage = () => {
                 <h4 className="text-center mb-3">🔐 Email Verification</h4>
 
                 <p className="text-center text-muted">
-                    A verification code has been sent to <strong>{email}</strong>
+                    A verification code will be sent to <strong>{email}</strong>
                 </p>
 
-                {/* OTP Input Form */}
+                {/* Loading spinner while initially sending OTP */}
+                {loading && !otpSent && (
+                    <div className="text-center my-2">
+                        <div className="spinner-border text-primary" role="status" />
+                        <p className="mt-2">Sending OTP...</p>
+                    </div>
+                )}
+
+                {/* Failed to send OTP */}
+                {!otpSent && sendError && (
+                    <div className="text-center mt-3">
+                        <p className="text-danger">Failed to send OTP.</p>
+                        <button
+                            className="btn btn-outline-primary"
+                            onClick={sendOtp}
+                            disabled={loading}
+                        >
+                            {loading ? "Retrying..." : "Resend OTP"}
+                        </button>
+                    </div>
+                )}
+
+                {/* OTP input form */}
                 {otpSent && (
                     <>
                         <form onSubmit={handleVerify} className="mt-4">
@@ -117,19 +138,20 @@ const VerifyOtpPage = () => {
                                     maxLength="6"
                                     required
                                     autoFocus
+                                    disabled={loading}
                                 />
                             </div>
 
                             <button
                                 type="submit"
                                 className="btn btn-success w-100"
-                                disabled={otp.length !== 6}
+                                disabled={otp.length !== 6 || loading}
                             >
-                                Verify
+                                {loading ? "Verifying..." : "Verify"}
                             </button>
                         </form>
 
-                        {/* Countdown + Resend */}
+                        {/* Timer / Resend section */}
                         <div className="text-center mt-3">
                             {timeLeft > 0 ? (
                                 <span>
@@ -150,10 +172,6 @@ const VerifyOtpPage = () => {
                         </div>
                     </>
                 )}
-
-                {/* Alert Boxes */}
-                {message && <div className="alert alert-success mt-3">{message}</div>}
-                {error && <div className="alert alert-danger mt-3">{error}</div>}
             </div>
         </div>
     );
