@@ -31,7 +31,7 @@ const Navbar = () => {
     }, []);
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
             <div className="container-fluid px-4">
                 {/* Brand */}
                 <NavLink to="/" className="navbar-brand" end>
