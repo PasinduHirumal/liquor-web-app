@@ -1,7 +1,7 @@
 
-class AdminUsers {
+class Users {
     constructor (id, data) {
-        this.id = id;
+        this.user_id = id;
 
         this.email = data.email;
         this.password = data.password;
@@ -9,7 +9,7 @@ class AdminUsers {
         this.lastName = data.lastName;
         this.phone = data.phone;
         this.idNumber = data.idNumber;
-        this.birthDay = data.birthDay;
+        this.dateOfBirth = data.dateOfBirth;
 
         this.addresses = data.addresses;
 
@@ -32,4 +32,4 @@ class AdminUsers {
 
 
 
-export default AdminUsers;
+export default Users;
