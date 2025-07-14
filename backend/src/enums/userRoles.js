@@ -1,5 +1,5 @@
-const User_ROLES = {
+const USER_ROLES = {
     USER: "user"
 };
 
-export default User_ROLES;
+export default USER_ROLES;
