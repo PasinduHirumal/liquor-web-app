@@ -19,10 +19,16 @@ import Navbar from "./components/Navbar";
 import useAuthStore from "./stores/adminAuthStore";
 
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAuthStore();
+  const { loading } = useAuthStore();
 
-  if (loading) return <div>Loading...</div>;
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (loading)
+    return (
+      <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
+        <div className="spinner-border text-primary" role="status" aria-hidden="true"></div>
+        <span className="ms-2">Loading...</span>
+      </div>
+    );
+
   return (
     <>
       <Navbar />
