@@ -56,7 +56,7 @@ const login = async (req, res) => {
 
         // create JWT token
         const payload = {
-            id: user.id,
+            id: user.user_id,
             email: user.email,
             username: `${user.firstName} ${user.lastName}`,
             role: user.role,
@@ -94,10 +94,19 @@ const logout = async (req, res) => {
 
 const checkAuth = async (req, res) => {
   try {
+    if (!req.user || !req.user.id) {
+      return res.status(401).json({ success: false, message: "User not authenticated" });
+    }
+
+    console.log('Checking auth for user ID:', req.user.id);
+
     const user = await userService.findById(req.user.id);
+    if (!user) {
+        return res.status(404).json({ success: false, message: "User not found"});
+    }
 
     const userData = {
-        id: user.id,
+        id: user.user_id,
         email: user.email,
         username: `${user.firstName} ${user.lastName}`,
         role: user.role,
