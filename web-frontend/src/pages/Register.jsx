@@ -36,7 +36,7 @@ const RegisterForm = () => {
                 phone: formData.phone.trim()
             };
 
-            const res = await axiosInstance.post("/auth/register", payload);
+            const res = await axiosInstance.post("/auth/admin/register", payload);
 
             toast.success(res.data.message || "Registered successfully!");
 

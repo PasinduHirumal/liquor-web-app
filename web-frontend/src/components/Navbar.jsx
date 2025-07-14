@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-import useAuthStore from "../stores/authStore";
+import useAuthStore from "../stores/adminAuthStore";
 
 const Navbar = () => {
     const navigate = useNavigate();

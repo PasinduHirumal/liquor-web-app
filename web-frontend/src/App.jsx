@@ -1,5 +1,11 @@
 import React, { useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  Outlet
+} from "react-router-dom";
 import ToastProvider from "./common/ToastProvider";
 
 import LoginForm from "./routes/Login";
@@ -8,35 +14,40 @@ import Home from "./routes/Home";
 import VerifyOtpPage from "./components/VerifyOtpPage";
 import AdminUserList from "./pages/AdminList";
 import Navbar from "./components/Navbar";
-import useAuthStore from "./stores/authStore";
+import useAuthStore from "./stores/adminAuthStore";
 import UserList from "./pages/UserList";
 
-
-const ProtectedRoute = ({ children }) => {
+const ProtectedRoute = () => {
   const { isAuthenticated, loading } = useAuthStore();
 
   if (loading) return <div>Loading...</div>;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
-  return children;
+  return <Outlet />;
 };
+
+const ProtectedLayout = () => (
+  <>
+    <Navbar />
+    <Outlet />
+  </>
+);
 
 function App() {
   const checkAuth = useAuthStore((state) => state.checkAuth);
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
-    checkAuth();
+    checkAuth(); // called once on mount
   }, [checkAuth]);
+
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
     <Router>
       <ToastProvider />
 
-      {isAuthenticated && <Navbar />}
-
       <Routes>
-        <Route path="*" element={<Navigate to="/" replace />} />
-
+        {/* Public Routes */}
+        <Route path="/verify-otp" element={<VerifyOtpPage />} />
         <Route
           path="/login"
           element={isAuthenticated ? <Navigate to="/" replace /> : <LoginForm />}
@@ -45,33 +56,18 @@ function App() {
           path="/register"
           element={isAuthenticated ? <Navigate to="/" replace /> : <RegisterForm />}
         />
-        <Route path="/verify-otp" element={<VerifyOtpPage />} />
 
         {/* Protected Routes */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin-users"
-          element={
-            <ProtectedRoute>
-              <AdminUserList />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/users"
-          element={
-            <ProtectedRoute>
-              <UserList />
-            </ProtectedRoute>
-          }
-        />
+        <Route element={<ProtectedRoute />}>
+          <Route element={<ProtectedLayout />}>
+            <Route path="/" element={<Home />} />
+            <Route path="/admin-users" element={<AdminUserList />} />
+            <Route path="/users" element={<UserList />} />
+          </Route>
+        </Route>
+
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to={isAuthenticated ? "/" : "/login"} replace />} />
       </Routes>
     </Router>
   );

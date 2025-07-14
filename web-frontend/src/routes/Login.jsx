@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import useAuthStore from "../stores/authStore";
+import useAuthStore from "../stores/adminAuthStore";
 
 const LoginForm = () => {
     const navigate = useNavigate();
