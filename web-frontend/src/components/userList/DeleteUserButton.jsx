@@ -1,4 +1,3 @@
-// src/components/userList/DeleteUserButton.jsx
 import React from 'react';
 import toast from 'react-hot-toast';
 import { axiosInstance } from '../../lib/axios';
@@ -18,7 +17,7 @@ const DeleteUserButton = ({ userId, onSuccess }) => {
         if (!confirmed) return;
 
         try {
-            const response = await axiosInstance.delete(`/users/delete/${userId}`);
+            await axiosInstance.delete(`/users/delete/${userId}`);
             toast.success('User deleted successfully');
             if (onSuccess) onSuccess();
         } catch (err) {

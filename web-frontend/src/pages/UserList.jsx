@@ -51,6 +51,10 @@ const UserList = () => {
 
     const clearFilters = () => setFilter({ isActive: '', isAccountCompleted: '' });
 
+    const handleUserDeleted = (deletedUserId) => {
+        setUsers((prevUsers) => prevUsers.filter((u) => (u.id || u._id || u.user_id) !== deletedUserId));
+    };
+
     return (
         <div className="d-flex justify-content-center mt-5 pt-4">
             <div className="container" style={{ maxWidth: 900 }}>
@@ -90,20 +94,20 @@ const UserList = () => {
                                         <table className="table table-bordered table-hover text-center align-middle mb-0">
                                             <thead className="table-light">
                                                 <tr>
-                                                    <th scope="col">#</th>
-                                                    <th scope="col">Name</th>
-                                                    <th scope="col">Email</th>
-                                                    <th scope="col">Role</th>
-                                                    <th scope="col">Active</th>
-                                                    <th scope="col">Account Completed</th>
-                                                    <th scope="col">Actions</th>
+                                                    <th>#</th>
+                                                    <th>Name</th>
+                                                    <th>Email</th>
+                                                    <th>Role</th>
+                                                    <th>Active</th>
+                                                    <th>Account Completed</th>
+                                                    <th>Actions</th>
                                                 </tr>
                                             </thead>
                                             <tbody>
                                                 {users.map((user, index) => {
-                                                    const key = user.id || user._id || index;
+                                                    const userId = user.user_id || user.id || user._id;
                                                     return (
-                                                        <tr key={key}>
+                                                        <tr key={userId}>
                                                             <th scope="row">{index + 1}</th>
                                                             <td>{user.firstName || ''} {user.lastName || ''}</td>
                                                             <td>{user.email || '-'}</td>
@@ -112,8 +116,8 @@ const UserList = () => {
                                                             <td>{user.isAccountCompleted ? '✅' : '❌'}</td>
                                                             <td>
                                                                 <DeleteUserButton
-                                                                    userId={user.user_id || user.user_id}
-                                                                    onSuccess={fetchUsers}
+                                                                    userId={userId}
+                                                                    onSuccess={() => handleUserDeleted(userId)}
                                                                 />
                                                             </td>
                                                         </tr>
