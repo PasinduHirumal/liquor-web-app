@@ -1,52 +1,37 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-import useAuthStore from "../stores/authStore";
+import useAuthStore from "../stores/adminAuthStore";
 
 const Navbar = () => {
     const navigate = useNavigate();
     const logout = useAuthStore((state) => state.logout);
+    const user = useAuthStore((state) => state.user);
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const collapseRef = useRef(null);
 
     const handleLogout = async () => {
         await logout();
         navigate("/login");
     };
 
-    useEffect(() => {
-        const collapseEl = collapseRef.current;
-
-        const handleShow = () => setIsCollapsed(true);
-        const handleHide = () => setIsCollapsed(false);
-
-        collapseEl?.addEventListener("show.bs.collapse", handleShow);
-        collapseEl?.addEventListener("hide.bs.collapse", handleHide);
-
-        return () => {
-            collapseEl?.removeEventListener("show.bs.collapse", handleShow);
-            collapseEl?.removeEventListener("hide.bs.collapse", handleHide);
-        };
-    }, []);
+    const toggleCollapse = () => setIsCollapsed((prev) => !prev);
+    const closeCollapse = () => setIsCollapsed(false);
 
     return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" aria-label="Main navigation">
             <div className="container-fluid px-4">
-                {/* Brand */}
-                <NavLink to="/" className="navbar-brand" end>
+                <NavLink to="/" className="navbar-brand" onClick={closeCollapse}>
                     🍷 Liquor Web App
                 </NavLink>
 
-                {/* Toggler with animation */}
                 <button
                     className="navbar-toggler border-0"
                     type="button"
-                    data-bs-toggle="collapse"
-                    data-bs-target="#navbarContent"
-                    aria-controls="navbarContent"
-                    aria-expanded={isCollapsed}
+                    onClick={toggleCollapse}
                     aria-label="Toggle navigation"
+                    aria-controls="navbarSupportedContent"
+                    aria-expanded={isCollapsed}
                 >
                     <AnimatePresence mode="wait" initial={false}>
                         {isCollapsed ? (
@@ -73,19 +58,36 @@ const Navbar = () => {
                     </AnimatePresence>
                 </button>
 
-                {/* Collapsible content */}
                 <div
-                    className="collapse navbar-collapse"
-                    id="navbarContent"
-                    ref={collapseRef}
+                    className={`collapse navbar-collapse ${isCollapsed ? "show" : ""}`}
+                    id="navbarSupportedContent"
                 >
                     <ul className="navbar-nav ms-auto align-items-lg-center">
                         <li className="nav-item">
                             <NavLink
+                                to="/"
+                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                                onClick={closeCollapse}
+                            >
+                                Home
+                            </NavLink>
+                        </li>
+
+                        <li className="nav-item">
+                            <NavLink
+                                to={`/profile/${user?._id || user?.id}`}
+                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                                onClick={closeCollapse}
+                            >
+                                Profile
+                            </NavLink>
+                        </li>
+
+                        <li className="nav-item">
+                            <NavLink
                                 to="/users"
-                                className={({ isActive }) =>
-                                    "nav-link" + (isActive ? " active" : "")
-                                }
+                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                                onClick={closeCollapse}
                             >
                                 👥 Users
                             </NavLink>
@@ -94,11 +96,10 @@ const Navbar = () => {
                         <li className="nav-item">
                             <NavLink
                                 to="/admin-users"
-                                className={({ isActive }) =>
-                                    "nav-link" + (isActive ? " active" : "")
-                                }
+                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                                onClick={closeCollapse}
                             >
-                                👥 Admin Users
+                                🛡️ Admin Users
                             </NavLink>
                         </li>
 

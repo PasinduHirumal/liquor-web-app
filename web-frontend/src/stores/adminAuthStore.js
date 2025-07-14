@@ -12,7 +12,7 @@ const useAuthStore = create((set) => ({
   login: async (credentials) => {
     set({ loading: true, error: null });
     try {
-      const res = await axiosInstance.post('/auth/login', credentials);
+      const res = await axiosInstance.post('/auth/admin/login', credentials);
       set({
         user: res.data.data,
         isAuthenticated: true,
@@ -34,7 +34,7 @@ const useAuthStore = create((set) => ({
   // LOGOUT
   logout: async () => {
     try {
-      await axiosInstance.post('/auth/logout');
+      await axiosInstance.post('/auth/admin/logout');
       set({
         user: null,
         isAuthenticated: false,
@@ -51,7 +51,7 @@ const useAuthStore = create((set) => ({
   checkAuth: async () => {
     set({ loading: true, error: null });
     try {
-      const res = await axiosInstance.get('/auth/checkAuth');
+      const res = await axiosInstance.get('/auth/admin/checkAuth');
       set({
         user: res.data.data,
         isAuthenticated: true,

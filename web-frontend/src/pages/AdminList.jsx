@@ -60,7 +60,7 @@ const AdminUserList = () => {
   }, [filter]);
 
   return (
-    <div className="container-fluid px-4 py-4" style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
+    <div className="container-fluid mt-5 px-4 py-4">
       <h3 className="mb-4 text-center">Admin User List</h3>
 
       {/* Filters */}

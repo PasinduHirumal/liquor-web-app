@@ -26,11 +26,7 @@ const UserList = () => {
     }, []);
 
     return (
-        <div
-            className="d-flex justify-content-center"
-            style={{ backgroundColor: '#f8f9fa', minHeight: '100vh', paddingTop: '40px' }}
-        >
-
+        <div className="d-flex justify-content-center mt-5 pt-4">
             <div className="container">
                 <div className="card shadow-sm">
                     <div className="card-body">
