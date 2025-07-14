@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { axiosInstance } from '../lib/axios';
+import { axiosInstance } from '../../lib/axios';
 import toast from 'react-hot-toast';
-import ConfirmDialog from '../common/ConfirmDialog';
+import ConfirmDialog from '../../common/ConfirmDialog';
 
 const DeleteAdminButton = ({ adminId, onSuccess }) => {
     const [isLoading, setIsLoading] = useState(false);

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { axiosInstance } from '../lib/axios';
 import toast from 'react-hot-toast';
-import AdminUserRowEditable from '../components/AdminUserRowEditable';
+import AdminUserRowEditable from '../components/adminList/AdminUserRowEditable';
 
 const AdminUserList = () => {
   const [admins, setAdmins] = useState([]);

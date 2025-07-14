@@ -6,9 +6,10 @@ import LoginForm from "./routes/Login";
 import RegisterForm from "./pages/Register";
 import Home from "./routes/Home";
 import VerifyOtpPage from "./components/VerifyOtpPage";
-import AdminUserList from "./pages/AdminUserList";
+import AdminUserList from "./pages/AdminList";
 import Navbar from "./components/Navbar";
 import useAuthStore from "./stores/authStore";
+import UserList from "./pages/UserList";
 
 
 const ProtectedRoute = ({ children }) => {
@@ -60,6 +61,14 @@ function App() {
           element={
             <ProtectedRoute>
               <AdminUserList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/users"
+          element={
+            <ProtectedRoute>
+              <UserList />
             </ProtectedRoute>
           }
         />
