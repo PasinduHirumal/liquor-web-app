@@ -1,27 +1,20 @@
 import React, { useEffect, useState } from 'react';
 import { axiosInstance } from '../lib/axios';
 import toast from 'react-hot-toast';
-import DeleteAdminButton from '../components/DeleteAdminButton';
-
-// Possible roles from backend/adminRoles.js
-const ROLES = ['pending', 'admin', 'super_admin'];
+import AdminUserRowEditable from '../components/AdminUserRowEditable';
 
 const AdminUserList = () => {
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
-  // Track edits: { [adminId]: { role, isActive } }
-  const [edits, setEdits] = useState({});
 
-  // Filters: only one allowed at a time according to backend
   const [filter, setFilter] = useState({
-    isAdminAccepted: '', // '' means no filter, else 'true' or 'false'
+    isAdminAccepted: '',
     isActive: '',
   });
 
   const fetchAdmins = async () => {
     setLoading(true);
     try {
-      // Build query params based on filter state
       const params = {};
       if (filter.isAdminAccepted !== '') {
         params.isAdminAccepted = filter.isAdminAccepted;
@@ -39,14 +32,11 @@ const AdminUserList = () => {
     }
   };
 
-  // Handle filter change: clear other filter to ensure only one at a time
   const handleFilterChange = (field, value) => {
     setFilter((prev) => {
       if (value === '') {
-        // Clear this filter only
         return { ...prev, [field]: '' };
       }
-      // Set selected filter, clear the other
       if (field === 'isAdminAccepted') {
         return { isAdminAccepted: value, isActive: '' };
       } else {
@@ -55,58 +45,19 @@ const AdminUserList = () => {
     });
   };
 
-  // When field changes, store in edits
-  const handleFieldChange = (adminId, field, value) => {
-    setEdits((prev) => ({
-      ...prev,
-      [adminId]: {
-        ...prev[adminId],
-        [field]: value,
-      },
-    }));
-  };
-
-  // Update admin via PATCH call
-  const handleUpdate = async (adminId) => {
-    if (!edits[adminId]) return;
-
-    try {
-      const updatedData = edits[adminId];
-      const response = await axiosInstance.patch(`/admin/update/${adminId}`, updatedData);
-      toast.success('Admin updated successfully');
-
-      // Update admins list locally
-      setAdmins((prev) =>
-        prev.map((admin) =>
-          admin.id === adminId ? { ...admin, ...response.data.data } : admin
-        )
-      );
-
-      // Clear edits for this admin
-      setEdits((prev) => {
-        const copy = { ...prev };
-        delete copy[adminId];
-        return copy;
-      });
-    } catch (error) {
-      console.error('Update failed:', error);
-      toast.error(error?.response?.data?.message || 'Failed to update admin');
-    }
-  };
-
   const handleDeleteSuccess = (deletedId) => {
     setAdmins((prev) => prev.filter((admin) => admin.id !== deletedId));
-    // Also clear any pending edits for that admin
-    setEdits((prev) => {
-      const copy = { ...prev };
-      delete copy[deletedId];
-      return copy;
-    });
+  };
+
+  const handleUpdateLocal = (updatedAdmin) => {
+    setAdmins((prev) =>
+      prev.map((admin) => (admin.id === updatedAdmin.id ? { ...admin, ...updatedAdmin } : admin))
+    );
   };
 
   useEffect(() => {
     fetchAdmins();
-  }, [filter]); // refetch when filter changes
+  }, [filter]);
 
   return (
     <div className="container-fluid px-4 py-3">
@@ -176,57 +127,14 @@ const AdminUserList = () => {
               </tr>
             </thead>
             <tbody className="text-center">
-              {admins.map((admin, index) => {
-                const adminEdits = edits[admin.id] || {};
-                // Compute if there's any change in editable fields
-                const hasChanges =
-                  (adminEdits.role && adminEdits.role !== admin.role) ||
-                  (typeof adminEdits.isActive === 'boolean' && adminEdits.isActive !== admin.isActive);
-
-                return (
-                  <tr key={admin.id}>
-                    <th scope="row">{index + 1}</th>
-                    <td className="text-start">{admin.email}</td>
-                    <td className="text-start">
-                      {admin.firstName} {admin.lastName}
-                    </td>
-                    <td>{admin.phone}</td>
-                    <td>
-                      <select
-                        className="form-select form-select-sm"
-                        value={adminEdits.role ?? admin.role}
-                        onChange={(e) => handleFieldChange(admin.id, 'role', e.target.value)}
-                      >
-                        {ROLES.map((role) => (
-                          <option key={role} value={role}>
-                            {role}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    <td>
-                      <input
-                        type="checkbox"
-                        checked={adminEdits.isActive ?? admin.isActive}
-                        onChange={(e) => handleFieldChange(admin.id, 'isActive', e.target.checked)}
-                      />
-                    </td>
-                    <td>{admin.isAccountVerified ? 'Yes' : 'No'}</td>
-                    <td>{admin.isAdminAccepted ? 'Yes' : 'No'}</td>
-                    <td>
-                      <button
-                        className="btn btn-sm btn-primary me-2"
-                        disabled={!hasChanges}
-                        onClick={() => handleUpdate(admin.id)}
-                        title={hasChanges ? 'Update admin' : 'No changes to update'}
-                      >
-                        Update
-                      </button>
-                      <DeleteAdminButton adminId={admin.id} onSuccess={handleDeleteSuccess} />
-                    </td>
-                  </tr>
-                );
-              })}
+              {admins.map((admin, index) => (
+                <AdminUserRowEditable
+                  key={admin.id}
+                  admin={{ ...admin, index: index + 1 }}
+                  onDeleteSuccess={handleDeleteSuccess}
+                  onUpdateLocal={handleUpdateLocal}
+                />
+              ))}
             </tbody>
           </table>
         </div>
