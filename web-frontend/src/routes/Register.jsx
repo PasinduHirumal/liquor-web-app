@@ -13,7 +13,7 @@ const Register = () => {
       case 'UserRegister':
         return <UserRegister />
       default:
-        return <AdminRegister />
+        return <UserRegister />
     }
   }
 
@@ -22,16 +22,16 @@ const Register = () => {
       <div className="dashboard-nav">
         <div className="btn-group" role="group" aria-label="Dashboard Navigation">
           <button 
-            className={`btn nav-button ${activeComponent === 'AdminRegister' ? 'btn-primary' : 'btn-outline-primary'}`}
-            onClick={() => setActiveComponent('AdminRegister')}
-          >
-            <span className="btn-text">Admin Register</span>
-          </button>
-          <button 
             className={`btn nav-button ${activeComponent === 'UserRegister' ? 'btn-primary' : 'btn-outline-primary'}`}
             onClick={() => setActiveComponent('UserRegister')}
           >
             <span className="btn-text">User Register</span>
+          </button>
+          <button 
+            className={`btn nav-button ${activeComponent === 'AdminRegister' ? 'btn-primary' : 'btn-outline-primary'}`}
+            onClick={() => setActiveComponent('AdminRegister')}
+          >
+            <span className="btn-text">Admin Register</span>
           </button>
         </div>
       </div>

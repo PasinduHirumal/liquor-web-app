@@ -8,7 +8,7 @@ import {
 } from "react-router-dom";
 import ToastProvider from "./common/ToastProvider";
 
-import LoginForm from "./routes/Login";
+import Login from "./routes/Login";
 import Home from "./routes/Home";
 import Register from "./routes/register";
 import VerifyOtpPage from "./components/VerifyOtpPage";
@@ -50,7 +50,7 @@ function App() {
         <Route path="/verify-otp" element={<VerifyOtpPage />} />
         <Route
           path="/login"
-          element={isAuthenticated ? <Navigate to="/" replace /> : <LoginForm />}
+          element={isAuthenticated ? <Navigate to="/" replace /> : <Login />}
         />
         <Route
           path="/register"
