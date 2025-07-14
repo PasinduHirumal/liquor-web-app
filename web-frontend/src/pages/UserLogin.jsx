@@ -85,106 +85,104 @@ const UserLogin = () => {
     };
 
     return (
-        <div className="login-container d-flex align-items-center justify-content-center">
-            <div className="card p-4 shadow login-card">
-                <h3 className="mb-4 text-center text-primary">👤 User Login</h3>
+        <div className="card p-4 shadow login-card">
+            <h3 className="mb-4 text-center text-primary">👤 User Login</h3>
 
-                {/* Method Switch */}
-                <div className="d-flex justify-content-center mb-3">
-                    <div className="btn-group gap-1" role="group" aria-label="Login Method Switch">
-                        <button
-                            type="button"
-                            className={`btn ${loginMethod === "email" ? "btn-primary" : "btn-outline-primary"}`}
-                            onClick={() => setLoginMethod("email")}
-                        >
-                            Email
-                        </button>
-                        <button
-                            type="button"
-                            className={`btn ${loginMethod === "phone" ? "btn-primary" : "btn-outline-primary"}`}
-                            onClick={() => setLoginMethod("phone")}
-                        >
-                            Phone
-                        </button>
-                    </div>
+            {/* Method Switch */}
+            <div className="d-flex justify-content-center mb-3">
+                <div className="btn-group gap-1" role="group" aria-label="Login Method Switch">
+                    <button
+                        type="button"
+                        className={`btn ${loginMethod === "email" ? "btn-primary" : "btn-outline-primary"}`}
+                        onClick={() => setLoginMethod("email")}
+                    >
+                        Email
+                    </button>
+                    <button
+                        type="button"
+                        className={`btn ${loginMethod === "phone" ? "btn-primary" : "btn-outline-primary"}`}
+                        onClick={() => setLoginMethod("phone")}
+                    >
+                        Phone
+                    </button>
                 </div>
+            </div>
 
-                {/* Form */}
-                <form onSubmit={handleSubmit} noValidate>
-                    {loginMethod === "email" ? (
-                        <div className="mb-3">
-                            <label className="form-label">Email <span className="text-danger">*</span></label>
-                            <input
-                                type="email"
-                                name="email"
-                                className="form-control"
-                                value={formData.email}
-                                onChange={handleChange}
-                                placeholder="you@example.com"
-                                autoComplete="email"
-                                autoFocus
-                            />
-                        </div>
-                    ) : (
-                        <div className="mb-3">
-                            <label className="form-label">Phone <span className="text-danger">*</span></label>
-                            <input
-                                type="tel"
-                                name="phone"
-                                className="form-control"
-                                value={formData.phone}
-                                onChange={handleChange}
-                                placeholder="+947XXXXXXXX"
-                                autoComplete="tel"
-                                pattern="^\+?\d{7,15}$"
-                                title="Phone number must include country code"
-                                autoFocus
-                            />
-                        </div>
-                    )}
-
+            {/* Form */}
+            <form onSubmit={handleSubmit} noValidate>
+                {loginMethod === "email" ? (
                     <div className="mb-3">
-                        <label className="form-label">Password <span className="text-danger">*</span></label>
-                        <div className="input-group">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                name="password"
-                                placeholder="Enter your password"
-                                className="form-control"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                                autoComplete="current-password"
-                            />
-                            <button
-                                type="button"
-                                className="btn border"
-                                onClick={() => setShowPassword(!showPassword)}
-                                tabIndex={-1}
-                            >
-                                {showPassword ? <FaEyeSlash /> : <FaEye />}
-                            </button>
-                        </div>
+                        <label className="form-label">Email <span className="text-danger">*</span></label>
+                        <input
+                            type="email"
+                            name="email"
+                            className="form-control"
+                            value={formData.email}
+                            onChange={handleChange}
+                            placeholder="you@example.com"
+                            autoComplete="email"
+                            autoFocus
+                        />
                     </div>
+                ) : (
+                    <div className="mb-3">
+                        <label className="form-label">Phone <span className="text-danger">*</span></label>
+                        <input
+                            type="tel"
+                            name="phone"
+                            className="form-control"
+                            value={formData.phone}
+                            onChange={handleChange}
+                            placeholder="+947XXXXXXXX"
+                            autoComplete="tel"
+                            pattern="^\+?\d{7,15}$"
+                            title="Phone number must include country code"
+                            autoFocus
+                        />
+                    </div>
+                )}
 
-                    <button
-                        type="submit"
-                        className="btn btn-primary w-100"
-                        disabled={loading}
-                    >
-                        {loading ? "Logging in..." : "Login"}
-                    </button>
-                </form>
-
-                <div className="text-center mt-4">
-                    Don't have an account?{" "}
-                    <button
-                        className="btn btn-link p-0 text-decoration-none"
-                        onClick={() => navigate("/register")}
-                    >
-                        Register here
-                    </button>
+                <div className="mb-3">
+                    <label className="form-label">Password <span className="text-danger">*</span></label>
+                    <div className="input-group">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            placeholder="Enter your password"
+                            className="form-control"
+                            value={formData.password}
+                            onChange={handleChange}
+                            required
+                            autoComplete="current-password"
+                        />
+                        <button
+                            type="button"
+                            className="btn border"
+                            onClick={() => setShowPassword(!showPassword)}
+                            tabIndex={-1}
+                        >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </button>
+                    </div>
                 </div>
+
+                <button
+                    type="submit"
+                    className="btn btn-primary w-100"
+                    disabled={loading}
+                >
+                    {loading ? "Logging in..." : "Login"}
+                </button>
+            </form>
+
+            <div className="text-center mt-4">
+                Don't have an account?{" "}
+                <button
+                    className="btn btn-link p-0 text-decoration-none"
+                    onClick={() => navigate("/register")}
+                >
+                    Register here
+                </button>
             </div>
         </div>
     );
