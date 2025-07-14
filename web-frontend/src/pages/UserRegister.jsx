@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { FaEye, FaEyeSlash } from "react-icons/fa";
 
 const RegisterForm = () => {
     const navigate = useNavigate();
@@ -17,6 +18,7 @@ const RegisterForm = () => {
     });
 
     const [loading, setLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -108,19 +110,30 @@ const RegisterForm = () => {
                     />
                 </div>
 
-                {/* Password */}
+                {/* Password with toggle */}
                 <div className="mb-3">
                     <label className="form-label">Password <span className="text-danger">*</span></label>
-                    <input
-                        type="password"
-                        name="password"
-                        className="form-control"
-                        placeholder="Enter a strong password"
-                        value={formData.password}
-                        onChange={handleChange}
-                        minLength={6}
-                        required
-                    />
+                    <div className="input-group">
+                        <input
+                            type={showPassword ? "text" : "password"}
+                            name="password"
+                            className="form-control"
+                            placeholder="Enter a strong password"
+                            value={formData.password}
+                            onChange={handleChange}
+                            minLength={6}
+                            required
+                        />
+                        <button
+                            type="button"
+                            className="btn border"
+                            onClick={() => setShowPassword((prev) => !prev)}
+                            tabIndex={-1}
+                            title={showPassword ? "Hide password" : "Show password"}
+                        >
+                            {showPassword ? <FaEyeSlash /> : <FaEye />}
+                        </button>
+                    </div>
                 </div>
 
                 {/* NIC Number */}
