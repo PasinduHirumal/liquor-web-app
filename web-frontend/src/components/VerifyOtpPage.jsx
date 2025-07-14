@@ -13,6 +13,7 @@ const VerifyOtpPage = () => {
     const [timeLeft, setTimeLeft] = useState(0);
     const [loading, setLoading] = useState(false);
     const [otpSent, setOtpSent] = useState(false);
+    const [sendError, setSendError] = useState(false);
 
     const inputRef = useRef(null);
 
@@ -50,6 +51,7 @@ const VerifyOtpPage = () => {
         if (!email || loading) return;
 
         setLoading(true);
+        setSendError(false);
         try {
             const res = await axiosInstance.post("/verify/sendVerifyOtp", { email });
 
@@ -61,6 +63,7 @@ const VerifyOtpPage = () => {
             toast.success(res.data.message || "OTP has been sent.");
         } catch (err) {
             console.error("Send OTP error:", err.response || err.message || err);
+            setSendError(true);
             toast.error(err.response?.data?.message || "Failed to send OTP.");
         } finally {
             setLoading(false);
@@ -94,6 +97,7 @@ const VerifyOtpPage = () => {
                     A verification code will be sent to <strong>{email}</strong>
                 </p>
 
+                {/* Loading spinner while initially sending OTP */}
                 {loading && !otpSent && (
                     <div className="text-center my-2">
                         <div className="spinner-border text-primary" role="status" />
@@ -101,6 +105,21 @@ const VerifyOtpPage = () => {
                     </div>
                 )}
 
+                {/* Failed to send OTP */}
+                {!otpSent && sendError && (
+                    <div className="text-center mt-3">
+                        <p className="text-danger">Failed to send OTP.</p>
+                        <button
+                            className="btn btn-outline-primary"
+                            onClick={sendOtp}
+                            disabled={loading}
+                        >
+                            {loading ? "Retrying..." : "Resend OTP"}
+                        </button>
+                    </div>
+                )}
+
+                {/* OTP input form */}
                 {otpSent && (
                     <>
                         <form onSubmit={handleVerify} className="mt-4">
@@ -132,6 +151,7 @@ const VerifyOtpPage = () => {
                             </button>
                         </form>
 
+                        {/* Timer / Resend section */}
                         <div className="text-center mt-3">
                             {timeLeft > 0 ? (
                                 <span>
