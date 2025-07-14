@@ -12,9 +12,9 @@ const getAdminById = async (req, res) => {
         }
 
         // Remove password before sending user
-        admin.password = undefined;
+        const { password, ...adminWithoutPassword } = admin;
 
-        return res.status(200).json({ success: true, message: "Admin found: ", data: admin});
+        return res.status(200).json({ success: true, message: "Admin found: ", data: adminWithoutPassword});
     } catch (error) {
         console.error("Get admin by id error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
@@ -86,36 +86,53 @@ const updateAdmin = async (req, res) => {
         const adminIdToUpdate = req.params.id;
         const currentUserId = req.user.id;
 
-        // Only allow users to update their own profile unless admin
-        if (req.user.role !== ADMIN_ROLES.SUPER_ADMIN && currentUserId !== adminIdToUpdate) {
-            return res.status(403).json({ success: false, message: "Not authorized to update" });
-        }
-        
-        // Don't allow role change unless admin
-        if (req.body.role && req.user.role !== ADMIN_ROLES.SUPER_ADMIN) {
-            delete req.body.role;
-        }
-
         const admin = await adminService.findById(adminIdToUpdate);
         if (!admin) {
             return res.status(404).json({ success: false, message: "Admin not found"});
         }
 
+        // Authorization logic
+        const isSuperAdmin = req.user.role === ADMIN_ROLES.SUPER_ADMIN;
+        const isAdmin = req.user.role === ADMIN_ROLES.ADMIN;
+        const isUpdatingSelf = currentUserId === adminIdToUpdate;
+
+        // Only allow:
+        // 1. Super admin can update anyone
+        // 2. Admin can update themselves
+        if (!isSuperAdmin && !isUpdatingSelf) {
+            return res.status(403).json({ success: false, message: "Not authorized to update" });
+        }
+        
+        // Role change restrictions
+        if (req.body.role) {
+            // Only super admin can change roles
+            if (!isSuperAdmin) {
+                return res.status(403).json({ success: false, message: "Not authorized to change roles" });
+            }
+
+            // Validate role value
+            if (!Object.values(ADMIN_ROLES).includes(req.body.role)) {
+                return res.status(400).json({ success: false, message: "Invalid role value" });
+            }
+        }
+
         let isUpdatingTokenValue = false;
-        if (req.body.role && currentUserId === adminIdToUpdate) {
+        if (req.body.role && isUpdatingSelf) {
             isUpdatingTokenValue = true;
         }
 
-        let updatedAdmin = await adminService.updateById(admin.id, req.body);
-        if (!updatedAdmin) {
-            return res.status(400).json({ success: false, message: "Failed to update admin"});
+        let updateData = { ...req.body };
+        
+        // Handle isAdminAccepted logic
+        if (updateData.isAdminAccepted === true && admin.role === ADMIN_ROLES.PENDING) {
+            // If accepting a pending admin, set their role to ADMIN
+            updateData.role = ADMIN_ROLES.ADMIN;
         }
 
-        if (updatedAdmin.isAdminAccepted) {
-            updatedAdmin = await adminService.updateById(admin.id, { role: ADMIN_ROLES.ADMIN });
-            if (!updatedAdmin) {
-                return res.status(400).json({ success: false, message: "Failed to update admin"});
-            }
+        // Update the admin
+        let updatedAdmin = await adminService.updateById(admin.id, updateData);
+        if (!updatedAdmin) {
+            return res.status(400).json({ success: false, message: "Failed to update admin"});
         }
         
         if (isUpdatingTokenValue) {
@@ -131,9 +148,9 @@ const updateAdmin = async (req, res) => {
         }
 
         // remove password
-        updatedAdmin.password = undefined;
+        const { password, ...adminWithoutPassword } = updatedAdmin;
 
-        return res.status(200).json({ success: true, message: "Admin updated successfully", data: updatedAdmin});
+        return res.status(200).json({ success: true, message: "Admin updated successfully", data: adminWithoutPassword});
     } catch (error) {
         console.error("Update admin error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });

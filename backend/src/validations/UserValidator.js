@@ -1,7 +1,7 @@
 import Joi from 'joi';
 
 // CREATE VALIDATOR - With defaults
-const validateAdminUser = (req, res, next) => {
+const validateUser = (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string().email().lowercase().required(),
     password: Joi.string().min(6).max(128).required(),
@@ -9,7 +9,7 @@ const validateAdminUser = (req, res, next) => {
     lastName: Joi.string().min(2).max(50).required(),
     phone: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).min(10).max(18).trim().required(),
     idNumber: Joi.string().min(12).max(12).required(),
-    birthDay: Joi.alternatives().try(
+    dateOfBirth: Joi.alternatives().try(
       Joi.date(),
       Joi.string().isoDate(),
       Joi.valid(null)
@@ -17,7 +17,7 @@ const validateAdminUser = (req, res, next) => {
     
     addresses: Joi.array().items(Joi.string().max(350)).max(20).default([]),
     
-    role: Joi.string().valid('pending', 'admin', 'super_admin').default('pending'),
+    role: Joi.string().valid('user').default('user'),
     googleId: Joi.string().allow('').default(''),
     isActive: Joi.boolean().default(true),
     isAccountCompleted: Joi.boolean().default(false),
@@ -63,17 +63,26 @@ const validateAdminUser = (req, res, next) => {
 
 
 // UPDATE VALIDATOR - NO defaults, all fields optional
-const validateAdminUserUpdate = (req, res, next) => {
+const validateUserUpdate = (req, res, next) => {
   const schema = Joi.object({
     email: Joi.string().email().lowercase().optional(),
     password: Joi.string().min(6).max(128).optional(),
     firstName: Joi.string().min(2).max(50).optional(),
     lastName: Joi.string().min(2).max(50).optional(),
     phone: Joi.string().pattern(/^(?:\+?\d{9,15})$/).min(9).trim().optional(),
-    addresses: Joi.array().items(Joi.string()).optional(),
-    role: Joi.string().valid('customer', 'manager', 'owner').optional(),
+    idNumber: Joi.string().min(12).max(12).optional(),
+    dateOfBirth: Joi.alternatives().try(
+      Joi.date(),
+      Joi.string().isoDate(),
+      Joi.valid(null)
+    ).optional(),
+
+    addresses: Joi.array().items(Joi.string().max(350)).max(20).optional(),
+    
+    role: Joi.string().valid('user').optional(),
     googleId: Joi.string().allow('').optional(),
     isActive: Joi.boolean().optional(),
+    isAccountCompleted: Joi.boolean().optional(),
     
     verifyOtp: Joi.string().allow('').optional(),
     verifyOtpExpiredAt: Joi.alternatives().try(
@@ -119,4 +128,4 @@ const validateAdminUserUpdate = (req, res, next) => {
 
 
 
-export { validateAdminUser, validateAdminUserUpdate };
+export { validateUser, validateUserUpdate };

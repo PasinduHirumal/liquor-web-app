@@ -8,6 +8,7 @@ import { initializeDefaultSuperAdmin } from "./src/initialize/defaultSuperAdminA
 import authRoutes from "./src/routes/auth.routes.js";
 import verifyRoutes from "./src/routes/verify.routes.js";
 import adminRoutes from "./src/routes/admin.routes.js";
+import userRoutes from "./src/routes/user.routes.js";
 
 dotenv.config();
 
@@ -28,6 +29,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/verify", verifyRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/users", userRoutes);
 
 //  Route handler for the root path
 app.get('/', (req, res) => {
