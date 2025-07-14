@@ -60,13 +60,13 @@ const AdminUserList = () => {
   }, [filter]);
 
   return (
-    <div className="container-fluid px-4 py-3">
+    <div className="container-fluid px-4 py-4" style={{ minHeight: '100vh', backgroundColor: '#f8f9fa' }}>
       <h3 className="mb-4 text-center">Admin User List</h3>
 
       {/* Filters */}
-      <div className="mb-3 d-flex justify-content-center gap-4 flex-wrap">
+      <div className="mb-4 d-flex justify-content-center gap-4 flex-wrap">
         <div>
-          <label htmlFor="filterAdminAccepted" className="form-label me-2">
+          <label htmlFor="filterAdminAccepted" className="form-label me-2 fw-semibold">
             Filter by Admin Accepted:
           </label>
           <select
@@ -81,7 +81,7 @@ const AdminUserList = () => {
           </select>
         </div>
         <div>
-          <label htmlFor="filterIsActive" className="form-label me-2">
+          <label htmlFor="filterIsActive" className="form-label me-2 fw-semibold">
             Filter by Active Status:
           </label>
           <select
@@ -96,17 +96,23 @@ const AdminUserList = () => {
           </select>
         </div>
         <button
-          className="btn btn-sm btn-secondary"
+          className="btn btn-sm btn-secondary align-self-end"
           onClick={() => setFilter({ isAdminAccepted: '', isActive: '' })}
+          title="Clear filters"
         >
           Clear Filters
         </button>
       </div>
 
+      {/* Content */}
       {loading ? (
-        <p>Loading...</p>
+        <div className="d-flex justify-content-center my-5">
+          <div className="spinner-border text-primary" role="status" aria-label="Loading">
+            <span className="visually-hidden">Loading...</span>
+          </div>
+        </div>
       ) : admins.length === 0 ? (
-        <p>No admin users found.</p>
+        <p className="text-center fs-5 text-muted my-5">No admin users found.</p>
       ) : (
         <div
           className="table-responsive shadow-sm rounded border border-secondary"
