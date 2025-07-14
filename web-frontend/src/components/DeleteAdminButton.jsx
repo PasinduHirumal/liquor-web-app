@@ -33,7 +33,7 @@ const DeleteAdminButton = ({ adminId, onSuccess }) => {
             className="btn btn-sm btn-danger d-flex justify-content-center align-items-center"
             onClick={handleDelete}
             disabled={isLoading}
-            style={{ width: '90px', height: '32px' }}
+            style={{ width: '70px', height: '32px' }}
         >
             {isLoading ? (
                 <span
