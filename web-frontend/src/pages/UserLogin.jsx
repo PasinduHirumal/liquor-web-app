@@ -17,7 +17,6 @@ const UserLogin = () => {
     const login = useAuthStore((state) => state.login);
     const loading = useAuthStore((state) => state.loading);
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-    const error = useAuthStore((state) => state.error);
     const resetError = useAuthStore((state) => state.resetError);
     const checkAuth = useAuthStore((state) => state.checkAuth);
 
@@ -109,13 +108,6 @@ const UserLogin = () => {
                         </button>
                     </div>
                 </div>
-
-                {/* Error */}
-                {error && (
-                    <div className="alert alert-danger py-2 small text-center" role="alert">
-                        {error}
-                    </div>
-                )}
 
                 {/* Form */}
                 <form onSubmit={handleSubmit} noValidate>
