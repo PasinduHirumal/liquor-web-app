@@ -3,7 +3,7 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
-const UserRegister = () => {
+const RegisterForm = () => {
     const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
@@ -133,4 +133,4 @@ const UserRegister = () => {
     );
 };
 
-export default UserRegister;
+export default RegisterForm;
