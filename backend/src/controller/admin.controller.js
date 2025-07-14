@@ -23,7 +23,27 @@ const getAdminById = async (req, res) => {
 
 const getAllAdmins = async (req, res) => {
 	try {
-        const admins = await adminService.findAll();
+        const { isAdminAccepted, isActive } = req.query;
+        let admins;
+        let filterDescription = [];
+
+        if (isAdminAccepted !== undefined && isActive !== undefined) {
+            return res.status(400).json({ success: false, message: "Pass only one query parameter at a time"});
+        }
+
+        if (isAdminAccepted !== undefined){
+            // Convert string to boolean (query params are always strings)
+            const status = isAdminAccepted === 'true';
+            admins = await adminService.findByFilter('isAdminAccepted', '==', status);
+            filterDescription.push(`isAdminAccepted: ${isAdminAccepted}`);
+        } else if (isActive !== undefined){
+            // Convert string to boolean (query params are always strings)
+            const status = isActive === 'true';
+            admins = await adminService.findByFilter('isActive', '==', status);
+            filterDescription.push(`isActive: ${isActive}`);
+        } else {
+            admins = await adminService.findAll();
+        }
 
         const rolePriority = {
             [ADMIN_ROLES.SUPER_ADMIN]: 3,
@@ -48,7 +68,13 @@ const getAllAdmins = async (req, res) => {
             })
         : [];
 
-        return res.status(200).json({ success: true, message: "All admins received successfully", count: sortedUsers.length, data: sortedUsers});
+        return res.status(200).json({ 
+            success: true, 
+            message: "All admins received successfully", 
+            count: sortedUsers.length, 
+            filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null,
+            data: sortedUsers
+        });
     } catch (error) {
         console.error("Get all admins error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });

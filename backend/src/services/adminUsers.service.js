@@ -82,6 +82,20 @@ class AdminUserService {
         }
     }
 
+    async findByFilter(field, operator, value) {
+        try {
+            const usersRef = await this.collection.where(field, operator, value).get();
+
+            if (usersRef.empty) {
+                return [];
+            }
+
+            return usersRef.docs.map(doc => new AdminUsers(doc.id, doc.data()));
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async create(userData) {
         try {
             const salt = await bcrypt.genSalt(10);
