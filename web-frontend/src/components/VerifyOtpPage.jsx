@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../lib/axios";
+import toast from "react-hot-toast";
 
 const VerifyOtpPage = () => {
     const location = useLocation();
@@ -9,8 +10,6 @@ const VerifyOtpPage = () => {
     const email = location.state?.email || localStorage.getItem("otpEmail");
 
     const [otp, setOtp] = useState("");
-    const [message, setMessage] = useState("");
-    const [error, setError] = useState("");
     const [timeLeft, setTimeLeft] = useState(0);
     const [loading, setLoading] = useState(false);
     const [otpSent, setOtpSent] = useState(false);
@@ -50,21 +49,19 @@ const VerifyOtpPage = () => {
     const sendOtp = async () => {
         if (!email || loading) return;
 
-        setMessage("");
-        setError("");
         setLoading(true);
-
         try {
             const res = await axiosInstance.post("/verify/sendVerifyOtp", { email });
 
             setOtpSent(true);
-            setTimeLeft(150); // 2.5 minutes
+            setTimeLeft(150);
             setOtp("");
-            setMessage(res.data.message || "OTP has been sent.");
             inputRef.current?.focus();
+
+            toast.success(res.data.message || "OTP has been sent.");
         } catch (err) {
             console.error("Send OTP error:", err.response || err.message || err);
-            setError(err.response?.data?.message || "Failed to send OTP.");
+            toast.error(err.response?.data?.message || "Failed to send OTP.");
         } finally {
             setLoading(false);
         }
@@ -72,18 +69,17 @@ const VerifyOtpPage = () => {
 
     const handleVerify = async (e) => {
         e.preventDefault();
-        setError("");
-        setMessage("");
         setLoading(true);
 
         try {
             const res = await axiosInstance.post("/verify/verifyEmail", { email, otp });
-            setMessage(res.data.message || "Email verified successfully.");
+
+            toast.success(res.data.message || "Email verified successfully.");
             localStorage.removeItem("otpEmail");
 
             setTimeout(() => navigate("/login"), 2000);
         } catch (err) {
-            setError(err.response?.data?.message || "Verification failed.");
+            toast.error(err.response?.data?.message || "Verification failed.");
         } finally {
             setLoading(false);
         }
@@ -98,7 +94,6 @@ const VerifyOtpPage = () => {
                     A verification code will be sent to <strong>{email}</strong>
                 </p>
 
-                {/* Loading status for OTP sending */}
                 {loading && !otpSent && (
                     <div className="text-center my-2">
                         <div className="spinner-border text-primary" role="status" />
@@ -106,7 +101,6 @@ const VerifyOtpPage = () => {
                     </div>
                 )}
 
-                {/* OTP Input Form */}
                 {otpSent && (
                     <>
                         <form onSubmit={handleVerify} className="mt-4">
@@ -138,7 +132,6 @@ const VerifyOtpPage = () => {
                             </button>
                         </form>
 
-                        {/* Countdown + Resend */}
                         <div className="text-center mt-3">
                             {timeLeft > 0 ? (
                                 <span>
@@ -159,10 +152,6 @@ const VerifyOtpPage = () => {
                         </div>
                     </>
                 )}
-
-                {/* Alert Boxes */}
-                {message && <div className="alert alert-success mt-3">{message}</div>}
-                {error && <div className="alert alert-danger mt-3">{error}</div>}
             </div>
         </div>
     );
