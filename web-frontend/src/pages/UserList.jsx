@@ -112,7 +112,7 @@ const UserList = () => {
                                                             <td>{user.isAccountCompleted ? '✅' : '❌'}</td>
                                                             <td>
                                                                 <DeleteUserButton
-                                                                    userId={user.id || user._id}
+                                                                    userId={user.user_id || user.user_id}
                                                                     onSuccess={fetchUsers}
                                                                 />
                                                             </td>
