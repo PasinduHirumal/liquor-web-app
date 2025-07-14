@@ -82,6 +82,17 @@ const Navbar = () => {
                     <ul className="navbar-nav ms-auto align-items-lg-center">
                         <li className="nav-item">
                             <NavLink
+                                to="/users"
+                                className={({ isActive }) =>
+                                    "nav-link" + (isActive ? " active" : "")
+                                }
+                            >
+                                👥 Users
+                            </NavLink>
+                        </li>
+
+                        <li className="nav-item">
+                            <NavLink
                                 to="/admin-users"
                                 className={({ isActive }) =>
                                     "nav-link" + (isActive ? " active" : "")
@@ -90,6 +101,7 @@ const Navbar = () => {
                                 👥 Admin Users
                             </NavLink>
                         </li>
+
                         <li className="nav-item mt-2 mt-lg-0">
                             <button className="btn btn-danger ms-lg-3" onClick={handleLogout}>
                                 Logout

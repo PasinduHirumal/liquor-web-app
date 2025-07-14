@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { axiosInstance } from '../lib/axios';
+import { axiosInstance } from '../../lib/axios';
 import toast from 'react-hot-toast';
 import DeleteAdminButton from './DeleteAdminButton';
 
@@ -73,8 +73,7 @@ const AdminUserRowEditable = ({ admin, onDeleteSuccess, onUpdateLocal }) => {
             </td>
             <td>{admin.isAccountVerified ? 'Yes' : 'No'}</td>
             <td>{admin.isAdminAccepted ? 'Yes' : 'No'}</td>
-            <td>
-                {/* Delete button */}
+            <td className='justify-content-center d-flex'>
                 <DeleteAdminButton adminId={admin.id} onSuccess={onDeleteSuccess} />
             </td>
         </tr>
