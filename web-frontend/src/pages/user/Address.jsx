@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
+import AddressFormModal from "../../components/user/AddressFormModal"; // ← Import here
 
 const Address = () => {
     const [addresses, setAddresses] = useState([]);
@@ -25,10 +26,10 @@ const Address = () => {
             setLoading(true);
             const response = await axiosInstance.get("/addresses/myAddresses");
             setAddresses(response.data.data);
-            setLoading(false);
         } catch (error) {
             console.error("Error fetching addresses:", error);
             toast.error("Failed to load addresses");
+        } finally {
             setLoading(false);
         }
     };
@@ -45,11 +46,9 @@ const Address = () => {
         e.preventDefault();
         try {
             if (editingId) {
-                // Update existing address
                 await axiosInstance.patch(`/addresses/update/${editingId}`, formData);
                 toast.success("Address updated successfully");
             } else {
-                // Create new address
                 await axiosInstance.post("/addresses/createAddress", formData);
                 toast.success("Address created successfully");
             }
@@ -71,50 +70,24 @@ const Address = () => {
     };
 
     const handleEdit = (address) => {
-        setFormData({
-            street: address.street,
-            city: address.city,
-            state: address.state,
-            postalCode: address.postalCode,
-            country: address.country,
-            isActive: address.isActive
-        });
+        setFormData({ ...address });
         setEditingId(address.id);
         setShowForm(true);
     };
 
     const handleSetDefault = async (addressId) => {
         try {
-            // First set all addresses to inactive
             await Promise.all(
                 addresses.map(addr =>
                     axiosInstance.patch(`/addresses/update/${addr.id}`, { isActive: false })
                 )
             );
-
-            // Then set the selected address to active
             await axiosInstance.patch(`/addresses/update/${addressId}`, { isActive: true });
-
             toast.success("Default address updated");
             fetchAddresses();
         } catch (error) {
             console.error("Error setting default address:", error);
             toast.error("Failed to set default address");
-        }
-    };
-
-    const handleDelete = async (addressId) => {
-        if (window.confirm("Are you sure you want to delete this address?")) {
-            try {
-                // Note: Your backend doesn't have a delete endpoint in the provided code
-                // You would need to implement this in your backend
-                await axiosInstance.delete(`/addresses/${addressId}`);
-                toast.success("Address deleted successfully");
-                fetchAddresses();
-            } catch (error) {
-                console.error("Error deleting address:", error);
-                toast.error("Failed to delete address");
-            }
         }
     };
 
@@ -128,112 +101,26 @@ const Address = () => {
                             <button
                                 className="btn btn-primary"
                                 onClick={() => {
-                                    setShowForm(!showForm);
-                                    if (showForm) {
-                                        setEditingId(null);
-                                        setFormData({
-                                            street: "",
-                                            city: "",
-                                            state: "",
-                                            postalCode: "",
-                                            country: "",
-                                            isActive: false
-                                        });
-                                    }
+                                    setShowForm(true);
+                                    setEditingId(null);
+                                    setFormData({
+                                        street: "",
+                                        city: "",
+                                        state: "",
+                                        postalCode: "",
+                                        country: "",
+                                        isActive: false
+                                    });
                                 }}
                             >
-                                {showForm ? "Cancel" : "Add New Address"}
+                                Add New Address
                             </button>
                         </div>
 
                         <div className="card-body">
-                            {showForm && (
-                                <form onSubmit={handleSubmit} className="mb-4">
-                                    <div className="row g-3">
-                                        <div className="col-md-6">
-                                            <label className="form-label">Street</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                name="street"
-                                                value={formData.street}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </div>
-                                        <div className="col-md-6">
-                                            <label className="form-label">City</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                name="city"
-                                                value={formData.city}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <label className="form-label">State/Province</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                name="state"
-                                                value={formData.state}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <label className="form-label">Postal Code</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                name="postalCode"
-                                                value={formData.postalCode}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </div>
-                                        <div className="col-md-4">
-                                            <label className="form-label">Country</label>
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                name="country"
-                                                value={formData.country}
-                                                onChange={handleInputChange}
-                                                required
-                                            />
-                                        </div>
-                                        <div className="col-12">
-                                            <div className="form-check">
-                                                <input
-                                                    className="form-check-input"
-                                                    type="checkbox"
-                                                    name="isActive"
-                                                    checked={formData.isActive}
-                                                    onChange={handleInputChange}
-                                                    id="isActive"
-                                                />
-                                                <label className="form-check-label" htmlFor="isActive">
-                                                    Set as default shipping address
-                                                </label>
-                                            </div>
-                                        </div>
-                                        <div className="col-12">
-                                            <button type="submit" className="btn btn-primary">
-                                                {editingId ? "Update Address" : "Save Address"}
-                                            </button>
-                                        </div>
-                                    </div>
-                                </form>
-                            )}
-
                             {loading ? (
                                 <div className="text-center">
-                                    <div className="spinner-border" role="status">
-                                        <span className="visually-hidden">Loading...</span>
-                                    </div>
+                                    <div className="spinner-border" role="status" />
                                 </div>
                             ) : addresses.length === 0 ? (
                                 <div className="alert alert-info">
@@ -270,12 +157,6 @@ const Address = () => {
                                                     >
                                                         Edit
                                                     </button>
-                                                    <button
-                                                        className="btn btn-sm btn-outline-danger"
-                                                        onClick={() => handleDelete(address.id)}
-                                                    >
-                                                        Delete
-                                                    </button>
                                                 </div>
                                             </div>
                                         </div>
@@ -286,6 +167,16 @@ const Address = () => {
                     </div>
                 </div>
             </div>
+
+            {/* Modal */}
+            <AddressFormModal
+                show={showForm}
+                handleClose={() => setShowForm(false)}
+                handleSubmit={handleSubmit}
+                handleInputChange={handleInputChange}
+                formData={formData}
+                editingId={editingId}
+            />
         </div>
     );
 };
