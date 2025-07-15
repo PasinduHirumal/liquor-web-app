@@ -1,8 +1,10 @@
-import React from "react";
-import { Route, Navigate } from "react-router-dom";
-import UserHome from "./UserHome";
+// user.routes.js
 import UserNavbar from "../../components/user/UserNavbar";
+import UserHome from "./UserHome";
+import UserProfile from "../../pages/user/UserProfile";
 import useUserAuthStore from "../../stores/userAuthStore";
+
+import React from "react";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -12,9 +14,8 @@ const Loader = () => (
 );
 
 const UserProtectedRoute = ({ children }) => {
-    const { loading, isAuthenticated } = useUserAuthStore();
+    const { loading } = useUserAuthStore();
     if (loading) return <Loader />;
-    if (!isAuthenticated) return <Navigate to="/login" replace />;
     return (
         <>
             <UserNavbar />
@@ -23,13 +24,21 @@ const UserProtectedRoute = ({ children }) => {
     );
 };
 
-export const userRoutes = (
-    <Route
-        path="/user"
-        element={
+export const userRoutes = [
+    {
+        path: "/user",
+        element: (
             <UserProtectedRoute>
                 <UserHome />
             </UserProtectedRoute>
-        }
-    />
-);
+        ),
+    },
+    {
+        path: "/profile/:profileId",
+        element: (
+            <UserProtectedRoute>
+                <UserProfile />
+            </UserProtectedRoute>
+        ),
+    },
+];

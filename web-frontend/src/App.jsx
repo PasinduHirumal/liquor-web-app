@@ -26,13 +26,14 @@ function App() {
   useEffect(() => {
     adminCheckAuth();
     userCheckAuth();
-  }, [adminCheckAuth, userCheckAuth]);
+  }, []);
 
   return (
     <Router>
       <ToastProvider />
+
       <Routes>
-        {/* Public Routes */}
+        {/* ✅ Public Routes */}
         <Route
           path="/login"
           element={
@@ -48,21 +49,32 @@ function App() {
         <Route
           path="/register"
           element={
-            adminAuth || userAuth ? <Navigate to="/login" replace /> : <Register />
+            adminAuth || userAuth ? <Navigate to="/" replace /> : <Register />
           }
         />
         <Route path="/verify-otp" element={<VerifyOtpPage />} />
 
-        {/* Admin & User Routes */}
-        {adminRoutes}
+        {/* ✅ Admin Routes */}
+        {adminRoutes.map(({ path, element }, i) => (
+          <Route key={`admin-${i}`} path={path} element={element} />
+        ))}
 
-        {userRoutes}
+        {/* ✅ User Routes */}
+        {userRoutes.map(({ path, element }, i) => (
+          <Route key={`user-${i}`} path={path} element={element} />
+        ))}
 
-        {/* Catch-all */}
+        {/* ✅ Catch-all Route */}
         <Route
           path="*"
           element={
-            <Navigate to={adminAuth ? "/admin" : userAuth ? "/user" : "/login"} replace />
+            adminAuth ? (
+              <Navigate to="/admin" replace />
+            ) : userAuth ? (
+              <Navigate to="/user" replace />
+            ) : (
+              <Navigate to="/login" replace />
+            )
           }
         />
       </Routes>

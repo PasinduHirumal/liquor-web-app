@@ -75,7 +75,7 @@ const AdminNavbar = () => {
 
                         <li className="nav-item">
                             <NavLink
-                                to={`/profile/${user?._id || user?.id}`}
+                                to={`/admin/profile/${user?._id || user?.id}`}
                                 className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
                                 onClick={closeCollapse}
                             >

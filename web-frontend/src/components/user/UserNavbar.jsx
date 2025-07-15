@@ -58,22 +58,26 @@ const UserNavbar = () => {
                     </AnimatePresence>
                 </button>
 
-                <div
-                    className={`collapse navbar-collapse ${isCollapsed ? "show" : ""}`}
-                    id="navbarSupportedContent"
-                >
+                <div className={`collapse navbar-collapse ${isCollapsed ? "show" : ""}`} id="navbarSupportedContent">
                     <ul className="navbar-nav ms-auto align-items-lg-center">
-
-                        <li className="nav-item">
+                        <li className="nav-item mt-2 mt-lg-0">
                             <NavLink
-                                to={`/profile/${user?.user_id || user?.id || user?._id}`}
-                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                                to="/user"
+                                className="nav-link"
+                                onClick={closeCollapse}
+                            >
+                                Home
+                            </NavLink>
+                        </li>
+                        <li className="nav-item mt-2 mt-lg-0">
+                            <NavLink
+                                to={`/profile/${user?.id}`}
+                                className="nav-link"
                                 onClick={closeCollapse}
                             >
                                 Profile
                             </NavLink>
                         </li>
-
                         <li className="nav-item mt-2 mt-lg-0">
                             <button className="btn btn-danger ms-lg-3" onClick={handleLogout}>
                                 Logout
