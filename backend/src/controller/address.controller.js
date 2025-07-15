@@ -30,7 +30,7 @@ const createAddress = async (req, res) => {
             console.error(`Error updating user ${user.email} with new address:`, updateError.message);
         }
         
-        return res.status(200).json({ 
+        return res.status(201).json({ 
             success: true, 
             message: "Address created successfully",
             data: address
@@ -75,6 +75,27 @@ const getAllAddressesForUser = async (req, res) => {
     }
 };
 
+const updateAddress = async (req, res) => {
+	try {
+        const addressId = req.params.id;
 
+        const address = await addressService.findById(addressId);
+        if (!address) {
+            return res.status(404).json({ success: false, message: "Address not found"});
+        }
 
-export { createAddress, getAllAddressesForUser};
+        if (address.userId !== req.user.id) {
+            return res.status(403).json({ success: false, message: "Not authorized to update" });
+        }
+
+        const addressData = { ...req.body };
+        const updatedAddress = await addressService.updateById(addressId, addressData);
+        
+        return res.status(200).json({ success: true, message: "Address updated successfully", data: updatedAddress});
+    } catch (error) {
+        console.error("Update address error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+export { createAddress, getAllAddressesForUser, updateAddress};

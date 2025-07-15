@@ -1,7 +1,7 @@
 import express from 'express';
 import { authenticateUser, authorizeRoles } from '../middleware/authMiddleware.js';
-import { validateAddress } from '../validations/AddressValidator.js';
-import { createAddress, getAllAddressesForUser } from '../controller/address.controller.js';
+import { validateAddress, validateAddressUpdate } from '../validations/AddressValidator.js';
+import { createAddress, getAllAddressesForUser, updateAddress } from '../controller/address.controller.js';
 
 const router = express.Router();
 
@@ -9,6 +9,6 @@ const router = express.Router();
 
 router.post('/createAddress', authenticateUser, validateAddress, createAddress);
 router.get('/myAddresses', authenticateUser, getAllAddressesForUser);
-
+router.patch('/update/:id', authenticateUser, validateAddressUpdate, updateAddress);
 
 export default router;

@@ -44,7 +44,7 @@ const validateAddressUpdate = (req, res, next) => {
   const schema = Joi.object({
     city: Joi.string().min(1).max(100).optional(),
     state: Joi.string().min(1).max(100).optional(),
-    postalCode: oi.string().pattern(/^[A-Za-z0-9\s\-]{3,10}$/).optional(),
+    postalCode: Joi.string().pattern(/^[A-Za-z0-9\s\-]{3,10}$/).optional(),
     country: Joi.string().min(2).max(100).optional(),
     
     latitude: Joi.number().min(-90).max(90).precision(6).optional(),
