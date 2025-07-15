@@ -72,7 +72,7 @@ const AddressFormModal = ({
                                 name="isActive"
                                 checked={formData.isActive}
                                 onChange={handleInputChange}
-                                label="Set as default shipping address"
+                                label="Set as active shipping address"
                             />
                         </Col>
                         <Col xs={12}>
