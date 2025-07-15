@@ -32,7 +32,7 @@ const Address = () => {
         try {
             setLoading(true);
             const response = await axiosInstance.get("/addresses/myAddresses");
-            setAddresses(response.data.data);
+            setAddresses(response.data.data || []);
         } catch (error) {
             console.error("Error fetching addresses:", error);
             toast.error("Failed to load addresses");
@@ -55,36 +55,40 @@ const Address = () => {
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData({
-            ...formData,
+        setFormData((prev) => ({
+            ...prev,
             [name]: type === "checkbox" ? checked : value
-        });
+        }));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setSubmitLoading(true);
+
         try {
+            const payload = {
+                city: formData.city.trim(),
+                state: formData.state.trim(),
+                postalCode: formData.postalCode.trim(),
+                country: formData.country.trim(),
+                isActive: formData.isActive
+            };
+
             if (editingId) {
-                await axiosInstance.patch(`/addresses/update/${editingId}`, formData);
+                await axiosInstance.patch(`/addresses/update/${editingId}`, payload);
                 toast.success("Address updated successfully");
             } else {
-                await axiosInstance.post("/addresses/createAddress", formData);
+                await axiosInstance.post("/addresses/createAddress", payload);
                 toast.success("Address created successfully");
             }
 
+            // Reset
             setShowForm(false);
             setEditingId(null);
-            setFormData({
-                city: "",
-                state: "",
-                postalCode: "",
-                country: "",
-                isActive: false
-            });
+            resetForm();
             fetchAddresses();
         } catch (error) {
-            console.error("Error saving address:", error);
+            console.error("Error saving address:", error.response?.data || error.message);
             toast.error(error.response?.data?.message || "Failed to save address");
         } finally {
             setSubmitLoading(false);
@@ -92,10 +96,25 @@ const Address = () => {
     };
 
     const handleEdit = (address) => {
-        const { street, ...rest } = address;
-        setFormData({ ...rest });
+        setFormData({
+            city: address.city || "",
+            state: address.state || "",
+            postalCode: address.postalCode || "",
+            country: address.country || "",
+            isActive: !!address.isActive
+        });
         setEditingId(address.id);
         setShowForm(true);
+    };
+
+    const resetForm = () => {
+        setFormData({
+            city: "",
+            state: "",
+            postalCode: "",
+            country: "",
+            isActive: false
+        });
     };
 
     return (
@@ -110,13 +129,7 @@ const Address = () => {
                                 onClick={() => {
                                     setShowForm(true);
                                     setEditingId(null);
-                                    setFormData({
-                                        city: "",
-                                        state: "",
-                                        postalCode: "",
-                                        country: "",
-                                        isActive: false
-                                    });
+                                    resetForm();
                                 }}
                             >
                                 <FaPlusCircle className="me-2" />
@@ -159,7 +172,7 @@ const Address = () => {
                                                     </p>
                                                     {address.isActive && (
                                                         <span className="badge bg-success">
-                                                            <FaCheckCircle className="me-1" /> Default
+                                                            <FaCheckCircle className="me-1" /> Active
                                                         </span>
                                                     )}
                                                 </div>
