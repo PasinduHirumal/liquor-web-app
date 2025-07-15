@@ -17,7 +17,7 @@ const register = async (req, res) => {
         const user = await userService.create(req.body);
 
         // block password displaying
-        const { password, ...userWithoutPassword } = user
+        const { password, ...userWithoutPassword } = user;
 
         return res.status(201).json({ success: true, message: "Your account registered successfully", data: userWithoutPassword });
     } catch (error) {

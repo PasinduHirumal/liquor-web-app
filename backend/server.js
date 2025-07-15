@@ -10,6 +10,7 @@ import verifyRoutes from "./src/routes/verify.routes.js";
 import adminRoutes from "./src/routes/admin.routes.js";
 import userRoutes from "./src/routes/user.routes.js";
 import addressRoutes from "./src/routes/address.routes.js";
+import driverRoutes from "./src/routes/driver.routes.js";
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ app.use("/api/verify", verifyRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/addresses", addressRoutes);
+app.use("/api/drivers", driverRoutes);
 
 //  Route handler for the root path
 app.get('/', (req, res) => {
