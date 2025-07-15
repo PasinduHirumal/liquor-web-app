@@ -33,7 +33,7 @@ function App() {
       <ToastProvider />
 
       <Routes>
-        {/* ✅ Public Routes */}
+        {/* Public Routes */}
         <Route
           path="/login"
           element={
@@ -54,17 +54,17 @@ function App() {
         />
         <Route path="/verify-otp" element={<VerifyOtpPage />} />
 
-        {/* ✅ Admin Routes */}
+        {/* Admin Routes */}
         {adminRoutes.map(({ path, element }, i) => (
           <Route key={`admin-${i}`} path={path} element={element} />
         ))}
 
-        {/* ✅ User Routes */}
+        {/* User Routes */}
         {userRoutes.map(({ path, element }, i) => (
           <Route key={`user-${i}`} path={path} element={element} />
         ))}
 
-        {/* ✅ Catch-all Route */}
+        {/* Catch-all Route */}
         <Route
           path="*"
           element={
