@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-import useAuthStore from "../stores/adminAuthStore";
+import useAuthStore from "../../stores/userAuthStore";
 
-const Navbar = () => {
+const UserNavbar = () => {
     const navigate = useNavigate();
     const logout = useAuthStore((state) => state.logout);
     const user = useAuthStore((state) => state.user);
@@ -58,51 +58,26 @@ const Navbar = () => {
                     </AnimatePresence>
                 </button>
 
-                <div
-                    className={`collapse navbar-collapse ${isCollapsed ? "show" : ""}`}
-                    id="navbarSupportedContent"
-                >
+                <div className={`collapse navbar-collapse ${isCollapsed ? "show" : ""}`} id="navbarSupportedContent">
                     <ul className="navbar-nav ms-auto align-items-lg-center">
-                        <li className="nav-item">
+                        <li className="nav-item mt-2 mt-lg-0">
                             <NavLink
-                                to="/"
-                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                                to="/user"
+                                className="nav-link"
                                 onClick={closeCollapse}
                             >
                                 Home
                             </NavLink>
                         </li>
-
-                        <li className="nav-item">
+                        <li className="nav-item mt-2 mt-lg-0">
                             <NavLink
-                                to={`/profile/${user?._id || user?.id}`}
-                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                                to={`/profile/${user?.id}`}
+                                className="nav-link"
                                 onClick={closeCollapse}
                             >
                                 Profile
                             </NavLink>
                         </li>
-
-                        <li className="nav-item">
-                            <NavLink
-                                to="/users"
-                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
-                                onClick={closeCollapse}
-                            >
-                                👥 Users
-                            </NavLink>
-                        </li>
-
-                        <li className="nav-item">
-                            <NavLink
-                                to="/admin-users"
-                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
-                                onClick={closeCollapse}
-                            >
-                                🛡️ Admin Users
-                            </NavLink>
-                        </li>
-
                         <li className="nav-item mt-2 mt-lg-0">
                             <button className="btn btn-danger ms-lg-3" onClick={handleLogout}>
                                 Logout
@@ -115,4 +90,4 @@ const Navbar = () => {
     );
 };
 
-export default Navbar;
+export default UserNavbar;

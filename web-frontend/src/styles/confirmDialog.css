@@ -1,0 +1,44 @@
+.swal2-small-popup {
+    width: 320px !important;
+    padding: 1.2rem !important;
+    border-radius: 0.8rem !important;
+}
+
+.swal2-title-sm {
+    font-size: 1.2rem !important;
+}
+
+.swal2-html-sm {
+    font-size: 0.85rem !important;
+    margin-top: 0.3rem;
+}
+
+.swal2-confirm-sm {
+    background-color: #d33 !important;
+    color: #fff !important;
+    padding: 6px 16px !important;
+    border-radius: 4px !important;
+    font-size: 0.85rem !important;
+    border: none !important;
+    margin: 0 4px !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.swal2-confirm-sm:hover {
+    background-color: #a82828 !important;
+}
+
+.swal2-cancel-sm {
+    background-color: #3085d6 !important;
+    color: #fff !important;
+    padding: 6px 16px !important;
+    border-radius: 4px !important;
+    font-size: 0.85rem !important;
+    border: none !important;
+    margin: 0 4px !important;
+    transition: background-color 0.3s ease !important;
+}
+
+.swal2-cancel-sm:hover {
+    background-color: #1e5fa4 !important;
+}

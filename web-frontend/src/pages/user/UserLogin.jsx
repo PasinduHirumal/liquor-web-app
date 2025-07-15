@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import useAuthStore from "../stores/adminAuthStore";
+import useAuthStore from "../../stores/userAuthStore";
 
-const AdminLogin = () => {
+const UserLogin = () => {
     const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);
@@ -11,25 +11,30 @@ const AdminLogin = () => {
     const [formData, setFormData] = useState({
         email: "",
         phone: "",
-        password: ""
+        password: "",
     });
 
     const login = useAuthStore((state) => state.login);
     const loading = useAuthStore((state) => state.loading);
     const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
     const resetError = useAuthStore((state) => state.resetError);
+    const checkAuth = useAuthStore((state) => state.checkAuth);
 
     useEffect(() => {
-        setFormData({ email: "", phone: "", password: "" });
-        setShowPassword(false);
-        resetError();
-    }, [loginMethod]);
+        checkAuth();
+    }, [checkAuth]);
 
     useEffect(() => {
         if (isAuthenticated) {
             navigate("/");
         }
     }, [isAuthenticated, navigate]);
+
+    useEffect(() => {
+        setFormData({ email: "", phone: "", password: "" });
+        setShowPassword(false);
+        resetError();
+    }, [loginMethod]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -53,19 +58,35 @@ const AdminLogin = () => {
             return;
         }
 
-        const dataToSend = {
+        // Email format check
+        if (loginMethod === "email") {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(credential)) {
+                useAuthStore.setState({ error: "Invalid email format." });
+                return;
+            }
+        }
+
+        // Phone format check
+        if (loginMethod === "phone") {
+            const phoneRegex = /^\+?\d{7,15}$/;
+            if (!phoneRegex.test(credential)) {
+                useAuthStore.setState({ error: "Invalid phone number format." });
+                return;
+            }
+        }
+
+        const payload = {
             password: formData.password,
-            ...(loginMethod === "email"
-                ? { email: credential }
-                : { phone: credential })
+            ...(loginMethod === "email" ? { email: credential } : { phone: credential }),
         };
 
-        await login(dataToSend);
+        await login(payload);
     };
 
     return (
         <div className="card p-4 shadow login-card">
-            <h3 className="mb-4 text-center text-primary">🔐 Admin Login</h3>
+            <h3 className="mb-4 text-center text-primary">👤 User Login</h3>
 
             {/* Method Switch */}
             <div className="d-flex justify-content-center mb-3">
@@ -88,7 +109,7 @@ const AdminLogin = () => {
             </div>
 
             {/* Form */}
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} noValidate>
                 {loginMethod === "email" ? (
                     <div className="mb-3">
                         <label className="form-label">Email <span className="text-danger">*</span></label>
@@ -114,7 +135,7 @@ const AdminLogin = () => {
                             onChange={handleChange}
                             placeholder="+947XXXXXXXX"
                             autoComplete="tel"
-                            pattern="^\+\d{1,3}\d{4,14}$"
+                            pattern="^\+?\d{7,15}$"
                             title="Phone number must include country code"
                             autoFocus
                         />
@@ -145,7 +166,11 @@ const AdminLogin = () => {
                     </div>
                 </div>
 
-                <button type="submit" className="btn btn-primary w-100" disabled={loading}>
+                <button
+                    type="submit"
+                    className="btn btn-primary w-100"
+                    disabled={loading}
+                >
                     {loading ? "Logging in..." : "Login"}
                 </button>
             </form>
@@ -163,4 +188,4 @@ const AdminLogin = () => {
     );
 };
 
-export default AdminLogin;
+export default UserLogin;

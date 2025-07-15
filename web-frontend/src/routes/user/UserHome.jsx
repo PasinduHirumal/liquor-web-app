@@ -1,12 +1,12 @@
 import React from "react";
 
-const Home = () => {
+const UserHome = () => {
 
     return (
         <div className="container-fluid mt-5 pt-4">
-            <h1>home</h1>
+            <h1>user home</h1>
         </div>
     );
 };
 
-export default Home;
+export default UserHome;

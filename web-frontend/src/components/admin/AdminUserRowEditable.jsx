@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { axiosInstance } from '../../lib/axios';
 import toast from 'react-hot-toast';
+import { axiosInstance } from '../../lib/axios';
 import DeleteAdminButton from './DeleteAdminButton';
 
 const ROLES = ['pending', 'admin', 'super_admin'];
