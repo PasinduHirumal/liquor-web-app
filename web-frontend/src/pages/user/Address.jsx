@@ -6,6 +6,8 @@ import { FaEdit, FaCheckCircle, FaPlusCircle } from "react-icons/fa";
 
 const Address = () => {
     const [addresses, setAddresses] = useState([]);
+    const [filteredAddresses, setFilteredAddresses] = useState([]);
+    const [filter, setFilter] = useState("all"); // all | active | inactive
     const [loading, setLoading] = useState(true);
     const [submitLoading, setSubmitLoading] = useState(false);
     const [showForm, setShowForm] = useState(false);
@@ -22,6 +24,10 @@ const Address = () => {
         fetchAddresses();
     }, []);
 
+    useEffect(() => {
+        applyFilter();
+    }, [filter, addresses]);
+
     const fetchAddresses = async () => {
         try {
             setLoading(true);
@@ -33,6 +39,18 @@ const Address = () => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const applyFilter = () => {
+        let filtered = [];
+        if (filter === "active") {
+            filtered = addresses.filter((addr) => addr.isActive === true);
+        } else if (filter === "inactive") {
+            filtered = addresses.filter((addr) => addr.isActive === false);
+        } else {
+            filtered = addresses;
+        }
+        setFilteredAddresses(filtered);
     };
 
     const handleInputChange = (e) => {
@@ -54,6 +72,7 @@ const Address = () => {
                 await axiosInstance.post("/addresses/createAddress", formData);
                 toast.success("Address created successfully");
             }
+
             setShowForm(false);
             setEditingId(null);
             setFormData({
@@ -77,22 +96,6 @@ const Address = () => {
         setFormData({ ...rest });
         setEditingId(address.id);
         setShowForm(true);
-    };
-
-    const handleSetDefault = async (addressId) => {
-        try {
-            await Promise.all(
-                addresses.map(addr =>
-                    axiosInstance.patch(`/addresses/update/${addr.id}`, { isActive: false })
-                )
-            );
-            await axiosInstance.patch(`/addresses/update/${addressId}`, { isActive: true });
-            toast.success("Default address updated");
-            fetchAddresses();
-        } catch (error) {
-            console.error("Error setting default address:", error);
-            toast.error("Failed to set default address");
-        }
     };
 
     return (
@@ -122,17 +125,29 @@ const Address = () => {
                         </div>
 
                         <div className="card-body">
+                            <div className="d-flex justify-content-end mb-3">
+                                <select
+                                    className="form-select w-auto"
+                                    value={filter}
+                                    onChange={(e) => setFilter(e.target.value)}
+                                >
+                                    <option value="all">Show All</option>
+                                    <option value="active">Active Only</option>
+                                    <option value="inactive">Inactive Only</option>
+                                </select>
+                            </div>
+
                             {loading ? (
                                 <div className="text-center py-5">
                                     <div className="spinner-border text-primary" role="status" />
                                 </div>
-                            ) : addresses.length === 0 ? (
+                            ) : filteredAddresses.length === 0 ? (
                                 <div className="alert alert-info text-center">
-                                    You don't have any saved addresses. Add one using the button above.
+                                    No addresses found for this filter.
                                 </div>
                             ) : (
                                 <div className="row g-3">
-                                    {addresses.map((address) => (
+                                    {filteredAddresses.map((address) => (
                                         <div key={address.id} className="col-md-6">
                                             <div className={`card border-${address.isActive ? "success" : "secondary"} h-100`}>
                                                 <div className="card-body">
@@ -149,14 +164,6 @@ const Address = () => {
                                                     )}
                                                 </div>
                                                 <div className="card-footer bg-light d-flex justify-content-end gap-2">
-                                                    {!address.isActive && (
-                                                        <button
-                                                            className="btn btn-outline-success btn-sm"
-                                                            onClick={() => handleSetDefault(address.id)}
-                                                        >
-                                                            Set as Default
-                                                        </button>
-                                                    )}
                                                     <button
                                                         className="btn btn-outline-primary btn-sm"
                                                         onClick={() => handleEdit(address)}
