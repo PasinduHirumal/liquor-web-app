@@ -119,7 +119,7 @@ const Address = () => {
     };
 
     return (
-        <div className="mt-5 pt-5">
+        <div className="container-fluid mt-5 pt-5">
             <div className="row justify-content-center">
                 <div className="col-lg-10">
                     <div className="card shadow">
@@ -160,10 +160,7 @@ const Address = () => {
                                     No addresses found for this filter.
                                 </div>
                             ) : (
-                                <div
-                                    className="overflow-auto"
-                                    style={{ maxHeight: "400px" }}
-                                >
+                                <div style={{ maxHeight: "400px", overflowY: "auto", overflowX: "hidden" }} >
                                     <div className="row g-3">
                                         {filteredAddresses.map((address) => (
                                             <div key={address.id} className="col-md-6">
