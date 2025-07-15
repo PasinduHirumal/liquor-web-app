@@ -1,4 +1,5 @@
 import DriverService from "../services/driver.service.js";
+import ADMIN_ROLES from '../enums/adminRoles.js';
 
 const driverService = new DriverService();
 
@@ -89,10 +90,31 @@ const getAllDrivers = async (req, res) => {
 
 const updateDriver = async (req, res) => {
 	try {
-        return res.status(400).json({ success: false, message: ""});
-        return res.status(200).json({ success: true, message: ""});
+        const driverId = req.params.id;
+        const currentUserId = req.user.id;
+
+        const driver = await driverService.findById(driverId);
+        if (!driver) {
+            return res.status(404).json({ success: false, message: "Driver not found"});
+        }
+
+        // Authorization logic
+        const isSuperAdmin = req.user.role === ADMIN_ROLES.SUPER_ADMIN;
+        const isAdmin = req.user.role === ADMIN_ROLES.ADMIN;
+        const isUpdatingSelf = currentUserId === driverId;
+
+        if ((!isSuperAdmin && !isAdmin) && !isUpdatingSelf) {
+            return res.status(403).json({ success: false, message: "Not authorized to update" });
+        }
+
+        const driverData = { ...req.body };
+        const updatedDriver = await driverService.updateById(driverId, driverData)
+
+        const { password, ...driverWithoutPassword } = updatedDriver;
+
+        return res.status(200).json({ success: true, message: "Driver updated successfully", data: driverWithoutPassword });
     } catch (error) {
-        console.error("Method_name error:", error.message);
+        console.error("Update driver error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
@@ -115,4 +137,4 @@ const deleteDriver = async (req, res) => {
     }
 };
 
-export { createDriver, getAllDrivers, deleteDriver};
+export { createDriver, getAllDrivers, updateDriver, deleteDriver};
