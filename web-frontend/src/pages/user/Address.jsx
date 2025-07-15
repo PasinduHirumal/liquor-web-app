@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
 import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
-import AddressFormModal from "../../components/user/AddressFormModal";
 import { FaEdit, FaCheckCircle, FaPlusCircle } from "react-icons/fa";
+import AddressFormModal from "../../components/user/AddressFormModal";
+import SetActiveButton from "../../components/user/SetActiveButton";
 
 const Address = () => {
     const [addresses, setAddresses] = useState([]);
@@ -177,6 +178,11 @@ const Address = () => {
                                                     )}
                                                 </div>
                                                 <div className="card-footer bg-light d-flex justify-content-end gap-2">
+                                                    <SetActiveButton
+                                                        addressId={address.id}
+                                                        isActive={address.isActive}
+                                                        onSuccess={fetchAddresses}
+                                                    />
                                                     <button
                                                         className="btn btn-outline-primary btn-sm"
                                                         onClick={() => handleEdit(address)}
