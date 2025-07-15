@@ -119,7 +119,7 @@ const Address = () => {
     };
 
     return (
-        <div className="container mt-5 pt-5">
+        <div className="mt-5 pt-5">
             <div className="row justify-content-center">
                 <div className="col-lg-10">
                     <div className="card shadow">
@@ -160,40 +160,45 @@ const Address = () => {
                                     No addresses found for this filter.
                                 </div>
                             ) : (
-                                <div className="row g-3">
-                                    {filteredAddresses.map((address) => (
-                                        <div key={address.id} className="col-md-6">
-                                            <div className={`card border-${address.isActive ? "success" : "secondary"} h-100`}>
-                                                <div className="card-body">
-                                                    <h5 className="card-title">
-                                                        {address.city}, {address.state}
-                                                    </h5>
-                                                    <p className="card-text mb-1">
-                                                        {address.postalCode}, {address.country}
-                                                    </p>
-                                                    {address.isActive && (
-                                                        <span className="badge bg-success">
-                                                            <FaCheckCircle className="me-1" /> Active
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                <div className="card-footer bg-light d-flex justify-content-end gap-2">
-                                                    <SetActiveButton
-                                                        addressId={address.id}
-                                                        isActive={address.isActive}
-                                                        onSuccess={fetchAddresses}
-                                                    />
-                                                    <button
-                                                        className="btn btn-outline-primary btn-sm"
-                                                        onClick={() => handleEdit(address)}
-                                                    >
-                                                        <FaEdit className="me-1" />
-                                                        Edit
-                                                    </button>
+                                <div
+                                    className="overflow-auto"
+                                    style={{ maxHeight: "400px" }}
+                                >
+                                    <div className="row g-3">
+                                        {filteredAddresses.map((address) => (
+                                            <div key={address.id} className="col-md-6">
+                                                <div className={`card border-${address.isActive ? "success" : "secondary"} h-100`}>
+                                                    <div className="card-body">
+                                                        <h5 className="card-title">
+                                                            {address.city}, {address.state}
+                                                        </h5>
+                                                        <p className="card-text mb-1">
+                                                            {address.postalCode}, {address.country}
+                                                        </p>
+                                                        {address.isActive && (
+                                                            <span className="badge bg-success">
+                                                                <FaCheckCircle className="me-1" /> Active
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    <div className="card-footer bg-light d-flex justify-content-end gap-2">
+                                                        <SetActiveButton
+                                                            addressId={address.id}
+                                                            isActive={address.isActive}
+                                                            onSuccess={fetchAddresses}
+                                                        />
+                                                        <button
+                                                            className="btn btn-outline-primary btn-sm"
+                                                            onClick={() => handleEdit(address)}
+                                                        >
+                                                            <FaEdit className="me-1" />
+                                                            Edit
+                                                        </button>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
-                                    ))}
+                                        ))}
+                                    </div>
                                 </div>
                             )}
                         </div>
