@@ -3,7 +3,10 @@ import { useParams } from "react-router-dom";
 import { axiosInstance } from "../../lib/axios";
 import useUserAuthStore from "../../stores/userAuthStore";
 import UserProfileEdit from "./EditUserProfile";
-import { Modal, Button } from "react-bootstrap";
+import { Modal } from "react-bootstrap";
+
+// Optional: Make sure Bootstrap Icons are globally included in your app
+// import "bootstrap-icons/font/bootstrap-icons.css";
 
 const UserProfile = () => {
     const { user } = useUserAuthStore();
@@ -13,47 +16,39 @@ const UserProfile = () => {
     const [error, setError] = useState(null);
     const [showEditModal, setShowEditModal] = useState(false);
 
-    useEffect(() => {
-        const fetchUserProfile = async () => {
-            try {
-                setLoading(true);
-                const targetId = profileId || user?.id;
-                if (!targetId) {
-                    setError("User ID not found.");
-                    return;
-                }
-
-                const res = await axiosInstance.get(`/users/getUserById/${targetId}`);
-                setProfile(res.data.data);
-                setError(null);
-            } catch (error) {
-                console.error("Error fetching user profile:", error);
-                setError("Failed to fetch user profile.");
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        if (profileId || user?.id) {
-            fetchUserProfile();
+    const fetchUserProfile = async (targetId) => {
+        try {
+            setLoading(true);
+            const res = await axiosInstance.get(`/users/getUserById/${targetId}`, {
+                withCredentials: true
+            });
+            setProfile(res.data.data);
+            setError(null);
+        } catch (err) {
+            console.error("Error fetching user profile:", err);
+            setError("Failed to fetch user profile.");
+        } finally {
+            setLoading(false);
         }
-    }, [profileId, user]);
-
-    const handleEditClick = () => {
-        setShowEditModal(true);
     };
 
-    const handleCloseEditModal = () => {
-        setShowEditModal(false);
-    };
-
-    const handleProfileUpdated = () => {
-        // Refresh the profile data after successful update
+    useEffect(() => {
         const targetId = profileId || user?.id;
         if (targetId) {
-            axiosInstance.get(`/users/getUserById/${targetId}`)
-                .then(res => setProfile(res.data.data))
-                .catch(err => console.error("Error refreshing profile:", err));
+            fetchUserProfile(targetId);
+        } else {
+            setLoading(false);
+            setError("User ID not found.");
+        }
+    }, [profileId, user?.id]);
+
+    const handleEditClick = () => setShowEditModal(true);
+    const handleCloseEditModal = () => setShowEditModal(false);
+
+    const handleProfileUpdated = () => {
+        const targetId = profileId || user?.id;
+        if (targetId) {
+            fetchUserProfile(targetId);
         }
         setShowEditModal(false);
     };
@@ -91,7 +86,6 @@ const UserProfile = () => {
                         <div className="card shadow-lg border-0 rounded-4">
                             <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-top-4">
                                 <h3 className="mb-0">User Profile</h3>
-                                {/* Add Edit Button - only show if this is the current user's profile */}
                                 {(!profileId || profileId === user?.id) && (
                                     <button
                                         className="btn btn-light btn-sm"
@@ -106,6 +100,14 @@ const UserProfile = () => {
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <strong>Name:</strong>
                                         <span>{profile.firstName} {profile.lastName}</span>
+                                    </li>
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <strong>NIC Number:</strong>
+                                        <span>{profile.nic_number}</span>
+                                    </li>
+                                    <li className="list-group-item d-flex justify-content-between align-items-center">
+                                        <strong>Phone:</strong>
+                                        <span>{profile.phone}</span>
                                     </li>
                                     <li className="list-group-item d-flex justify-content-between align-items-center">
                                         <strong>Email:</strong>
