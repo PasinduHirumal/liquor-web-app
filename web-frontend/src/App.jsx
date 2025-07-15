@@ -7,64 +7,26 @@ import {
 } from "react-router-dom";
 
 import ToastProvider from "./common/ToastProvider";
-
 import Login from "./routes/Login";
 import Register from "./routes/Register";
-import AdminHome from "./routes/AdminHome";
-import UserHome from "./routes/UserHome";
-import VerifyOtpPage from "./components/VerifyOtpPage";
-import AdminUserList from "./pages/AdminList";
-import UserList from "./pages/UserList";
-import AdminProfile from "./pages/AdminProfile";
-import AdminNavbar from "./components/AdminNavbar";
-import UserNavbar from "./components/UserNavbar";
+import VerifyOtpPage from "./components/admin/VerifyOtpPage";
 
 import useAdminAuthStore from "./stores/adminAuthStore";
 import useUserAuthStore from "./stores/userAuthStore";
 
-// Loader UI
-const Loader = () => (
-  <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
-    <div className="spinner-border text-primary" role="status" aria-hidden="true"></div>
-    <span className="ms-2">Loading...</span>
-  </div>
-);
-
-// Protected Route for Admin
-const AdminProtectedRoute = ({ children }) => {
-  const { loading } = useAdminAuthStore();
-  if (loading) return <Loader />;
-  return (
-    <>
-      <AdminNavbar />
-      {children}
-    </>
-  );
-};
-
-// Protected Route for User
-const UserProtectedRoute = ({ children }) => {
-  const { loading } = useUserAuthStore();
-  if (loading) return <Loader />;
-  return (
-    <>
-      <UserNavbar />
-      {children}
-    </>
-  );
-};
+import { adminRoutes } from "./routes/admin/AdminRoutes";
+import { userRoutes } from "./routes/user/UserRoutes";
 
 function App() {
   const adminCheckAuth = useAdminAuthStore((state) => state.checkAuth);
   const userCheckAuth = useUserAuthStore((state) => state.checkAuth);
+  const adminAuth = useAdminAuthStore((state) => state.isAuthenticated);
+  const userAuth = useUserAuthStore((state) => state.isAuthenticated);
 
   useEffect(() => {
     adminCheckAuth();
     userCheckAuth();
   }, [adminCheckAuth, userCheckAuth]);
-
-  const adminAuth = useAdminAuthStore((state) => state.isAuthenticated);
-  const userAuth = useUserAuthStore((state) => state.isAuthenticated);
 
   return (
     <Router>
@@ -91,52 +53,18 @@ function App() {
         />
         <Route path="/verify-otp" element={<VerifyOtpPage />} />
 
-        {/* Admin Protected Routes */}
-        <Route
-          path="/admin"
-          element={
-            <AdminProtectedRoute>
-              <AdminHome />
-            </AdminProtectedRoute>
-          }
-        />
-        <Route
-          path="/admin-users"
-          element={
-            <AdminProtectedRoute>
-              <AdminUserList />
-            </AdminProtectedRoute>
-          }
-        />
-        <Route
-          path="/users"
-          element={
-            <AdminProtectedRoute>
-              <UserList />
-            </AdminProtectedRoute>
-          }
-        />
-        <Route
-          path="/profile/:id"
-          element={
-            <AdminProtectedRoute>
-              <AdminProfile />
-            </AdminProtectedRoute>
-          }
-        />
+        {/* Admin & User Routes */}
+        {adminRoutes}
 
-        {/* User Protected Route */}
-        <Route
-          path="/user"
-          element={
-            <UserProtectedRoute>
-              <UserHome />
-            </UserProtectedRoute>
-          }
-        />
+        {userRoutes}
 
         {/* Catch-all */}
-        <Route path="*" element={<Navigate to={adminAuth ? "/admin" : userAuth ? "/user" : "/login"} replace />} />
+        <Route
+          path="*"
+          element={
+            <Navigate to={adminAuth ? "/admin" : userAuth ? "/user" : "/login"} replace />
+          }
+        />
       </Routes>
     </Router>
   );

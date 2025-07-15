@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-import useAuthStore from "../stores/userAuthStore";
+import useAuthStore from "../../stores/adminAuthStore";
 
 const AdminNavbar = () => {
     const navigate = useNavigate();
@@ -63,6 +63,15 @@ const AdminNavbar = () => {
                     id="navbarSupportedContent"
                 >
                     <ul className="navbar-nav ms-auto align-items-lg-center">
+                        <li className="nav-item">
+                            <NavLink
+                                to="/"
+                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                                onClick={closeCollapse}
+                            >
+                                Home
+                            </NavLink>
+                        </li>
 
                         <li className="nav-item">
                             <NavLink
@@ -71,6 +80,26 @@ const AdminNavbar = () => {
                                 onClick={closeCollapse}
                             >
                                 Profile
+                            </NavLink>
+                        </li>
+
+                        <li className="nav-item">
+                            <NavLink
+                                to="/users"
+                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                                onClick={closeCollapse}
+                            >
+                                👥 Users
+                            </NavLink>
+                        </li>
+
+                        <li className="nav-item">
+                            <NavLink
+                                to="/admin-users"
+                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                                onClick={closeCollapse}
+                            >
+                                🛡️ Admin Users
                             </NavLink>
                         </li>
 

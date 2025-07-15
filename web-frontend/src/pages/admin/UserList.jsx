@@ -1,8 +1,8 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { axiosInstance } from '../lib/axios';
-import UserFilter from '../components/userList/UserFilter';
-import DeleteUserButton from '../components/userList/DeleteUserButton';
+import { axiosInstance } from '../../lib/axios';
+import UserFilter from '../../components/user/UserFilter';
+import DeleteUserButton from '../../components/user/DeleteUserButton';
 
 const UserList = () => {
     const [users, setUsers] = useState([]);

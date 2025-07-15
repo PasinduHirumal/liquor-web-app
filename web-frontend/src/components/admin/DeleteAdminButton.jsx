@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { axiosInstance } from '../../lib/axios';
 import toast from 'react-hot-toast';
+import { axiosInstance } from '../../lib/axios';
 import ConfirmDialog from '../../common/ConfirmDialog';
 
 const DeleteAdminButton = ({ adminId, onSuccess }) => {

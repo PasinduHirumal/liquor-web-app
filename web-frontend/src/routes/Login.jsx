@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import UserLogin from '../pages/UserLogin';
-import AdminLogin from '../pages/AdminLogin';
+import UserLogin from '../pages/user/UserLogin';
+import AdminLogin from '../pages/admin/AdminLogin';
 
 const Login = () => {
     const [activeComponent, setActiveComponent] = useState('UserLogin');

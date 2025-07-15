@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import AdminRegister from '../pages/AdminRegister';
-import UserRegister from '../pages/UserRegister';
+import AdminRegister from '../pages/admin/AdminRegister';
+import UserRegister from '../pages/user/UserRegister';
 
 const Register = () => {
   const [activeComponent, setActiveComponent] = useState('UserRegister');
