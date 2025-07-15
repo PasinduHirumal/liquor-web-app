@@ -17,7 +17,7 @@ const validateDriver = (req, res, next) => {
       Joi.string().isoDate(),
       Joi.valid(null)
     ).required(),
-    profileImage: Joi.string().uri().allow('').default(null),
+    profileImage: Joi.string().uri().allow('').optional(),
     address: Joi.string().max(350).allow('').default(null),
     city: Joi.string().max(100).allow('').default(null),
     emergencyContact: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).allow('').default(null),

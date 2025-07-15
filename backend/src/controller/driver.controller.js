@@ -48,4 +48,22 @@ const createDriver = async (req, res) => {
     }
 };
 
-export { createDriver, };
+const deleteDriver = async (req, res) => {
+	try {
+        const driverId = req.params.id;
+
+        const driverToDelete = await driverService.findById(driverId);
+        if (!driverToDelete) {
+            return res.status(404).json({ success: false, message: "Driver not found"});
+        }
+
+        await driverService.deleteById(driverId);
+
+        return res.status(200).json({ success: true, message: "Driver deleted successfully"});
+    } catch (error) {
+        console.error("Delete driver error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+export { createDriver, deleteDriver};
