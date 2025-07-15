@@ -7,7 +7,8 @@ const AddressFormModal = ({
     handleSubmit,
     handleInputChange,
     formData,
-    editingId
+    editingId,
+    submitLoading,
 }) => {
     return (
         <Modal show={show} onHide={handleClose} centered>
@@ -75,8 +76,24 @@ const AddressFormModal = ({
                             />
                         </Col>
                         <Col xs={12}>
-                            <Button variant="primary" type="submit" className="w-100 mt-3">
-                                {editingId ? "Update Address" : "Save Address"}
+                            <Button
+                                variant="primary"
+                                type="submit"
+                                className="w-100 mt-3"
+                                disabled={submitLoading}
+                            >
+                                {submitLoading ? (
+                                    <>
+                                        <span
+                                            className="spinner-border spinner-border-sm me-2"
+                                            role="status"
+                                            aria-hidden="true"
+                                        ></span>
+                                        {editingId ? "Updating..." : "Saving..."}
+                                    </>
+                                ) : (
+                                    editingId ? "Update Address" : "Save Address"
+                                )}
                             </Button>
                         </Col>
                     </Row>

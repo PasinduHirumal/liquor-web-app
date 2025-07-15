@@ -7,6 +7,7 @@ import { FaEdit, FaCheckCircle, FaPlusCircle } from "react-icons/fa";
 const Address = () => {
     const [addresses, setAddresses] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [submitLoading, setSubmitLoading] = useState(false);
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
         city: "",
@@ -44,6 +45,7 @@ const Address = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setSubmitLoading(true);
         try {
             if (editingId) {
                 await axiosInstance.patch(`/addresses/update/${editingId}`, formData);
@@ -65,6 +67,8 @@ const Address = () => {
         } catch (error) {
             console.error("Error saving address:", error);
             toast.error(error.response?.data?.message || "Failed to save address");
+        } finally {
+            setSubmitLoading(false);
         }
     };
 
@@ -178,6 +182,7 @@ const Address = () => {
                 handleInputChange={handleInputChange}
                 formData={formData}
                 editingId={editingId}
+                submitLoading={submitLoading}
             />
         </div>
     );
