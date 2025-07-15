@@ -32,9 +32,8 @@ const Loader = () => (
 
 // Protected Route for Admin
 const AdminProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useAdminAuthStore();
+  const { loading } = useAdminAuthStore();
   if (loading) return <Loader />;
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
   return (
     <>
       <AdminNavbar />
@@ -45,9 +44,8 @@ const AdminProtectedRoute = ({ children }) => {
 
 // Protected Route for User
 const UserProtectedRoute = ({ children }) => {
-  const { isAuthenticated, loading } = useUserAuthStore();
+  const { loading } = useUserAuthStore();
   if (loading) return <Loader />;
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
   return (
     <>
       <UserNavbar />
