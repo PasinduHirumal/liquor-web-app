@@ -71,6 +71,15 @@ const UserNavbar = () => {
                         </li>
                         <li className="nav-item mt-2 mt-lg-0">
                             <NavLink
+                                to={`/address`}
+                                className="nav-link"
+                                onClick={closeCollapse}
+                            >
+                                Address
+                            </NavLink>
+                        </li>
+                        <li className="nav-item mt-2 mt-lg-0">
+                            <NavLink
                                 to={`/profile/${user?.id}`}
                                 className="nav-link"
                                 onClick={closeCollapse}
