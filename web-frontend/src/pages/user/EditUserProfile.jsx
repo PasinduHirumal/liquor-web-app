@@ -1,12 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
 
-const UserProfileEdit = () => {
-    const { id } = useParams();
-    const navigate = useNavigate();
-
+const UserProfileEdit = ({ id, onClose, onUpdate }) => {
     // Form state
     const [formData, setFormData] = useState({
         email: "",
@@ -109,7 +105,7 @@ const UserProfileEdit = () => {
             const res = await axiosInstance.patch(`/users/update/${id}`, formData);
             if (res.data.success) {
                 toast.success("Profile updated successfully!");
-                navigate(-1);
+                onUpdate(); // Notify parent component of successful update
             } else {
                 toast.error(res.data.message || "Update failed");
             }
@@ -123,7 +119,7 @@ const UserProfileEdit = () => {
 
     if (loading) {
         return (
-            <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
+            <div className="d-flex justify-content-center align-items-center py-4">
                 <div className="spinner-border text-primary" role="status" aria-hidden="true"></div>
                 <span className="ms-2 fs-5">Loading profile...</span>
             </div>
@@ -131,165 +127,160 @@ const UserProfileEdit = () => {
     }
 
     return (
-        <div className="container mt-5 pt-4">
-            <div className="row justify-content-center">
-                <div className="col-lg-7 col-md-9">
-                    <div className="card shadow-lg rounded-4 border-0">
-                        <div className="card-header bg-primary text-white text-center rounded-top-4 py-3">
-                            <h2 className="mb-0">Edit Profile</h2>
-                        </div>
-                        <div className="card-body p-4">
-                            <form onSubmit={handleSubmit}>
-                                <div className="mb-4">
-                                    <label htmlFor="email" className="form-label fw-semibold">
-                                        Email (cannot be changed)
-                                    </label>
-                                    <input
-                                        type="email"
-                                        className="form-control"
-                                        id="email"
-                                        name="email"
-                                        value={formData.email}
-                                        disabled
-                                    />
-                                </div>
+        <form onSubmit={handleSubmit}>
+            <div className="mb-4">
+                <label htmlFor="email" className="form-label fw-semibold">
+                    Email (cannot be changed)
+                </label>
+                <input
+                    type="email"
+                    className="form-control"
+                    id="email"
+                    name="email"
+                    value={formData.email}
+                    disabled
+                />
+            </div>
 
-                                <div className="row g-3 mb-4">
-                                    <div className="col-md-6">
-                                        <label htmlFor="firstName" className="form-label fw-semibold">
-                                            First Name *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="firstName"
-                                            name="firstName"
-                                            value={formData.firstName}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label htmlFor="lastName" className="form-label fw-semibold">
-                                            Last Name *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="lastName"
-                                            name="lastName"
-                                            value={formData.lastName}
-                                            onChange={handleChange}
-                                            required
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="row g-3 mb-4">
-                                    <div className="col-md-6">
-                                        <label htmlFor="phone" className="form-label fw-semibold">
-                                            Phone *
-                                        </label>
-                                        <input
-                                            type="tel"
-                                            className="form-control"
-                                            id="phone"
-                                            name="phone"
-                                            value={formData.phone}
-                                            onChange={handleChange}
-                                            required
-                                            placeholder="+1234567890"
-                                        />
-                                    </div>
-                                    <div className="col-md-6">
-                                        <label htmlFor="nic_number" className="form-label fw-semibold">
-                                            NIC Number *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            className="form-control"
-                                            id="nic_number"
-                                            name="nic_number"
-                                            value={formData.nic_number}
-                                            onChange={handleChange}
-                                            required
-                                            maxLength={12}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="mb-4">
-                                    <label htmlFor="dateOfBirth" className="form-label fw-semibold">
-                                        Date of Birth
-                                    </label>
-                                    <input
-                                        type="date"
-                                        className="form-control"
-                                        id="dateOfBirth"
-                                        name="dateOfBirth"
-                                        value={formData.dateOfBirth}
-                                        onChange={handleChange}
-                                    />
-                                </div>
-
-                                <div className="mb-4">
-                                    <label className="form-label fw-semibold">Addresses</label>
-                                    {formData.addresses.map((addr, idx) => (
-                                        <div key={idx} className="input-group mb-3">
-                                            <input
-                                                type="text"
-                                                className="form-control"
-                                                name="addresses"
-                                                value={addr}
-                                                onChange={(e) => handleChange(e, idx)}
-                                                maxLength={350}
-                                                placeholder={`Address #${idx + 1}`}
-                                            />
-                                            <button
-                                                type="button"
-                                                className="btn btn-outline-danger"
-                                                onClick={() => removeAddress(idx)}
-                                                disabled={formData.addresses.length <= 1}
-                                            >
-                                                &times;
-                                            </button>
-                                        </div>
-                                    ))}
-                                    <button
-                                        type="button"
-                                        className="btn btn-outline-primary"
-                                        onClick={addAddress}
-                                    >
-                                        + Add Address
-                                    </button>
-                                </div>
-
-                                <div className="d-grid">
-                                    <button
-                                        type="submit"
-                                        className="btn btn-primary btn-lg"
-                                        disabled={submitting}
-                                    >
-                                        {submitting ? (
-                                            <>
-                                                <span
-                                                    className="spinner-border spinner-border-sm me-2"
-                                                    role="status"
-                                                    aria-hidden="true"
-                                                ></span>
-                                                Saving...
-                                            </>
-                                        ) : (
-                                            "Save Changes"
-                                        )}
-                                    </button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
+            <div className="row g-3 mb-4">
+                <div className="col-md-6">
+                    <label htmlFor="firstName" className="form-label fw-semibold">
+                        First Name *
+                    </label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="firstName"
+                        name="firstName"
+                        value={formData.firstName}
+                        onChange={handleChange}
+                        required
+                    />
+                </div>
+                <div className="col-md-6">
+                    <label htmlFor="lastName" className="form-label fw-semibold">
+                        Last Name *
+                    </label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="lastName"
+                        name="lastName"
+                        value={formData.lastName}
+                        onChange={handleChange}
+                        required
+                    />
                 </div>
             </div>
-        </div>
+
+            <div className="row g-3 mb-4">
+                <div className="col-md-6">
+                    <label htmlFor="phone" className="form-label fw-semibold">
+                        Phone *
+                    </label>
+                    <input
+                        type="tel"
+                        className="form-control"
+                        id="phone"
+                        name="phone"
+                        value={formData.phone}
+                        onChange={handleChange}
+                        required
+                        placeholder="+1234567890"
+                    />
+                </div>
+                <div className="col-md-6">
+                    <label htmlFor="nic_number" className="form-label fw-semibold">
+                        NIC Number *
+                    </label>
+                    <input
+                        type="text"
+                        className="form-control"
+                        id="nic_number"
+                        name="nic_number"
+                        value={formData.nic_number}
+                        onChange={handleChange}
+                        required
+                        maxLength={12}
+                    />
+                </div>
+            </div>
+
+            <div className="mb-4">
+                <label htmlFor="dateOfBirth" className="form-label fw-semibold">
+                    Date of Birth
+                </label>
+                <input
+                    type="date"
+                    className="form-control"
+                    id="dateOfBirth"
+                    name="dateOfBirth"
+                    value={formData.dateOfBirth}
+                    onChange={handleChange}
+                />
+            </div>
+
+            <div className="mb-4">
+                <label className="form-label fw-semibold">Addresses</label>
+                {formData.addresses.map((addr, idx) => (
+                    <div key={idx} className="input-group mb-3">
+                        <input
+                            type="text"
+                            className="form-control"
+                            name="addresses"
+                            value={addr}
+                            onChange={(e) => handleChange(e, idx)}
+                            maxLength={350}
+                            placeholder={`Address #${idx + 1}`}
+                        />
+                        <button
+                            type="button"
+                            className="btn btn-outline-danger"
+                            onClick={() => removeAddress(idx)}
+                            disabled={formData.addresses.length <= 1}
+                        >
+                            &times;
+                        </button>
+                    </div>
+                ))}
+                <button
+                    type="button"
+                    className="btn btn-outline-primary"
+                    onClick={addAddress}
+                >
+                    + Add Address
+                </button>
+            </div>
+
+            <div className="d-flex justify-content-end gap-2 pt-2">
+                <button
+                    type="button"
+                    className="btn btn-outline-secondary"
+                    onClick={onClose}
+                    disabled={submitting}
+                >
+                    Cancel
+                </button>
+                <button
+                    type="submit"
+                    className="btn btn-primary"
+                    disabled={submitting}
+                >
+                    {submitting ? (
+                        <>
+                            <span
+                                className="spinner-border spinner-border-sm me-2"
+                                role="status"
+                                aria-hidden="true"
+                            ></span>
+                            Saving...
+                        </>
+                    ) : (
+                        "Save Changes"
+                    )}
+                </button>
+            </div>
+        </form>
     );
 };
 
