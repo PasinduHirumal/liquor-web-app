@@ -41,4 +41,40 @@ const createAddress = async (req, res) => {
     }
 };
 
-export { createAddress, };
+const getAllAddressesForUser = async (req, res) => {
+	try {
+        const userId = req.user.id;
+        const { isActive } = req.query;
+
+        const addresses = await addressService.findByFilter('userId', '==', userId);
+        if (!addresses) {
+            return res.status(400).json({ success: false, message: "Failed to find addresses for user"});
+        }
+
+        let filteredAddresses;
+        let filterDescription = [];
+        if (isActive !== undefined) {
+            // Convert string to boolean since query params are strings
+            const isActiveBoolean = isActive === 'true';
+            filteredAddresses = addresses.filter(address => address.isActive === isActiveBoolean);
+            filterDescription.push(`isActive: ${isActive}`);
+        } else {
+            filteredAddresses = addresses;
+        }
+        
+        return res.status(200).json({ 
+            success: true, 
+            message: "Addresses found", 
+            count: filteredAddresses.length,
+            filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
+            data: filteredAddresses
+        });
+    } catch (error) {
+        console.error("Find addresses for user error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+
+
+export { createAddress, getAllAddressesForUser};
