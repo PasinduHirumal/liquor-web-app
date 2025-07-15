@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../lib/axios";
 import useUserAuthStore from "../../stores/userAuthStore";
 
 const UserProfile = () => {
     const { user } = useUserAuthStore();
     const { profileId } = useParams();
+    const navigate = useNavigate();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
 
@@ -44,8 +45,15 @@ const UserProfile = () => {
             <div className="row justify-content-center">
                 <div className="col-md-8">
                     <div className="card shadow-lg border-0 rounded-4">
-                        <div className="card-header bg-primary text-white text-center rounded-top-4">
+                        <div className="card-header bg-primary text-white text-center rounded-top-4 d-flex justify-content-between align-items-center">
                             <h3 className="mb-0">User Profile</h3>
+                            {/* Edit Profile Button */}
+                            <button
+                                className="btn btn-light btn-sm"
+                                onClick={() => navigate(`/profile/edit/${profile.id}`)}
+                            >
+                                Edit Profile
+                            </button>
                         </div>
                         <div className="card-body p-4">
                             <ul className="list-group list-group-flush">
