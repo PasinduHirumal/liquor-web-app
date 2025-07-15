@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { axiosInstance } from "../../lib/axios";
 import useUserAuthStore from "../../stores/userAuthStore";
 
 const UserProfile = () => {
     const { user } = useUserAuthStore();
     const { profileId } = useParams();
-    const navigate = useNavigate();
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -62,8 +61,6 @@ const UserProfile = () => {
         );
     }
 
-    const isOwnProfile = user?.user_id === profile.id;
-
     return (
         <div className="container mt-5 pt-4">
             <div className="row justify-content-center">
@@ -71,14 +68,6 @@ const UserProfile = () => {
                     <div className="card shadow-lg border-0 rounded-4">
                         <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-top-4">
                             <h3 className="mb-0">User Profile</h3>
-                            {isOwnProfile && (
-                                <button
-                                    className="btn btn-light btn-sm"
-                                    onClick={() => navigate(`/profile/edit/${profile.id}`)}
-                                >
-                                    Edit Profile
-                                </button>
-                            )}
                         </div>
                         <div className="card-body p-4">
                             <ul className="list-group list-group-flush">

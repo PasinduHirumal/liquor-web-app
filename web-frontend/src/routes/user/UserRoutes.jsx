@@ -1,10 +1,9 @@
+import React from "react";
 import UserNavbar from "../../components/user/UserNavbar";
 import UserHome from "./UserHome";
 import UserProfile from "../../pages/user/UserProfile";
 import useUserAuthStore from "../../stores/userAuthStore";
 
-import React from "react";
-import UserProfileEdit from "../../pages/user/EditUserProfile";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -38,14 +37,6 @@ export const userRoutes = [
         element: (
             <UserProtectedRoute>
                 <UserProfile />
-            </UserProtectedRoute>
-        ),
-    },
-    {
-        path: "/profile/edit/:id",
-        element: (
-            <UserProtectedRoute>
-                <UserProfileEdit />
             </UserProtectedRoute>
         ),
     },
