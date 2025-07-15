@@ -1,0 +1,83 @@
+import Joi from 'joi';
+
+// CREATE VALIDATOR - With defaults
+const validateAddress = (req, res, next) => {
+  const schema = Joi.object({
+    city: Joi.string().min(1).max(100).required(),
+    state: Joi.string().min(1).max(100).required(),
+    postalCode: Joi.string().pattern(/^[A-Za-z0-9\s\-]{3,10}$/).required(),
+    country: Joi.string().min(2).max(100).required(),
+    
+    latitude: Joi.number().min(-90).max(90).precision(6).optional(),
+    longitude: Joi.number().min(-180).max(180).precision(6).optional(),
+    
+    isDefault: Joi.boolean().default(false),
+    isActive: Joi.boolean().default(true),
+  });
+
+  // THE KEY CHANGE: Use the validated value with defaults applied
+  const { error, value } = schema.validate(req.body, {
+    allowUnknown: false,
+    stripUnknown: true,
+    abortEarly: false
+  });
+
+  if (error) {
+    return res.status(400).json({ 
+        success: false,
+        message: error.details[0].message,
+        errors: error.details.map(detail => ({
+          field: detail.path.join('.'),
+          message: detail.message,
+          value: detail.context?.value
+        }))
+    });
+  }
+
+  // Replace req.body with the validated value that includes defaults
+  req.body = value;
+  next();
+};
+
+// UPDATE VALIDATOR - NO defaults, all fields optional
+const validateAddressUpdate = (req, res, next) => {
+  const schema = Joi.object({
+    city: Joi.string().min(1).max(100).optional(),
+    state: Joi.string().min(1).max(100).optional(),
+    postalCode: oi.string().pattern(/^[A-Za-z0-9\s\-]{3,10}$/).optional(),
+    country: Joi.string().min(2).max(100).optional(),
+    
+    latitude: Joi.number().min(-90).max(90).precision(6).optional(),
+    longitude: Joi.number().min(-180).max(180).precision(6).optional(),
+    
+    isDefault: Joi.boolean().optional(),
+    isActive: Joi.boolean().optional(),
+  })
+  .min(1) // Require at least one field to update
+  .options({ stripUnknown: true });; 
+
+  // THE KEY CHANGE: Use the validated value with defaults applied
+  const { error, value } = schema.validate(req.body, {
+    allowUnknown: false,
+    abortEarly: false
+  });
+
+  if (error) {
+    console.log("Validation error: " + error.details[0].message)
+    return res.status(400).json({ 
+        success: false,
+        message: "Validation failed",
+        errors: error.details.map(detail => ({
+          field: detail.path.join('.'),
+          message: detail.message,
+          value: detail.context?.value
+        }))
+    });
+  }
+
+  // Replace req.body with the validated value that includes defaults
+  req.body = value;
+  next();
+};
+
+export { validateAddress, validateAddressUpdate };
