@@ -3,6 +3,7 @@ import UserNavbar from "../../components/user/UserNavbar";
 import UserHome from "./UserHome";
 import UserProfile from "../../pages/user/UserProfile";
 import useUserAuthStore from "../../stores/userAuthStore";
+import Address from "../../pages/user/Address";
 
 
 const Loader = () => (
@@ -37,6 +38,14 @@ export const userRoutes = [
         element: (
             <UserProtectedRoute>
                 <UserProfile />
+            </UserProtectedRoute>
+        ),
+    },
+    {
+        path: "/address",
+        element: (
+            <UserProtectedRoute>
+                <Address />
             </UserProtectedRoute>
         ),
     },

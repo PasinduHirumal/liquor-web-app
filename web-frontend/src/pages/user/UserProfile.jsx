@@ -5,9 +5,6 @@ import useUserAuthStore from "../../stores/userAuthStore";
 import UserProfileEdit from "./EditUserProfile";
 import { Modal } from "react-bootstrap";
 
-// Optional: Make sure Bootstrap Icons are globally included in your app
-// import "bootstrap-icons/font/bootstrap-icons.css";
-
 const UserProfile = () => {
     const { user } = useUserAuthStore();
     const { profileId } = useParams();
