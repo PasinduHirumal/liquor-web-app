@@ -13,6 +13,7 @@ class Addresses {
         this.longitude = data.longitude;
 
         this.isDefault = data.isDefault;
+        this.isActive = data.isActive;
 
         this.createdAt = data.createdAt || new Date().toISOString();
         this.updatedAt = data.updatedAt || new Date().toISOString();

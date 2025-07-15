@@ -1,6 +1,6 @@
-import bcrypt from "bcryptjs"
+import bcrypt from "bcryptjs";
 import initializeFirebase from "../config/firebase.config.js";
-import AdminUsers from "../models/AdminUsers.js"
+import AdminUsers from "../models/AdminUsers.js";
 
 const { db } = initializeFirebase();
 
