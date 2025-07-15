@@ -1,14 +1,14 @@
 import { useState, useEffect } from "react";
 import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
-import AddressFormModal from "../../components/user/AddressFormModal"; // ← Import here
+import AddressFormModal from "../../components/user/AddressFormModal";
+import { FaEdit, FaCheckCircle, FaPlusCircle } from "react-icons/fa";
 
 const Address = () => {
     const [addresses, setAddresses] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
     const [formData, setFormData] = useState({
-        street: "",
         city: "",
         state: "",
         postalCode: "",
@@ -55,7 +55,6 @@ const Address = () => {
             setShowForm(false);
             setEditingId(null);
             setFormData({
-                street: "",
                 city: "",
                 state: "",
                 postalCode: "",
@@ -70,7 +69,8 @@ const Address = () => {
     };
 
     const handleEdit = (address) => {
-        setFormData({ ...address });
+        const { street, ...rest } = address;
+        setFormData({ ...rest });
         setEditingId(address.id);
         setShowForm(true);
     };
@@ -94,17 +94,16 @@ const Address = () => {
     return (
         <div className="container mt-5 pt-5">
             <div className="row justify-content-center">
-                <div className="col-md-10">
-                    <div className="card">
-                        <div className="card-header d-flex justify-content-between align-items-center">
-                            <h2 className="mb-0">My Addresses</h2>
+                <div className="col-lg-10">
+                    <div className="card shadow">
+                        <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                            <h4 className="mb-0">My Addresses</h4>
                             <button
-                                className="btn btn-primary"
+                                className="btn btn-light text-primary d-flex align-items-center"
                                 onClick={() => {
                                     setShowForm(true);
                                     setEditingId(null);
                                     setFormData({
-                                        street: "",
                                         city: "",
                                         state: "",
                                         postalCode: "",
@@ -113,48 +112,52 @@ const Address = () => {
                                     });
                                 }}
                             >
-                                Add New Address
+                                <FaPlusCircle className="me-2" />
+                                Add Address
                             </button>
                         </div>
 
                         <div className="card-body">
                             {loading ? (
-                                <div className="text-center">
-                                    <div className="spinner-border" role="status" />
+                                <div className="text-center py-5">
+                                    <div className="spinner-border text-primary" role="status" />
                                 </div>
                             ) : addresses.length === 0 ? (
-                                <div className="alert alert-info">
-                                    You don't have any saved addresses. Add one above.
+                                <div className="alert alert-info text-center">
+                                    You don't have any saved addresses. Add one using the button above.
                                 </div>
                             ) : (
-                                <div className="list-group">
+                                <div className="row g-3">
                                     {addresses.map((address) => (
-                                        <div
-                                            key={address.id}
-                                            className={`list-group-item ${address.isActive ? 'active' : ''}`}
-                                        >
-                                            <div className="d-flex justify-content-between align-items-start">
-                                                <div>
-                                                    <h5>
-                                                        {address.street}, {address.city}, {address.state} {address.postalCode}, {address.country}
+                                        <div key={address.id} className="col-md-6">
+                                            <div className={`card border-${address.isActive ? "success" : "secondary"} h-100`}>
+                                                <div className="card-body">
+                                                    <h5 className="card-title">
+                                                        {address.city}, {address.state}
                                                     </h5>
+                                                    <p className="card-text mb-1">
+                                                        {address.postalCode}, {address.country}
+                                                    </p>
                                                     {address.isActive && (
-                                                        <span className="badge bg-success">Default</span>
+                                                        <span className="badge bg-success">
+                                                            <FaCheckCircle className="me-1" /> Default
+                                                        </span>
                                                     )}
                                                 </div>
-                                                <div className="btn-group">
+                                                <div className="card-footer bg-light d-flex justify-content-end gap-2">
                                                     {!address.isActive && (
                                                         <button
-                                                            className="btn btn-sm btn-outline-secondary"
+                                                            className="btn btn-outline-success btn-sm"
                                                             onClick={() => handleSetDefault(address.id)}
                                                         >
                                                             Set as Default
                                                         </button>
                                                     )}
                                                     <button
-                                                        className="btn btn-sm btn-outline-primary"
+                                                        className="btn btn-outline-primary btn-sm"
                                                         onClick={() => handleEdit(address)}
                                                     >
+                                                        <FaEdit className="me-1" />
                                                         Edit
                                                     </button>
                                                 </div>
@@ -168,7 +171,6 @@ const Address = () => {
                 </div>
             </div>
 
-            {/* Modal */}
             <AddressFormModal
                 show={showForm}
                 handleClose={() => setShowForm(false)}

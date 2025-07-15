@@ -18,18 +18,6 @@ const AddressFormModal = ({
                 <Form onSubmit={handleSubmit}>
                     <Row className="g-2">
                         <Col md={6}>
-                            <Form.Group controlId="street">
-                                <Form.Label>Street</Form.Label>
-                                <Form.Control
-                                    type="text"
-                                    name="street"
-                                    value={formData.street}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </Form.Group>
-                        </Col>
-                        <Col md={6}>
                             <Form.Group controlId="city">
                                 <Form.Label>City</Form.Label>
                                 <Form.Control
@@ -41,7 +29,7 @@ const AddressFormModal = ({
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md={4}>
+                        <Col md={6}>
                             <Form.Group controlId="state">
                                 <Form.Label>State/Province</Form.Label>
                                 <Form.Control
@@ -53,7 +41,7 @@ const AddressFormModal = ({
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md={4}>
+                        <Col md={6}>
                             <Form.Group controlId="postalCode">
                                 <Form.Label>Postal Code</Form.Label>
                                 <Form.Control
@@ -65,7 +53,7 @@ const AddressFormModal = ({
                                 />
                             </Form.Group>
                         </Col>
-                        <Col md={4}>
+                        <Col md={6}>
                             <Form.Group controlId="country">
                                 <Form.Label>Country</Form.Label>
                                 <Form.Control
