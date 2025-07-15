@@ -34,7 +34,7 @@ export const adminRoutes = [
         ),
     },
     {
-        path: "/admin-users",
+        path: "/admin-users-list",
         element: (
             <AdminProtectedRoute>
                 <AdminUserList />
@@ -42,7 +42,7 @@ export const adminRoutes = [
         ),
     },
     {
-        path: "/users",
+        path: "/users-list",
         element: (
             <AdminProtectedRoute>
                 <UserList />

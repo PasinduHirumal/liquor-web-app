@@ -1,4 +1,3 @@
-// user.routes.js
 import UserNavbar from "../../components/user/UserNavbar";
 import UserHome from "./UserHome";
 import UserProfile from "../../pages/user/UserProfile";
