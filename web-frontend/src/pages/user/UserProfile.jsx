@@ -36,19 +36,48 @@ const UserProfile = () => {
     }
 
     if (!profile) {
-        return <div className="text-center mt-4">Profile not found.</div>;
+        return <div className="text-center mt-4 text-danger">Profile not found.</div>;
     }
 
     return (
-        <div className="container mt-5">
-            <h2>User Profile</h2>
-            <ul className="list-group">
-                <li className="list-group-item"><strong>Name:</strong> {profile.firstName} {profile.lastName}</li>
-                <li className="list-group-item"><strong>Email:</strong> {profile.email}</li>
-                <li className="list-group-item"><strong>Role:</strong> {profile.role}</li>
-                <li className="list-group-item"><strong>Account Completed:</strong> {profile.isAccountCompleted ? "Yes" : "No"}</li>
-                <li className="list-group-item"><strong>Active:</strong> {profile.isActive ? "Yes" : "No"}</li>
-            </ul>
+        <div className="container mt-5 pt-5">
+            <div className="row justify-content-center">
+                <div className="col-md-8">
+                    <div className="card shadow-lg border-0 rounded-4">
+                        <div className="card-header bg-primary text-white text-center rounded-top-4">
+                            <h3 className="mb-0">User Profile</h3>
+                        </div>
+                        <div className="card-body p-4">
+                            <ul className="list-group list-group-flush">
+                                <li className="list-group-item d-flex justify-content-between">
+                                    <strong>Name:</strong>
+                                    <span>{profile.firstName} {profile.lastName}</span>
+                                </li>
+                                <li className="list-group-item d-flex justify-content-between">
+                                    <strong>Email:</strong>
+                                    <span>{profile.email}</span>
+                                </li>
+                                <li className="list-group-item d-flex justify-content-between">
+                                    <strong>Role:</strong>
+                                    <span className="badge bg-secondary">{profile.role}</span>
+                                </li>
+                                <li className="list-group-item d-flex justify-content-between">
+                                    <strong>Account Completed:</strong>
+                                    <span className={`badge ${profile.isAccountCompleted ? "bg-success" : "bg-warning"}`}>
+                                        {profile.isAccountCompleted ? "Yes" : "No"}
+                                    </span>
+                                </li>
+                                <li className="list-group-item d-flex justify-content-between">
+                                    <strong>Active:</strong>
+                                    <span className={`badge ${profile.isActive ? "bg-success" : "bg-danger"}`}>
+                                        {profile.isActive ? "Yes" : "No"}
+                                    </span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };
