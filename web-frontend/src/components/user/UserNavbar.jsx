@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
-import useAuthStore from "../../stores/userAuthStore";
+import useUserAuthStore from "../../stores/userAuthStore";
 
 const UserNavbar = () => {
     const navigate = useNavigate();
-    const logout = useAuthStore((state) => state.logout);
-    const user = useAuthStore((state) => state.user);
+    const logout = useUserAuthStore((state) => state.logout);
+    const user = useUserAuthStore((state) => state.user);
     const [isCollapsed, setIsCollapsed] = useState(false);
 
     const handleLogout = async () => {
