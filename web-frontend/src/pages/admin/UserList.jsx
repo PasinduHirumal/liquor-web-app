@@ -1,8 +1,11 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
+import { Table, Tag, Space, Spin, Alert, Typography } from 'antd';
 import { axiosInstance } from '../../lib/axios';
 import UserFilter from '../../components/user/UserFilter';
 import DeleteUserButton from '../../components/user/DeleteUserButton';
+
+const { Title, Text } = Typography;
 
 const UserList = () => {
     const [users, setUsers] = useState([]);
@@ -38,7 +41,6 @@ const UserList = () => {
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
-
         if (value !== '') {
             setFilter({
                 [name]: value,
@@ -52,87 +54,105 @@ const UserList = () => {
     const clearFilters = () => setFilter({ isActive: '', isAccountCompleted: '' });
 
     const handleUserDeleted = (deletedUserId) => {
-        setUsers((prevUsers) => prevUsers.filter((u) => (u.id || u._id || u.user_id) !== deletedUserId));
+        setUsers((prevUsers) =>
+            prevUsers.filter((u) => (u.id || u._id || u.user_id) !== deletedUserId)
+        );
     };
+
+    const columns = [
+        {
+            title: '#',
+            dataIndex: 'index',
+            key: 'index',
+            render: (_, __, index) => index + 1,
+            width: 40,
+        },
+        {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+            render: (_, record) => `${record.firstName || ''} ${record.lastName || ''}`,
+        },
+        {
+            title: 'Email',
+            dataIndex: 'email',
+            key: 'email',
+            render: (text) => text || '-',
+            width: 300,
+        },
+        {
+            title: 'Role',
+            dataIndex: 'role',
+            key: 'role',
+            render: (role) => <Tag color="blue">{role || '-'}</Tag>,
+            width: 70,
+        },
+        {
+            title: 'Active',
+            dataIndex: 'isActive',
+            key: 'isActive',
+            render: (isActive) =>
+                isActive ? <Tag color="green">Active</Tag> : <Tag color="red">Inactive</Tag>,
+            width: 80,
+        },
+        {
+            title: 'Account Completed',
+            dataIndex: 'isAccountCompleted',
+            key: 'isAccountCompleted',
+            render: (isCompleted) =>
+                isCompleted ? <Tag color="green">Yes</Tag> : <Tag color="volcano">No</Tag>,
+        },
+        {
+            title: 'Actions',
+            key: 'actions',
+            render: (_, record) => {
+                const userId = record.user_id || record.id || record._id;
+                return (
+                    <Space>
+                        <DeleteUserButton userId={userId} onSuccess={() => handleUserDeleted(userId)} />
+                    </Space>
+                );
+            },
+            width: 100,
+        },
+    ];
 
     return (
         <div className="d-flex justify-content-center mt-5 pt-4">
-            <div className="container" style={{ maxWidth: 900 }}>
-                <div className="card border-0">
-                    <div className="card-body">
-                        <h2 className="card-title text-center mb-4">User List</h2>
-
-                        <UserFilter
-                            filter={filter}
-                            onFilterChange={handleFilterChange}
-                            onClearFilters={clearFilters}
-                        />
-
-                        {loading && (
-                            <div className="text-center my-4" role="status" aria-live="polite">
-                                <div className="spinner-border text-primary" />
-                                <p className="mt-2">Loading users...</p>
-                            </div>
-                        )}
-
-                        {!loading && error && (
-                            <div className="alert alert-danger text-center" role="alert">
-                                {error}
-                            </div>
-                        )}
-
-                        {!loading && !error && (
-                            <>
-                                {filterInfo && (
-                                    <p className="text-center text-muted mb-3">
-                                        Filtered by: <strong>{filterInfo}</strong>
-                                    </p>
-                                )}
-
-                                {users.length > 0 ? (
-                                    <div className="table-responsive border rounded-3" style={{ maxHeight: '360px', overflowY: 'auto' }}>
-                                        <table className="table table-bordered table-hover text-center align-middle mb-0">
-                                            <thead className="table-light">
-                                                <tr>
-                                                    <th>#</th>
-                                                    <th>Name</th>
-                                                    <th>Email</th>
-                                                    <th>Role</th>
-                                                    <th>Active</th>
-                                                    <th>Account Completed</th>
-                                                    <th>Actions</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody>
-                                                {users.map((user, index) => {
-                                                    const userId = user.user_id || user.id || user._id;
-                                                    return (
-                                                        <tr key={userId}>
-                                                            <th scope="row">{index + 1}</th>
-                                                            <td>{user.firstName || ''} {user.lastName || ''}</td>
-                                                            <td>{user.email || '-'}</td>
-                                                            <td>{user.role || '-'}</td>
-                                                            <td>{user.isActive ? '✅' : '❌'}</td>
-                                                            <td>{user.isAccountCompleted ? '✅' : '❌'}</td>
-                                                            <td>
-                                                                <DeleteUserButton
-                                                                    userId={userId}
-                                                                    onSuccess={() => handleUserDeleted(userId)}
-                                                                />
-                                                            </td>
-                                                        </tr>
-                                                    );
-                                                })}
-                                            </tbody>
-                                        </table>
-                                    </div>
-                                ) : (
-                                    <p className="text-center my-4">No users found.</p>
-                                )}
-                            </>
-                        )}
-                    </div>
+            <div className="container" style={{ maxWidth: 1000 }}>
+                <div className="mb-4 text-center">
+                    <Title level={2}>User List</Title>
                 </div>
+
+                <UserFilter
+                    filter={filter}
+                    onFilterChange={handleFilterChange}
+                    onClearFilters={clearFilters}
+                />
+
+                {loading ? (
+                    <div className="text-center my-4">
+                        <Spin tip="Loading users..." size="large" />
+                    </div>
+                ) : error ? (
+                    <Alert message="Error" description={error} type="error" showIcon className="my-4" />
+                ) : (
+                    <>
+                        {filterInfo && (
+                            <Text type="secondary" className="d-block text-center mb-3">
+                                Filtered by: <strong>{filterInfo}</strong>
+                            </Text>
+                        )}
+                        <Table
+                            rowKey={(record) => record.user_id || record.id || record._id}
+                            columns={columns}
+                            dataSource={users}
+                            pagination={{ pageSize: 10 }}
+                            scroll={{ y: 360 }}
+                            bordered
+                        />
+                    </>
+                )}
             </div>
         </div>
     );

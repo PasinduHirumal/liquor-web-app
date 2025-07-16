@@ -95,6 +95,16 @@ const AdminNavbar = () => {
 
                         <li className="nav-item">
                             <NavLink
+                                to="/driver-list"
+                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
+                                onClick={closeCollapse}
+                            >
+                                🛡️ Drivers
+                            </NavLink>
+                        </li>
+
+                        <li className="nav-item">
+                            <NavLink
                                 to="/admin-users-list"
                                 className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
                                 onClick={closeCollapse}
