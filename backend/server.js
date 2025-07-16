@@ -13,6 +13,7 @@ import addressRoutes from "./src/routes/address.routes.js";
 import driverRoutes from "./src/routes/driver.routes.js";
 import categoryRoutes from "./src/routes/category.routes.js";
 import productRoutes from "./src/routes/product.routes.js";
+import otherProductRoutes from "./src/routes/otherProducts.routes.js";
 
 
 dotenv.config();
@@ -39,6 +40,7 @@ app.use("/api/addresses", addressRoutes);
 app.use("/api/drivers", driverRoutes);
 app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
+app.use("/api/other-products", otherProductRoutes);
 
 
 //  Route handler for the root path
