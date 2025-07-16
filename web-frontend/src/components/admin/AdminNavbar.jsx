@@ -89,7 +89,7 @@ const AdminNavbar = () => {
                                 className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
                                 onClick={closeCollapse}
                             >
-                                👥 Users
+                                Users
                             </NavLink>
                         </li>
 
@@ -99,7 +99,7 @@ const AdminNavbar = () => {
                                 className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
                                 onClick={closeCollapse}
                             >
-                                🛡️ Drivers
+                                Drivers
                             </NavLink>
                         </li>
 
@@ -109,7 +109,7 @@ const AdminNavbar = () => {
                                 className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
                                 onClick={closeCollapse}
                             >
-                                🛡️ Admin Users
+                                Admin Users
                             </NavLink>
                         </li>
 
