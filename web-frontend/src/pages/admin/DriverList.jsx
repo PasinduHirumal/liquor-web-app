@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { axiosInstance } from '../../lib/axios';
 import CreateDriverForm from '../../components/admin/CreateDriverForm';
+import toast from 'react-hot-toast';
 
 import {
     Table, Button, message, Space, Tag, Switch, Popconfirm,
@@ -36,7 +37,7 @@ const DriverList = () => {
                 total: response.data.count || 0,
             }));
         } catch (err) {
-            message.error(err.response?.data?.message || 'Failed to load drivers');
+            toast.error(err.response?.data?.message || 'Failed to load drivers');
         } finally {
             setLoading(false);
         }
@@ -63,20 +64,20 @@ const DriverList = () => {
     const handleStatusChange = async (id, statusType, value) => {
         try {
             await axiosInstance.patch(`/drivers/update/${id}`, { [statusType]: value });
-            message.success('Driver status updated');
+            toast.success('Driver status updated');
             fetchDrivers();
         } catch {
-            message.error('Failed to update status');
+            toast.error('Failed to update status');
         }
     };
 
     const handleDelete = async (id) => {
         try {
             await axiosInstance.delete(`/drivers/delete/${id}`);
-            message.success('Driver deleted successfully');
+            toast.success('Driver deleted successfully');
             fetchDrivers();
         } catch {
-            message.error('Failed to delete driver');
+            toast.error('Failed to delete driver');
         }
     };
 
