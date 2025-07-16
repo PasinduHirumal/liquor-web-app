@@ -111,6 +111,7 @@ const DriverList = () => {
                 </Space>
             ),
             sorter: true,
+            width: 200,
         },
         {
             title: 'Contact',
@@ -121,6 +122,7 @@ const DriverList = () => {
                     <Text type="secondary">{record.phone}</Text>
                 </Space>
             ),
+            width: 250,
         },
         {
             title: 'Vehicle',
@@ -131,6 +133,7 @@ const DriverList = () => {
                     {record.vehicleNumber && <Text type="secondary">{record.vehicleNumber}</Text>}
                 </Space>
             ),
+            width: 150,
         },
         {
             title: 'Status',
@@ -153,6 +156,7 @@ const DriverList = () => {
                 { text: 'Inactive', value: false },
             ],
             onFilter: (value, record) => record.isActive === value,
+            width: 150,
         },
         {
             title: 'Documents',
@@ -162,6 +166,7 @@ const DriverList = () => {
                     {record.isDocumentVerified ? 'Verified' : 'Pending'}
                 </Tag>
             ),
+            width: 120,
         },
         {
             title: 'Actions',
@@ -188,6 +193,7 @@ const DriverList = () => {
                     </Popconfirm>
                 </Space>
             ),
+            width: 100,
         },
     ];
 
