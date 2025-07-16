@@ -2,14 +2,14 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { axiosInstance } from '../../lib/axios';
 import CreateDriverForm from '../../components/admin/CreateDriverForm';
 import toast from 'react-hot-toast';
+import { buildDriverQueryParams } from '../../components/admin/driverFilterParams';
 
 import {
-    Table, Button, message, Space, Tag, Switch, Popconfirm,
+    Table, Button, Space, Tag, Switch, Popconfirm,
     Card, Row, Col, Typography, Select, Badge
 } from 'antd';
 import {
-    EditOutlined, DeleteOutlined, EyeOutlined,
-    PlusOutlined, ReloadOutlined, FilterOutlined
+    EditOutlined, DeleteOutlined, PlusOutlined, ReloadOutlined, FilterOutlined
 } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
@@ -24,13 +24,15 @@ const DriverList = () => {
     const [filters, setFilters] = useState({
         isActive: undefined,
         isAvailable: undefined,
-        isDocumentVerified: undefined
+        isDocumentVerified: undefined,
     });
 
     const fetchDrivers = useCallback(async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get('/drivers/allDrivers');
+            const params = buildDriverQueryParams(filters);
+            const response = await axiosInstance.get('/drivers/allDrivers', { params });
+
             setDrivers(response.data.data || []);
             setPagination(prev => ({
                 ...prev,
@@ -41,7 +43,7 @@ const DriverList = () => {
         } finally {
             setLoading(false);
         }
-    }, []);
+    }, [filters]);
 
     useEffect(() => {
         fetchDrivers();
@@ -57,7 +59,7 @@ const DriverList = () => {
         setFilters({
             isActive: undefined,
             isAvailable: undefined,
-            isDocumentVerified: undefined
+            isDocumentVerified: undefined,
         });
     };
 
@@ -198,8 +200,8 @@ const DriverList = () => {
                             value={filters.isActive}
                             onChange={(value) => handleFilterChange('isActive', value)}
                         >
-                            <Option value={true}>Active</Option>
-                            <Option value={false}>Inactive</Option>
+                            <Option value="true">Active</Option>
+                            <Option value="false">Inactive</Option>
                         </Select>
                     </Col>
                     <Col span={8}>
@@ -210,8 +212,8 @@ const DriverList = () => {
                             value={filters.isAvailable}
                             onChange={(value) => handleFilterChange('isAvailable', value)}
                         >
-                            <Option value={true}>Available</Option>
-                            <Option value={false}>Unavailable</Option>
+                            <Option value="true">Available</Option>
+                            <Option value="false">Unavailable</Option>
                         </Select>
                     </Col>
                     <Col span={8}>
