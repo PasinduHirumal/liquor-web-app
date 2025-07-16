@@ -28,6 +28,11 @@ const getAllProducts = async (req, res) => {
             return res.status(400).json({ success: false, message: "Error in populate products"});
         }
 
+        // Add filter description for category filtering
+        if (populatedProducts.length < filteredProducts.length) {
+            filterDescription.push('category.isActive: true');
+        }
+
         return res.status(200).json({ 
             success: true, 
             message: "Fetching products successful",

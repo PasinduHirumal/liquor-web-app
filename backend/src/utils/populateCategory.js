@@ -31,9 +31,17 @@ const populateCategory = async (data) => {
     };
 
     if (Array.isArray(data)) {
-        return Promise.all(data.map(populateOne));
+        const populatedProducts = await Promise.all(data.map(populateOne));
+        // Filter out products where category is inactive or null
+        return populatedProducts.filter(product => 
+            product.category_id && product.category_id.is_active === true
+        );
     } else {
-        return populateOne(data);
+        const populatedProduct = await populateOne(data);
+        // Return null if category is inactive or null
+        return (populatedProduct.category_id && populatedProduct.category_id.is_active === true) 
+            ? populatedProduct 
+            : null;
     }
 };
 
