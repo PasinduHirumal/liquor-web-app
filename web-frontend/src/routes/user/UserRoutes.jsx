@@ -4,7 +4,7 @@ import UserHome from "./UserHome";
 import UserProfile from "../../pages/user/UserProfile";
 import useUserAuthStore from "../../stores/userAuthStore";
 import Address from "../../pages/user/Address";
-
+import { Navigate, useLocation } from "react-router-dom";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -14,8 +14,15 @@ const Loader = () => (
 );
 
 const UserProtectedRoute = ({ children }) => {
-    const { loading } = useUserAuthStore();
+    const { loading, isAuthenticated } = useUserAuthStore();
+    const location = useLocation();
+
     if (loading) return <Loader />;
+
+    if (!isAuthenticated) {
+        return <Navigate to="/" state={{ from: location }} replace />;
+    }
+
     return (
         <>
             <UserNavbar />

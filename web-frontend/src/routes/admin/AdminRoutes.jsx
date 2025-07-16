@@ -5,6 +5,7 @@ import UserList from "../../pages/admin/UserList";
 import AdminProfile from "../../pages/admin/AdminProfile";
 import AdminNavbar from "../../components/admin/AdminNavbar";
 import useAdminAuthStore from "../../stores/adminAuthStore";
+import { Navigate, useLocation } from "react-router-dom";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -13,9 +14,17 @@ const Loader = () => (
     </div>
 );
 
+
 const AdminProtectedRoute = ({ children }) => {
-    const { loading } = useAdminAuthStore();
+    const { loading, isAuthenticated } = useAdminAuthStore();
+    const location = useLocation();
+
     if (loading) return <Loader />;
+
+    if (!isAuthenticated) {
+        return <Navigate to="/" state={{ from: location }} replace />;
+    }
+
     return (
         <>
             <AdminNavbar />
@@ -50,7 +59,7 @@ export const adminRoutes = [
         ),
     },
     {
-        path: "/admin/profile/:id", // Changed to avoid conflict with user profile
+        path: "/admin/profile/:id",
         element: (
             <AdminProtectedRoute>
                 <AdminProfile />
