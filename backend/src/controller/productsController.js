@@ -5,27 +5,42 @@ const productService = new ProductService();
 
 const getAllProducts = async (req, res) => {
 	try {
-        const { is_active } = req.query;
+        const { is_active, is_in_stock, is_liquor } = req.query;
 
         const products = await productService.findAll();
         if (!products) {
             return res.status(400).json({ success: false, message: "Failed to fetch products"});
         }
         
-        let filteredProducts;
+        let filteredProducts = products;
         let filterDescription = [];
         if (is_active !== undefined) {
             // Convert string to boolean since query params are strings
             const isActiveBoolean = is_active === 'true';
-            filteredProducts = products.filter(product => product.is_active === isActiveBoolean);
+            filteredProducts = filteredProducts.filter(product => product.is_active === isActiveBoolean);
             filterDescription.push(`isActive: ${is_active}`);
-        } else {
-            filteredProducts = products;
+        } 
+        
+        if (is_in_stock !== undefined){
+            const isActiveBoolean = is_in_stock === 'true';
+            filteredProducts = filteredProducts.filter(product => product.is_in_stock === isActiveBoolean);
+            filterDescription.push(`is_in_stock: ${is_in_stock}`);
+        }
+
+        if (is_liquor !== undefined){
+            const isActiveBoolean = is_liquor === 'true';
+            filteredProducts = filteredProducts.filter(product => product.is_liquor === isActiveBoolean);
+            filterDescription.push(`is_liquor: ${is_liquor}`);
         }
 
         const populatedProducts = await populateCategory(filteredProducts);
         if (!populatedProducts) {
             return res.status(400).json({ success: false, message: "Error in populate products"});
+        }
+
+        // Add filter description for category filtering
+        if (populatedProducts.length < filteredProducts.length) {
+            filterDescription.push('category.isActive: true');
         }
 
         return res.status(200).json({ 
