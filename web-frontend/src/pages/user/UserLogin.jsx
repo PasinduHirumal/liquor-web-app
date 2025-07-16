@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import useAuthStore from "../../stores/userAuthStore";
+import useUserAuthStore from "../../stores/userAuthStore";
 
 const UserLogin = () => {
     const navigate = useNavigate();
@@ -14,11 +14,11 @@ const UserLogin = () => {
         password: "",
     });
 
-    const login = useAuthStore((state) => state.login);
-    const loading = useAuthStore((state) => state.loading);
-    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-    const resetError = useAuthStore((state) => state.resetError);
-    const checkAuth = useAuthStore((state) => state.checkAuth);
+    const login = useUserAuthStore((state) => state.login);
+    const loading = useUserAuthStore((state) => state.loading);
+    const isAuthenticated = useUserAuthStore((state) => state.isAuthenticated);
+    const resetError = useUserAuthStore((state) => state.resetError);
+    const checkAuth = useUserAuthStore((state) => state.checkAuth);
 
     useEffect(() => {
         checkAuth();
@@ -49,12 +49,12 @@ const UserLogin = () => {
         const credentialLabel = loginMethod === "email" ? "Email" : "Phone number";
 
         if (!credential) {
-            useAuthStore.setState({ error: `${credentialLabel} is required.` });
+            useUserAuthStore.setState({ error: `${credentialLabel} is required.` });
             return;
         }
 
         if (!formData.password) {
-            useAuthStore.setState({ error: "Password is required." });
+            useUserAuthStore.setState({ error: "Password is required." });
             return;
         }
 
@@ -62,7 +62,7 @@ const UserLogin = () => {
         if (loginMethod === "email") {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
             if (!emailRegex.test(credential)) {
-                useAuthStore.setState({ error: "Invalid email format." });
+                useUserAuthStore.setState({ error: "Invalid email format." });
                 return;
             }
         }
@@ -71,7 +71,7 @@ const UserLogin = () => {
         if (loginMethod === "phone") {
             const phoneRegex = /^\+?\d{7,15}$/;
             if (!phoneRegex.test(credential)) {
-                useAuthStore.setState({ error: "Invalid phone number format." });
+                useUserAuthStore.setState({ error: "Invalid phone number format." });
                 return;
             }
         }

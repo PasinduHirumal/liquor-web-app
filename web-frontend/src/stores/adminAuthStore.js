@@ -2,7 +2,7 @@ import { create } from 'zustand';
 import { axiosInstance } from '../lib/axios';
 import toast from 'react-hot-toast';
 
-const useAuthStore = create((set) => ({
+const useAdminAuthStore = create((set) => ({
   user: null,
   loading: false,
   error: null,
@@ -72,4 +72,4 @@ const useAuthStore = create((set) => ({
   resetError: () => set({ error: null })
 }));
 
-export default useAuthStore;
+export default useAdminAuthStore;

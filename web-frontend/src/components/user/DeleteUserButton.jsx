@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { axiosInstance } from '../../lib/axios';
 import ConfirmDialog from '../../common/ConfirmDialog';
-import useAuthStore from '../../stores/adminAuthStore';
+import useAdminAuthStore from '../../stores/adminAuthStore';
 
 const DeleteUserButton = ({ userId, onSuccess }) => {
-    const currentUser = useAuthStore((state) => state.user);
+    const currentUser = useAdminAuthStore((state) => state.user);
     const [isLoading, setIsLoading] = useState(false);
 
     const handleDelete = async () => {

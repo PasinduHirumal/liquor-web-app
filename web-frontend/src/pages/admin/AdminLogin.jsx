@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import useAuthStore from "../../stores/adminAuthStore";
+import useAdminAuthStore from "../../stores/adminAuthStore";
 
 const AdminLogin = () => {
     const navigate = useNavigate();
@@ -14,10 +14,10 @@ const AdminLogin = () => {
         password: ""
     });
 
-    const login = useAuthStore((state) => state.login);
-    const loading = useAuthStore((state) => state.loading);
-    const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
-    const resetError = useAuthStore((state) => state.resetError);
+    const login = useAdminAuthStore((state) => state.login);
+    const loading = useAdminAuthStore((state) => state.loading);
+    const isAuthenticated = useAdminAuthStore((state) => state.isAuthenticated);
+    const resetError = useAdminAuthStore((state) => state.resetError);
 
     useEffect(() => {
         setFormData({ email: "", phone: "", password: "" });
@@ -44,12 +44,12 @@ const AdminLogin = () => {
         const credentialLabel = loginMethod === "email" ? "Email" : "Phone number";
 
         if (!credential) {
-            useAuthStore.setState({ error: `${credentialLabel} is required.` });
+            useAdminAuthStore.setState({ error: `${credentialLabel} is required.` });
             return;
         }
 
         if (!formData.password) {
-            useAuthStore.setState({ error: "Password is required." });
+            useAdminAuthStore.setState({ error: "Password is required." });
             return;
         }
 
