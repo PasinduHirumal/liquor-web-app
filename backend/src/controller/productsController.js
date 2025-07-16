@@ -3,6 +3,16 @@ import populateCategory from '../utils/populateCategory.js';
 
 const productService = new ProductService();
 
+const createProduct = async (req, res) => {
+	try {
+        //return res.status(400).json({ success: false, message: ""});
+        return res.status(200).json({ success: true, message: ""});
+    } catch (error) {
+        console.error("Method_name error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
 const getAllProducts = async (req, res) => {
 	try {
         const { is_active, is_in_stock, is_liquor } = req.query;
@@ -52,6 +62,16 @@ const getAllProducts = async (req, res) => {
         });
     } catch (error) {
         console.error("Fetch products error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+const updateProduct = async (req, res) => {
+	try {
+        //return res.status(400).json({ success: false, message: ""});
+        return res.status(200).json({ success: true, message: ""});
+    } catch (error) {
+        console.error("Method_name error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };

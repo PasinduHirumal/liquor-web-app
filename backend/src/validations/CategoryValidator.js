@@ -6,7 +6,8 @@ const validateCategory = (req, res, next) => {
     name: Joi.string().min(1).max(100).required(),
     description: Joi.string().min(1).max(200).required(),
     
-    isActive: Joi.boolean().default(true),
+    is_active: Joi.boolean().default(true),
+    is_liquor: Joi.boolean().default(true),
   });
 
   // THE KEY CHANGE: Use the validated value with defaults applied
@@ -39,7 +40,8 @@ const validateCategoryUpdate = (req, res, next) => {
     name: Joi.string().min(1).max(100).optional(),
     description: Joi.string().min(1).max(200).optional(),
     
-    isActive: Joi.boolean().optional(),
+    is_active: Joi.boolean().optional(),
+    is_liquor: Joi.boolean().optional(),
   })
   .min(1) // Require at least one field to update
   .options({ stripUnknown: true });; 
