@@ -71,13 +71,26 @@ const UserList = () => {
             title: 'Name',
             dataIndex: 'name',
             key: 'name',
-            render: (_, record) => `${record.firstName || ''} ${record.lastName || ''}`,
+            render: (_, record) => (
+                <Space direction="vertical" size={0}>
+                    <Text strong>{record.firstName || ''} {record.lastName || ''}</Text>
+                    {record.nic_number && <Text>{record.nic_number}</Text>}
+                    {record.dateOfBirth && (
+                        <Text>{new Date(record.dateOfBirth).toLocaleDateString()}</Text>
+                    )}
+                </Space>
+            ),
         },
         {
             title: 'Email',
             dataIndex: 'email',
             key: 'email',
-            render: (text) => text || '-',
+            render: (_, record) => (
+                <Space direction="vertical" size={0}>
+                    <Text strong>{record.email}</Text>
+                    {record.phone && <Text>{record.phone}</Text>}
+                </Space>
+            ),
             width: 300,
         },
         {

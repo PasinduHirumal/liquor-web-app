@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { axiosInstance } from '../../lib/axios';
-import { Table, Button, message, Space, Tag, Switch, Popconfirm, Card, Row, Col, Typography, Select, Badge } from 'antd';
+import CreateDriverForm from '../../components/admin/CreateDriverForm';
+import toast from 'react-hot-toast';
+import { buildDriverQueryParams } from '../../components/admin/driverFilterParams';
+
 import {
-    EditOutlined,
-    DeleteOutlined,
-    EyeOutlined,
-    PlusOutlined,
-    ReloadOutlined,
-    FilterOutlined
+    Table, Button, Space, Tag, Switch, Popconfirm,
+    Card, Row, Col, Typography, Select, Badge
+} from 'antd';
+import {
+    EditOutlined, DeleteOutlined, PlusOutlined, ReloadOutlined, FilterOutlined
 } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
@@ -16,28 +18,19 @@ const { Option } = Select;
 const DriverList = () => {
     const [drivers, setDrivers] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
-    const [pagination, setPagination] = useState({
-        current: 1,
-        pageSize: 10,
-        total: 0,
-    });
+    const [isModalVisible, setIsModalVisible] = useState(false);
+
+    const [pagination, setPagination] = useState({ current: 1, pageSize: 10, total: 0 });
     const [filters, setFilters] = useState({
         isActive: undefined,
         isAvailable: undefined,
-        isDocumentVerified: undefined
+        isDocumentVerified: undefined,
     });
 
     const fetchDrivers = useCallback(async () => {
         setLoading(true);
-        setError(null);
         try {
-            const params = {
-                page: pagination.current,
-                pageSize: pagination.pageSize,
-                ...filters
-            };
-
+            const params = buildDriverQueryParams(filters);
             const response = await axiosInstance.get('/drivers/allDrivers', { params });
 
             setDrivers(response.data.data || []);
@@ -46,56 +39,47 @@ const DriverList = () => {
                 total: response.data.count || 0,
             }));
         } catch (err) {
-            console.error(err);
-            setError(err.response?.data?.message || 'Failed to load drivers');
-            message.error(err.response?.data?.message || 'Failed to load drivers');
+            toast.error(err.response?.data?.message || 'Failed to load drivers');
         } finally {
             setLoading(false);
         }
-    }, [pagination.current, pagination.pageSize, filters]);
+    }, [filters]);
 
     useEffect(() => {
         fetchDrivers();
     }, [fetchDrivers]);
 
-    const handleTableChange = (pagination, filters) => {
-        setPagination(pagination);
-    };
+    const handleTableChange = (pagination) => setPagination(pagination);
 
     const handleFilterChange = (name, value) => {
-        setFilters(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setFilters(prev => ({ ...prev, [name]: value }));
     };
 
     const clearFilters = () => {
         setFilters({
             isActive: undefined,
             isAvailable: undefined,
-            isDocumentVerified: undefined
+            isDocumentVerified: undefined,
         });
     };
 
     const handleStatusChange = async (id, statusType, value) => {
         try {
             await axiosInstance.patch(`/drivers/update/${id}`, { [statusType]: value });
-            message.success('Driver status updated');
+            toast.success('Driver status updated');
             fetchDrivers();
-        } catch (error) {
-            message.error('Failed to update status');
-            console.error('Update status error:', error);
+        } catch {
+            toast.error('Failed to update status');
         }
     };
 
     const handleDelete = async (id) => {
         try {
             await axiosInstance.delete(`/drivers/delete/${id}`);
-            message.success('Driver deleted successfully');
+            toast.success('Driver deleted successfully');
             fetchDrivers();
-        } catch (error) {
-            message.error('Failed to delete driver');
-            console.error('Delete driver error:', error);
+        } catch {
+            toast.error('Failed to delete driver');
         }
     };
 
@@ -104,13 +88,16 @@ const DriverList = () => {
             title: 'Driver',
             dataIndex: 'firstName',
             key: 'driver',
-            render: (text, record) => (
-                <Space>
+            render: (_, record) => (
+                <Space direction="vertical" size={0}>
                     <Text strong>{record.firstName} {record.lastName}</Text>
                     {record.isOnline && <Badge status="success" text="Online" />}
+                    {record.nic_number && <Text>{record.nic_number}</Text>}
+                    {record.dateOfBirth && (
+                        <Text>{new Date(record.dateOfBirth).toLocaleDateString()}</Text>
+                    )}
                 </Space>
             ),
-            sorter: true,
             width: 200,
         },
         {
@@ -151,11 +138,6 @@ const DriverList = () => {
                     </Tag>
                 </Space>
             ),
-            filters: [
-                { text: 'Active', value: true },
-                { text: 'Inactive', value: false },
-            ],
-            onFilter: (value, record) => record.isActive === value,
             width: 150,
         },
         {
@@ -173,16 +155,7 @@ const DriverList = () => {
             key: 'actions',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button
-                        icon={<EyeOutlined />}
-                        onClick={() => console.log('View', record._id)}
-                        type="text"
-                    />
-                    <Button
-                        icon={<EditOutlined />}
-                        onClick={() => console.log('Edit', record._id)}
-                        type="text"
-                    />
+                    <Button icon={<EditOutlined />} type="text" />
                     <Popconfirm
                         title="Are you sure to delete this driver?"
                         onConfirm={() => handleDelete(record._id)}
@@ -209,7 +182,7 @@ const DriverList = () => {
                             <Button
                                 type="primary"
                                 icon={<PlusOutlined />}
-                                onClick={() => console.log('Add new driver')}
+                                onClick={() => setIsModalVisible(true)}
                             >
                                 Add Driver
                             </Button>
@@ -227,8 +200,8 @@ const DriverList = () => {
                             value={filters.isActive}
                             onChange={(value) => handleFilterChange('isActive', value)}
                         >
-                            <Option value={true}>Active</Option>
-                            <Option value={false}>Inactive</Option>
+                            <Option value="true">Active</Option>
+                            <Option value="false">Inactive</Option>
                         </Select>
                     </Col>
                     <Col span={8}>
@@ -239,24 +212,14 @@ const DriverList = () => {
                             value={filters.isAvailable}
                             onChange={(value) => handleFilterChange('isAvailable', value)}
                         >
-                            <Option value={true}>Available</Option>
-                            <Option value={false}>Unavailable</Option>
+                            <Option value="true">Available</Option>
+                            <Option value="false">Unavailable</Option>
                         </Select>
                     </Col>
                     <Col span={8}>
                         <Space>
-                            <Button
-                                icon={<FilterOutlined />}
-                                onClick={fetchDrivers}
-                            >
-                                Apply Filters
-                            </Button>
-                            <Button
-                                icon={<ReloadOutlined />}
-                                onClick={clearFilters}
-                            >
-                                Reset
-                            </Button>
+                            <Button icon={<FilterOutlined />} onClick={fetchDrivers}>Apply Filters</Button>
+                            <Button icon={<ReloadOutlined />} onClick={clearFilters}>Reset</Button>
                         </Space>
                     </Col>
                 </Row>
@@ -272,6 +235,12 @@ const DriverList = () => {
                     bordered
                 />
             </Card>
+
+            <CreateDriverForm
+                visible={isModalVisible}
+                onClose={() => setIsModalVisible(false)}
+                onSuccess={fetchDrivers}
+            />
         </div>
     );
 };
