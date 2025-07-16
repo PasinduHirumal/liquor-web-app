@@ -2,6 +2,28 @@ import CategoryService from '../services/category.service.js';
 
 const categoryService = new CategoryService();
 
+const createCategory = async (req, res) => {
+	try {
+        const { name, is_liquor } = req.body;
+
+        const categories = await categoryService.findByFilter('name', '==', name);
+        if (categories.length !== 0) {
+            const filtered = categories.filter(category => category.is_liquor === is_liquor);
+            if (filtered.length !== 0) {
+                return res.status(400).json({ success: false, message: "Category already created"});
+            }
+        }
+
+        const categoryData = { ...req.body };
+        const newCategory = await categoryService.create(categoryData);
+
+        return res.status(201).json({ success: true, message: "Category created successfully", data: newCategory });
+    } catch (error) {
+        console.error("Create category error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
 const getAllCategories = async (req, res) => {
 	try {
         const { is_active } = req.query;
@@ -35,4 +57,4 @@ const getAllCategories = async (req, res) => {
     }
 };
 
-export { getAllCategories, };
+export { createCategory, getAllCategories, };

@@ -7,6 +7,7 @@ class Categories {
         this.description = data.description;
 
         this.is_active = data.is_active;
+        this.is_liquor = data.is_liquor;
 
         this.created_at = data.created_at || new Date().toISOString();
         this.updated_at = data.updated_at || new Date().toISOString();
