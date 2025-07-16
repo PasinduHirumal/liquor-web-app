@@ -13,3 +13,21 @@
     background-color: #bae7ff !important;
     color: #0958d9 !important;
 }
+
+/* Table */
+.ant-table-bordered {
+    border: 1px solid #000000 !important;
+}
+
+.ant-table-bordered .ant-table-cell {
+    border-right: 1px solid #000000 !important;
+    border-bottom: 1px solid #000000 !important;
+}
+
+.ant-table-bordered .ant-table-cell:last-child {
+    border-right: none !important;
+}
+
+.ant-table-tbody>tr:last-child>td {
+    border-bottom: none !important;
+}
