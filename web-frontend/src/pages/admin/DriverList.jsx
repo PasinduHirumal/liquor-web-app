@@ -6,11 +6,11 @@ import { buildDriverQueryParams } from '../../components/admin/driverFilterParam
 import DeleteDriverButton from '../../components/admin/DeleteDriverButton';
 
 import {
-    Table, Button, Space, Tag, Switch, Popconfirm,
+    Table, Button, Space, Tag, Switch,
     Card, Row, Col, Typography, Select, Badge
 } from 'antd';
 import {
-    EditOutlined, DeleteOutlined, PlusOutlined, ReloadOutlined, FilterOutlined
+    EditOutlined, PlusOutlined, ReloadOutlined, FilterOutlined
 } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
@@ -71,16 +71,6 @@ const DriverList = () => {
             fetchDrivers();
         } catch {
             toast.error('Failed to update status');
-        }
-    };
-
-    const handleDelete = async (id) => {
-        try {
-            await axiosInstance.delete(`/drivers/delete/${id}`);
-            toast.success('Driver deleted successfully');
-            fetchDrivers();
-        } catch {
-            toast.error('Failed to delete driver');
         }
     };
 
