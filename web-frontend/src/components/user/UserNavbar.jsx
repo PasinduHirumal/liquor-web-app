@@ -12,7 +12,7 @@ const UserNavbar = () => {
 
     const handleLogout = async () => {
         await logout();
-        navigate("/login");
+        navigate("/");
     };
 
     const toggleCollapse = () => setIsCollapsed((prev) => !prev);
