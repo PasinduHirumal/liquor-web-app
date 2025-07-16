@@ -2,25 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { axiosInstance } from '../../lib/axios';
 import toast from 'react-hot-toast';
 import AdminUserRowEditable from '../../components/admin/AdminUserRowEditable';
+import { Select, Button, Space, Spin, Typography, Table, Tag } from 'antd';
+
+const { Title } = Typography;
+const { Option } = Select;
 
 const AdminUserList = () => {
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  const [filter, setFilter] = useState({
-    isAdminAccepted: '',
-    isActive: '',
-  });
+  const [filter, setFilter] = useState({ isAdminAccepted: '', isActive: '' });
 
   const fetchAdmins = async () => {
     setLoading(true);
     try {
       const params = {};
-      if (filter.isAdminAccepted !== '') {
-        params.isAdminAccepted = filter.isAdminAccepted;
-      } else if (filter.isActive !== '') {
-        params.isActive = filter.isActive;
-      }
+      if (filter.isAdminAccepted !== '') params.isAdminAccepted = filter.isAdminAccepted;
+      else if (filter.isActive !== '') params.isActive = filter.isActive;
 
       const response = await axiosInstance.get('/admin/getAll', { params });
       setAdmins(response.data.data || []);
@@ -33,16 +30,11 @@ const AdminUserList = () => {
   };
 
   const handleFilterChange = (field, value) => {
-    setFilter((prev) => {
-      if (value === '') {
-        return { ...prev, [field]: '' };
-      }
-      if (field === 'isAdminAccepted') {
-        return { isAdminAccepted: value, isActive: '' };
-      } else {
-        return { isAdminAccepted: '', isActive: value };
-      }
-    });
+    setFilter((prev) =>
+      field === 'isAdminAccepted'
+        ? { isAdminAccepted: value, isActive: '' }
+        : { isAdminAccepted: '', isActive: value }
+    );
   };
 
   const handleDeleteSuccess = (deletedId) => {
@@ -59,91 +51,120 @@ const AdminUserList = () => {
     fetchAdmins();
   }, [filter]);
 
+  const columns = [
+    {
+      title: '#',
+      dataIndex: 'index',
+      key: 'index',
+      width: 40,
+      render: (_, __, index) => index + 1,
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>,
+      width: 300,
+    },
+    {
+      title: 'Full Name',
+      render: (_, record) => `${record.firstName || ''} ${record.lastName || ''}`,
+      width: 150,
+    },
+    {
+      title: 'Phone',
+      dataIndex: 'phone',
+      width: 130,
+    },
+    {
+      title: 'Role',
+      dataIndex: 'role',
+      render: (_, admin) => (
+        <AdminUserRowEditable admin={admin} onDeleteSuccess={handleDeleteSuccess} onUpdateLocal={handleUpdateLocal} part="role" />
+      ),
+      width: 140,
+    },
+    {
+      title: 'Active',
+      dataIndex: 'isActive',
+      render: (_, admin) => (
+        <AdminUserRowEditable admin={admin} onDeleteSuccess={handleDeleteSuccess} onUpdateLocal={handleUpdateLocal} part="isActive" />
+      ),
+      width: 100,
+    },
+    {
+      title: 'Verified',
+      dataIndex: 'isAccountVerified',
+      render: (val) => <Tag color={val ? 'green' : 'red'}>{val ? 'Yes' : 'No'}</Tag>,
+      width: 80,
+    },
+    {
+      title: 'Admin Accepted',
+      dataIndex: 'isAdminAccepted',
+      render: (val) => <Tag color={val ? 'blue' : 'orange'}>{val ? 'Yes' : 'No'}</Tag>,
+      width: 100,
+    },
+    {
+      title: 'Actions',
+      key: 'actions',
+      render: (_, admin) => (
+        <AdminUserRowEditable admin={admin} onDeleteSuccess={handleDeleteSuccess} onUpdateLocal={handleUpdateLocal} part="actions" />
+      ),
+      width: 100,
+    },
+  ];
+
   return (
     <div className="container-fluid mt-5 px-4 py-4">
-      <h3 className="mb-4 text-center">Admin User List</h3>
+      <Title level={3} className="text-center">Admin User List</Title>
 
       {/* Filters */}
-      <div className="mb-4 d-flex justify-content-center gap-4 flex-wrap">
-        <div>
-          <label htmlFor="filterAdminAccepted" className="form-label me-2 fw-semibold">
-            Filter by Admin Accepted:
-          </label>
-          <select
-            id="filterAdminAccepted"
-            className="form-select form-select-sm d-inline-block w-auto"
-            value={filter.isAdminAccepted}
-            onChange={(e) => handleFilterChange('isAdminAccepted', e.target.value)}
-          >
-            <option value="">All</option>
-            <option value="true">Accepted</option>
-            <option value="false">Not Accepted</option>
-          </select>
-        </div>
-        <div>
-          <label htmlFor="filterIsActive" className="form-label me-2 fw-semibold">
-            Filter by Active Status:
-          </label>
-          <select
-            id="filterIsActive"
-            className="form-select form-select-sm d-inline-block w-auto"
-            value={filter.isActive}
-            onChange={(e) => handleFilterChange('isActive', e.target.value)}
-          >
-            <option value="">All</option>
-            <option value="true">Active</option>
-            <option value="false">Inactive</option>
-          </select>
-        </div>
-        <button
-          className="btn btn-sm btn-secondary align-self-end"
-          onClick={() => setFilter({ isAdminAccepted: '', isActive: '' })}
-          title="Clear filters"
+      <Space wrap size="large" className="mb-4 d-flex justify-content-center">
+        <Select
+          placeholder="Filter by Admin Accepted"
+          style={{ width: 220 }}
+          value={filter.isAdminAccepted || undefined}
+          onChange={(value) => handleFilterChange('isAdminAccepted', value)}
+          allowClear
         >
-          Clear Filters
-        </button>
-      </div>
+          <Option value="true">Accepted</Option>
+          <Option value="false">Not Accepted</Option>
+        </Select>
 
-      {/* Content */}
+        <Select
+          placeholder="Filter by Active Status"
+          style={{ width: 220 }}
+          value={filter.isActive || undefined}
+          onChange={(value) => handleFilterChange('isActive', value)}
+          allowClear
+        >
+          <Option value="true">Active</Option>
+          <Option value="false">Inactive</Option>
+        </Select>
+
+        {(filter.isAdminAccepted || filter.isActive) && (
+          <Button onClick={() => setFilter({ isAdminAccepted: '', isActive: '' })}>
+            Clear Filters
+          </Button>
+        )}
+      </Space>
+
+      {/* Table */}
       {loading ? (
         <div className="d-flex justify-content-center my-5">
-          <div className="spinner-border text-primary" role="status" aria-label="Loading">
-            <span className="visually-hidden">Loading...</span>
-          </div>
+          <Spin size="large" />
         </div>
       ) : admins.length === 0 ? (
         <p className="text-center fs-5 text-muted my-5">No admin users found.</p>
       ) : (
-        <div
-          className="table-responsive shadow-sm rounded border border-secondary"
-          style={{ maxHeight: '460px', overflowY: 'auto' }}
-        >
-          <table className="table table-hover table-bordered align-middle mb-0">
-            <thead className="table-dark text-center sticky-top">
-              <tr>
-                <th>#</th>
-                <th>Email</th>
-                <th>Full Name</th>
-                <th>Phone</th>
-                <th>Role</th>
-                <th>Is Active</th>
-                <th>Verified</th>
-                <th>Admin Accepted</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody className="text-center">
-              {admins.map((admin, index) => (
-                <AdminUserRowEditable
-                  key={admin.id}
-                  admin={{ ...admin, index: index + 1 }}
-                  onDeleteSuccess={handleDeleteSuccess}
-                  onUpdateLocal={handleUpdateLocal}
-                />
-              ))}
-            </tbody>
-          </table>
-        </div>
+        <Table
+          rowKey="id"
+          dataSource={admins}
+          columns={columns}
+          pagination={{ pageSize: 10 }}
+          scroll={{ y: 400 }}
+          bordered
+          className="shadow-sm"
+        />
       )}
     </div>
   );

@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { Table, Tag, Space, Spin, Alert, Typography } from 'antd';
 import { axiosInstance } from '../../lib/axios';
-import UserFilter from '../../components/user/UserFilter';
+import UserFilter from '../../components/admin/UserFilter';
 import DeleteUserButton from '../../components/admin/DeleteUserButton';
 
 const { Title, Text } = Typography;
