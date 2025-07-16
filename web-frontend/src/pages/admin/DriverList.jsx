@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { axiosInstance } from '../../lib/axios';
-import CreateDriverModal from '../../components/admin/CreateDriverForm';
+import CreateDriverForm from '../../components/admin/CreateDriverForm';
 
 import {
     Table, Button, message, Space, Tag, Switch, Popconfirm,
@@ -152,7 +152,6 @@ const DriverList = () => {
             key: 'actions',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button icon={<EyeOutlined />} type="text" />
                     <Button icon={<EditOutlined />} type="text" />
                     <Popconfirm
                         title="Are you sure to delete this driver?"
@@ -234,7 +233,7 @@ const DriverList = () => {
                 />
             </Card>
 
-            <CreateDriverModal
+            <CreateDriverForm
                 visible={isModalVisible}
                 onClose={() => setIsModalVisible(false)}
                 onSuccess={fetchDrivers}

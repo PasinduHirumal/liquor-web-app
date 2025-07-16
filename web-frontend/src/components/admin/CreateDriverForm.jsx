@@ -1,6 +1,7 @@
 import React from 'react';
-import { Modal, Form, Input, DatePicker, message, Row, Col } from 'antd';
+import { Modal, Form, Input, DatePicker, Row, Col } from 'antd';
 import { axiosInstance } from '../../lib/axios';
+import toast from 'react-hot-toast';
 
 const CreateDriverModal = ({ visible, onClose, onSuccess }) => {
     const [form] = Form.useForm();
@@ -8,12 +9,12 @@ const CreateDriverModal = ({ visible, onClose, onSuccess }) => {
     const handleCreateDriver = async (values) => {
         try {
             await axiosInstance.post('/drivers/createDriver', values);
-            message.success('Driver created successfully');
+            toast.success('Driver created successfully');
             form.resetFields();
             onSuccess();
             onClose();
         } catch (err) {
-            message.error(err.response?.data?.message || 'Failed to create driver');
+            toast.error(err.response?.data?.message || 'Failed to create driver');
         }
     };
 
@@ -24,7 +25,7 @@ const CreateDriverModal = ({ visible, onClose, onSuccess }) => {
             onCancel={onClose}
             onOk={() => form.submit()}
             okText="Create"
-            width={700} // Wider modal to fit two columns nicely
+            width={700}
         >
             <Form
                 form={form}
