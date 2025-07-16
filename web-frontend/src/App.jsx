@@ -10,6 +10,7 @@ import ToastProvider from "./common/ToastProvider";
 import Login from "./routes/Login";
 import Register from "./routes/Register";
 import VerifyOtpPage from "./components/admin/VerifyOtpPage";
+import PublicHome from "./routes/PublicHome";
 
 import useAdminAuthStore from "./stores/adminAuthStore";
 import useUserAuthStore from "./stores/userAuthStore";
@@ -33,25 +34,35 @@ function App() {
       <ToastProvider />
 
       <Routes>
-        {/* Public Routes */}
+
+        {/* Auth Routes */}
         <Route
-          path="/login"
+          path="/"
           element={
             adminAuth ? (
               <Navigate to="/admin" replace />
             ) : userAuth ? (
               <Navigate to="/user" replace />
             ) : (
-              <Login />
+              <PublicHome />
             )
           }
         />
+
+        <Route
+          path="/login"
+          element={
+            adminAuth || userAuth ? <Navigate to="/" replace /> : <Login />
+          }
+        />
+
         <Route
           path="/register"
           element={
             adminAuth || userAuth ? <Navigate to="/" replace /> : <Register />
           }
         />
+
         <Route path="/verify-otp" element={<VerifyOtpPage />} />
 
         {/* Admin Routes */}
@@ -64,7 +75,7 @@ function App() {
           <Route key={`user-${i}`} path={path} element={element} />
         ))}
 
-        {/* Catch-all Route */}
+        {/* Catch-All Fallback */}
         <Route
           path="*"
           element={
@@ -73,7 +84,7 @@ function App() {
             ) : userAuth ? (
               <Navigate to="/user" replace />
             ) : (
-              <Navigate to="/login" replace />
+              <Navigate to="/" replace />
             )
           }
         />
