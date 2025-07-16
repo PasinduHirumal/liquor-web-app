@@ -83,34 +83,44 @@ const AdminNavbar = () => {
                             </NavLink>
                         </li>
 
-                        <li className="nav-item">
-                            <NavLink
-                                to="/users-list"
-                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
-                                onClick={closeCollapse}
+                        <li className="nav-item dropdown">
+                            <button
+                                className="nav-link dropdown-toggle btn btn-link text-white"
+                                id="manageDropdown"
+                                data-bs-toggle="dropdown"
+                                aria-expanded="false"
                             >
-                                Users
-                            </NavLink>
-                        </li>
-
-                        <li className="nav-item">
-                            <NavLink
-                                to="/driver-list"
-                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
-                                onClick={closeCollapse}
-                            >
-                                Drivers
-                            </NavLink>
-                        </li>
-
-                        <li className="nav-item">
-                            <NavLink
-                                to="/admin-users-list"
-                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
-                                onClick={closeCollapse}
-                            >
-                                Admin Users
-                            </NavLink>
+                                Manage
+                            </button>
+                            <ul className="dropdown-menu dropdown-menu-dark" aria-labelledby="manageDropdown">
+                                <li>
+                                    <NavLink
+                                        to="/users-list"
+                                        className="dropdown-item"
+                                        onClick={closeCollapse}
+                                    >
+                                        Users
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <NavLink
+                                        to="/driver-list"
+                                        className="dropdown-item"
+                                        onClick={closeCollapse}
+                                    >
+                                        Drivers
+                                    </NavLink>
+                                </li>
+                                <li>
+                                    <NavLink
+                                        to="/admin-users-list"
+                                        className="dropdown-item"
+                                        onClick={closeCollapse}
+                                    >
+                                        Admin Users
+                                    </NavLink>
+                                </li>
+                            </ul>
                         </li>
 
                         <li className="nav-item mt-2 mt-lg-0">
