@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { Table, Tag, Space, Spin, Alert, Typography } from 'antd';
 import { axiosInstance } from '../../lib/axios';
 import UserFilter from '../../components/user/UserFilter';
-import DeleteUserButton from '../../components/user/DeleteUserButton';
+import DeleteUserButton from '../../components/admin/DeleteUserButton';
 
 const { Title, Text } = Typography;
 

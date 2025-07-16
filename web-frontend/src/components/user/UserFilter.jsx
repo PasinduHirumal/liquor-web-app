@@ -1,43 +1,69 @@
 import React from 'react';
+import { Select, Button, Space } from 'antd';
+import { CloseCircleOutlined } from '@ant-design/icons';
+import '../../styles/UserFilter.css';
+
+const { Option } = Select;
 
 const UserFilter = ({ filter, onFilterChange, onClearFilters }) => {
     return (
-        <div className="d-flex justify-content-center mb-4 gap-3 flex-wrap">
-            <select
-                name="isActive"
-                value={filter.isActive}
-                onChange={onFilterChange}
-                className="form-select"
-                style={{ maxWidth: 200 }}
-                aria-label="Filter by Active Status"
-            >
-                <option value="">Filter by Active Status</option>
-                <option value="true">Active ✅</option>
-                <option value="false">Inactive ❌</option>
-            </select>
+        <div
+            style={{
+                background: '#fafafa',
+                padding: '16px 24px',
+                borderRadius: '8px',
+                boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)',
+                marginBottom: '24px',
+                display: 'flex',
+                justifyContent: 'center',
+            }}
+        >
+            <Space wrap size="large">
+                <Select
+                    name="isActive"
+                    value={filter.isActive !== '' ? filter.isActive : null}
 
-            <select
-                name="isAccountCompleted"
-                value={filter.isAccountCompleted}
-                onChange={onFilterChange}
-                className="form-select"
-                style={{ maxWidth: 250 }}
-                aria-label="Filter by Account Completion"
-            >
-                <option value="">Filter by Account Completed</option>
-                <option value="true">Completed ✅</option>
-                <option value="false">Not Completed ❌</option>
-            </select>
+                    onChange={(value) =>
+                        onFilterChange({ target: { name: 'isActive', value } })
+                    }
+                    placeholder="Filter by Active Status"
+                    style={{ width: 220 }}
+                    allowClear
+                    dropdownClassName="highlight-dropdown"
+                    status={filter.isActive !== '' ? 'success' : undefined}
 
-            {(filter.isActive || filter.isAccountCompleted) && (
-                <button
-                    className="btn btn-outline-secondary"
-                    onClick={onClearFilters}
-                    aria-label="Clear Filters"
                 >
-                    Clear Filters
-                </button>
-            )}
+                    <Option value="true">🟢 Active</Option>
+                    <Option value="false">🔴 Inactive</Option>
+                </Select>
+
+                <Select
+                    name="isAccountCompleted"
+                    value={filter.isAccountCompleted !== '' ? filter.isAccountCompleted : undefined}
+                    onChange={(value) =>
+                        onFilterChange({ target: { name: 'isAccountCompleted', value } })
+                    }
+                    placeholder="Filter by Account Completed"
+                    style={{ width: 250 }}
+                    allowClear
+                    dropdownClassName="highlight-dropdown"
+                    status={filter.isAccountCompleted ? 'success' : ''}
+                >
+                    <Option value="true">✅ Completed</Option>
+                    <Option value="false">❌ Not Completed</Option>
+                </Select>
+
+                {(filter.isActive || filter.isAccountCompleted) && (
+                    <Button
+                        onClick={onClearFilters}
+                        type="primary"
+                        danger
+                        icon={<CloseCircleOutlined />}
+                    >
+                        Clear Filters
+                    </Button>
+                )}
+            </Space>
         </div>
     );
 };

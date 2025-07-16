@@ -1,0 +1,15 @@
+/* UserFilter.css */
+.highlight-dropdown .ant-select-item-option {
+    font-weight: 500 !important;
+    padding: 10px 14px !important;
+}
+
+.highlight-dropdown .ant-select-item-option-active {
+    background-color: #e6f7ff !important;
+    color: #1890ff !important;
+}
+
+.highlight-dropdown .ant-select-item-option-selected {
+    background-color: #bae7ff !important;
+    color: #0958d9 !important;
+}
