@@ -3,6 +3,7 @@ import { axiosInstance } from '../../lib/axios';
 import CreateDriverForm from '../../components/admin/CreateDriverForm';
 import toast from 'react-hot-toast';
 import { buildDriverQueryParams } from '../../components/admin/driverFilterParams';
+import DeleteDriverButton from '../../components/admin/DeleteDriverButton';
 
 import {
     Table, Button, Space, Tag, Switch, Popconfirm,
@@ -155,15 +156,8 @@ const DriverList = () => {
             key: 'actions',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button icon={<EditOutlined />} type="text" />
-                    <Popconfirm
-                        title="Are you sure to delete this driver?"
-                        onConfirm={() => handleDelete(record._id)}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Button icon={<DeleteOutlined />} type="text" danger />
-                    </Popconfirm>
+                    <Button icon={<EditOutlined style={{ fontSize: '18px' }} />} type="text" />
+                    <DeleteDriverButton driverId={record.id} onDeleted={fetchDrivers} />
                 </Space>
             ),
             width: 100,
