@@ -3,7 +3,7 @@ import { NavLink, useNavigate } from "react-router-dom";
 import { FiMenu, FiX } from "react-icons/fi";
 import { motion, AnimatePresence } from "framer-motion";
 
-const AdminNavbar = () => {
+const PublicNavbar = () => {
     const navigate = useNavigate();
     const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -81,4 +81,4 @@ const AdminNavbar = () => {
     );
 };
 
-export default AdminNavbar;
+export default PublicNavbar;
