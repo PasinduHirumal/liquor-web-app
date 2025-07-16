@@ -6,6 +6,6 @@ const router = express.Router();
 
 // http://localhost:5000/api/categories
 
-router.get('/getAll', authenticateUser, authorizeRoles("admin", "super_admin"), getAllCategories);
+router.get('/getAll', getAllCategories);
 
 export default router;
