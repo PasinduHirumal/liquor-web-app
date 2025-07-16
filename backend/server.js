@@ -11,6 +11,7 @@ import adminRoutes from "./src/routes/admin.routes.js";
 import userRoutes from "./src/routes/user.routes.js";
 import addressRoutes from "./src/routes/address.routes.js";
 import driverRoutes from "./src/routes/driver.routes.js";
+import categoryRoutes from "./src/routes/category.routes.js";
 
 dotenv.config();
 
@@ -34,6 +35,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/addresses", addressRoutes);
 app.use("/api/drivers", driverRoutes);
+app.use("/api/categories", categoryRoutes);
 
 //  Route handler for the root path
 app.get('/', (req, res) => {
