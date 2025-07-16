@@ -6,6 +6,7 @@ const router = express.Router();
 
 // http://localhost:5000/api/products
 
-router.get('/getAll', authenticateUser, authorizeRoles("admin", "super_admin"), getAllProducts);
+
+router.get('/getAll', getAllProducts);
 
 export default router;
