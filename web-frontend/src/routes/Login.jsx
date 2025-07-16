@@ -19,7 +19,8 @@ const Login = () => {
 
     return (
         <>
-            <PublicNavbar />
+            <PublicNavbar isAuthenticated={true} />
+
             <div className="d-flex flex-column align-items-center justify-content-center mt-5">
                 <h3 className="mt-4 m-0 p-0 text-center fw-semibold" style={{ letterSpacing: '0.05em' }}>
                     Sign In
