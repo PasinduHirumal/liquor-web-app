@@ -1,4 +1,5 @@
 import ProductService from '../services/product.service.js';
+import populateCategory from '../utils/populateCategory.js';
 
 const productService = new ProductService();
 
@@ -22,12 +23,17 @@ const getAllProducts = async (req, res) => {
             filteredProducts = products;
         }
 
+        const populatedProducts = await populateCategory(filteredProducts);
+        if (!populatedProducts) {
+            return res.status(400).json({ success: false, message: "Error in populate products"});
+        }
+
         return res.status(200).json({ 
             success: true, 
             message: "Fetching products successful",
-            count: filteredProducts.length,
+            count: populatedProducts.length,
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
-            data: filteredProducts
+            data: populatedProducts
         });
     } catch (error) {
         console.error("Fetch products error:", error.message);
