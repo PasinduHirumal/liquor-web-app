@@ -4,10 +4,15 @@ import ProductCard from "../common/LiquorProductCard";
 
 const PublicHome = () => {
   const [products, setProducts] = useState([]);
+  const [filteredProducts, setFilteredProducts] = useState([]);
   const [visibleProducts, setVisibleProducts] = useState([]);
   const [showAll, setShowAll] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [filters] = useState({
+    is_active: true,
+    is_in_stock: true,
+  });
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -16,7 +21,6 @@ const PublicHome = () => {
         const response = await axiosInstance.get("/products/getAll");
         const allProducts = response.data.data || [];
         setProducts(allProducts);
-        setVisibleProducts(allProducts.slice(0, 6));
       } catch (err) {
         setError(err.message || "Failed to fetch products");
         console.error("Fetch products error:", err);
@@ -28,9 +32,20 @@ const PublicHome = () => {
     fetchProducts();
   }, []);
 
+  useEffect(() => {
+    const applyFilters = () => {
+      const filtered = products.filter(
+        (p) => p.is_active === filters.is_active && p.is_in_stock === filters.is_in_stock
+      );
+      setFilteredProducts(filtered);
+      setVisibleProducts(showAll ? filtered : filtered.slice(0, 6));
+    };
+
+    applyFilters();
+  }, [products, filters, showAll]);
+
   const toggleShowAll = () => {
-    setVisibleProducts(showAll ? products.slice(0, 6) : products);
-    setShowAll(!showAll);
+    setShowAll((prev) => !prev);
   };
 
   if (loading) {
@@ -52,32 +67,30 @@ const PublicHome = () => {
   }
 
   return (
-    <>
-      <div className="container-fluid py-4">
-        <div className="d-flex justify-content-between align-items-center mb-4">
-          <h2 className="mb-0">All Products</h2>
-          {products.length > 6 && (
-            <button className="btn btn-outline-primary" onClick={toggleShowAll}>
-              {showAll ? "Show Less" : "View More"}
-            </button>
-          )}
-        </div>
-
-        <div className="row g-4">
-          {visibleProducts.length > 0 ? (
-            visibleProducts.map((product) => (
-              <ProductCard key={product.product_id} product={product} />
-            ))
-          ) : (
-            <div className="col-12">
-              <div className="alert alert-info" role="alert">
-                No products available.
-              </div>
-            </div>
-          )}
-        </div>
+    <div className="container-fluid py-4">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <h2 className="mb-0">All Products</h2>
+        {filteredProducts.length > 6 && (
+          <button className="btn btn-outline-primary" onClick={toggleShowAll}>
+            {showAll ? "Show Less" : "View More"}
+          </button>
+        )}
       </div>
-    </>
+
+      <div className="row g-4">
+        {visibleProducts.length > 0 ? (
+          visibleProducts.map((product) => (
+            <ProductCard key={product.product_id} product={product} />
+          ))
+        ) : (
+          <div className="col-12">
+            <div className="alert alert-info" role="alert">
+              No products available based on filters.
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
