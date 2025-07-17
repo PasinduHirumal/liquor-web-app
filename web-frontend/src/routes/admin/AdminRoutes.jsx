@@ -1,5 +1,5 @@
 import React from "react";
-import AdminHome from "./AdminHome";
+import LiquorList from "../../pages/admin/LiquorList";
 import AdminUserList from "../../pages/admin/AdminList";
 import UserList from "../../pages/admin/UserList";
 import AdminProfile from "../../pages/admin/AdminProfile";
@@ -7,6 +7,7 @@ import AdminNavbar from "../../components/admin/AdminNavbar";
 import useAdminAuthStore from "../../stores/adminAuthStore";
 import { Navigate, useLocation } from "react-router-dom";
 import DriverList from "../../pages/admin/DriverList";
+import PublicHome from "../PublicHome";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -39,7 +40,7 @@ export const adminRoutes = [
         path: "/admin",
         element: (
             <AdminProtectedRoute>
-                <AdminHome />
+                <PublicHome />
             </AdminProtectedRoute>
         ),
     },
@@ -64,6 +65,14 @@ export const adminRoutes = [
         element: (
             <AdminProtectedRoute>
                 <DriverList />
+            </AdminProtectedRoute>
+        ),
+    },
+    {
+        path: "/liquor-list",
+        element: (
+            <AdminProtectedRoute>
+                <LiquorList />
             </AdminProtectedRoute>
         ),
     },
