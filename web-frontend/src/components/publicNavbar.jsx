@@ -19,7 +19,7 @@ import {
   Login as LoginIcon,
 } from "@mui/icons-material";
 
-// Styled NavLink
+// Styled NavLink for dark theme
 const StyledNavLink = styled(NavLink)(({ theme }) => ({
   color: theme.palette.common.white,
   textDecoration: "none",
@@ -27,11 +27,11 @@ const StyledNavLink = styled(NavLink)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   transition: "background-color 0.3s ease",
   "&.active": {
-    backgroundColor: theme.palette.primary.light,
+    backgroundColor: "#333",
     fontWeight: "bold",
   },
   "&:hover": {
-    backgroundColor: theme.palette.primary.dark,
+    backgroundColor: "#444",
   },
 }));
 
@@ -48,19 +48,27 @@ const PublicNavbar = ({ isAuthenticated = false }) => {
 
   return (
     <>
-      <AppBar position="fixed">
+      <AppBar
+        position="fixed"
+        elevation={4}
+        sx={{
+          backgroundColor: "#121212",
+        }}
+      >
         <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2, md: 4 } }}>
           <Box
-            component={StyledNavLink}
+            component={NavLink}
             to="/"
             onClick={closeMobileMenu}
+            style={{
+              textDecoration: "none",
+              color: "white",
+            }}
             sx={{
               display: "flex",
               alignItems: "center",
               fontSize: "1.3rem",
               fontWeight: "bold",
-              color: "white",
-              textDecoration: "none",
             }}
           >
             🍷 Liquor Web App
@@ -75,10 +83,15 @@ const PublicNavbar = ({ isAuthenticated = false }) => {
             {!isAuthenticated && (
               <Button
                 variant="contained"
-                color="secondary"
+                sx={{
+                  ml: 2,
+                  backgroundColor: theme.palette.error.main,
+                  "&:hover": {
+                    backgroundColor: theme.palette.error.dark,
+                  },
+                }}
                 startIcon={<LoginIcon />}
                 onClick={handleLogin}
-                sx={{ ml: 2 }}
               >
                 Login
               </Button>
@@ -95,10 +108,10 @@ const PublicNavbar = ({ isAuthenticated = false }) => {
               sx={{ ml: "auto" }}
             >
               <Fade in={!mobileMenuOpen} unmountOnExit>
-                <MenuIcon />
+                <MenuIcon sx={{ color: "white" }} />
               </Fade>
               <Fade in={mobileMenuOpen} unmountOnExit>
-                <CloseIcon />
+                <CloseIcon sx={{ color: "white" }} />
               </Fade>
             </IconButton>
           )}
@@ -115,7 +128,7 @@ const PublicNavbar = ({ isAuthenticated = false }) => {
                 right: 0,
                 width: "75vw",
                 maxWidth: 300,
-                bgcolor: theme.palette.primary.dark,
+                bgcolor: "#1e1e1e",
                 zIndex: theme.zIndex.drawer + 1,
                 p: 3,
                 display: "flex",
@@ -130,8 +143,13 @@ const PublicNavbar = ({ isAuthenticated = false }) => {
                 <Button
                   fullWidth
                   variant="contained"
-                  color="secondary"
                   startIcon={<LoginIcon />}
+                  sx={{
+                    backgroundColor: theme.palette.error.main,
+                    "&:hover": {
+                      backgroundColor: theme.palette.error.dark,
+                    },
+                  }}
                   onClick={() => {
                     handleLogin();
                     closeMobileMenu();
