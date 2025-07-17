@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { axiosInstance } from "../../lib/axios";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css";
+import { FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit, FaCheckCircle, FaTimesCircle, FaStar } from "react-icons/fa";
+import "./LiquorProductDetail.css";
 
 const LiquorProductDetail = () => {
     const { id } = useParams();
@@ -16,7 +20,7 @@ const LiquorProductDetail = () => {
                 setProduct(res.data.data);
                 setActiveImage(res.data.data.images?.[0] || null);
             } catch (err) {
-                setError("Failed to load product details.");
+                setError("Failed to load product details. Please try again later.");
             } finally {
                 setLoading(false);
             }
@@ -25,104 +29,184 @@ const LiquorProductDetail = () => {
         fetchProduct();
     }, [id]);
 
-    if (loading) return <div className="container my-5">Loading product details...</div>;
-    if (error) return <div className="container my-5 text-danger">{error}</div>;
-    if (!product) return <div className="container my-5">Product not found.</div>;
+    const renderStars = (rating) => {
+        const stars = [];
+        const fullStars = Math.floor(rating || 0);
+        const hasHalfStar = (rating || 0) % 1 >= 0.5;
+
+        for (let i = 0; i < 5; i++) {
+            if (i < fullStars) {
+                stars.push(<FaStar key={i} className="star filled" />);
+            } else if (i === fullStars && hasHalfStar) {
+                stars.push(<FaStar key={i} className="star half-filled" />);
+            } else {
+                stars.push(<FaStar key={i} className="star" />);
+            }
+        }
+
+        return stars;
+    };
+
+    if (error) return (
+        <div className="product-detail-error">
+            <div className="error-message">
+                <FaTimesCircle className="error-icon" />
+                <h3>{error}</h3>
+                <button onClick={() => window.location.reload()} className="retry-button">
+                    Retry
+                </button>
+            </div>
+        </div>
+    );
 
     return (
-        <div className="container-fluid mt-2">
-            <h2 className="mb-4">{product.name}</h2>
-            <div className="row">
-                {/* Image Preview Section */}
-                <div className="col-md-6 mb-4">
-                    {activeImage ? (
-                        <img
-                            src={activeImage}
-                            alt={product.name}
-                            className="img-fluid border p-2"
-                            style={{ maxHeight: "400px", objectFit: "contain" }}
-                        />
-                    ) : (
-                        <div className="bg-light d-flex justify-content-center align-items-center border" style={{ height: "400px" }}>
-                            <span>No Image Available</span>
-                        </div>
-                    )}
-
-                    {/* Image thumbnails */}
-                    {product.images?.length > 1 && (
-                        <div className="d-flex flex-wrap gap-2 mt-3">
-                            {product.images.map((img, index) => (
-                                <img
-                                    key={index}
-                                    src={img}
-                                    alt={`Thumbnail ${index + 1}`}
-                                    onClick={() => setActiveImage(img)}
-                                    style={{
-                                        width: "60px",
-                                        height: "60px",
-                                        objectFit: "cover",
-                                        cursor: "pointer",
-                                        border: activeImage === img ? "2px solid #007bff" : "1px solid #ccc",
-                                        borderRadius: "5px",
-                                    }}
-                                />
+        <div className="container-fluid px-4">
+            {loading ? (
+                <div className="product-detail-loading">
+                    <div className="loading-left">
+                        <Skeleton height={400} />
+                        <div className="loading-thumbnails">
+                            {[1, 2, 3].map((item) => (
+                                <Skeleton key={item} height={60} width={60} />
                             ))}
                         </div>
-                    )}
+                    </div>
+                    <div className="loading-right">
+                        <Skeleton height={40} width="80%" />
+                        <Skeleton count={8} />
+                    </div>
                 </div>
+            ) : product ? (
+                <>
+                    <div className="product-header">
+                        <h1>{product.name}</h1>
+                    </div>
 
-                {/* Product Details Section */}
-                <div className="col-md-6">
-                    <table className="table table-bordered">
-                        <tbody>
-                            <tr>
-                                <th>Product Name</th>
-                                <td>{product.name || "N/A"}</td>
-                            </tr>
-                            <tr>
-                                <th>Category</th>
-                                <td>{product.category_id?.name || "Uncategorized"}</td>
-                            </tr>
-                            <tr>
-                                <th>Price</th>
-                                <td>${product.price?.toFixed(2)}</td>
-                            </tr>
-                            <tr>
-                                <th>Stock Quantity</th>
-                                <td>{product.stock_quantity}</td>
-                            </tr>
-                            <tr>
-                                <th>Status</th>
-                                <td>
-                                    <span className={`badge ${product.is_active ? "bg-success" : "bg-secondary"}`}>
+                    <div className="product-content">
+                        {/* Image Gallery */}
+                        <div className="product-gallery">
+                            <div className="main-image-container">
+                                {activeImage ? (
+                                    <img
+                                        src={activeImage}
+                                        alt={product.name}
+                                        className="main-image"
+                                        onError={(e) => {
+                                            e.target.src = '/placeholder-bottle.jpg';
+                                        }}
+                                    />
+                                ) : (
+                                    <div className="no-image">
+                                        <FaWineBottle className="no-image-icon" />
+                                        <span>No Image Available</span>
+                                    </div>
+                                )}
+                            </div>
+
+                            {product.images?.length > 1 && (
+                                <div className="thumbnail-container">
+                                    {product.images.map((img, index) => (
+                                        <div
+                                            key={index}
+                                            className={`thumbnail ${activeImage === img ? 'active' : ''}`}
+                                            onClick={() => setActiveImage(img)}
+                                        >
+                                            <img
+                                                src={img}
+                                                alt={`Thumbnail ${index + 1}`}
+                                                onError={(e) => {
+                                                    e.target.src = '/placeholder-bottle.jpg';
+                                                }}
+                                            />
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* Product Details */}
+                        <div className="product-info">
+                            <div className="price-section">
+                                <span className="current-price">${product.price?.toFixed(2)}</span>
+                                {product.originalPrice && product.originalPrice > product.price && (
+                                    <span className="original-price">${product.originalPrice.toFixed(2)}</span>
+                                )}
+                            </div>
+
+                            <div className="availability-section">
+                                <div className={`stock-status ${product.is_in_stock ? 'in-stock' : 'out-of-stock'}`}>
+                                    {product.is_in_stock ? (
+                                        <>
+                                            <FaCheckCircle className="status-icon" />
+                                            <span>In Stock</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <FaTimesCircle className="status-icon" />
+                                            <span>Out of Stock</span>
+                                        </>
+                                    )}
+                                </div>
+                                <div className="stock-quantity">
+                                    <FaBoxOpen className="quantity-icon" />
+                                    <span>{product.stock_quantity} units available</span>
+                                </div>
+                            </div>
+
+                            <div className="description-section">
+                                <h3>Description</h3>
+                                <p>{product.description || "No description provided."}</p>
+                            </div>
+
+                            <div className="details-grid">
+                                <div className="detail-item">
+                                    <span className="detail-label">Category:</span>
+                                    <span className="detail-value">{product.category_id?.name || "Uncategorized"}</span>
+                                </div>
+                                <div className="detail-item">
+                                    <span className="detail-label">ABV:</span>
+                                    <span className="detail-value">{product.alcohol_content || "N/A"}%</span>
+                                </div>
+                                <div className="detail-item">
+                                    <span className="detail-label">Volume:</span>
+                                    <span className="detail-value">{product.volume || "N/A"} ml</span>
+                                </div>
+                                <div className="detail-item">
+                                    <span className="detail-label">Status:</span>
+                                    <span className={`detail-value status-badge ${product.is_active ? 'active' : 'inactive'}`}>
                                         {product.is_active ? "Active" : "Inactive"}
                                     </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Availability</th>
-                                <td>
-                                    <span className={`badge ${product.is_in_stock ? "bg-primary" : "bg-warning text-dark"}`}>
-                                        {product.is_in_stock ? "In Stock" : "Out of Stock"}
+                                </div>
+                                <div className="detail-item">
+                                    <span className="detail-label">Created:</span>
+                                    <span className="detail-value">
+                                        <FaCalendarAlt className="calendar-icon" />
+                                        {new Date(product.createdAt).toLocaleDateString()}
                                     </span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <th>Description</th>
-                                <td>{product.description || "No description provided."}</td>
-                            </tr>
-                            <tr>
-                                <th>Created At</th>
-                                <td>{new Date(product.createdAt).toLocaleString()}</td>
-                            </tr>
-                            <tr>
-                                <th>Updated At</th>
-                                <td>{new Date(product.updatedAt).toLocaleString()}</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                                </div>
+                                <div className="detail-item">
+                                    <span className="detail-label">Last Updated:</span>
+                                    <span className="detail-value">
+                                        <FaEdit className="edit-icon" />
+                                        {new Date(product.updatedAt).toLocaleDateString()}
+                                    </span>
+                                </div>
+                            </div>
+
+                            <div className="action-buttons">
+                                <button className="add-to-cart">Edit</button>
+                                <button className="wishlist">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </>
+            ) : (
+                <div className="product-not-found">
+                    <FaTimesCircle className="not-found-icon" />
+                    <h3>Product not found</h3>
+                    <p>The requested product could not be located.</p>
                 </div>
-            </div>
+            )}
         </div>
     );
 };
