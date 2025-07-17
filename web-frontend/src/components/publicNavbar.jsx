@@ -85,9 +85,10 @@ const PublicNavbar = ({ isAuthenticated = false }) => {
                 variant="contained"
                 sx={{
                   ml: 2,
-                  backgroundColor: theme.palette.error.main,
+                  backgroundColor: theme.palette.info.main,
+                  color: "#fff",
                   "&:hover": {
-                    backgroundColor: theme.palette.error.dark,
+                    backgroundColor: theme.palette.info.dark,
                   },
                 }}
                 startIcon={<LoginIcon />}
@@ -145,9 +146,10 @@ const PublicNavbar = ({ isAuthenticated = false }) => {
                   variant="contained"
                   startIcon={<LoginIcon />}
                   sx={{
-                    backgroundColor: theme.palette.error.main,
+                    backgroundColor: theme.palette.info.main,
+                    color: "#fff",
                     "&:hover": {
-                      backgroundColor: theme.palette.error.dark,
+                      backgroundColor: theme.palette.info.dark,
                     },
                   }}
                   onClick={() => {
