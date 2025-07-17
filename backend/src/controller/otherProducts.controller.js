@@ -1,13 +1,14 @@
 import OtherProductService from '../services/otherProduct.service.js';
 import CategoryService from '../services/category.service.js';
 import populateCategory from '../utils/populateCategory.js';
+import { uploadImages } from '../utils/firebaseStorage.js';
 
 const categoryService = new CategoryService();
 const productService = new OtherProductService();
 
 const createProduct = async (req, res) => {
 	try {
-        const { marked_price, discount_percentage, category_id } = req.body;
+        const { marked_price, discount_percentage, category_id, images } = req.body;
 
         const category = await categoryService.findById(category_id);
         if (!category) {
@@ -27,10 +28,24 @@ const createProduct = async (req, res) => {
             delete req.body.discount_amount;
         }
 
+        if (images !== undefined) {
+            try {
+                const imageUrls = await uploadImages(images, 'products');
+                req.body.images = imageUrls;
+                console.log('✅ Images uploaded successfully:', imageUrls);
+            } catch (uploadError) {
+                console.error('Image upload failed:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload images" 
+                });
+            }
+        }
+
         const productData = { 
             selling_price: marked_price - discount,
             discount_amount: discount,
-            ...req.body 
+            ...req.body,
         };
 
         const product = await productService.create(productData);
