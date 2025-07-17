@@ -13,7 +13,7 @@ import {
   Fade,
   Typography,
 } from "@mui/material";
-import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
+import { Menu as MenuIcon, Close as CloseIcon, Logout as LogoutIcon } from "@mui/icons-material";
 import useUserAuthStore from "../../stores/userAuthStore";
 
 // Styled NavLink for dark theme with active styling
@@ -92,6 +92,7 @@ const UserNavbar = () => {
               color="error"
               sx={{ ml: 2 }}
               onClick={handleLogout}
+              startIcon={<LogoutIcon />}
             >
               Logout
             </Button>
@@ -107,10 +108,10 @@ const UserNavbar = () => {
               sx={{ ml: "auto" }}
             >
               <Fade in={!mobileMenuOpen} unmountOnExit>
-                <MenuIcon sx={{ color: "white" }} />
+                <MenuIcon sx={{ color: "white", fontSize: 28 }} />
               </Fade>
               <Fade in={mobileMenuOpen} unmountOnExit>
-                <CloseIcon sx={{ color: "white" }} />
+                <CloseIcon sx={{ color: "white", fontSize: 28 }} />
               </Fade>
             </IconButton>
           )}
@@ -152,6 +153,7 @@ const UserNavbar = () => {
                 color="error"
                 fullWidth
                 onClick={handleLogout}
+                startIcon={<LogoutIcon />}
               >
                 Logout
               </Button>

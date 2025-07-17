@@ -109,10 +109,10 @@ const PublicNavbar = ({ isAuthenticated = false }) => {
               sx={{ ml: "auto" }}
             >
               <Fade in={!mobileMenuOpen} unmountOnExit>
-                <MenuIcon sx={{ color: "white" }} />
+                <MenuIcon sx={{ color: "white", fontSize: 28 }} />
               </Fade>
               <Fade in={mobileMenuOpen} unmountOnExit>
-                <CloseIcon sx={{ color: "white" }} />
+                <CloseIcon sx={{ color: "white", fontSize: 28 }} />
               </Fade>
             </IconButton>
           )}
