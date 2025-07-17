@@ -24,6 +24,22 @@ const createCategory = async (req, res) => {
     }
 };
 
+const getCategoryById = async (req, res) => {
+	try {
+        const categoryId = req.params.id;
+
+        const category = await categoryService.findById(categoryId);
+        if (!category) {
+            return res.status(404).json({ success: false, message: "Category not found"});
+        }
+
+        return res.status(200).json({ success: true, message: "Category fetched successfully", data: category });
+    } catch (error) {
+        console.error("Get category by id error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
 const getAllCategories = async (req, res) => {
 	try {
         const { is_active } = req.query;
@@ -95,4 +111,4 @@ const deleteCategory = async (req, res) => {
     }
 };
 
-export { createCategory, getAllCategories, updateCategory, deleteCategory };
+export { createCategory, getCategoryById, getAllCategories, updateCategory, deleteCategory };
