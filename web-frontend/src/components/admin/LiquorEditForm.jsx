@@ -153,6 +153,11 @@ const LiquorEditForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (existingImages.length + newImagesBase64.length === 0) {
+            toast.error("Please upload at least one image before updating.");
+            return;
+        }
+
         if (!validateForm()) {
             return;
         }
@@ -383,7 +388,7 @@ const LiquorEditForm = () => {
                                                                 src={url}
                                                                 alt={`existing-${idx}`}
                                                                 thumbnail
-                                                                style={{ width: 80, height: 80, objectFit: 'cover' }}
+                                                                style={{ width: 80, height: 80, objectFit: 'contain' }}
                                                                 onError={(e) => (e.target.src = "/placeholder-bottle.jpg")}
                                                             />
                                                             <Button
@@ -436,7 +441,7 @@ const LiquorEditForm = () => {
                                                                 src={base64}
                                                                 alt={`new-${idx}`}
                                                                 thumbnail
-                                                                style={{ width: 80, height: 80, objectFit: 'cover' }}
+                                                                style={{ width: 80, height: 80, objectFit: 'contain' }}
                                                             />
                                                             <Button
                                                                 variant="danger"
