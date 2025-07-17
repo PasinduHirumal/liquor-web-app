@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { Button } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
-import { axiosInstance } from '../../lib/axios';
+import { axiosInstance } from '../../../lib/axios';
 import toast from 'react-hot-toast';
-import ConfirmDialog from '../../common/ConfirmDialog';
+import ConfirmDialog from '../../../common/ConfirmDialog';
 
 const DeleteDriverButton = ({ driverId, onDeleted }) => {
     const [loading, setLoading] = useState(false);

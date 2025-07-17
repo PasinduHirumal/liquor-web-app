@@ -1,23 +1,31 @@
-import React from "react";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const ProductCard = ({ product, showId = false }) => {
+const LiquorProductCard = ({ product, DetaiButton = false }) => {
+  const [activeImage, setActiveImage] = useState(product.images?.[0]);
+  const navigate = useNavigate();
+
+  const handleViewDetail = () => {
+    navigate(`/products/${product.product_id || product.id}`);
+  };
+
   return (
-    <div className="col-12 col-sm-6 col-md-4 col-lg-2">
+    <div className="col-12 col-sm-6 col-md-4 col-lg-3">
       <div
         className="card h-100"
-        style={{
-          opacity: product.is_active ? 1 : 0.7,
-          transition: "transform 0.2s ease-in-out",
-        }}
         onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.01)")}
         onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
       >
-        {product.images?.length > 0 ? (
+        {activeImage ? (
           <img
-            src={product.images[0]}
+            src={activeImage}
             alt={product.name}
             className="card-img-top"
-            style={{ height: "200px", objectFit: "contain", backgroundColor: "#f8f9fa" }}
+            style={{
+              height: "200px",
+              objectFit: "contain",
+              backgroundColor: "#f8f9fa",
+            }}
           />
         ) : (
           <div
@@ -28,7 +36,29 @@ const ProductCard = ({ product, showId = false }) => {
           </div>
         )}
 
-        <div className="card-body d-flex flex-column">
+        {/* Thumbnail previews */}
+        {product.images?.length > 1 && (
+          <div className="d-flex justify-content-center gap-1 py-2 px-1 flex-wrap">
+            {product.images.map((img, idx) => (
+              <img
+                key={idx}
+                src={img}
+                alt={`Thumbnail ${idx + 1}`}
+                onClick={() => setActiveImage(img)}
+                style={{
+                  width: "30px",
+                  height: "30px",
+                  objectFit: "cover",
+                  cursor: "pointer",
+                  border: img === activeImage ? "2px solid #007bff" : "1px solid #ccc",
+                  borderRadius: "3px",
+                }}
+              />
+            ))}
+          </div>
+        )}
+
+        <div className="card-body d-flex flex-column border-top">
           <h6 className="card-title text-truncate">{product.name}</h6>
           <p className="card-text mb-1">
             <small className="text-muted">
@@ -55,9 +85,11 @@ const ProductCard = ({ product, showId = false }) => {
             </span>
           </div>
 
-          {showId && (
+          {DetaiButton && (
             <div className="mt-auto text-end">
-              <small className="text-muted">ID: {product.product_id}</small>
+              <button className="btn btn-primary btn-sm" onClick={handleViewDetail}>
+                View Detail
+              </button>
             </div>
           )}
         </div>
@@ -66,4 +98,4 @@ const ProductCard = ({ product, showId = false }) => {
   );
 };
 
-export default ProductCard;
+export default LiquorProductCard;

@@ -1,36 +1,32 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
-import { axiosInstance } from '../../lib/axios';
-import ConfirmDialog from '../../common/ConfirmDialog';
-import useAdminAuthStore from '../../stores/adminAuthStore';
+import { axiosInstance } from '../../../lib/axios';
+import ConfirmDialog from '../../../common/ConfirmDialog';
 
-const DeleteUserButton = ({ userId, onSuccess }) => {
-    const currentUser = useAdminAuthStore((state) => state.user);
+const DeleteAdminButton = ({ adminId, onSuccess }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const handleDelete = async () => {
         const confirmed = await ConfirmDialog({
-            title: 'Delete User?',
-            html: 'This action cannot be undone.',
-            icon: 'warning',
+            title: 'Confirm Deletion',
+            html: 'This admin will be permanently removed. You cannot undo this action!',
         });
 
         if (!confirmed) return;
 
         setIsLoading(true);
+
         try {
-            await axiosInstance.delete(`/users/delete/${userId}`);
-            toast.success('User deleted successfully');
-            if (onSuccess) onSuccess();
-        } catch (err) {
-            console.error("Delete error:", err);
-            toast.error(err.response?.data?.message || 'Failed to delete user');
+            await axiosInstance.delete(`/admin/delete/${adminId}`);
+            toast.success('Admin deleted successfully');
+            onSuccess(adminId);
+        } catch (error) {
+            console.error('Error deleting admin:', error);
+            toast.error(error?.response?.data?.message || 'Failed to delete admin');
         } finally {
             setIsLoading(false);
         }
     };
-
-    if (currentUser.role !== 'super_admin') return null;
 
     return (
         <button
@@ -52,4 +48,4 @@ const DeleteUserButton = ({ userId, onSuccess }) => {
     );
 };
 
-export default DeleteUserButton;
+export default DeleteAdminButton;
