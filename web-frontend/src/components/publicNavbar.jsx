@@ -1,78 +1,153 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FiMenu, FiX } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Button,
+  Box,
+  useMediaQuery,
+  useTheme,
+  styled,
+  Slide,
+  Fade,
+  Typography,
+} from "@mui/material";
+import {
+  Menu as MenuIcon,
+  Close as CloseIcon,
+  Login as LoginIcon,
+} from "@mui/icons-material";
+
+// Styled NavLink
+const StyledNavLink = styled(NavLink)(({ theme }) => ({
+  color: theme.palette.common.white,
+  textDecoration: "none",
+  padding: theme.spacing(1, 2),
+  borderRadius: theme.shape.borderRadius,
+  transition: "background-color 0.3s ease",
+  "&.active": {
+    backgroundColor: theme.palette.primary.light,
+    fontWeight: "bold",
+  },
+  "&:hover": {
+    backgroundColor: theme.palette.primary.dark,
+  },
+}));
 
 const PublicNavbar = ({ isAuthenticated = false }) => {
   const navigate = useNavigate();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const handleLogin = () => navigate("/login");
-  const toggleCollapse = () => setIsCollapsed((prev) => !prev);
-  const closeCollapse = () => setIsCollapsed(false);
+  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
-      <div className="container-fluid px-4">
-        <NavLink to="/" className="navbar-brand" onClick={closeCollapse}>
-          🍷 Liquor Web App
-        </NavLink>
+    <>
+      <AppBar position="fixed">
+        <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2, md: 4 } }}>
+          <Box
+            component={StyledNavLink}
+            to="/"
+            onClick={closeMobileMenu}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              fontSize: "1.3rem",
+              fontWeight: "bold",
+              color: "white",
+              textDecoration: "none",
+            }}
+          >
+            🍷 Liquor Web App
+          </Box>
 
-        <button
-          className="navbar-toggler border-0"
-          type="button"
-          onClick={toggleCollapse}
-          aria-label="Toggle navigation"
-          aria-expanded={isCollapsed}
-        >
-          <AnimatePresence mode="wait" initial={false}>
-            {isCollapsed ? (
-              <motion.div
-                key="close"
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <FiX size={28} color="white" />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="menu"
-                initial={{ rotate: 90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: -90, opacity: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <FiMenu size={28} color="white" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </button>
-
-        <div className={`collapse navbar-collapse ${isCollapsed ? "show" : ""}`}>
-          <ul className="navbar-nav ms-auto align-items-lg-center">
-            <li className="nav-item">
-              <NavLink
-                to="/"
-                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
-                onClick={closeCollapse}
-              >
-                Home
-              </NavLink>
-            </li>
+          {/* Desktop Navigation */}
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+            <StyledNavLink to="/" onClick={closeMobileMenu}>
+              Home
+            </StyledNavLink>
 
             {!isAuthenticated && (
-              <li className="nav-item mt-2 mt-lg-0">
-                <button className="btn btn-primary ms-lg-3" onClick={handleLogin}>
-                  Login
-                </button>
-              </li>
+              <Button
+                variant="contained"
+                color="secondary"
+                startIcon={<LoginIcon />}
+                onClick={handleLogin}
+                sx={{ ml: 2 }}
+              >
+                Login
+              </Button>
             )}
-          </ul>
-        </div>
-      </div>
-    </nav>
+          </Box>
+
+          {/* Mobile Menu Icon */}
+          {isMobile && (
+            <IconButton
+              color="inherit"
+              edge="end"
+              onClick={toggleMobileMenu}
+              aria-label="menu"
+              sx={{ ml: "auto" }}
+            >
+              <Fade in={!mobileMenuOpen} unmountOnExit>
+                <MenuIcon />
+              </Fade>
+              <Fade in={mobileMenuOpen} unmountOnExit>
+                <CloseIcon />
+              </Fade>
+            </IconButton>
+          )}
+        </Toolbar>
+
+        {/* Mobile Slide-down Menu */}
+        {isMobile && (
+          <Slide direction="left" in={mobileMenuOpen} mountOnEnter unmountOnExit>
+            <Box
+              sx={{
+                position: "fixed",
+                top: { xs: 56, sm: 64 },
+                height: { xs: "calc(100vh - 56px)", sm: "calc(100vh - 64px)" },
+                right: 0,
+                width: "75vw",
+                maxWidth: 300,
+                bgcolor: theme.palette.primary.dark,
+                zIndex: theme.zIndex.drawer + 1,
+                p: 3,
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <StyledNavLink to="/" onClick={closeMobileMenu} sx={{ mb: 2 }}>
+                Home
+              </StyledNavLink>
+
+              {!isAuthenticated && (
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="secondary"
+                  startIcon={<LoginIcon />}
+                  onClick={() => {
+                    handleLogin();
+                    closeMobileMenu();
+                  }}
+                >
+                  Login
+                </Button>
+              )}
+            </Box>
+          </Slide>
+        )}
+      </AppBar>
+
+      {/* Add spacing so content below navbar isn't hidden */}
+      <Toolbar />
+    </>
   );
 };
 
