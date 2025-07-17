@@ -8,6 +8,7 @@ import useAdminAuthStore from "../../stores/adminAuthStore";
 import { Navigate, useLocation } from "react-router-dom";
 import DriverList from "../../pages/admin/DriverList";
 import PublicHome from "../PublicHome";
+import LiquorProductDetail from "../../components/admin/LiquorProductDetail";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -81,6 +82,14 @@ export const adminRoutes = [
         element: (
             <AdminProtectedRoute>
                 <AdminProfile />
+            </AdminProtectedRoute>
+        ),
+    },
+    {
+        path: "/products/:id",
+        element: (
+            <AdminProtectedRoute>
+                <LiquorProductDetail />
             </AdminProtectedRoute>
         ),
     },

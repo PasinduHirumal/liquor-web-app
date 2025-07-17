@@ -83,7 +83,7 @@ const AdminNavbar = () => {
 
                     {/* Desktop Navigation */}
                     <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
-                        <StyledNavLink to="/" onClick={closeMobileMenu}>
+                        <StyledNavLink to="/admin" onClick={closeMobileMenu}>
                             Home
                         </StyledNavLink>
 
@@ -209,10 +209,10 @@ const AdminNavbar = () => {
                                 flexDirection: "column",
                             }}
                         >
-                            <StyledNavLink to="/" onClick={closeMobileMenu} sx={{ mb: 2 }}>
+                            <StyledNavLink to="/admin" onClick={closeMobileMenu} sx={{ mb: 2 }}>
                                 Home
                             </StyledNavLink>
-                            
+
                             <StyledNavLink
                                 to="/liquor-list"
                                 onClick={closeMobileMenu}

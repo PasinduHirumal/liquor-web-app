@@ -1,10 +1,16 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-const LiquorProductCard = ({ product, showId = false }) => {
+const LiquorProductCard = ({ product, DetaiButton = false }) => {
   const [activeImage, setActiveImage] = useState(product.images?.[0]);
+  const navigate = useNavigate();
+
+  const handleViewDetail = () => {
+    navigate(`/products/${product.product_id || product.id}`);
+  };
 
   return (
-    <div className="col-12 col-sm-6 col-md-4 col-lg-2">
+    <div className="col-12 col-sm-6 col-md-4 col-lg-3">
       <div
         className="card h-100"
         style={{
@@ -83,9 +89,11 @@ const LiquorProductCard = ({ product, showId = false }) => {
             </span>
           </div>
 
-          {showId && (
+          {DetaiButton && (
             <div className="mt-auto text-end">
-              <small className="text-muted">ID: {product.product_id}</small>
+              <button className="btn btn-primary btn-sm" onClick={handleViewDetail}>
+                View Detail
+              </button>
             </div>
           )}
         </div>
