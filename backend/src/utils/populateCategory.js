@@ -18,6 +18,7 @@ const populateCategory = async (data) => {
                         name: categoryData.name,
                         description: categoryData.description,
                         is_active: categoryData.is_active,
+                        is_liquor: categoryData.is_liquor
                     };
                 } else {
                     product.category_id = null;

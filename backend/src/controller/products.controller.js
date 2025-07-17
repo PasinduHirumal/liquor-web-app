@@ -97,8 +97,27 @@ const getAllProducts = async (req, res) => {
     }
 };
 
+const getProductById = async (req, res) => {
+	try {
+        const productId = req.params.id;
+
+        const product = await productService.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found"});
+        }
+
+        const populatedProduct = await populateCategory(product);
+
+        return res.status(200).json({ success: true, message: "Product fetched successfully", data: populatedProduct });
+    } catch (error) {
+        console.error("Get product by id error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
 const updateProduct = async (req, res) => {
 	try {
+        const productId = req.params.id;
         //return res.status(400).json({ success: false, message: ""});
         return res.status(200).json({ success: true, message: ""});
     } catch (error) {
@@ -107,4 +126,4 @@ const updateProduct = async (req, res) => {
     }
 };
 
-export { getAllProducts, createProduct, };
+export { getAllProducts, getProductById, createProduct, };
