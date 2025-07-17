@@ -56,7 +56,7 @@ const LiquorProductCard = ({ product, showId = false }) => {
           </div>
         )}
 
-        <div className="card-body d-flex flex-column">
+        <div className="card-body d-flex flex-column border-top">
           <h6 className="card-title text-truncate">{product.name}</h6>
           <p className="card-text mb-1">
             <small className="text-muted">
