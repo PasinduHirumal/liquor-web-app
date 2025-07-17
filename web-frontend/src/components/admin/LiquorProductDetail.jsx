@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { axiosInstance } from "../../lib/axios";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit, FaCheckCircle, FaTimesCircle, FaArrowLeft } from "react-icons/fa";
 import "../../styles/LiquorProductDetail.css";
+import { FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit, FaCheckCircle, FaTimesCircle, FaArrowLeft } from "react-icons/fa";
+import { axiosInstance } from "../../lib/axios";
+import DeleteLiquorButton from "./buttons/DeleteLiquorButton";
 
 const LiquorProductDetail = () => {
     const { id } = useParams();
@@ -13,6 +14,7 @@ const LiquorProductDetail = () => {
     const [activeImage, setActiveImage] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [isDeleting, setIsDeleting] = useState(false)
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -29,6 +31,10 @@ const LiquorProductDetail = () => {
 
         fetchProduct();
     }, [id]);
+
+    const handleDeleteSuccess = () => {
+        navigate("/products", { state: { message: "Product deleted successfully" } });
+    };
 
     if (error) return (
         <div className="product-detail-error">
@@ -182,8 +188,13 @@ const LiquorProductDetail = () => {
                             </div>
 
                             <div className="action-buttons">
-                                <button className="edit-button">Edit</button>
-                                <button className="delete-button">Delete</button>
+                                <div className="action-buttons">
+                                    <button className="edit-button">Edit</button>
+                                    <DeleteLiquorButton
+                                        id={id}
+                                        onSuccess={handleDeleteSuccess}
+                                    />
+                                </div>
                             </div>
                         </div>
                     </div>
