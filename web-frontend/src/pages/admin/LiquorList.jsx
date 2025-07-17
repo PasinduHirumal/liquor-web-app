@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { Modal, Button } from "react-bootstrap";
 import { axiosInstance } from "../../lib/axios";
 import ProductCard from "../../common/LiquorProductCard";
+import LiquorCreateForm from "../../components/admin/LiquorCreateForm";
 
 const LiquorList = () => {
     const [products, setProducts] = useState([]);
@@ -10,6 +12,7 @@ const LiquorList = () => {
         is_active: true,
         is_in_stock: true
     });
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     useEffect(() => {
         const fetchProducts = async () => {
@@ -40,6 +43,11 @@ const LiquorList = () => {
         }));
     };
 
+    const handleCreateSuccess = (newProduct) => {
+        setProducts([newProduct, ...products]);
+        setShowCreateModal(false);
+    };
+
     if (loading) {
         return (
             <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "80vh" }}>
@@ -60,7 +68,16 @@ const LiquorList = () => {
 
     return (
         <div className="container-fluid py-4">
-            <h2 className="mb-4">Manage Liquors</h2>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h2>Manage Liquors</h2>
+                <Button
+                    variant="primary"
+                    onClick={() => setShowCreateModal(true)}
+                    className="ms-2"
+                >
+                    Create Item
+                </Button>
+            </div>
 
             {/* Filters */}
             <div className="card mb-4">
@@ -111,6 +128,19 @@ const LiquorList = () => {
                     </div>
                 )}
             </div>
+
+            {/* Create Product Modal */}
+            <Modal show={showCreateModal} onHide={() => setShowCreateModal(false)} size="lg" className="mt-5 pb-5">
+                <Modal.Header closeButton>
+                    <Modal.Title>Create New Product</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <LiquorCreateForm
+                        onSuccess={handleCreateSuccess}
+                        onCancel={() => setShowCreateModal(false)}
+                    />
+                </Modal.Body>
+            </Modal>
         </div>
     );
 };
