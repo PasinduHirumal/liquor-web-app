@@ -33,13 +33,11 @@ const LiquorList = () => {
         fetchProducts();
     }, [filters]);
 
-    const handleFilterChange = (filterName, value) => {
-        const parsedValue = value === "true";
-        if (filters[filterName] === parsedValue) return;
-
+    const handleFilterChange = (e) => {
+        const { name, checked } = e.target;
         setFilters((prev) => ({
             ...prev,
-            [filterName]: parsedValue
+            [name]: checked
         }));
     };
 
@@ -82,33 +80,35 @@ const LiquorList = () => {
             {/* Filters */}
             <div className="card mb-4">
                 <div className="card-body">
-                    <h5 className="card-title">Filters</h5>
+                    <h5 className="card-title mb-3">Filters</h5>
 
-                    <div className="row">
-                        <div className="col-md-6 mb-3">
-                            <label htmlFor="activeFilter" className="form-label">Product Status</label>
-                            <select
-                                className="form-select"
-                                id="activeFilter"
-                                value={filters.is_active.toString()}
-                                onChange={(e) => handleFilterChange("is_active", e.target.value)}
-                            >
-                                <option value="true">Active</option>
-                                <option value="false">Inactive</option>
-                            </select>
+                    <div className="d-flex gap-4 flex-wrap">
+                        <div className="form-check">
+                            <input
+                                className="form-check-input"
+                                type="checkbox"
+                                name="is_active"
+                                id="filterActive"
+                                checked={filters.is_active}
+                                onChange={handleFilterChange}
+                            />
+                            <label className="form-check-label" htmlFor="filterActive">
+                                Active
+                            </label>
                         </div>
 
-                        <div className="col-md-6 mb-3">
-                            <label htmlFor="stockFilter" className="form-label">Stock Availability</label>
-                            <select
-                                className="form-select"
-                                id="stockFilter"
-                                value={filters.is_in_stock.toString()}
-                                onChange={(e) => handleFilterChange("is_in_stock", e.target.value)}
-                            >
-                                <option value="true">In Stock</option>
-                                <option value="false">Sold Out</option>
-                            </select>
+                        <div className="form-check">
+                            <input
+                                className="form-check-input"
+                                type="checkbox"
+                                name="is_in_stock"
+                                id="filterInStock"
+                                checked={filters.is_in_stock}
+                                onChange={handleFilterChange}
+                            />
+                            <label className="form-check-label" htmlFor="filterInStock">
+                                In Stock
+                            </label>
                         </div>
                     </div>
                 </div>

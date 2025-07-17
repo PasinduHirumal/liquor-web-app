@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Form, Button, Spinner } from 'react-bootstrap';
 import { toast } from 'react-hot-toast';
+import { FaTrash } from 'react-icons/fa';
 import { axiosInstance } from '../../lib/axios';
 
 const LiquorCreateForm = ({ onSuccess, onCancel }) => {
@@ -21,9 +22,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
     const [images, setImages] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [validationErrors, setValidationErrors] = useState([]);
 
-    // Fetch categories on mount
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -31,37 +30,31 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                 setCategories(res.data.data || []);
             } catch (err) {
                 toast.error('Failed to fetch categories');
-                console.error('Failed to fetch categories', err);
+                console.error('Category fetch error:', err);
             }
         };
         fetchCategories();
     }, []);
 
-    // Handle form input changes
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        let newValue;
-        if (type === 'checkbox') {
-            newValue = checked;
-        } else if (type === 'number') {
-            newValue = value === '' ? '' : parseFloat(value);
-        } else {
-            newValue = value;
-        }
+        const newValue =
+            type === 'checkbox' ? checked :
+            type === 'number' ? (value === '' ? '' : parseFloat(value)) :
+            value;
+
         setFormData((prev) => ({ ...prev, [name]: newValue }));
     };
 
-    // Handle image file input and convert to base64
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
-        const readers = files.map(
-            (file) =>
-                new Promise((resolve, reject) => {
-                    const reader = new FileReader();
-                    reader.onload = (event) => resolve(event.target.result);
-                    reader.onerror = reject;
-                    reader.readAsDataURL(file);
-                })
+        const readers = files.map(file => 
+            new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = (event) => resolve(event.target.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(file);
+            })
         );
 
         Promise.all(readers)
@@ -72,23 +65,18 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
             });
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setValidationErrors([]);
 
         try {
-            const payload = {
-                ...formData,
-                images,
-            };
+            const payload = { ...formData, images };
+            const res = await axiosInstance.post('/products/create', payload);
 
-            const response = await axiosInstance.post('/products/create', payload);
             toast.success('Product created successfully!');
-            onSuccess(response.data.data);
+            onSuccess(res.data.data);
 
-            // Reset form
+            // Reset
             setFormData({
                 name: '',
                 description: '',
@@ -106,11 +94,11 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
         } catch (err) {
             const resData = err.response?.data;
             if (resData?.errors?.length) {
-                setValidationErrors(resData.errors);
-                toast.warn('Please fix validation errors.');
+                resData.errors.forEach(e => {
+                    toast.error(`${e.field}: ${e.message}`);
+                });
             } else {
-                const msg = resData?.message || 'Failed to create product';
-                toast.error(msg);
+                toast.error(resData?.message || 'Failed to create product');
             }
         } finally {
             setLoading(false);
@@ -119,20 +107,6 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
 
     return (
         <Form onSubmit={handleSubmit}>
-            {/* Validation errors */}
-            {validationErrors.length > 0 && (
-                <div className="alert alert-warning" role="alert">
-                    <strong>Validation Errors:</strong>
-                    <ul className="mb-0">
-                        {validationErrors.map((e, idx) => (
-                            <li key={idx}>
-                                {e.field}: {e.message}
-                            </li>
-                        ))}
-                    </ul>
-                </div>
-            )}
-
             <Form.Group className="mb-3">
                 <Form.Label>Product Name</Form.Label>
                 <Form.Control
@@ -140,6 +114,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                     name="name"
                     value={formData.name}
                     onChange={handleChange}
+                    disabled={loading}
                     required
                 />
             </Form.Group>
@@ -151,6 +126,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                     name="description"
                     value={formData.description}
                     onChange={handleChange}
+                    disabled={loading}
                     required
                 />
             </Form.Group>
@@ -163,6 +139,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                         name="brand"
                         value={formData.brand}
                         onChange={handleChange}
+                        disabled={loading}
                         required
                     />
                 </Form.Group>
@@ -173,6 +150,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                         name="category_id"
                         value={formData.category_id}
                         onChange={handleChange}
+                        disabled={loading}
                         required
                     >
                         <option value="">Select a category</option>
@@ -195,6 +173,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                         onChange={handleChange}
                         min="0"
                         max="100"
+                        disabled={loading}
                         required
                     />
                 </Form.Group>
@@ -207,6 +186,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                         value={formData.volume}
                         onChange={handleChange}
                         min="0"
+                        disabled={loading}
                         required
                     />
                 </Form.Group>
@@ -220,6 +200,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                         onChange={handleChange}
                         min="0"
                         step="0.01"
+                        disabled={loading}
                         required
                     />
                 </Form.Group>
@@ -233,6 +214,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                     value={formData.stock_quantity}
                     onChange={handleChange}
                     min="0"
+                    disabled={loading}
                     required
                 />
             </Form.Group>
@@ -275,6 +257,54 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                     disabled={loading}
                 />
             </Form.Group>
+
+            {images.length > 0 && (
+                <div className="mb-3">
+                    <Form.Label>Image Preview</Form.Label>
+                    <div className="d-flex flex-wrap gap-3">
+                        {images.map((img, index) => (
+                            <div
+                                key={index}
+                                className="position-relative"
+                                style={{
+                                    width: '150px',
+                                    height: '150px',
+                                    border: '1px solid #ccc',
+                                    borderRadius: '8px',
+                                    overflow: 'hidden',
+                                }}
+                            >
+                                <img
+                                    src={img}
+                                    alt={`preview-${index}`}
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        objectFit: 'contain',
+                                    }}
+                                />
+                                <Button
+                                    variant="danger"
+                                    size="sm"
+                                    className="position-absolute top-0 end-0"
+                                    style={{
+                                        padding: '0.2rem 0.5rem',
+                                        fontSize: '0.8rem',
+                                        lineHeight: 1,
+                                        borderRadius: '0 0 0 6px',
+                                    }}
+                                    onClick={() => {
+                                        setImages(images.filter((_, i) => i !== index));
+                                    }}
+                                    title="Remove"
+                                >
+                                    <FaTrash size={14} />
+                                </Button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
 
             <div className="d-flex justify-content-end gap-2">
                 <Button
