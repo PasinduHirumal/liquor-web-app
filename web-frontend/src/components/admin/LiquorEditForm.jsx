@@ -145,7 +145,6 @@ const LiquorEditForm = () => {
             </div>
         );
 
-
     return (
         <div className="container mt-4">
             <h2>Edit Liquor Product</h2>
