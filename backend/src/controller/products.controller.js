@@ -118,12 +118,48 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
 	try {
         const productId = req.params.id;
-        //return res.status(400).json({ success: false, message: ""});
-        return res.status(200).json({ success: true, message: ""});
+        const { category_id, images } = req.body;
+
+        const product = await productService.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found"});
+        } 
+
+        if (category_id !== undefined) {
+            const category = await categoryService.findById(category_id);
+            if (!category) {
+                return res.status(400).json({ success: false, message: "Invalid category"});
+            }
+        }
+
+        if (images !== undefined) {
+            try {
+                const imageUrls = await uploadImages(images, 'products');
+                req.body.images = imageUrls;
+                console.log('✅ Images uploaded successfully:', imageUrls);
+            } catch (uploadError) {
+                console.error('Image upload failed:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload images" 
+                });
+            }
+        }
+
+        const updateData = { ...req.body };
+        
+        const updatedProduct = await productService.updateById(productId, updateData);
+        if (!updatedProduct) {
+            return res.status(400).json({ success: false, message: "Failed to update product"});
+        }
+
+        const populatedProduct = await populateCategory(updatedProduct);
+
+        return res.status(201).json({ success: true, message: "Product updated successfully", data: populatedProduct });
     } catch (error) {
-        console.error("Method_name error:", error.message);
+        console.error("Update product error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
 
-export { getAllProducts, getProductById, createProduct, };
+export { getAllProducts, getProductById, createProduct, updateProduct, };
