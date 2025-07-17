@@ -119,7 +119,7 @@ const Address = () => {
     };
 
     return (
-        <div className="container-fluid mt-5 pt-5">
+        <div className="container-fluid mt-4">
             <div className="row justify-content-center">
                 <div className="col-lg-10">
                     <div className="card shadow">

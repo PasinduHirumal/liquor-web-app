@@ -114,7 +114,7 @@ const AdminUserList = () => {
   ];
 
   return (
-    <div className="container-fluid mt-5 px-4 py-4">
+    <div className="container-fluid mt-3">
       <Title level={3} className="text-center">Admin User List</Title>
 
       {/* Filters */}

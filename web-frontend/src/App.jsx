@@ -17,6 +17,7 @@ import useUserAuthStore from "./stores/userAuthStore";
 
 import { adminRoutes } from "./routes/admin/AdminRoutes";
 import { userRoutes } from "./routes/user/UserRoutes";
+import MainLayout from "./layout/Mainlayout";
 
 function App() {
   const adminCheckAuth = useAdminAuthStore((state) => state.checkAuth);
@@ -34,60 +35,57 @@ function App() {
       <ToastProvider />
 
       <Routes>
+        <Route path="/" element={<MainLayout />}>
+        
+          <Route
+            index
+            element={
+              adminAuth ? (
+                <Navigate to="/admin" replace />
+              ) : userAuth ? (
+                <Navigate to="/user" replace />
+              ) : (
+                <PublicHome />
+              )
+            }
+          />
+          <Route
+            path="login"
+            element={
+              adminAuth || userAuth ? <Navigate to="/" replace /> : <Login />
+            }
+          />
+          <Route
+            path="register"
+            element={
+              adminAuth || userAuth ? <Navigate to="/" replace /> : <Register />
+            }
+          />
+          <Route path="verify-otp" element={<VerifyOtpPage />} />
 
-        {/* Auth Routes */}
-        <Route
-          path="/"
-          element={
-            adminAuth ? (
-              <Navigate to="/admin" replace />
-            ) : userAuth ? (
-              <Navigate to="/user" replace />
-            ) : (
-              <PublicHome />
-            )
-          }
-        />
+          {/* Admin Routes */}
+          {adminRoutes.map(({ path, element }, i) => (
+            <Route key={`admin-${i}`} path={path} element={element} />
+          ))}
 
-        <Route
-          path="/login"
-          element={
-            adminAuth || userAuth ? <Navigate to="/" replace /> : <Login />
-          }
-        />
+          {/* User Routes */}
+          {userRoutes.map(({ path, element }, i) => (
+            <Route key={`user-${i}`} path={path} element={element} />
+          ))}
 
-        <Route
-          path="/register"
-          element={
-            adminAuth || userAuth ? <Navigate to="/" replace /> : <Register />
-          }
-        />
-
-        <Route path="/verify-otp" element={<VerifyOtpPage />} />
-
-        {/* Admin Routes */}
-        {adminRoutes.map(({ path, element }, i) => (
-          <Route key={`admin-${i}`} path={path} element={element} />
-        ))}
-
-        {/* User Routes */}
-        {userRoutes.map(({ path, element }, i) => (
-          <Route key={`user-${i}`} path={path} element={element} />
-        ))}
-
-        {/* Catch-All Fallback */}
-        <Route
-          path="*"
-          element={
-            adminAuth ? (
-              <Navigate to="/admin" replace />
-            ) : userAuth ? (
-              <Navigate to="/user" replace />
-            ) : (
-              <Navigate to="/" replace />
-            )
-          }
-        />
+          <Route
+            path="*"
+            element={
+              adminAuth ? (
+                <Navigate to="/admin" replace />
+              ) : userAuth ? (
+                <Navigate to="/user" replace />
+              ) : (
+                <Navigate to="/" replace />
+              )
+            }
+          />
+        </Route>
       </Routes>
     </Router>
   );

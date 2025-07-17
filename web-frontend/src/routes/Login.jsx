@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import UserLogin from '../pages/user/UserLogin';
 import AdminLogin from '../pages/admin/AdminLogin';
-import PublicNavbar from '../components/PublicNavbar';
+import PublicNavbar from '../components/publicNavbar';
 
 const Login = () => {
     const [activeComponent, setActiveComponent] = useState('UserLogin');
@@ -21,8 +21,8 @@ const Login = () => {
         <>
             <PublicNavbar isAuthenticated={true} />
 
-            <div className="d-flex flex-column align-items-center justify-content-center mt-5">
-                <h3 className="mt-4 m-0 p-0 text-center fw-semibold" style={{ letterSpacing: '0.05em' }}>
+            <div className="d-flex flex-column align-items-center justify-content-center">
+                <h3 className="mt-3 m-0 p-0 text-center fw-semibold" style={{ letterSpacing: '0.05em' }}>
                     Sign In
                 </h3>
                 <div className="card border-0 p-4" style={{ minWidth: '350px', maxWidth: '450px', width: '100%' }}>

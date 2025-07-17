@@ -3,13 +3,14 @@ import { axiosInstance } from '../../lib/axios';
 import CreateDriverForm from '../../components/admin/CreateDriverForm';
 import toast from 'react-hot-toast';
 import { buildDriverQueryParams } from '../../components/admin/driverFilterParams';
+import DeleteDriverButton from '../../components/admin/DeleteDriverButton';
 
 import {
-    Table, Button, Space, Tag, Switch, Popconfirm,
+    Table, Button, Space, Tag, Switch,
     Card, Row, Col, Typography, Select, Badge
 } from 'antd';
 import {
-    EditOutlined, DeleteOutlined, PlusOutlined, ReloadOutlined, FilterOutlined
+    EditOutlined, PlusOutlined, ReloadOutlined, FilterOutlined
 } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
@@ -70,16 +71,6 @@ const DriverList = () => {
             fetchDrivers();
         } catch {
             toast.error('Failed to update status');
-        }
-    };
-
-    const handleDelete = async (id) => {
-        try {
-            await axiosInstance.delete(`/drivers/delete/${id}`);
-            toast.success('Driver deleted successfully');
-            fetchDrivers();
-        } catch {
-            toast.error('Failed to delete driver');
         }
     };
 
@@ -155,15 +146,8 @@ const DriverList = () => {
             key: 'actions',
             render: (_, record) => (
                 <Space size="middle">
-                    <Button icon={<EditOutlined />} type="text" />
-                    <Popconfirm
-                        title="Are you sure to delete this driver?"
-                        onConfirm={() => handleDelete(record._id)}
-                        okText="Yes"
-                        cancelText="No"
-                    >
-                        <Button icon={<DeleteOutlined />} type="text" danger />
-                    </Popconfirm>
+                    <Button icon={<EditOutlined style={{ fontSize: '18px' }} />} type="text" />
+                    <DeleteDriverButton driverId={record.id} onDeleted={fetchDrivers} />
                 </Space>
             ),
             width: 100,
@@ -171,7 +155,7 @@ const DriverList = () => {
     ];
 
     return (
-        <div className="container-fluid mt-5 pt-4">
+        <div className="container-fluid mt-3">
             <Card
                 title={
                     <Row justify="space-between" align="middle">

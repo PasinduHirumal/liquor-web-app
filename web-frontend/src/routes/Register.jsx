@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import AdminRegister from '../pages/admin/AdminRegister';
 import UserRegister from '../pages/user/UserRegister';
-import PublicNavbar from '../components/PublicNavbar';
+import PublicNavbar from '../components/publicNavbar';
 
 const Register = () => {
   const [activeComponent, setActiveComponent] = useState('UserRegister');
@@ -20,8 +20,8 @@ const Register = () => {
   return (
     <>
       <PublicNavbar isAuthenticated={false} />
-      <div className="d-flex flex-column align-items-center justify-content-center min-vh-100 bg-light px-3 mt-5">
-        <h3 className="mt-4 text-center fw-semibold" style={{ letterSpacing: '0.05em' }}>
+      <div className="d-flex flex-column align-items-center justify-content-center min-vh-100 bg-light">
+        <h3 className="mt-3 text-center fw-semibold" style={{ letterSpacing: '0.05em' }}>
           Register
         </h3>
 
