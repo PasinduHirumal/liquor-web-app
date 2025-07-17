@@ -18,9 +18,10 @@ const LiquorEditForm = () => {
         is_active: true,
         is_in_stock: true,
         is_liquor: true,
-        images: [],
     });
 
+    const [existingImages, setExistingImages] = useState([]);
+    const [newImagesBase64, setNewImagesBase64] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -40,8 +41,9 @@ const LiquorEditForm = () => {
                     is_active: product.is_active ?? true,
                     is_in_stock: product.is_in_stock ?? true,
                     is_liquor: product.is_liquor ?? true,
-                    images: product.images || [],
                 });
+
+                setExistingImages(product.images || []);
             } catch (err) {
                 toast.error("Failed to load product.");
                 navigate("/liquor-list");
@@ -57,7 +59,9 @@ const LiquorEditForm = () => {
         const { name, value, type, checked } = e.target;
         let newValue = type === "checkbox" ? checked : value;
 
-        if (["price", "stock_quantity", "alcohol_content", "volume"].includes(name)) {
+        if (
+            ["price", "stock_quantity", "alcohol_content", "volume"].includes(name)
+        ) {
             newValue = parseFloat(newValue) || 0;
         }
 
@@ -67,13 +71,49 @@ const LiquorEditForm = () => {
         }));
     };
 
+    const fileToBase64 = (file) =>
+        new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = (error) => reject(error);
+        });
+
+    const handleNewImagesChange = async (e) => {
+        const files = Array.from(e.target.files);
+        try {
+            const base64Promises = files.map((file) => fileToBase64(file));
+            const base64Images = await Promise.all(base64Promises);
+            setNewImagesBase64((prev) => [...prev, ...base64Images]);
+        } catch (error) {
+            toast.error("Failed to read image files.");
+        }
+    };
+
+    const removeExistingImage = (url) => {
+        setExistingImages((prev) => prev.filter((img) => img !== url));
+    };
+
+    const removeNewImage = (index) => {
+        setNewImagesBase64((prev) => prev.filter((_, i) => i !== index));
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
         try {
-            await axiosInstance.patch(`/products/update/${id}`, formData);
+            const finalImages = [...existingImages, ...newImagesBase64];
+
+            const payload = {
+                ...formData,
+                images: finalImages,
+            };
+
+            await axiosInstance.patch(`/products/update/${id}`, payload);
             toast.success("Product updated successfully!");
-            navigate(-1);
+            navigate(`/liquor/${id}`);
         } catch (err) {
+            console.error(err);
             toast.error(err.response?.data?.message || "Update failed.");
         }
     };
@@ -83,7 +123,12 @@ const LiquorEditForm = () => {
     return (
         <div className="container mt-4">
             <h2>Edit Liquor Product</h2>
-            <form onSubmit={handleSubmit} className="edit-product-form">
+            <form
+                onSubmit={handleSubmit}
+                className="edit-product-form"
+                encType="multipart/form-data"
+            >
+                {/* Other product fields */}
                 <div className="form-group">
                     <label>Name</label>
                     <input
@@ -170,7 +215,9 @@ const LiquorEditForm = () => {
                         className="form-check-input"
                         id="is_active"
                     />
-                    <label className="form-check-label" htmlFor="is_active">Active</label>
+                    <label className="form-check-label" htmlFor="is_active">
+                        Active
+                    </label>
                 </div>
 
                 <div className="form-check">
@@ -182,10 +229,115 @@ const LiquorEditForm = () => {
                         className="form-check-input"
                         id="is_in_stock"
                     />
-                    <label className="form-check-label" htmlFor="is_in_stock">In Stock</label>
+                    <label className="form-check-label" htmlFor="is_in_stock">
+                        In Stock
+                    </label>
                 </div>
 
-                <button type="submit" className="btn btn-success mt-3">Update Product</button>
+                {/* Image Management */}
+                <div className="form-group mt-3">
+                    <label>Current Images</label>
+                    <div
+                        className="image-preview-container"
+                        style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}
+                    >
+                        {existingImages.length === 0 && <p>No images available</p>}
+                        {existingImages.map((url, idx) => (
+                            <div key={idx} style={{ position: "relative" }}>
+                                <img
+                                    src={url}
+                                    alt={`existing-${idx}`}
+                                    style={{
+                                        width: 100,
+                                        height: 100,
+                                        objectFit: "cover",
+                                        borderRadius: 4,
+                                    }}
+                                    onError={(e) => (e.target.src = "/placeholder-bottle.jpg")}
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => removeExistingImage(url)}
+                                    style={{
+                                        position: "absolute",
+                                        top: 0,
+                                        right: 0,
+                                        background: "rgba(255,0,0,0.7)",
+                                        border: "none",
+                                        color: "white",
+                                        borderRadius: "50%",
+                                        width: 24,
+                                        height: 24,
+                                        cursor: "pointer",
+                                    }}
+                                    title="Remove image"
+                                >
+                                    &times;
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="form-group mt-3">
+                    <label>Add New Images</label>
+                    <input
+                        type="file"
+                        multiple
+                        accept="image/*"
+                        onChange={handleNewImagesChange}
+                        className="form-control"
+                    />
+                    {newImagesBase64.length > 0 && (
+                        <div
+                            className="new-image-preview-container"
+                            style={{
+                                display: "flex",
+                                gap: "10px",
+                                flexWrap: "wrap",
+                                marginTop: "10px",
+                            }}
+                        >
+                            {newImagesBase64.map((base64, idx) => (
+                                <div key={idx} style={{ position: "relative" }}>
+                                    <img
+                                        src={base64}
+                                        alt={`new-${idx}`}
+                                        style={{
+                                            width: 100,
+                                            height: 100,
+                                            objectFit: "cover",
+                                            borderRadius: 4,
+                                        }}
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => removeNewImage(idx)}
+                                        style={{
+                                            position: "absolute",
+                                            top: 0,
+                                            right: 0,
+                                            background: "rgba(255,0,0,0.7)",
+                                            border: "none",
+                                            color: "white",
+                                            borderRadius: "50%",
+                                            width: 24,
+                                            height: 24,
+                                            cursor: "pointer",
+                                        }}
+                                        title="Remove image"
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    )}
+                </div>
+
+                <button type="submit" className="btn btn-success mt-4">
+                    Update Product
+                </button>
             </form>
         </div>
     );
