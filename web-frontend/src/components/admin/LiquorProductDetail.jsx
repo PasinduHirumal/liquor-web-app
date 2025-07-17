@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../lib/axios";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit, FaCheckCircle, FaTimesCircle, FaStar } from "react-icons/fa";
-import "./LiquorProductDetail.css";
+import { FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit, FaCheckCircle, FaTimesCircle, FaArrowLeft } from "react-icons/fa";
+import "../../styles/LiquorProductDetail.css";
 
 const LiquorProductDetail = () => {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [product, setProduct] = useState(null);
     const [activeImage, setActiveImage] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -29,24 +30,6 @@ const LiquorProductDetail = () => {
         fetchProduct();
     }, [id]);
 
-    const renderStars = (rating) => {
-        const stars = [];
-        const fullStars = Math.floor(rating || 0);
-        const hasHalfStar = (rating || 0) % 1 >= 0.5;
-
-        for (let i = 0; i < 5; i++) {
-            if (i < fullStars) {
-                stars.push(<FaStar key={i} className="star filled" />);
-            } else if (i === fullStars && hasHalfStar) {
-                stars.push(<FaStar key={i} className="star half-filled" />);
-            } else {
-                stars.push(<FaStar key={i} className="star" />);
-            }
-        }
-
-        return stars;
-    };
-
     if (error) return (
         <div className="product-detail-error">
             <div className="error-message">
@@ -60,7 +43,7 @@ const LiquorProductDetail = () => {
     );
 
     return (
-        <div className="container-fluid px-4">
+        <div className="container-fluid px-4 pb-2 mt-3">
             {loading ? (
                 <div className="product-detail-loading">
                     <div className="loading-left">
@@ -78,7 +61,12 @@ const LiquorProductDetail = () => {
                 </div>
             ) : product ? (
                 <>
-                    <div className="product-header">
+                    <div className="product-header d-flex align-items-center gap-4">
+                        <button onClick={() => navigate(-1)} className="btn btn-outline-dark d-flex align-items-center gap-2">
+                            <FaArrowLeft />
+                            Back
+                        </button>
+
                         <h1>{product.name}</h1>
                     </div>
 
@@ -194,8 +182,8 @@ const LiquorProductDetail = () => {
                             </div>
 
                             <div className="action-buttons">
-                                <button className="add-to-cart">Edit</button>
-                                <button className="wishlist">Delete</button>
+                                <button className="edit-button">Edit</button>
+                                <button className="delete-button">Delete</button>
                             </div>
                         </div>
                     </div>

@@ -209,22 +209,22 @@
     transition: all 0.2s ease;
 }
 
-.add-to-cart {
+.edit-button {
     background-color: #3498db;
     color: white;
 }
 
-.add-to-cart:hover {
+.edit-button:hover {
     background-color: #2980b9;
 }
 
-.wishlist {
-    background-color: #f1f1f1;
-    color: #333;
+.delete-button {
+    background-color: #e74c3c;
+    color: white;
 }
 
-.wishlist:hover {
-    background-color: #e1e1e1;
+.delete-button:hover {
+    background-color: #c0392b;
 }
 
 /* Loading state */
