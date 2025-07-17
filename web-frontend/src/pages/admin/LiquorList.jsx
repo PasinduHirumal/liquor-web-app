@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
-import ProductCard from "../../common/ProductCard";
+import ProductCard from "../../common/LiquorProductCard";
 
 const LiquorList = () => {
     const [products, setProducts] = useState([]);
@@ -60,7 +60,7 @@ const LiquorList = () => {
 
     return (
         <div className="container-fluid py-4">
-            <h2 className="mb-4">Product Management</h2>
+            <h2 className="mb-4">Manage Liquors</h2>
 
             {/* Filters */}
             <div className="card mb-4">

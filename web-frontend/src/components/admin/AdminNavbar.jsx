@@ -109,7 +109,7 @@ const AdminNavbar = () => {
                                 }}
                                 endIcon={manageOpen ? <ExpandLess /> : <ExpandMore />}
                             >
-                                Manage
+                                Manage Memberes
                             </Button>
 
                             {manageOpen && (
@@ -232,7 +232,7 @@ const AdminNavbar = () => {
                                         },
                                     }}
                                 >
-                                    <ListItemText primary="Manage" />
+                                    <ListItemText primary="Manage Memberes" />
                                     {manageOpen ? <ExpandLess sx={{ color: "white" }} /> : <ExpandMore sx={{ color: "white" }} />}
                                 </ListItemButton>
                                 <Collapse in={manageOpen} timeout="auto" unmountOnExit>
