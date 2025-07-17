@@ -4,6 +4,7 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import "../../styles/LiquorProductDetail.css";
 import { FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit, FaCheckCircle, FaTimesCircle, FaArrowLeft } from "react-icons/fa";
+import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
 import DeleteLiquorButton from "./buttons/DeleteLiquorButton";
 
@@ -13,8 +14,6 @@ const LiquorProductDetail = () => {
     const [product, setProduct] = useState(null);
     const [activeImage, setActiveImage] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [isDeleting, setIsDeleting] = useState(false)
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -23,7 +22,8 @@ const LiquorProductDetail = () => {
                 setProduct(res.data.data);
                 setActiveImage(res.data.data.images?.[0] || null);
             } catch (err) {
-                setError("Failed to load product details. Please try again later.");
+                toast.error("Failed to load product details. Please try again later.");
+                navigate("/liquor-list");
             } finally {
                 setLoading(false);
             }
@@ -35,18 +35,6 @@ const LiquorProductDetail = () => {
     const handleDeleteSuccess = () => {
         navigate("/liquor-list");
     };
-
-    if (error) return (
-        <div className="product-detail-error">
-            <div className="error-message">
-                <FaTimesCircle className="error-icon" />
-                <h3>{error}</h3>
-                <button onClick={() => window.location.reload()} className="retry-button">
-                    Retry
-                </button>
-            </div>
-        </div>
-    );
 
     return (
         <div className="container-fluid px-4 pb-2 mt-3">
