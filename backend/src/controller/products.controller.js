@@ -1,14 +1,45 @@
 import ProductService from '../services/product.service.js';
+import CategoryService from '../services/category.service.js';
 import populateCategory from '../utils/populateCategory.js';
+import { uploadImages } from '../utils/firebaseStorage.js';
 
 const productService = new ProductService();
+const categoryService = new CategoryService();
 
 const createProduct = async (req, res) => {
 	try {
-        //return res.status(400).json({ success: false, message: ""});
-        return res.status(200).json({ success: true, message: ""});
+        const { category_id, images } = req.body;
+
+        const category = await categoryService.findById(category_id);
+        if (!category) {
+            return res.status(400).json({ success: false, message: "Invalid category"});
+        }
+
+        if (images !== undefined) {
+            try {
+                const imageUrls = await uploadImages(images, 'products');
+                req.body.images = imageUrls;
+                console.log('✅ Images uploaded successfully:', imageUrls);
+            } catch (uploadError) {
+                console.error('Image upload failed:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload images" 
+                });
+            }
+        }
+
+        const productData = { ...req.body };
+        const product = await productService.create(productData);
+        if (!product) {
+            return res.status(400).json({ success: false, message: "Failed to create product"});
+        }
+
+        const populatedProduct = await populateCategory(product);
+
+        return res.status(201).json({ success: true, message: "Product created successfully", data: populatedProduct });
     } catch (error) {
-        console.error("Method_name error:", error.message);
+        console.error("Create product error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
@@ -76,4 +107,4 @@ const updateProduct = async (req, res) => {
     }
 };
 
-export { getAllProducts, };
+export { getAllProducts, createProduct, };
