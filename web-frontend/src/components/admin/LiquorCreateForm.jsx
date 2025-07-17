@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Button, Alert, Spinner } from 'react-bootstrap';
+import { Form, Button, Spinner } from 'react-bootstrap';
+import { toast } from 'react-hot-toast';
 import { axiosInstance } from '../../lib/axios';
 
 const LiquorCreateForm = ({ onSuccess, onCancel }) => {
@@ -20,47 +21,61 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
     const [images, setImages] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
     const [validationErrors, setValidationErrors] = useState([]);
 
-    // Fetch categories
+    // Fetch categories on mount
     useEffect(() => {
         const fetchCategories = async () => {
             try {
-                const res = await axiosInstance.get("/categories/getAll");
+                const res = await axiosInstance.get('/categories/getAll');
                 setCategories(res.data.data || []);
             } catch (err) {
-                console.error("Failed to fetch categories", err);
+                toast.error('Failed to fetch categories');
+                console.error('Failed to fetch categories', err);
             }
         };
-
         fetchCategories();
     }, []);
 
+    // Handle form input changes
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        const newValue = type === 'checkbox' ? checked : (type === 'number' ? parseFloat(value) : value);
+        let newValue;
+        if (type === 'checkbox') {
+            newValue = checked;
+        } else if (type === 'number') {
+            newValue = value === '' ? '' : parseFloat(value);
+        } else {
+            newValue = value;
+        }
         setFormData((prev) => ({ ...prev, [name]: newValue }));
     };
 
+    // Handle image file input and convert to base64
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
-        const readers = files.map(file => new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.onload = (event) => resolve(event.target.result);
-            reader.onerror = reject;
-            reader.readAsDataURL(file);
-        }));
+        const readers = files.map(
+            (file) =>
+                new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = (event) => resolve(event.target.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                })
+        );
 
         Promise.all(readers)
-            .then(base64Images => setImages(base64Images))
-            .catch(err => console.error("Image read error:", err));
+            .then((base64Images) => setImages(base64Images))
+            .catch((err) => {
+                toast.error('Failed to read image files');
+                console.error('Image read error:', err);
+            });
     };
 
+    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError(null);
         setValidationErrors([]);
 
         try {
@@ -70,9 +85,10 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
             };
 
             const response = await axiosInstance.post('/products/create', payload);
+            toast.success('Product created successfully!');
             onSuccess(response.data.data);
 
-            // Optionally reset form
+            // Reset form
             setFormData({
                 name: '',
                 description: '',
@@ -88,13 +104,13 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
             });
             setImages([]);
         } catch (err) {
-            console.error("Create product error:", err);
             const resData = err.response?.data;
-
             if (resData?.errors?.length) {
                 setValidationErrors(resData.errors);
+                toast.warn('Please fix validation errors.');
             } else {
-                setError(resData?.message || "Failed to create product");
+                const msg = resData?.message || 'Failed to create product';
+                toast.error(msg);
             }
         } finally {
             setLoading(false);
@@ -103,17 +119,18 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
 
     return (
         <Form onSubmit={handleSubmit}>
-            {error && <Alert variant="danger">{error}</Alert>}
-
+            {/* Validation errors */}
             {validationErrors.length > 0 && (
-                <Alert variant="warning">
+                <div className="alert alert-warning" role="alert">
                     <strong>Validation Errors:</strong>
                     <ul className="mb-0">
                         {validationErrors.map((e, idx) => (
-                            <li key={idx}>{e.field}: {e.message}</li>
+                            <li key={idx}>
+                                {e.field}: {e.message}
+                            </li>
                         ))}
                     </ul>
-                </Alert>
+                </div>
             )}
 
             <Form.Group className="mb-3">
@@ -159,7 +176,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                         required
                     >
                         <option value="">Select a category</option>
-                        {categories.map(cat => (
+                        {categories.map((cat) => (
                             <option key={cat.category_id} value={cat.category_id}>
                                 {cat.name}
                             </option>
@@ -228,6 +245,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                     onChange={handleImageChange}
                     multiple
                     accept="image/*"
+                    disabled={loading}
                 />
             </Form.Group>
 
@@ -238,6 +256,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                     name="is_active"
                     checked={formData.is_active}
                     onChange={handleChange}
+                    disabled={loading}
                 />
                 <Form.Check
                     type="checkbox"
@@ -245,6 +264,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                     name="is_in_stock"
                     checked={formData.is_in_stock}
                     onChange={handleChange}
+                    disabled={loading}
                 />
                 <Form.Check
                     type="checkbox"
@@ -252,11 +272,19 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                     name="is_liquor"
                     checked={formData.is_liquor}
                     onChange={handleChange}
+                    disabled={loading}
                 />
             </Form.Group>
 
             <div className="d-flex justify-content-end gap-2">
-                <Button variant="secondary" onClick={onCancel} disabled={loading}>
+                <Button
+                    variant="secondary"
+                    onClick={() => {
+                        onCancel();
+                        toast.info('Creation cancelled.');
+                    }}
+                    disabled={loading}
+                >
                     Cancel
                 </Button>
                 <Button variant="primary" type="submit" disabled={loading}>
