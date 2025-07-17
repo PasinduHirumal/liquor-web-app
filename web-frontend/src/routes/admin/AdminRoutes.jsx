@@ -9,6 +9,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import DriverList from "../../pages/admin/DriverList";
 import PublicHome from "../PublicHome";
 import LiquorProductDetail from "../../components/admin/LiquorProductDetail";
+import LiquorEditForm from "../../components/admin/LiquorEditForm";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -90,6 +91,14 @@ export const adminRoutes = [
         element: (
             <AdminProtectedRoute>
                 <LiquorProductDetail />
+            </AdminProtectedRoute>
+        ),
+    },
+    {
+        path: "/products/edit/:id",
+        element: (
+            <AdminProtectedRoute>
+                <LiquorEditForm />
             </AdminProtectedRoute>
         ),
     },

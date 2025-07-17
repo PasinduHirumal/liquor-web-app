@@ -177,7 +177,14 @@ const LiquorProductDetail = () => {
 
                             <div className="action-buttons">
                                 <div className="action-buttons">
-                                    <button className="edit-button">Edit</button>
+                                    <button
+                                        className="edit-button d-flex align-items-center gap-2 px-3 py-2"
+                                        onClick={() => navigate(`/products/edit/${id}`)}
+                                    >
+                                        <FaEdit/>
+                                        Edit
+                                    </button>
+
                                     <DeleteLiquorButton
                                         id={id}
                                         onSuccess={handleDeleteSuccess}
