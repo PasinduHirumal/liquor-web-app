@@ -40,15 +40,15 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
         const { name, value, type, checked } = e.target;
         const newValue =
             type === 'checkbox' ? checked :
-            type === 'number' ? (value === '' ? '' : parseFloat(value)) :
-            value;
+                type === 'number' ? (value === '' ? '' : parseFloat(value)) :
+                    value;
 
         setFormData((prev) => ({ ...prev, [name]: newValue }));
     };
 
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
-        const readers = files.map(file => 
+        const readers = files.map(file =>
             new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.onload = (event) => resolve(event.target.result);
@@ -245,14 +245,6 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                     label="In Stock"
                     name="is_in_stock"
                     checked={formData.is_in_stock}
-                    onChange={handleChange}
-                    disabled={loading}
-                />
-                <Form.Check
-                    type="checkbox"
-                    label="Is Liquor"
-                    name="is_liquor"
-                    checked={formData.is_liquor}
                     onChange={handleChange}
                     disabled={loading}
                 />

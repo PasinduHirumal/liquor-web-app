@@ -25,6 +25,7 @@ const LiquorEditForm = () => {
     const [existingImages, setExistingImages] = useState([]);
     const [newImagesBase64, setNewImagesBase64] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [updating, setUpdating] = useState(false);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -114,6 +115,7 @@ const LiquorEditForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setUpdating(true);
 
         try {
             const finalImages = [...existingImages, ...newImagesBase64];
@@ -129,10 +131,20 @@ const LiquorEditForm = () => {
         } catch (err) {
             console.error(err);
             toast.error(err.response?.data?.message || "Update failed.");
+        } finally {
+            setUpdating(false);
         }
     };
 
-    if (loading) return <div>Loading...</div>;
+    if (loading)
+        return (
+            <div className="d-flex justify-content-center align-items-center" style={{ height: "200px" }}>
+                <div className="spinner-border text-dark" role="status" aria-label="Loading">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        );
+
 
     return (
         <div className="container mt-4">
@@ -173,7 +185,7 @@ const LiquorEditForm = () => {
                         className="form-control"
                     />
                 </div>
-                
+
                 <div className="form-group">
                     <label>Category</label>
                     <select
@@ -367,9 +379,24 @@ const LiquorEditForm = () => {
                     )}
                 </div>
 
-                <button type="submit" className="btn btn-success mt-4">
-                    Update Product
-                </button>
+                <div className="d-flex gap-2 mt-4">
+                    <button
+                        type="submit"
+                        className="btn btn-success"
+                        disabled={updating}
+                    >
+                        {updating ? "Updating..." : "Update Product"}
+                    </button>
+
+                    <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => navigate(-1)}
+                        disabled={updating}
+                    >
+                        Cancel
+                    </button>
+                </div>
             </form>
         </div>
     );
