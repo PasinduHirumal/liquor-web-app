@@ -13,10 +13,6 @@ const LiquorProductCard = ({ product, DetaiButton = false }) => {
     <div className="col-12 col-sm-6 col-md-4 col-lg-3">
       <div
         className="card h-100"
-        style={{
-          opacity: product.is_active ? 1 : 0.7,
-          transition: "transform 0.2s ease-in-out",
-        }}
         onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.01)")}
         onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
       >
