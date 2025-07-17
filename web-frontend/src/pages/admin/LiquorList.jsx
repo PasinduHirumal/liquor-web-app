@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { axiosInstance } from "../../lib/axios";
-import ProductCard from "../../common/LiquorProductCard";
+import LiquorProductCard from "../../common/LiquorProductCard";
 import LiquorCreateForm from "../../components/admin/LiquorCreateForm";
 
 const LiquorList = () => {
@@ -118,7 +118,7 @@ const LiquorList = () => {
             <div className="row g-4">
                 {products.length > 0 ? (
                     products.map((product) => (
-                        <ProductCard key={product.product_id} product={product} showId={true} />
+                        <LiquorProductCard key={product.product_id} product={product} showId={true} />
                     ))
                 ) : (
                     <div className="col-12">

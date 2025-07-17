@@ -1,6 +1,8 @@
-import React from "react";
+import React, { useState } from "react";
 
-const ProductCard = ({ product, showId = false }) => {
+const LiquorProductCard = ({ product, showId = false }) => {
+  const [activeImage, setActiveImage] = useState(product.images?.[0]);
+
   return (
     <div className="col-12 col-sm-6 col-md-4 col-lg-2">
       <div
@@ -12,12 +14,16 @@ const ProductCard = ({ product, showId = false }) => {
         onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.01)")}
         onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
       >
-        {product.images?.length > 0 ? (
+        {activeImage ? (
           <img
-            src={product.images[0]}
+            src={activeImage}
             alt={product.name}
             className="card-img-top"
-            style={{ height: "200px", objectFit: "contain", backgroundColor: "#f8f9fa" }}
+            style={{
+              height: "200px",
+              objectFit: "contain",
+              backgroundColor: "#f8f9fa",
+            }}
           />
         ) : (
           <div
@@ -25,6 +31,28 @@ const ProductCard = ({ product, showId = false }) => {
             style={{ height: "200px" }}
           >
             <small className="text-muted">No Image</small>
+          </div>
+        )}
+
+        {/* Thumbnail previews */}
+        {product.images?.length > 1 && (
+          <div className="d-flex justify-content-center gap-1 py-2 px-1 flex-wrap">
+            {product.images.map((img, idx) => (
+              <img
+                key={idx}
+                src={img}
+                alt={`Thumbnail ${idx + 1}`}
+                onClick={() => setActiveImage(img)}
+                style={{
+                  width: "30px",
+                  height: "30px",
+                  objectFit: "cover",
+                  cursor: "pointer",
+                  border: img === activeImage ? "2px solid #007bff" : "1px solid #ccc",
+                  borderRadius: "3px",
+                }}
+              />
+            ))}
           </div>
         )}
 
@@ -66,4 +94,4 @@ const ProductCard = ({ product, showId = false }) => {
   );
 };
 
-export default ProductCard;
+export default LiquorProductCard;
