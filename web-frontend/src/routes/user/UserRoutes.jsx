@@ -1,10 +1,11 @@
 import React from "react";
+import { Navigate, useLocation } from "react-router-dom";
+
 import UserNavbar from "../../components/user/UserNavbar";
-import UserHome from "./UserHome";
 import UserProfile from "../../pages/user/UserProfile";
 import useUserAuthStore from "../../stores/userAuthStore";
 import Address from "../../pages/user/Address";
-import { Navigate, useLocation } from "react-router-dom";
+import PublicHome from "../PublicHome";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -36,7 +37,7 @@ export const userRoutes = [
         path: "/user",
         element: (
             <UserProtectedRoute>
-                <UserHome />
+                <PublicHome />
             </UserProtectedRoute>
         ),
     },
