@@ -248,9 +248,9 @@ const LiquorEditForm = () => {
                                     src={url}
                                     alt={`existing-${idx}`}
                                     style={{
-                                        width: 100,
-                                        height: 100,
-                                        objectFit: "cover",
+                                        width: 150,
+                                        height: 150,
+                                        objectFit: "contain",
                                         borderRadius: 4,
                                     }}
                                     onError={(e) => (e.target.src = "/placeholder-bottle.jpg")}
@@ -304,9 +304,9 @@ const LiquorEditForm = () => {
                                         src={base64}
                                         alt={`new-${idx}`}
                                         style={{
-                                            width: 100,
-                                            height: 100,
-                                            objectFit: "cover",
+                                            width: 150,
+                                            height: 150,
+                                            objectFit: "contain",
                                             borderRadius: 4,
                                         }}
                                     />
