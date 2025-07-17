@@ -88,10 +88,10 @@ const AdminNavbar = () => {
                         </StyledNavLink>
 
                         <StyledNavLink
-                            to={`/admin/profile/${user?._id || user?.id}`}
+                            to="/liquor-list"
                             onClick={closeMobileMenu}
                         >
-                            Profile
+                            Manage Liquors
                         </StyledNavLink>
 
                         {/* Manage Dropdown simulated */}
@@ -106,7 +106,6 @@ const AdminNavbar = () => {
                                     "&:hover": {
                                         bgcolor: "#444",
                                     },
-                                    mr: 2,
                                 }}
                                 endIcon={manageOpen ? <ExpandLess /> : <ExpandMore />}
                             >
@@ -159,6 +158,14 @@ const AdminNavbar = () => {
                                 </Box>
                             )}
                         </Box>
+
+                        <StyledNavLink
+                            to={`/admin/profile/${user?._id || user?.id}`}
+                            onClick={closeMobileMenu}
+                            sx={{ mr: 2 }}
+                        >
+                            Profile
+                        </StyledNavLink>
 
                         <Button variant="contained" color="error" startIcon={<LogoutIcon />} onClick={handleLogout}>
                             Logout
@@ -254,6 +261,14 @@ const AdminNavbar = () => {
                                     </Box>
                                 </Collapse>
                             </List>
+
+                            <StyledNavLink
+                                to="/liquor-list"
+                                onClick={closeMobileMenu}
+                                sx={{ mb: 2 }}
+                            >
+                                Manage Liquors
+                            </StyledNavLink>
 
                             <Button
                                 variant="contained"
