@@ -165,7 +165,6 @@ const PublicNavbar = ({ isAuthenticated = false }) => {
         )}
       </AppBar>
 
-      {/* Add spacing so content below navbar isn't hidden */}
       <Toolbar />
     </>
   );
