@@ -129,7 +129,7 @@ const LiquorList = () => {
                 onHide={() => setShowCreateModal(false)}
                 size="lg"
                 centered
-                className="mt-5"
+                className="mt-5 pb-5"
             >
                 <Modal.Header closeButton>
                     <Modal.Title>Create New Product</Modal.Title>

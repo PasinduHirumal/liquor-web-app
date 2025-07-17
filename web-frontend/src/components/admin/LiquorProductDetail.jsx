@@ -33,7 +33,7 @@ const LiquorProductDetail = () => {
     }, [id]);
 
     const handleDeleteSuccess = () => {
-        navigate("/products", { state: { message: "Product deleted successfully" } });
+        navigate("/liquor-list");
     };
 
     if (error) return (

@@ -2,12 +2,19 @@ import React, { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { axiosInstance } from "../../../lib/axios";
 import toast from "react-hot-toast";
+import ConfirmDialog from "../../../common/ConfirmDialog";
 
 const DeleteLiquorButton = ({ id, onSuccess }) => {
     const [isDeleting, setIsDeleting] = useState(false);
 
     const handleDelete = async () => {
-        if (!window.confirm("Are you sure you want to delete this product? This action cannot be undone.")) {
+        const confirmed = await ConfirmDialog({
+            title: "Are you sure?",
+            html: "You want to delete this product? This action cannot be undone.",
+            icon: "warning",
+        });
+
+        if (!confirmed) {
             return;
         }
 
@@ -27,16 +34,14 @@ const DeleteLiquorButton = ({ id, onSuccess }) => {
     };
 
     return (
-        <div className="delete-button-container">
-            <button
-                className="delete-button"
-                onClick={handleDelete}
-                disabled={isDeleting}
-            >
-                <FaTrash className="delete-icon" />
-                {isDeleting ? "Deleting..." : "Delete"}
-            </button>
-        </div>
+        <button
+            className="delete-button d-flex align-items-center gap-2 px-3 py-2"
+            onClick={handleDelete}
+            disabled={isDeleting}
+        >
+            <FaTrash className="delete-icon" />
+            {isDeleting ? "Deleting..." : "Delete"}
+        </button>
     );
 };
 
