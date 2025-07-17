@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { Form, Button, Alert } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Form, Button, Alert, Spinner } from 'react-bootstrap';
 import { axiosInstance } from '../../lib/axios';
 
 const LiquorCreateForm = ({ onSuccess, onCancel }) => {
@@ -14,56 +14,88 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
         stock_quantity: 0,
         is_active: true,
         is_in_stock: true,
-        is_liquor: true
+        is_liquor: true,
     });
+
     const [images, setImages] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
+    const [validationErrors, setValidationErrors] = useState([]);
+
+    // Fetch categories
+    useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await axiosInstance.get("/categories/getAll");
+                setCategories(res.data.data || []);
+            } catch (err) {
+                console.error("Failed to fetch categories", err);
+            }
+        };
+
+        fetchCategories();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
-        setFormData((prev) => ({
-            ...prev,
-            [name]: type === 'checkbox' ? checked : value
-        }));
+        const newValue = type === 'checkbox' ? checked : (type === 'number' ? parseFloat(value) : value);
+        setFormData((prev) => ({ ...prev, [name]: newValue }));
     };
 
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
-        const readers = files.map(file => {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.onload = (event) => resolve(event.target.result);
-                reader.onerror = reject;
-                reader.readAsDataURL(file);
-            });
-        });
+        const readers = files.map(file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => resolve(event.target.result);
+            reader.onerror = reject;
+            reader.readAsDataURL(file);
+        }));
 
         Promise.all(readers)
-            .then((base64Images) => {
-                setImages(base64Images);
-            })
-            .catch((err) => {
-                console.error("Failed to read images:", err);
-            });
+            .then(base64Images => setImages(base64Images))
+            .catch(err => console.error("Image read error:", err));
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+        setValidationErrors([]);
 
         try {
             const payload = {
                 ...formData,
-                images, // Send images to backend
+                images,
             };
 
             const response = await axiosInstance.post('/products/create', payload);
             onSuccess(response.data.data);
+
+            // Optionally reset form
+            setFormData({
+                name: '',
+                description: '',
+                category_id: '',
+                brand: '',
+                alcohol_content: 0,
+                volume: 0,
+                price: 0,
+                stock_quantity: 0,
+                is_active: true,
+                is_in_stock: true,
+                is_liquor: true,
+            });
+            setImages([]);
         } catch (err) {
-            setError(err.response?.data?.message || 'Failed to create product');
-            console.error('Create product error:', err);
+            console.error("Create product error:", err);
+            const resData = err.response?.data;
+
+            if (resData?.errors?.length) {
+                setValidationErrors(resData.errors);
+            } else {
+                setError(resData?.message || "Failed to create product");
+            }
         } finally {
             setLoading(false);
         }
@@ -72,6 +104,17 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
     return (
         <Form onSubmit={handleSubmit}>
             {error && <Alert variant="danger">{error}</Alert>}
+
+            {validationErrors.length > 0 && (
+                <Alert variant="warning">
+                    <strong>Validation Errors:</strong>
+                    <ul className="mb-0">
+                        {validationErrors.map((e, idx) => (
+                            <li key={idx}>{e.field}: {e.message}</li>
+                        ))}
+                    </ul>
+                </Alert>
+            )}
 
             <Form.Group className="mb-3">
                 <Form.Label>Product Name</Form.Label>
@@ -108,14 +151,20 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                 </Form.Group>
 
                 <Form.Group className="col-md-6 mb-3">
-                    <Form.Label>Category ID</Form.Label>
-                    <Form.Control
-                        type="text"
+                    <Form.Label>Category</Form.Label>
+                    <Form.Select
                         name="category_id"
                         value={formData.category_id}
                         onChange={handleChange}
                         required
-                    />
+                    >
+                        <option value="">Select a category</option>
+                        {categories.map(cat => (
+                            <option key={cat.category_id} value={cat.category_id}>
+                                {cat.name}
+                            </option>
+                        ))}
+                    </Form.Select>
                 </Form.Group>
             </div>
 
@@ -182,12 +231,36 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                 />
             </Form.Group>
 
+            <Form.Group className="mb-3 d-flex gap-3">
+                <Form.Check
+                    type="checkbox"
+                    label="Active"
+                    name="is_active"
+                    checked={formData.is_active}
+                    onChange={handleChange}
+                />
+                <Form.Check
+                    type="checkbox"
+                    label="In Stock"
+                    name="is_in_stock"
+                    checked={formData.is_in_stock}
+                    onChange={handleChange}
+                />
+                <Form.Check
+                    type="checkbox"
+                    label="Is Liquor"
+                    name="is_liquor"
+                    checked={formData.is_liquor}
+                    onChange={handleChange}
+                />
+            </Form.Group>
+
             <div className="d-flex justify-content-end gap-2">
                 <Button variant="secondary" onClick={onCancel} disabled={loading}>
                     Cancel
                 </Button>
                 <Button variant="primary" type="submit" disabled={loading}>
-                    {loading ? 'Creating...' : 'Create Product'}
+                    {loading ? <Spinner animation="border" size="sm" /> : 'Create Product'}
                 </Button>
             </div>
         </Form>
