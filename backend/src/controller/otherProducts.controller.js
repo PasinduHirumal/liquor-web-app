@@ -115,4 +115,136 @@ const getAllProducts = async (req, res) => {
     }
 };
 
-export { createProduct, getAllProducts };
+const getProductById = async (req, res) => {
+	try {
+        const productId = req.params.id;
+
+        const product = await productService.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found"});
+        }
+
+        const populatedProduct = await populateCategory(product);
+
+        return res.status(200).json({ success: true, message: "Product fetched successfully", data: populatedProduct });
+    } catch (error) {
+        console.error("Get product by id error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+const updateProduct = async (req, res) => {
+	try {
+        const productId = req.params.id;
+        const { marked_price, discount_percentage, category_id, images, add_quantity, withdraw_quantity } = req.body;
+
+        const product = await productService.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found"});
+        } 
+
+        if (category_id !== undefined) {
+            const category = await categoryService.findById(category_id);
+            if (!category) {
+                return res.status(400).json({ success: false, message: "Invalid category"});
+            }
+        }
+
+        if (images !== undefined) {
+            try {
+                const imageUrls = await uploadImages(images, 'products');
+                req.body.images = imageUrls;
+                console.log('✅ Images uploaded successfully:', imageUrls);
+            } catch (uploadError) {
+                console.error('Image upload failed:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload images" 
+                });
+            }
+        }
+
+        // update price
+        let discount = product.discount_amount;
+        let markedPrice = product.marked_price;
+        let discountPercentage = product.discount_percentage;
+        let isUpdatingPrice = false;
+        if (marked_price !== undefined) {
+            markedPrice = marked_price;
+            isUpdatingPrice = true;
+        }
+        if (discount_percentage !== undefined){
+            discountPercentage = discount_percentage;
+            isUpdatingPrice = true;
+        }
+
+        if (isUpdatingPrice){
+            if (discountPercentage > 0) {
+                discount = markedPrice * (discountPercentage / 100);
+            } else if (discountPercentage === 0) {
+                discount = 0;
+            } else {
+                discount = 0;
+            }
+        }
+
+        if (req.body.selling_price) {
+            delete req.body.selling_price;
+        }
+
+        if (req.body.discount_amount) {
+            delete req.body.discount_amount;
+        }
+
+        // quantity update
+        let addQuantity = 0;
+        let withdrawQuantity = 0;
+        if (add_quantity !== undefined) {
+            addQuantity = add_quantity;
+        }
+        if (withdraw_quantity !== undefined) {
+            withdrawQuantity = withdraw_quantity;
+        }
+
+        const stockQuantity = product.stock_quantity + addQuantity - withdrawQuantity;
+
+        const updateData = { 
+            selling_price: markedPrice - discount,
+            discount_amount: discount,
+            stock_quantity: stockQuantity,
+            ...req.body
+         };
+        
+        const updatedProduct = await productService.updateById(productId, updateData);
+        if (!updatedProduct) {
+            return res.status(400).json({ success: false, message: "Failed to update product"});
+        }
+
+        const populatedProduct = await populateCategory(updatedProduct);
+
+        return res.status(201).json({ success: true, message: "Product updated successfully", data: populatedProduct });
+    } catch (error) {
+        console.error("Update product error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+const deleteProduct = async (req, res) => {
+	try {
+        const productId = req.params.id;
+
+        const product = await productService.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found"});
+        }
+        
+        await productService.deleteById(productId);
+
+        return res.status(200).json({ success: true, message: "Product deleted successfully"});
+    } catch (error) {
+        console.error("Delete product error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+export { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct };
