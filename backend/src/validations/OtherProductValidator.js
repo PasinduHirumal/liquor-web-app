@@ -6,7 +6,40 @@ const validateOtherProduct = (req, res, next) => {
         name: Joi.string().min(1).max(200).required(),
         description: Joi.string().min(1).max(500).required(),
         category_id: Joi.string().min(1).max(100).required(),
-        images: Joi.array().items(Joi.string().uri()).default([]),
+        images: Joi.alternatives().try(
+            Joi.string().uri(),
+            Joi.string().pattern(/^data:.*;base64,.*/),
+            Joi.object({
+                buffer: Joi.binary().required(),
+                mimetype: Joi.string().valid(
+                    'image/jpeg', 
+                    'image/jpg', 
+                    'image/png', 
+                    'image/gif', 
+                    'image/webp'
+                ).required(),
+                originalname: Joi.string().required(),
+                size: Joi.number().max(5 * 1024 * 1024).optional()
+            }),
+            Joi.array().items(
+                Joi.alternatives().try(
+                    Joi.string().uri(),
+                    Joi.string().pattern(/^data:.*;base64,.*/),
+                    Joi.object({
+                        buffer: Joi.binary().required(),
+                        mimetype: Joi.string().valid(
+                            'image/jpeg', 
+                            'image/jpg', 
+                            'image/png', 
+                            'image/gif', 
+                            'image/webp'
+                        ).required(),
+                        originalname: Joi.string().required(),
+                        size: Joi.number().max(5 * 1024 * 1024).optional()
+                    })
+                )
+            ).max(10)
+        ).default([]),
         
         weight: Joi.number().positive().optional(),
         
@@ -58,7 +91,40 @@ const validateOtherProductUpdate = (req, res, next) => {
     name: Joi.string().min(1).max(200).optional(),
     description: Joi.string().min(1).max(500).optional(),
     category_id: Joi.string().min(1).max(100).optional(),
-    images: Joi.array().items(Joi.string().uri()).optional(),
+    images: Joi.alternatives().try(
+            Joi.string().uri(),
+            Joi.string().pattern(/^data:.*;base64,.*/),
+            Joi.object({
+                buffer: Joi.binary().required(),
+                mimetype: Joi.string().valid(
+                    'image/jpeg', 
+                    'image/jpg', 
+                    'image/png', 
+                    'image/gif', 
+                    'image/webp'
+                ).required(),
+                originalname: Joi.string().required(),
+                size: Joi.number().max(5 * 1024 * 1024).optional()
+            }),
+            Joi.array().items(
+                Joi.alternatives().try(
+                    Joi.string().uri(),
+                    Joi.string().pattern(/^data:.*;base64,.*/),
+                    Joi.object({
+                        buffer: Joi.binary().required(),
+                        mimetype: Joi.string().valid(
+                            'image/jpeg', 
+                            'image/jpg', 
+                            'image/png', 
+                            'image/gif', 
+                            'image/webp'
+                        ).required(),
+                        originalname: Joi.string().required(),
+                        size: Joi.number().max(5 * 1024 * 1024).optional()
+                    })
+                )
+            ).max(10)
+        ).optional(),
     
     weight: Joi.number().positive().optional(),
     
