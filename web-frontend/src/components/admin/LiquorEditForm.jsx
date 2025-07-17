@@ -11,6 +11,7 @@ const LiquorEditForm = () => {
         name: "",
         description: "",
         brand: "",
+        category_id: "",
         alcohol_content: 0,
         volume: 0,
         price: 0,
@@ -20,11 +21,22 @@ const LiquorEditForm = () => {
         is_liquor: true,
     });
 
+    const [categories, setCategories] = useState([]);
     const [existingImages, setExistingImages] = useState([]);
     const [newImagesBase64, setNewImagesBase64] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        const fetchCategories = async () => {
+            try {
+                const res = await axiosInstance.get("/categories/getAll");
+                setCategories(res.data.data || []);
+            } catch (err) {
+                toast.error("Failed to load categories.");
+                console.error(err);
+            }
+        };
+
         const fetchProduct = async () => {
             try {
                 const res = await axiosInstance.get(`/products/getProductById/${id}`);
@@ -34,6 +46,7 @@ const LiquorEditForm = () => {
                     name: product.name || "",
                     description: product.description || "",
                     brand: product.brand || "",
+                    category_id: product.category_id?._id || "",
                     alcohol_content: product.alcohol_content || 0,
                     volume: product.volume || 0,
                     price: product.price || 0,
@@ -52,6 +65,7 @@ const LiquorEditForm = () => {
             }
         };
 
+        fetchCategories();
         fetchProduct();
     }, [id, navigate]);
 
@@ -158,6 +172,24 @@ const LiquorEditForm = () => {
                         onChange={handleChange}
                         className="form-control"
                     />
+                </div>
+                
+                <div className="form-group">
+                    <label>Category</label>
+                    <select
+                        name="category_id"
+                        value={formData.category_id}
+                        onChange={handleChange}
+                        className="form-control"
+                        required
+                    >
+                        <option value="">Select category</option>
+                        {categories.map((cat) => (
+                            <option key={cat._id || cat.category_id} value={cat._id || cat.category_id}>
+                                {cat.name}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <div className="form-row d-flex gap-3">
