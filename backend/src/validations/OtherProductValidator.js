@@ -128,18 +128,6 @@ const validateOtherProductUpdate = (req, res, next) => {
     
     weight: Joi.number().positive().optional(),
     
-    // Pricing
-    cost_price: Joi.number().positive().optional(),
-    marked_price: Joi.number().positive().optional(),
-    selling_price: Joi.number().positive().optional(),
-    discount_percentage: Joi.number().min(0).max(100).optional(),
-    discount_amount: Joi.number().min(0).optional(),
-    
-    // Quantity management
-    add_quantity: Joi.number().integer().min(0).optional(),
-    withdraw_quantity: Joi.number().integer().min(0).optional(),
-    stock_quantity: Joi.number().integer().min(0).optional(),
-    
     // Status flags
     is_active: Joi.boolean().optional(),
     is_in_stock: Joi.boolean().optional(),
@@ -175,8 +163,10 @@ const validateOtherProductUpdate = (req, res, next) => {
 // Additional validator for quantity operations (if needed separately)
 const validateQuantityOperation = (req, res, next) => {
   const schema = Joi.object({
+    // Quantity management
     add_quantity: Joi.number().integer().min(0).optional(),
     withdraw_quantity: Joi.number().integer().min(0).optional(),
+    //stock_quantity: Joi.number().integer().min(0).optional(),
   })
   .min(1) // Require at least one quantity field
   .options({ stripUnknown: true });
@@ -202,4 +192,36 @@ const validateQuantityOperation = (req, res, next) => {
   next();
 };
 
-export { validateOtherProduct, validateOtherProductUpdate, validateQuantityOperation };
+// Additional validator for quantity operations (if needed separately)
+const validatePriceOperation = (req, res, next) => {
+  const schema = Joi.object({
+    // Pricing
+    cost_price: Joi.number().positive().optional(),
+    marked_price: Joi.number().positive().optional(),
+    discount_percentage: Joi.number().min(0).max(100).optional(),
+  })
+  .min(1) // Require at least one quantity field
+  .options({ stripUnknown: true });
+
+  const { error, value } = schema.validate(req.body, {
+    allowUnknown: false,
+    abortEarly: false
+  });
+
+  if (error) {
+    return res.status(400).json({ 
+        success: false,
+        message: "Validation failed",
+        errors: error.details.map(detail => ({
+          field: detail.path.join('.'),
+          message: detail.message,
+          value: detail.context?.value
+        }))
+    });
+  }
+
+  req.body = value;
+  next();
+};
+
+export { validateOtherProduct, validateOtherProductUpdate, validateQuantityOperation, validatePriceOperation};
