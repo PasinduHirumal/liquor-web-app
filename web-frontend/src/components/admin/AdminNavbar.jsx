@@ -1,138 +1,276 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FiMenu, FiX } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Button,
+  Box,
+  useMediaQuery,
+  useTheme,
+  styled,
+  Slide,
+  Fade,
+  Collapse,
+  List,
+  ListItemButton,
+  ListItemText,
+} from "@mui/material";
+import { Menu as MenuIcon, Close as CloseIcon, ExpandMore, ExpandLess } from "@mui/icons-material";
 import useAdminAuthStore from "../../stores/adminAuthStore";
 
+const StyledNavLink = styled(NavLink)(({ theme }) => ({
+  color: theme.palette.common.white,
+  textDecoration: "none",
+  padding: theme.spacing(1, 2),
+  borderRadius: theme.shape.borderRadius,
+  transition: "background-color 0.3s ease",
+  "&.active": {
+    backgroundColor: "#333",
+    fontWeight: "bold",
+  },
+  "&:hover": {
+    backgroundColor: "#444",
+  },
+}));
+
 const AdminNavbar = () => {
-    const navigate = useNavigate();
-    const logout = useAdminAuthStore((state) => state.logout);
-    const user = useAdminAuthStore((state) => state.user);
-    const [isCollapsed, setIsCollapsed] = useState(false);
+  const navigate = useNavigate();
+  const logout = useAdminAuthStore((state) => state.logout);
+  const user = useAdminAuthStore((state) => state.user);
 
-    const handleLogout = async () => {
-        await logout();
-        navigate("/");
-    };
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-    const toggleCollapse = () => setIsCollapsed((prev) => !prev);
-    const closeCollapse = () => setIsCollapsed(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [manageOpen, setManageOpen] = useState(false);
 
-    return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" aria-label="Main navigation">
-            <div className="container-fluid px-4">
-                <NavLink to="/" className="navbar-brand" onClick={closeCollapse}>
-                    🍷 Liquor Web App
-                </NavLink>
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+    setMobileMenuOpen(false);
+  };
 
-                <button
-                    className="navbar-toggler border-0"
-                    type="button"
-                    onClick={toggleCollapse}
-                    aria-label="Toggle navigation"
-                    aria-controls="navbarSupportedContent"
-                    aria-expanded={isCollapsed}
+  const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
+  const closeMobileMenu = () => {
+    setMobileMenuOpen(false);
+    setManageOpen(false);
+  };
+
+  const toggleManage = () => setManageOpen((prev) => !prev);
+
+  return (
+    <>
+      <AppBar position="fixed" elevation={4} sx={{ backgroundColor: "#121212" }}>
+        <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2, md: 4 } }}>
+          {/* Brand */}
+          <Box
+            component={NavLink}
+            to="/"
+            onClick={closeMobileMenu}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              fontSize: "1.3rem",
+              fontWeight: "bold",
+              color: "white",
+              textDecoration: "none",
+            }}
+          >
+            🍷 Liquor Web App
+          </Box>
+
+          {/* Desktop Navigation */}
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+            <StyledNavLink to="/" onClick={closeMobileMenu}>
+              Home
+            </StyledNavLink>
+
+            <StyledNavLink
+              to={`/admin/profile/${user?._id || user?.id}`}
+              onClick={closeMobileMenu}
+            >
+              Profile
+            </StyledNavLink>
+
+            {/* Manage Dropdown simulated */}
+            <Box sx={{ position: "relative" }}>
+              <Button
+                onClick={() => setManageOpen((prev) => !prev)}
+                sx={{
+                  color: "white",
+                  textTransform: "none",
+                  fontWeight: manageOpen ? "bold" : "normal",
+                  bgcolor: manageOpen ? "#333" : "transparent",
+                  "&:hover": {
+                    bgcolor: "#444",
+                  },
+                  mr: 2,
+                }}
+                endIcon={manageOpen ? <ExpandLess /> : <ExpandMore />}
+              >
+                Manage
+              </Button>
+
+              {manageOpen && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    top: "100%",
+                    left: 0,
+                    bgcolor: "#1e1e1e",
+                    borderRadius: 1,
+                    boxShadow: theme.shadows[5],
+                    zIndex: theme.zIndex.tooltip,
+                    minWidth: 140,
+                  }}
                 >
-                    <AnimatePresence mode="wait" initial={false}>
-                        {isCollapsed ? (
-                            <motion.div
-                                key="close"
-                                initial={{ rotate: -90, opacity: 0 }}
-                                animate={{ rotate: 0, opacity: 1 }}
-                                exit={{ rotate: 90, opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <FiX size={28} color="white" />
-                            </motion.div>
-                        ) : (
-                            <motion.div
-                                key="menu"
-                                initial={{ rotate: 90, opacity: 0 }}
-                                animate={{ rotate: 0, opacity: 1 }}
-                                exit={{ rotate: -90, opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <FiMenu size={28} color="white" />
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </button>
+                  <StyledNavLink
+                    to="/users-list"
+                    onClick={() => {
+                      closeMobileMenu();
+                      setManageOpen(false);
+                    }}
+                    style={{ display: "block", padding: "8px 16px" }}
+                  >
+                    Users
+                  </StyledNavLink>
+                  <StyledNavLink
+                    to="/driver-list"
+                    onClick={() => {
+                      closeMobileMenu();
+                      setManageOpen(false);
+                    }}
+                    style={{ display: "block", padding: "8px 16px" }}
+                  >
+                    Drivers
+                  </StyledNavLink>
+                  <StyledNavLink
+                    to="/admin-users-list"
+                    onClick={() => {
+                      closeMobileMenu();
+                      setManageOpen(false);
+                    }}
+                    style={{ display: "block", padding: "8px 16px" }}
+                  >
+                    Admin Users
+                  </StyledNavLink>
+                </Box>
+              )}
+            </Box>
 
-                <div
-                    className={`collapse navbar-collapse ${isCollapsed ? "show" : ""}`}
-                    id="navbarSupportedContent"
+            <Button variant="contained" color="error" onClick={handleLogout}>
+              Logout
+            </Button>
+          </Box>
+
+          {/* Mobile Menu Icon */}
+          {isMobile && (
+            <IconButton
+              color="inherit"
+              edge="end"
+              onClick={toggleMobileMenu}
+              aria-label="menu"
+              sx={{ ml: "auto" }}
+            >
+              <Fade in={!mobileMenuOpen} unmountOnExit>
+                <MenuIcon sx={{ color: "white" }} />
+              </Fade>
+              <Fade in={mobileMenuOpen} unmountOnExit>
+                <CloseIcon sx={{ color: "white" }} />
+              </Fade>
+            </IconButton>
+          )}
+        </Toolbar>
+
+        {/* Mobile Slide-down Menu */}
+        {isMobile && (
+          <Slide direction="left" in={mobileMenuOpen} mountOnEnter unmountOnExit>
+            <Box
+              sx={{
+                position: "fixed",
+                top: { xs: 56, sm: 64 },
+                height: { xs: "calc(100vh - 56px)", sm: "calc(100vh - 64px)" },
+                right: 0,
+                width: "75vw",
+                maxWidth: 300,
+                bgcolor: "#1e1e1e",
+                zIndex: theme.zIndex.drawer + 1,
+                p: 3,
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <StyledNavLink to="/" onClick={closeMobileMenu} sx={{ mb: 2 }}>
+                Home
+              </StyledNavLink>
+              <StyledNavLink
+                to={`/admin/profile/${user?._id || user?.id}`}
+                onClick={closeMobileMenu}
+                sx={{ mb: 2 }}
+              >
+                Profile
+              </StyledNavLink>
+
+              {/* Mobile Manage section */}
+              <List disablePadding sx={{ mb: 2, bgcolor: "transparent" }}>
+                <ListItemButton
+                  onClick={() => setManageOpen((prev) => !prev)}
+                  sx={{
+                    color: "white",
+                    px: 0,
+                    "&.Mui-expanded": {
+                      fontWeight: "bold",
+                    },
+                  }}
                 >
-                    <ul className="navbar-nav ms-auto align-items-lg-center">
-                        <li className="nav-item">
-                            <NavLink
-                                to="/"
-                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
-                                onClick={closeCollapse}
-                            >
-                                Home
-                            </NavLink>
-                        </li>
+                  <ListItemText primary="Manage" />
+                  {manageOpen ? <ExpandLess sx={{ color: "white" }} /> : <ExpandMore sx={{ color: "white" }} />}
+                </ListItemButton>
+                <Collapse in={manageOpen} timeout="auto" unmountOnExit>
+                  <Box sx={{ pl: 2 }}>
+                    <StyledNavLink
+                      to="/users-list"
+                      onClick={closeMobileMenu}
+                      sx={{ display: "block", mb: 1 }}
+                    >
+                      Users
+                    </StyledNavLink>
+                    <StyledNavLink
+                      to="/driver-list"
+                      onClick={closeMobileMenu}
+                      sx={{ display: "block", mb: 1 }}
+                    >
+                      Drivers
+                    </StyledNavLink>
+                    <StyledNavLink
+                      to="/admin-users-list"
+                      onClick={closeMobileMenu}
+                      sx={{ display: "block" }}
+                    >
+                      Admin Users
+                    </StyledNavLink>
+                  </Box>
+                </Collapse>
+              </List>
 
-                        <li className="nav-item">
-                            <NavLink
-                                to={`/admin/profile/${user?._id || user?.id}`}
-                                className={({ isActive }) => "nav-link" + (isActive ? " active" : "")}
-                                onClick={closeCollapse}
-                            >
-                                Profile
-                            </NavLink>
-                        </li>
+              <Button
+                variant="contained"
+                color="error"
+                fullWidth
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
+            </Box>
+          </Slide>
+        )}
+      </AppBar>
 
-                        <li className="nav-item dropdown">
-                            <button
-                                className="nav-link dropdown-toggle btn btn-link text-white"
-                                id="manageDropdown"
-                                data-bs-toggle="dropdown"
-                                aria-expanded="false"
-                            >
-                                Manage
-                            </button>
-                            <ul className="dropdown-menu dropdown-menu-dark" aria-labelledby="manageDropdown">
-                                <li>
-                                    <NavLink
-                                        to="/users-list"
-                                        className="dropdown-item"
-                                        onClick={closeCollapse}
-                                    >
-                                        Users
-                                    </NavLink>
-                                </li>
-                                <li>
-                                    <NavLink
-                                        to="/driver-list"
-                                        className="dropdown-item"
-                                        onClick={closeCollapse}
-                                    >
-                                        Drivers
-                                    </NavLink>
-                                </li>
-                                <li>
-                                    <NavLink
-                                        to="/admin-users-list"
-                                        className="dropdown-item"
-                                        onClick={closeCollapse}
-                                    >
-                                        Admin Users
-                                    </NavLink>
-                                </li>
-                            </ul>
-                        </li>
-
-                        <li className="nav-item mt-2 mt-lg-0">
-                            <button className="btn btn-danger ms-lg-3" onClick={handleLogout}>
-                                Logout
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    );
+      {/* Toolbar spacer */}
+      <Toolbar />
+    </>
+  );
 };
 
 export default AdminNavbar;

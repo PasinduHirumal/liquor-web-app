@@ -1,102 +1,168 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
-import { FiMenu, FiX } from "react-icons/fi";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  AppBar,
+  Toolbar,
+  IconButton,
+  Button,
+  Box,
+  useMediaQuery,
+  useTheme,
+  styled,
+  Slide,
+  Fade,
+  Typography,
+} from "@mui/material";
+import { Menu as MenuIcon, Close as CloseIcon } from "@mui/icons-material";
 import useUserAuthStore from "../../stores/userAuthStore";
 
+// Styled NavLink for dark theme with active styling
+const StyledNavLink = styled(NavLink)(({ theme }) => ({
+  color: theme.palette.common.white,
+  textDecoration: "none",
+  padding: theme.spacing(1, 2),
+  borderRadius: theme.shape.borderRadius,
+  transition: "background-color 0.3s ease",
+  "&.active": {
+    backgroundColor: "#333",
+    fontWeight: "bold",
+  },
+  "&:hover": {
+    backgroundColor: "#444",
+  },
+}));
+
 const UserNavbar = () => {
-    const navigate = useNavigate();
-    const logout = useUserAuthStore((state) => state.logout);
-    const user = useUserAuthStore((state) => state.user);
-    const [isCollapsed, setIsCollapsed] = useState(false);
+  const navigate = useNavigate();
+  const logout = useUserAuthStore((state) => state.logout);
+  const user = useUserAuthStore((state) => state.user);
 
-    const handleLogout = async () => {
-        await logout();
-        navigate("/");
-    };
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
-    const toggleCollapse = () => setIsCollapsed((prev) => !prev);
-    const closeCollapse = () => setIsCollapsed(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    return (
-        <nav className="navbar navbar-expand-lg navbar-dark bg-dark fixed-top" aria-label="Main navigation">
-            <div className="container-fluid px-4">
-                <NavLink to="/" className="navbar-brand" onClick={closeCollapse}>
-                    🍷 Liquor Web App
-                </NavLink>
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+    setMobileMenuOpen(false);
+  };
 
-                <button
-                    className="navbar-toggler border-0"
-                    type="button"
-                    onClick={toggleCollapse}
-                    aria-label="Toggle navigation"
-                    aria-controls="navbarSupportedContent"
-                    aria-expanded={isCollapsed}
-                >
-                    <AnimatePresence mode="wait" initial={false}>
-                        {isCollapsed ? (
-                            <motion.div
-                                key="close"
-                                initial={{ rotate: -90, opacity: 0 }}
-                                animate={{ rotate: 0, opacity: 1 }}
-                                exit={{ rotate: 90, opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <FiX size={28} color="white" />
-                            </motion.div>
-                        ) : (
-                            <motion.div
-                                key="menu"
-                                initial={{ rotate: 90, opacity: 0 }}
-                                animate={{ rotate: 0, opacity: 1 }}
-                                exit={{ rotate: -90, opacity: 0 }}
-                                transition={{ duration: 0.3 }}
-                            >
-                                <FiMenu size={28} color="white" />
-                            </motion.div>
-                        )}
-                    </AnimatePresence>
-                </button>
+  const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
+  const closeMobileMenu = () => setMobileMenuOpen(false);
 
-                <div className={`collapse navbar-collapse ${isCollapsed ? "show" : ""}`} id="navbarSupportedContent">
-                    <ul className="navbar-nav ms-auto align-items-lg-center">
-                        <li className="nav-item mt-2 mt-lg-0">
-                            <NavLink
-                                to="/user"
-                                className="nav-link"
-                                onClick={closeCollapse}
-                            >
-                                Home
-                            </NavLink>
-                        </li>
-                        <li className="nav-item mt-2 mt-lg-0">
-                            <NavLink
-                                to={`/address`}
-                                className="nav-link"
-                                onClick={closeCollapse}
-                            >
-                                Address
-                            </NavLink>
-                        </li>
-                        <li className="nav-item mt-2 mt-lg-0">
-                            <NavLink
-                                to={`/profile/${user?.id}`}
-                                className="nav-link"
-                                onClick={closeCollapse}
-                            >
-                                Profile
-                            </NavLink>
-                        </li>
-                        <li className="nav-item mt-2 mt-lg-0">
-                            <button className="btn btn-danger ms-lg-3" onClick={handleLogout}>
-                                Logout
-                            </button>
-                        </li>
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    );
+  return (
+    <>
+      <AppBar
+        position="fixed"
+        elevation={4}
+        sx={{ backgroundColor: "#121212" }}
+      >
+        <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2, md: 4 } }}>
+          {/* Logo / Brand */}
+          <Box
+            component={NavLink}
+            to="/"
+            onClick={closeMobileMenu}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              fontSize: "1.3rem",
+              fontWeight: "bold",
+              color: "white",
+              textDecoration: "none",
+            }}
+          >
+            🍷 Liquor Web App
+          </Box>
+
+          {/* Desktop Navigation */}
+          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+            <StyledNavLink to="/user" onClick={closeMobileMenu}>
+              Home
+            </StyledNavLink>
+            <StyledNavLink to="/address" onClick={closeMobileMenu}>
+              Address
+            </StyledNavLink>
+            <StyledNavLink to={`/profile/${user?.id}`} onClick={closeMobileMenu}>
+              Profile
+            </StyledNavLink>
+            <Button
+              variant="contained"
+              color="error"
+              sx={{ ml: 2 }}
+              onClick={handleLogout}
+            >
+              Logout
+            </Button>
+          </Box>
+
+          {/* Mobile Menu Icon */}
+          {isMobile && (
+            <IconButton
+              color="inherit"
+              edge="end"
+              onClick={toggleMobileMenu}
+              aria-label="menu"
+              sx={{ ml: "auto" }}
+            >
+              <Fade in={!mobileMenuOpen} unmountOnExit>
+                <MenuIcon sx={{ color: "white" }} />
+              </Fade>
+              <Fade in={mobileMenuOpen} unmountOnExit>
+                <CloseIcon sx={{ color: "white" }} />
+              </Fade>
+            </IconButton>
+          )}
+        </Toolbar>
+
+        {/* Mobile Slide-down Menu */}
+        {isMobile && (
+          <Slide direction="left" in={mobileMenuOpen} mountOnEnter unmountOnExit>
+            <Box
+              sx={{
+                position: "fixed",
+                top: { xs: 56, sm: 64 },
+                height: { xs: "calc(100vh - 56px)", sm: "calc(100vh - 64px)" },
+                right: 0,
+                width: "75vw",
+                maxWidth: 300,
+                bgcolor: "#1e1e1e",
+                zIndex: theme.zIndex.drawer + 1,
+                p: 3,
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <StyledNavLink to="/user" onClick={closeMobileMenu} sx={{ mb: 2 }}>
+                Home
+              </StyledNavLink>
+              <StyledNavLink to="/address" onClick={closeMobileMenu} sx={{ mb: 2 }}>
+                Address
+              </StyledNavLink>
+              <StyledNavLink
+                to={`/profile/${user?.id}`}
+                onClick={closeMobileMenu}
+                sx={{ mb: 2 }}
+              >
+                Profile
+              </StyledNavLink>
+              <Button
+                variant="contained"
+                color="error"
+                fullWidth
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
+            </Box>
+          </Slide>
+        )}
+      </AppBar>
+
+      <Toolbar />
+    </>
+  );
 };
 
 export default UserNavbar;
