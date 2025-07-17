@@ -1,6 +1,6 @@
 import React from "react";
 
-const ProductCard = ({ product }) => {
+const ProductCard = ({ product, showId = false }) => {
   return (
     <div className="col-12 col-sm-6 col-md-4 col-lg-2">
       <div
@@ -55,9 +55,11 @@ const ProductCard = ({ product }) => {
             </span>
           </div>
 
-          <div className="mt-auto text-end">
-            <small className="text-muted">ID: {product.product_id}</small>
-          </div>
+          {showId && (
+            <div className="mt-auto text-end">
+              <small className="text-muted">ID: {product.product_id}</small>
+            </div>
+          )}
         </div>
       </div>
     </div>

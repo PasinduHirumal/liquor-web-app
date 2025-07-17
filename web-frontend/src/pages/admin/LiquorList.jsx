@@ -118,7 +118,7 @@ const LiquorList = () => {
             <div className="row g-4">
                 {products.length > 0 ? (
                     products.map((product) => (
-                        <ProductCard key={product.product_id} product={product} />
+                        <ProductCard key={product.product_id} product={product} showId={true} />
                     ))
                 ) : (
                     <div className="col-12">
