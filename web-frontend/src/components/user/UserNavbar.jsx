@@ -58,7 +58,7 @@ const UserNavbar = () => {
         elevation={4}
         sx={{ backgroundColor: "#121212" }}
       >
-        <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2, md: 4 } }}>
+        <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2 } }}>
           {/* Logo / Brand */}
           <Box
             component={NavLink}
@@ -161,8 +161,6 @@ const UserNavbar = () => {
           </Slide>
         )}
       </AppBar>
-
-      <Toolbar />
     </>
   );
 };

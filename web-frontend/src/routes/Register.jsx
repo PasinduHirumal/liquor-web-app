@@ -19,7 +19,6 @@ const Register = () => {
 
   return (
     <>
-      <PublicNavbar isAuthenticated={false} />
       <div className="d-flex flex-column align-items-center justify-content-center min-vh-100 bg-light">
         <h3 className="mt-3 text-center fw-semibold" style={{ letterSpacing: '0.05em' }}>
           Register

@@ -55,7 +55,7 @@ const PublicNavbar = ({ isAuthenticated = false }) => {
           backgroundColor: "#121212",
         }}
       >
-        <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2, md: 4 } }}>
+        <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2} }}>
           <Box
             component={NavLink}
             to="/"
@@ -164,8 +164,6 @@ const PublicNavbar = ({ isAuthenticated = false }) => {
           </Slide>
         )}
       </AppBar>
-
-      <Toolbar />
     </>
   );
 };

@@ -6,18 +6,12 @@ const PublicHome = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({
-    is_active: true,
-    is_in_stock: true
-  });
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get('/products/getAll', {
-          params: filters
-        });
+        const response = await axiosInstance.get("/products/getAll");
         setProducts(response.data.data);
       } catch (err) {
         setError(err.message || "Failed to fetch products");
@@ -28,113 +22,99 @@ const PublicHome = () => {
     };
 
     fetchProducts();
-  }, [filters]);
+  }, []);
 
-  const handleFilterChange = (filterName, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterName]: value
-    }));
-  };
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "80vh" }}>
+        <div className="spinner-border" role="status" />
+      </div>
+    );
+  }
 
-  if (loading) return <div className="text-center mt-5 fs-4">Loading products...</div>;
-  if (error) return <div className="container-fluid mt-4">Error: {error}</div>;
+  if (error) {
+    return (
+      <div className="container mt-4">
+        <div className="alert alert-danger" role="alert">
+          {error}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
-      <PublicNavbar isAuthenticated={false} />
-      <div className="container-fluid">
-        <h1 className="mb-4">Product Management</h1>
-
-        {/* Filter Controls */}
-        <div className="card mb-4">
-          <div className="card-body">
-            <h5 className="card-title">Filters</h5>
-            <div className="form-check form-switch mb-2">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="activeFilter"
-                checked={filters.is_active}
-                onChange={(e) => handleFilterChange('is_active', e.target.checked)}
-              />
-              <label className="form-check-label" htmlFor="activeFilter">
-                Show Active Products Only
-              </label>
-            </div>
-            <div className="form-check form-switch">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="stockFilter"
-                checked={filters.is_in_stock}
-                onChange={(e) => handleFilterChange('is_in_stock', e.target.checked)}
-              />
-              <label className="form-check-label" htmlFor="stockFilter">
-                Show In-Stock Products Only
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* Products Grid */}
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+      <div className="container-fluid py-4">
+        <h2 className="mb-4">All Products</h2>
+        <div className="row g-4">
           {products.length > 0 ? (
-            products.map(product => (
-              <div key={product.product_id} className="col">
-                <div className={`card h-100 ${!product.is_active ? 'opacity-75' : ''}`}>
-                  {/* Product Image */}
-                  {product.images && product.images.length > 0 ? (
+            products.map((product) => (
+              <div key={product.product_id} className="col-12 col-sm-6 col-md-4 col-lg-2">
+                <div
+                  className="card h-100"
+                  style={{
+                    opacity: product.is_active ? 1 : 0.7,
+                    transition: "transform 0.2s ease-in-out",
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.01)")}
+                  onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+                >
+                  {product.images?.length > 0 ? (
                     <img
                       src={product.images[0]}
-                      className="card-img-top object-fit-contain"
                       alt={product.name}
-                      style={{ height: '200px' }}
+                      className="card-img-top"
+                      style={{ height: "200px", objectFit: "contain", backgroundColor: "#f8f9fa" }}
                     />
                   ) : (
                     <div
-                      className="bg-light d-flex align-items-center justify-content-center"
-                      style={{ height: '200px' }}
+                      className="d-flex justify-content-center align-items-center bg-light"
+                      style={{ height: "200px" }}
                     >
-                      <span className="text-muted">No Image</span>
+                      <small className="text-muted">No Image</small>
                     </div>
                   )}
 
-                  <div className="card-body">
-                    <h5 className="card-title">{product.name}</h5>
-                    <div className="d-flex justify-content-between mb-2">
-                      <span className="text-muted">Category:</span>
-                      <span>{product.category_id?.name || 'Uncategorized'}</span>
-                    </div>
-                    <div className="d-flex justify-content-between mb-2">
-                      <span className="text-muted">Price:</span>
-                      <span className="fw-bold">${product.price?.toFixed(2) || '0.00'}</span>
-                    </div>
-                    <div className="d-flex justify-content-between mb-3">
-                      <span className="text-muted">Stock:</span>
-                      <span>{product.stock_quantity || 0}</span>
+                  <div className="card-body d-flex flex-column">
+                    <h6 className="card-title text-truncate">{product.name}</h6>
+                    <p className="card-text mb-1">
+                      <small className="text-muted">
+                        Category: {product.category_id?.name || "Uncategorized"}
+                      </small>
+                    </p>
+                    <p className="card-text mb-1">
+                      <small>
+                        Price: <strong>${product.price?.toFixed(2) || "0.00"}</strong>
+                      </small>
+                    </p>
+                    <p className="card-text mb-2">
+                      <small className="text-muted">Stock: {product.stock_quantity || 0}</small>
+                    </p>
+
+                    <div className="mb-2">
+                      <span
+                        className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"}`}
+                      >
+                        {product.is_active ? "Active" : "Inactive"}
+                      </span>
+                      <span
+                        className={`badge ${product.is_in_stock ? "bg-primary" : "bg-warning text-dark"}`}
+                      >
+                        {product.is_in_stock ? "In Stock" : "Out of Stock"}
+                      </span>
                     </div>
 
-                    <div className="d-flex justify-content-between align-items-center">
-                      <span className={`badge ${product.is_active ? 'bg-success' : 'bg-secondary'}`}>
-                        {product.is_active ? 'Active' : 'Inactive'}
-                      </span>
-                      <span className={`badge ${product.is_in_stock ? 'bg-primary' : 'bg-warning'}`}>
-                        {product.is_in_stock ? 'In Stock' : 'Out of Stock'}
-                      </span>
+                    <div className="mt-auto text-end">
+                      <small className="text-muted">ID: {product.product_id}</small>
                     </div>
-                  </div>
-
-                  <div className="card-footer bg-transparent">
-                    <small className="text-muted">ID: {product.product_id}</small>
                   </div>
                 </div>
               </div>
             ))
           ) : (
             <div className="col-12">
-              <div className="alert alert-info text-center">
-                No products found matching your filters
+              <div className="alert alert-info" role="alert">
+                No products available.
               </div>
             </div>
           )}
