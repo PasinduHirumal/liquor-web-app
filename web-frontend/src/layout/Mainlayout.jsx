@@ -19,7 +19,9 @@ const MainLayout = () => {
             ) : (
                 <PublicNavbar />
             )}
-            <Outlet />
+            <div style={{ paddingTop: "64px" }}>
+                <Outlet />
+            </div>
         </>
     );
 };

@@ -1,23 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../lib/axios";
 import PublicNavbar from "../components/publicNavbar";
+import {
+  Container,
+  Grid,
+  Card,
+  CardMedia,
+  CardContent,
+  CardActions,
+  Typography,
+  Chip,
+  CircularProgress,
+  Alert,
+  Box,
+  useTheme,
+  useMediaQuery,
+} from "@mui/material";
 
 const PublicHome = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({
-    is_active: true,
-    is_in_stock: true
-  });
+
+  const theme = useTheme();
+  const isSmDown = useMediaQuery(theme.breakpoints.down("sm"));
+  const isMdUp = useMediaQuery(theme.breakpoints.up("md"));
 
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get('/products/getAll', {
-          params: filters
-        });
+        const response = await axiosInstance.get("/products/getAll");
         setProducts(response.data.data);
       } catch (err) {
         setError(err.message || "Failed to fetch products");
@@ -28,118 +41,138 @@ const PublicHome = () => {
     };
 
     fetchProducts();
-  }, [filters]);
+  }, []);
 
-  const handleFilterChange = (filterName, value) => {
-    setFilters(prev => ({
-      ...prev,
-      [filterName]: value
-    }));
-  };
+  if (loading) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+        <CircularProgress />
+      </Box>
+    );
+  }
 
-  if (loading) return <div className="text-center mt-5 fs-4">Loading products...</div>;
-  if (error) return <div className="container-fluid mt-4">Error: {error}</div>;
+  if (error) {
+    return (
+      <Container sx={{ mt: 4 }}>
+        <Alert severity="error">{error}</Alert>
+      </Container>
+    );
+  }
 
   return (
     <>
       <PublicNavbar isAuthenticated={false} />
-      <div className="container-fluid">
-        <h1 className="mb-4">Product Management</h1>
+      <Container maxWidth="xl" sx={{ py: 4 }}>
+        <Typography variant="h4" component="h1" gutterBottom textAlign="center">
+          All Products
+        </Typography>
 
-        {/* Filter Controls */}
-        <div className="card mb-4">
-          <div className="card-body">
-            <h5 className="card-title">Filters</h5>
-            <div className="form-check form-switch mb-2">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="activeFilter"
-                checked={filters.is_active}
-                onChange={(e) => handleFilterChange('is_active', e.target.checked)}
-              />
-              <label className="form-check-label" htmlFor="activeFilter">
-                Show Active Products Only
-              </label>
-            </div>
-            <div className="form-check form-switch">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                id="stockFilter"
-                checked={filters.is_in_stock}
-                onChange={(e) => handleFilterChange('is_in_stock', e.target.checked)}
-              />
-              <label className="form-check-label" htmlFor="stockFilter">
-                Show In-Stock Products Only
-              </label>
-            </div>
-          </div>
-        </div>
-
-        {/* Products Grid */}
-        <div className="row row-cols-1 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 g-4">
+        <Grid container spacing={4}>
           {products.length > 0 ? (
-            products.map(product => (
-              <div key={product.product_id} className="col">
-                <div className={`card h-100 ${!product.is_active ? 'opacity-75' : ''}`}>
-                  {/* Product Image */}
-                  {product.images && product.images.length > 0 ? (
-                    <img
-                      src={product.images[0]}
-                      className="card-img-top object-fit-contain"
+            products.map((product) => (
+              <Grid item key={product.product_id} xs={12} sm={6} md={4} lg={3}>
+                <Card
+                  sx={{
+                    display: "flex",
+                    flexDirection: isSmDown ? "column" : "row",
+                    height: isSmDown ? "auto" : 220,
+                    opacity: product.is_active ? 1 : 0.7,
+                    transition: "transform 0.2s ease-in-out",
+                    ":hover": {
+                      transform: "scale(1.01)",
+                    },
+                  }}
+                >
+                  {product.images?.length > 0 ? (
+                    <CardMedia
+                      component="img"
+                      image={product.images[0]}
                       alt={product.name}
-                      style={{ height: '200px' }}
+                      sx={{
+                        width: isSmDown ? "100%" : 180,
+                        height: isSmDown ? 180 : "100%",
+                        objectFit: "cover",
+                        backgroundColor: theme.palette.grey[100],
+                      }}
                     />
                   ) : (
-                    <div
-                      className="bg-light d-flex align-items-center justify-content-center"
-                      style={{ height: '200px' }}
+                    <Box
+                      sx={{
+                        width: isSmDown ? "100%" : 180,
+                        height: isSmDown ? 180 : "100%",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        backgroundColor: theme.palette.grey[100],
+                      }}
                     >
-                      <span className="text-muted">No Image</span>
-                    </div>
+                      <Typography variant="body2" color="text.secondary">
+                        No Image
+                      </Typography>
+                    </Box>
                   )}
 
-                  <div className="card-body">
-                    <h5 className="card-title">{product.name}</h5>
-                    <div className="d-flex justify-content-between mb-2">
-                      <span className="text-muted">Category:</span>
-                      <span>{product.category_id?.name || 'Uncategorized'}</span>
-                    </div>
-                    <div className="d-flex justify-content-between mb-2">
-                      <span className="text-muted">Price:</span>
-                      <span className="fw-bold">${product.price?.toFixed(2) || '0.00'}</span>
-                    </div>
-                    <div className="d-flex justify-content-between mb-3">
-                      <span className="text-muted">Stock:</span>
-                      <span>{product.stock_quantity || 0}</span>
-                    </div>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      flexGrow: 1,
+                      p: 2,
+                    }}
+                  >
+                    <CardContent sx={{ flex: 1, overflow: "hidden" }}>
+                      <Typography gutterBottom variant="h6" noWrap>
+                        {product.name}
+                      </Typography>
 
-                    <div className="d-flex justify-content-between align-items-center">
-                      <span className={`badge ${product.is_active ? 'bg-success' : 'bg-secondary'}`}>
-                        {product.is_active ? 'Active' : 'Inactive'}
-                      </span>
-                      <span className={`badge ${product.is_in_stock ? 'bg-primary' : 'bg-warning'}`}>
-                        {product.is_in_stock ? 'In Stock' : 'Out of Stock'}
-                      </span>
-                    </div>
-                  </div>
+                      <Typography variant="body2" color="text.secondary">
+                        Category: {product.category_id?.name || "Uncategorized"}
+                      </Typography>
 
-                  <div className="card-footer bg-transparent">
-                    <small className="text-muted">ID: {product.product_id}</small>
-                  </div>
-                </div>
-              </div>
+                      <Typography variant="body2" color="text.secondary">
+                        Price:{" "}
+                        <Typography component="span" fontWeight="bold">
+                          ${product.price?.toFixed(2) || "0.00"}
+                        </Typography>
+                      </Typography>
+
+                      <Typography variant="body2" color="text.secondary">
+                        Stock: {product.stock_quantity || 0}
+                      </Typography>
+
+                      <Box mt={1} display="flex" gap={1} flexWrap="wrap">
+                        <Chip
+                          label={product.is_active ? "Active" : "Inactive"}
+                          color={product.is_active ? "success" : "default"}
+                          size="small"
+                        />
+                        <Chip
+                          label={product.is_in_stock ? "In Stock" : "Out of Stock"}
+                          color={product.is_in_stock ? "primary" : "warning"}
+                          size="small"
+                        />
+                      </Box>
+                    </CardContent>
+
+                    <CardActions sx={{ justifyContent: "flex-end", pt: 0 }}>
+                      <Typography variant="caption" color="text.secondary" noWrap>
+                        ID: {product.product_id}
+                      </Typography>
+                    </CardActions>
+                  </Box>
+                </Card>
+              </Grid>
             ))
           ) : (
-            <div className="col-12">
-              <div className="alert alert-info text-center">
-                No products found matching your filters
-              </div>
-            </div>
+            <Grid item xs={12}>
+              <Alert severity="info" sx={{ width: "100%" }}>
+                No products available.
+              </Alert>
+            </Grid>
           )}
-        </div>
-      </div>
+        </Grid>
+      </Container>
     </>
   );
 };

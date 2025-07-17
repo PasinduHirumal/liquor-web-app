@@ -63,7 +63,7 @@ const AdminNavbar = () => {
     return (
         <>
             <AppBar position="fixed" elevation={4} sx={{ backgroundColor: "#121212" }}>
-                <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2, md: 4 } }}>
+                <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2 } }}>
                     {/* Brand */}
                     <Box
                         component={NavLink}
@@ -268,9 +268,6 @@ const AdminNavbar = () => {
                     </Slide>
                 )}
             </AppBar>
-
-            {/* Toolbar spacer */}
-            <Toolbar />
         </>
     );
 };
