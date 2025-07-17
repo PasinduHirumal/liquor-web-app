@@ -213,11 +213,11 @@ const AdminNavbar = () => {
                                 Home
                             </StyledNavLink>
                             <StyledNavLink
-                                to={`/admin/profile/${user?._id || user?.id}`}
+                                to="/liquor-list"
                                 onClick={closeMobileMenu}
                                 sx={{ mb: 2 }}
                             >
-                                Profile
+                                Manage Liquors
                             </StyledNavLink>
 
                             {/* Mobile Manage section */}
@@ -263,11 +263,11 @@ const AdminNavbar = () => {
                             </List>
 
                             <StyledNavLink
-                                to="/liquor-list"
+                                to={`/admin/profile/${user?._id || user?.id}`}
                                 onClick={closeMobileMenu}
                                 sx={{ mb: 2 }}
                             >
-                                Manage Liquors
+                                Profile
                             </StyledNavLink>
 
                             <Button
