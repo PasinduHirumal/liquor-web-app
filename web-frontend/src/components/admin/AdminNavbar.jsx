@@ -86,13 +86,6 @@ const AdminNavbar = () => {
                             Home
                         </StyledNavLink>
 
-                        <StyledNavLink
-                            to="/liquor-list"
-                            onClick={closeMobileMenu}
-                        >
-                            Manage Liquors
-                        </StyledNavLink>
-
                         {/* ManageProduct Dropdown simulated */}
                         <Box sx={{ position: "relative" }}>
                             <Button
@@ -265,14 +258,6 @@ const AdminNavbar = () => {
                         >
                             <StyledNavLink to="/admin" onClick={closeMobileMenu} sx={{ mb: 2 }}>
                                 Home
-                            </StyledNavLink>
-
-                            <StyledNavLink
-                                to="/liquor-list"
-                                onClick={closeMobileMenu}
-                                sx={{ mb: 2 }}
-                            >
-                                Manage Liquors
                             </StyledNavLink>
 
                             {/* Mobile ManageProduct section */}
