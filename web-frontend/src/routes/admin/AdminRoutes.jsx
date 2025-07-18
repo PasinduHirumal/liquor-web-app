@@ -11,6 +11,7 @@ import PublicHome from "../PublicHome";
 import LiquorProductDetail from "../../pages/admin/LiquorProductDetail";
 import LiquorEditForm from "../../components/admin/forms/LiquorEditForm"
 import OtherProductList from "../../pages/admin/OtherProductList";
+import OtherProductDetail from "../../pages/admin/OtherProductDetail";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -82,6 +83,10 @@ export const adminRoutes = [
     {
         path: "/products/:id",
         element: <LiquorProductDetail />
+    },
+    {
+        path: "/other-products/:id",
+        element: <OtherProductDetail />
     },
     {
         path: "/products/edit/:id",

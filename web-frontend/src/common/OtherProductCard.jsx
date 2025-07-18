@@ -6,7 +6,7 @@ const OtherProductCard = ({ product, showDetailButton = false }) => {
     const navigate = useNavigate();
 
     const handleViewDetail = () => {
-        navigate(`/products/${product.product_id}`);
+        navigate(`/other-products/${product.product_id}`);
     };
 
     const displayPrice = product.discount_percentage > 0
