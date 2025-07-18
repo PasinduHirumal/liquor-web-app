@@ -2,6 +2,7 @@ import ProductService from '../services/product.service.js';
 import CategoryService from '../services/category.service.js';
 import populateCategory from '../utils/populateCategory.js';
 import { uploadImages } from '../utils/firebaseStorage.js';
+import { validateStockOperation } from '../utils/stockCalculator.js';
 
 const productService = new ProductService();
 const categoryService = new CategoryService();
@@ -147,19 +148,18 @@ const updateProduct = async (req, res) => {
         }
 
         // quantity update
-        let addQuantity = 0;
-        let withdrawQuantity = 0;
-        if (add_quantity !== undefined) {
-            addQuantity = add_quantity;
-        }
-        if (withdraw_quantity !== undefined) {
-            withdrawQuantity = withdraw_quantity;
-        }
+        const stockValidation = validateStockOperation(
+            product.stock_quantity, 
+            add_quantity, 
+            withdraw_quantity
+        );
 
-        const stockQuantity = product.stock_quantity + addQuantity - withdrawQuantity;
+        if (!stockValidation.isValid) {
+            return res.status(400).json({ success: false, message: stockValidation.error });
+        }
 
         const updateData = { 
-            stock_quantity: stockQuantity,
+            stock_quantity: stockValidation.newStock,
             ...req.body 
         };
         
