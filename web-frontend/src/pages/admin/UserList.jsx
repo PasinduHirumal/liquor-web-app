@@ -161,7 +161,7 @@ const UserList = () => {
                             columns={columns}
                             dataSource={users}
                             pagination={{ pageSize: 10 }}
-                            scroll={{ y: 360 }}
+                            scroll={{ x: 'max-content' }}
                             bordered
                         />
                     </>
