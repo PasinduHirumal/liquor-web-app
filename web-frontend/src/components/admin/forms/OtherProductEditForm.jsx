@@ -304,19 +304,16 @@ const OtherProductEditForm = () => {
                                         <Row>
                                             <Col md={6}>
                                                 <FloatingLabel controlId="discountPercentage" label="Discount (%)" className="mb-3">
-                                                    <InputGroup>
-                                                        <Form.Control
-                                                            type="number"
-                                                            name="discount_percentage"
-                                                            value={formData.discount_percentage}
-                                                            onChange={handleChange}
-                                                            min="0"
-                                                            max="100"
-                                                            step="1"
-                                                            isInvalid={!!errors.discount_percentage}
-                                                        />
-                                                        <InputGroup.Text>%</InputGroup.Text>
-                                                    </InputGroup>
+                                                    <Form.Control
+                                                        type="number"
+                                                        name="discount_percentage"
+                                                        value={formData.discount_percentage}
+                                                        onChange={handleChange}
+                                                        min="0"
+                                                        max="100"
+                                                        step="1"
+                                                        isInvalid={!!errors.discount_percentage}
+                                                    />
                                                     <Form.Control.Feedback type="invalid">
                                                         {errors.discount_percentage}
                                                     </Form.Control.Feedback>
