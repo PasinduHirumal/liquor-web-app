@@ -35,7 +35,7 @@ const StyledNavLink = styled(NavLink)(({ theme }) => ({
   },
 }));
 
-const PublicNavbar = ({ isAuthenticated = false }) => {
+const PublicNavbar = () => {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -55,7 +55,7 @@ const PublicNavbar = ({ isAuthenticated = false }) => {
           backgroundColor: "#121212",
         }}
       >
-        <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2} }}>
+        <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2 } }}>
           <Box
             component={NavLink}
             to="/"
@@ -80,23 +80,29 @@ const PublicNavbar = ({ isAuthenticated = false }) => {
               Home
             </StyledNavLink>
 
-            {!isAuthenticated && (
-              <Button
-                variant="contained"
-                sx={{
-                  ml: 2,
-                  backgroundColor: theme.palette.info.main,
-                  color: "#fff",
-                  "&:hover": {
-                    backgroundColor: theme.palette.info.dark,
-                  },
-                }}
-                startIcon={<LoginIcon />}
-                onClick={handleLogin}
-              >
-                Login
-              </Button>
-            )}
+            <StyledNavLink to="/liquor-all" onClick={closeMobileMenu}>
+              Liquors
+            </StyledNavLink>
+
+            <StyledNavLink to="/other-product-all" onClick={closeMobileMenu}>
+              Other Products
+            </StyledNavLink>
+
+            <Button
+              variant="contained"
+              sx={{
+                ml: 2,
+                backgroundColor: theme.palette.info.main,
+                color: "#fff",
+                "&:hover": {
+                  backgroundColor: theme.palette.info.dark,
+                },
+              }}
+              startIcon={<LoginIcon />}
+              onClick={handleLogin}
+            >
+              Login
+            </Button>
           </Box>
 
           {/* Mobile Menu Icon */}
@@ -136,30 +142,36 @@ const PublicNavbar = ({ isAuthenticated = false }) => {
                 flexDirection: "column",
               }}
             >
-              <StyledNavLink to="/" onClick={closeMobileMenu} sx={{ mb: 2 }}>
+              <StyledNavLink to="/" onClick={closeMobileMenu}>
                 Home
               </StyledNavLink>
 
-              {!isAuthenticated && (
-                <Button
-                  fullWidth
-                  variant="contained"
-                  startIcon={<LoginIcon />}
-                  sx={{
-                    backgroundColor: theme.palette.info.main,
-                    color: "#fff",
-                    "&:hover": {
-                      backgroundColor: theme.palette.info.dark,
-                    },
-                  }}
-                  onClick={() => {
-                    handleLogin();
-                    closeMobileMenu();
-                  }}
-                >
-                  Login
-                </Button>
-              )}
+              <StyledNavLink to="/liquor-all" onClick={closeMobileMenu}>
+                Liquors
+              </StyledNavLink>
+
+              <StyledNavLink to="/other-product-all" onClick={closeMobileMenu} sx={{ mb: 2 }}>
+                Other Products
+              </StyledNavLink>
+
+              <Button
+                fullWidth
+                variant="contained"
+                startIcon={<LoginIcon />}
+                sx={{
+                  backgroundColor: theme.palette.info.main,
+                  color: "#fff",
+                  "&:hover": {
+                    backgroundColor: theme.palette.info.dark,
+                  },
+                }}
+                onClick={() => {
+                  handleLogin();
+                  closeMobileMenu();
+                }}
+              >
+                Login
+              </Button>
             </Box>
           </Slide>
         )}

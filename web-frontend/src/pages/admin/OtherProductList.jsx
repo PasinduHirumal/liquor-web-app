@@ -38,7 +38,7 @@ const OtherProductList = () => {
         (p) => p.is_active === filters.is_active && p.is_in_stock === filters.is_in_stock
       );
       setFilteredProducts(filtered);
-      setVisibleProducts(showAll ? filtered : filtered.slice(0, 6));
+      setVisibleProducts(showAll ? filtered : filtered.slice(0, 12));
     };
 
     applyFilters();

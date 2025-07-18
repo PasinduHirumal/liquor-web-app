@@ -18,6 +18,8 @@ import useUserAuthStore from "./stores/userAuthStore";
 import { adminRoutes } from "./routes/admin/AdminRoutes";
 import { userRoutes } from "./routes/user/UserRoutes";
 import MainLayout from "./layout/Mainlayout";
+import LiquorAll from "./pages/LiquorAll";
+import OtherProductAll from "./pages/OtherProductAll";
 
 function App() {
   const adminCheckAuth = useAdminAuthStore((state) => state.checkAuth);
@@ -49,19 +51,25 @@ function App() {
               )
             }
           />
+
           <Route
             path="login"
             element={
               adminAuth || userAuth ? <Navigate to="/" replace /> : <Login />
             }
           />
+
           <Route
             path="register"
             element={
               adminAuth || userAuth ? <Navigate to="/" replace /> : <Register />
             }
           />
+
           <Route path="verify-otp" element={<VerifyOtpPage />} />
+          
+          <Route path="/liquor-all" element={<LiquorAll />} />
+          <Route path="/other-product-all" element={<OtherProductAll />} />
 
           {/* Admin Routes */}
           {adminRoutes.map(({ path, element }, i) => (
@@ -85,6 +93,7 @@ function App() {
               )
             }
           />
+
         </Route>
       </Routes>
     </Router>

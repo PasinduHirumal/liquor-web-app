@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../lib/axios";
 import LiquorProductCard from "../common/LiquorProductCard";
 
-const LiquorProduct = () => {
+const OtherProductAll = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
-  const [visibleProducts, setVisibleProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [filters] = useState({
@@ -14,13 +12,11 @@ const LiquorProduct = () => {
     is_in_stock: true,
   });
 
-  const navigate = useNavigate();
-
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get("/products/getAll");
+        const response = await axiosInstance.get("/other-products/getAll");
         const allProducts = response.data.data || [];
         setProducts(allProducts);
       } catch (err) {
@@ -40,7 +36,6 @@ const LiquorProduct = () => {
         (p) => p.is_active === filters.is_active && p.is_in_stock === filters.is_in_stock
       );
       setFilteredProducts(filtered);
-      setVisibleProducts(filtered.slice(0, 12));
     };
 
     applyFilters();
@@ -67,17 +62,12 @@ const LiquorProduct = () => {
   return (
     <div className="container-fluid py-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-0">Liquor Products</h2>
-        {filteredProducts.length > 6 && (
-          <button className="btn btn-outline-primary" onClick={() => navigate("/liquor-all")}>
-            View All
-          </button>
-        )}
+        <h2 className="mb-0">Other Products</h2>
       </div>
 
       <div className="row g-4">
-        {visibleProducts.length > 0 ? (
-          visibleProducts.map((product) => (
+        {filteredProducts.length > 0 ? (
+          filteredProducts.map((product) => (
             <LiquorProductCard key={product.product_id} product={product} />
           ))
         ) : (
@@ -92,4 +82,4 @@ const LiquorProduct = () => {
   );
 };
 
-export default LiquorProduct;
+export default OtherProductAll;

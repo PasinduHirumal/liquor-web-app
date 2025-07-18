@@ -69,7 +69,7 @@ const OtherProduct = () => {
   return (
     <div className="container-fluid py-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-0">All Products</h2>
+        <h2 className="mb-0">Other Products</h2>
         {filteredProducts.length > 6 && (
           <button className="btn btn-outline-primary" onClick={toggleShowAll}>
             {showAll ? "Show Less" : "View More"}
