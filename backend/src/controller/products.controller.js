@@ -118,7 +118,7 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
 	try {
         const productId = req.params.id;
-        const { category_id, images } = req.body;
+        const { add_quantity, withdraw_quantity, category_id, images } = req.body;
 
         const product = await productService.findById(productId);
         if (!product) {
@@ -146,7 +146,22 @@ const updateProduct = async (req, res) => {
             }
         }
 
-        const updateData = { ...req.body };
+        // quantity update
+        let addQuantity = 0;
+        let withdrawQuantity = 0;
+        if (add_quantity !== undefined) {
+            addQuantity = add_quantity;
+        }
+        if (withdraw_quantity !== undefined) {
+            withdrawQuantity = withdraw_quantity;
+        }
+
+        const stockQuantity = product.stock_quantity + addQuantity - withdrawQuantity;
+
+        const updateData = { 
+            stock_quantity: stockQuantity,
+            ...req.body 
+        };
         
         const updatedProduct = await productService.updateById(productId, updateData);
         if (!updatedProduct) {
