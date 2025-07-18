@@ -6,7 +6,7 @@ import "../../styles/LiquorProductDetail.css";
 import { FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit, FaCheckCircle, FaTimesCircle, FaArrowLeft } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
-import DeleteLiquorButton from "./buttons/DeleteLiquorButton";
+import DeleteLiquorButton from "../../components/admin/buttons/DeleteLiquorButton";
 
 const LiquorProductDetail = () => {
     const { id } = useParams();

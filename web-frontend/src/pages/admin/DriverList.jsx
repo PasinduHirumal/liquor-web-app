@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { axiosInstance } from '../../lib/axios';
-import CreateDriverForm from '../../components/admin/CreateDriverForm';
+import CreateDriverForm from '../../components/admin/forms/CreateDriverForm';
 import toast from 'react-hot-toast';
 import { buildDriverQueryParams } from '../../components/admin/driverFilterParams';
 import DeleteDriverButton from '../../components/admin/buttons/DeleteDriverButton';

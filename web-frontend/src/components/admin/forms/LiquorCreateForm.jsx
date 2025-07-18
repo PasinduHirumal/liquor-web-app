@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Form, Button, Spinner } from 'react-bootstrap';
 import { toast } from 'react-hot-toast';
 import { FaTrash } from 'react-icons/fa';
-import { axiosInstance } from '../../lib/axios';
+import { axiosInstance } from '../../../lib/axios';
 
 const LiquorCreateForm = ({ onSuccess, onCancel }) => {
     const [formData, setFormData] = useState({
