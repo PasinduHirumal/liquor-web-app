@@ -8,10 +8,10 @@ import useAdminAuthStore from "../../stores/adminAuthStore";
 import { Navigate, useLocation } from "react-router-dom";
 import DriverList from "../../pages/admin/DriverList";
 import PublicHome from "../PublicHome";
-import LiquorProductDetail from "../../pages/admin/LiquorProductDetail";
+import LiquorProductDetail from "../../pages/admin/detailPages/LiquorProductDetail";
 import LiquorEditForm from "../../components/admin/forms/LiquorEditForm"
 import OtherProductList from "../../pages/admin/OtherProductList";
-import OtherProductDetail from "../../pages/admin/OtherProductDetail";
+import OtherProductDetail from "../../pages/admin/detailPages/OtherProductDetail";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">

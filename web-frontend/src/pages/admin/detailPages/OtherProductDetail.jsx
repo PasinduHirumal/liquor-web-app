@@ -8,9 +8,9 @@ import {
 } from "react-icons/fa";
 import { GiSodaCan } from "react-icons/gi";
 import toast from "react-hot-toast";
-import { axiosInstance } from "../../lib/axios";
-import DeleteLiquorButton from "../../components/admin/buttons/DeleteLiquorButton";
-import "../../styles/OtherProductDetail.css";
+import { axiosInstance } from "../../../lib/axios";
+import "../../../styles/OtherProductDetail.css";
+import DeleteOtherProductButton from "../../../components/admin/buttons/DeleteOtherProductButton";
 
 const OtherProductDetail = () => {
     const { id } = useParams();
@@ -285,7 +285,7 @@ const OtherProductDetail = () => {
                                     Edit Product
                                 </button>
 
-                                <DeleteLiquorButton
+                                <DeleteOtherProductButton
                                     id={id}
                                     onSuccess={handleDeleteSuccess}
                                     className="btn-delete"
