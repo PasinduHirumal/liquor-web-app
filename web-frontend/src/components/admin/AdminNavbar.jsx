@@ -109,6 +109,61 @@ const AdminNavbar = () => {
                                 }}
                                 endIcon={manageOpen ? <ExpandLess /> : <ExpandMore />}
                             >
+                                Manage Products
+                            </Button>
+
+                            {manageOpen && (
+                                <Box
+                                    sx={{
+                                        position: "absolute",
+                                        top: "100%",
+                                        left: 0,
+                                        bgcolor: "#1e1e1e",
+                                        borderRadius: 1,
+                                        boxShadow: theme.shadows[5],
+                                        zIndex: theme.zIndex.tooltip,
+                                        minWidth: 140,
+                                    }}
+                                >
+                                    <StyledNavLink
+                                        to="/liquor-list"
+                                        onClick={() => {
+                                            closeMobileMenu();
+                                            setManageOpen(false);
+                                        }}
+                                        style={{ display: "block", padding: "8px 16px" }}
+                                    >
+                                        Liquors
+                                    </StyledNavLink>
+                                    <StyledNavLink
+                                        to="/other-product-list"
+                                        onClick={() => {
+                                            closeMobileMenu();
+                                            setManageOpen(false);
+                                        }}
+                                        style={{ display: "block", padding: "8px 16px" }}
+                                    >
+                                        Other Product
+                                    </StyledNavLink>
+                                </Box>
+                            )}
+                        </Box>
+
+                        {/* Manage Dropdown simulated */}
+                        <Box sx={{ position: "relative" }}>
+                            <Button
+                                onClick={() => setManageOpen((prev) => !prev)}
+                                sx={{
+                                    color: "white",
+                                    textTransform: "none",
+                                    fontWeight: manageOpen ? "bold" : "normal",
+                                    bgcolor: manageOpen ? "#333" : "transparent",
+                                    "&:hover": {
+                                        bgcolor: "#444",
+                                    },
+                                }}
+                                endIcon={manageOpen ? <ExpandLess /> : <ExpandMore />}
+                            >
                                 Manage Memberes
                             </Button>
 
