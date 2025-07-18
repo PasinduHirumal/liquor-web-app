@@ -24,6 +24,7 @@ const OtherProductEditForm = () => {
     const [formData, setFormData] = useState({
         name: "",
         description: "",
+        category_id: "",
         cost_price: 0,
         marked_price: 0,
         selling_price: 0,
@@ -38,19 +39,29 @@ const OtherProductEditForm = () => {
         images: []
     });
 
+    const [categories, setCategories] = useState([]);
+    const [categoriesLoading, setCategoriesLoading] = useState(false);
+    const [categoriesError, setCategoriesError] = useState(null);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
-        const fetchProduct = async () => {
+        const fetchData = async () => {
             try {
+                // Fetch categories first
+                setCategoriesLoading(true);
+                const categoriesRes = await axiosInstance.get("/categories/getAll");
+                setCategories(categoriesRes.data.data.filter(cat => cat.is_active));
+                
+                // Then fetch product data
                 const productRes = await axiosInstance.get(`/other-products/getOtherProductById/${id}`);
                 const product = productRes.data.data;
 
                 setFormData({
                     name: product.name || "",
                     description: product.description || "",
+                    category_id: product.category_id?.id || product.category_id || "",
                     cost_price: product.cost_price || 0,
                     marked_price: product.marked_price || 0,
                     selling_price: product.selling_price || 0,
@@ -65,15 +76,20 @@ const OtherProductEditForm = () => {
                     images: product.images || []
                 });
             } catch (error) {
-                toast.error("Failed to load product data.");
                 console.error(error);
-                navigate("/products");
+                if (error.response?.status === 404) {
+                    toast.error("Product not found");
+                    navigate("/products");
+                } else {
+                    toast.error("Failed to load data");
+                }
             } finally {
+                setCategoriesLoading(false);
                 setLoading(false);
             }
         };
 
-        fetchProduct();
+        fetchData();
     }, [id, navigate]);
 
     const handleChange = (e) => {
@@ -139,6 +155,7 @@ const OtherProductEditForm = () => {
         const newErrors = {};
 
         if (!formData.name.trim()) newErrors.name = "Name is required";
+        if (!formData.category_id) newErrors.category_id = "Category is required";
         if (formData.cost_price <= 0) newErrors.cost_price = "Cost price must be positive";
         if (formData.marked_price <= 0) newErrors.marked_price = "Marked price must be positive";
         if (formData.discount_percentage < 0 || formData.discount_percentage > 100) {
@@ -160,6 +177,7 @@ const OtherProductEditForm = () => {
             const generalPayload = {
                 name: formData.name,
                 description: formData.description,
+                category_id: formData.category_id,
                 is_active: formData.is_active,
                 is_in_stock: formData.is_in_stock,
                 weight: formData.weight,
@@ -248,6 +266,36 @@ const OtherProductEditForm = () => {
                                                 placeholder="Product description"
                                             />
                                         </FloatingLabel>
+
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Category</Form.Label>
+                                            {categoriesLoading ? (
+                                                <div className="d-flex align-items-center text-muted">
+                                                    <Spinner animation="border" size="sm" className="me-2" />
+                                                    Loading categories...
+                                                </div>
+                                            ) : categoriesError ? (
+                                                <Alert variant="warning">{categoriesError}</Alert>
+                                            ) : (
+                                                <Form.Select
+                                                    name="category_id"
+                                                    value={formData.category_id}
+                                                    onChange={handleChange}
+                                                    isInvalid={!!errors.category_id}
+                                                    className="py-3"
+                                                >
+                                                    <option value="">-- Select Category --</option>
+                                                    {categories.map((cat) => (
+                                                        <option key={cat.category_id} value={cat.category_id}>
+                                                            {cat.name}
+                                                        </option>
+                                                    ))}
+                                                </Form.Select>
+                                            )}
+                                            <Form.Control.Feedback type="invalid">
+                                                {errors.category_id}
+                                            </Form.Control.Feedback>
+                                        </Form.Group>
 
                                         <FloatingLabel controlId="weight" label="Weight (grams)" className="mb-3">
                                             <Form.Control
