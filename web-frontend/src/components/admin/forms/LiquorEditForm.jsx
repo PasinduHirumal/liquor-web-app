@@ -76,7 +76,7 @@ const LiquorEditForm = () => {
                 setExistingImages(product.images || []);
             } catch (err) {
                 toast.error("Failed to load product.");
-                navigate("/liquor-list");
+                navigate(-1);
             } finally {
                 setLoading(false);
             }
