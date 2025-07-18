@@ -21,6 +21,8 @@ class OtherProducts {
         this.withdraw_quantity = data.withdraw_quantity;
         this.stock_quantity = data.stock_quantity;
 
+        this.stockHistory = data.stockHistory;
+        
         this.is_active = data.is_active;
         this.is_in_stock = data.is_in_stock;
         this.is_liquor = data.is_liquor;

@@ -2,6 +2,8 @@ import OtherProductService from '../services/otherProduct.service.js';
 import CategoryService from '../services/category.service.js';
 import populateCategory from '../utils/populateCategory.js';
 import { uploadImages } from '../utils/firebaseStorage.js';
+import { validateStockOperation } from '../utils/stockCalculator.js';
+import { createStockHistory } from './stockHistory.controller.js';
 
 const categoryService = new CategoryService();
 const productService = new OtherProductService();
@@ -207,13 +209,41 @@ const updateProduct = async (req, res) => {
             return res.status(400).json({ success: false, message: stockValidation.error });
         }
 
+        // update history 
+        let historyId = '';
+        let isUpdatingHistory = false;
+        if (add_quantity !== undefined || withdraw_quantity !== undefined) {
+            isUpdatingHistory = true;
+        }
+        
+        if (isUpdatingHistory) {
+            const stockUpdateResult  = await createStockHistory({ 
+                addQuantity: add_quantity,
+                withdrawQuantity: withdraw_quantity,
+                productId: productId,
+                userId: req.user.id
+            });
+
+            if (!stockUpdateResult.shouldCreateHistory) {
+                return res.status(400).json({ success: false, message: stockUpdateResult.error });
+            }
+            historyId = stockUpdateResult.historyId;
+        }
+
         const updateData = { 
             selling_price: markedPrice - discount,
             discount_amount: discount,
             stock_quantity: stockValidation.newStock,
             ...req.body
-         };
+        };
         
+        if (historyId !== '') {
+            const currentStockHistory = product.stockHistory || [];
+            const updatedStockHistory = [...currentStockHistory, historyId];
+
+            updateData.stockHistory = updatedStockHistory;
+        }
+
         const updatedProduct = await productService.updateById(productId, updateData);
         if (!updatedProduct) {
             return res.status(400).json({ success: false, message: "Failed to update product"});

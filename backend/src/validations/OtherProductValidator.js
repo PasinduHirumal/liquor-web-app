@@ -55,6 +55,8 @@ const validateOtherProduct = (req, res, next) => {
         withdraw_quantity: Joi.number().integer().min(0).default(0),
         stock_quantity: Joi.number().integer().min(0).required(),
         
+        stockHistory: Joi.array().items(Joi.string().max(150)).default([]),
+        
         // Status flags
         is_active: Joi.boolean().default(true),
         is_in_stock: Joi.boolean().default(true),
