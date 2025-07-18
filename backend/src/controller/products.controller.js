@@ -3,6 +3,7 @@ import CategoryService from '../services/category.service.js';
 import populateCategory from '../utils/populateCategory.js';
 import { uploadImages } from '../utils/firebaseStorage.js';
 import { validateStockOperation } from '../utils/stockCalculator.js';
+import { createStockHistory } from './stockHistory.controller.js';
 
 const productService = new ProductService();
 const categoryService = new CategoryService();
@@ -158,10 +159,38 @@ const updateProduct = async (req, res) => {
             return res.status(400).json({ success: false, message: stockValidation.error });
         }
 
+        // update history 
+        let historyId = '';
+        let isUpdatingHistory = false;
+        if (product.stock_quantity !== stockValidation.newStock) {
+            isUpdatingHistory = true;
+        }
+        
+        if (isUpdatingHistory) {
+            const stockUpdateResult  = await createStockHistory({ 
+                addQuantity: add_quantity,
+                withdrawQuantity: withdraw_quantity,
+                productId: productId,
+                userId: req.user.id
+            });
+
+            if (!stockUpdateResult.shouldCreateHistory) {
+                return res.status(400).json({ success: false, message: stockUpdateResult.error });
+            }
+            historyId = stockUpdateResult.historyId;
+        }
+
         const updateData = { 
             stock_quantity: stockValidation.newStock,
             ...req.body 
         };
+
+        if (historyId !== '') {
+            const currentStockHistory = product.stockHistory || [];
+            const updatedStockHistory = [...currentStockHistory, historyId];
+
+            updateData.stockHistory = updatedStockHistory;
+        }
         
         const updatedProduct = await productService.updateById(productId, updateData);
         if (!updatedProduct) {
