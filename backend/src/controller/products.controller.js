@@ -2,6 +2,7 @@ import ProductService from '../services/product.service.js';
 import CategoryService from '../services/category.service.js';
 import populateCategory from '../utils/populateCategory.js';
 import { uploadImages } from '../utils/firebaseStorage.js';
+import { validateStockOperation } from '../utils/stockCalculator.js';
 
 const productService = new ProductService();
 const categoryService = new CategoryService();
@@ -118,7 +119,7 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
 	try {
         const productId = req.params.id;
-        const { category_id, images } = req.body;
+        const { add_quantity, withdraw_quantity, category_id, images } = req.body;
 
         const product = await productService.findById(productId);
         if (!product) {
@@ -146,7 +147,21 @@ const updateProduct = async (req, res) => {
             }
         }
 
-        const updateData = { ...req.body };
+        // quantity update
+        const stockValidation = validateStockOperation(
+            product.stock_quantity, 
+            add_quantity, 
+            withdraw_quantity
+        );
+
+        if (!stockValidation.isValid) {
+            return res.status(400).json({ success: false, message: stockValidation.error });
+        }
+
+        const updateData = { 
+            stock_quantity: stockValidation.newStock,
+            ...req.body 
+        };
         
         const updatedProduct = await productService.updateById(productId, updateData);
         if (!updatedProduct) {

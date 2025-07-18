@@ -197,21 +197,20 @@ const updateProduct = async (req, res) => {
         }
 
         // quantity update
-        let addQuantity = 0;
-        let withdrawQuantity = 0;
-        if (add_quantity !== undefined) {
-            addQuantity = add_quantity;
-        }
-        if (withdraw_quantity !== undefined) {
-            withdrawQuantity = withdraw_quantity;
-        }
+        const stockValidation = validateStockOperation(
+            product.stock_quantity, 
+            add_quantity, 
+            withdraw_quantity
+        );
 
-        const stockQuantity = product.stock_quantity + addQuantity - withdrawQuantity;
+        if (!stockValidation.isValid) {
+            return res.status(400).json({ success: false, message: stockValidation.error });
+        }
 
         const updateData = { 
             selling_price: markedPrice - discount,
             discount_amount: discount,
-            stock_quantity: stockQuantity,
+            stock_quantity: stockValidation.newStock,
             ...req.body
          };
         

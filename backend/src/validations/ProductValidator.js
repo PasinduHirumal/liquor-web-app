@@ -60,10 +60,6 @@ const validateProductUpdate = (req, res, next) => {
     images: Joi.array().items(Joi.string().uri()).min(1).optional(),
     price: Joi.number().positive().optional(),
     
-    add_quantity: Joi.number().integer().min(0).optional(),
-    withdraw_quantity: Joi.number().integer().min(0).optional(),
-    stock_quantity: Joi.number().integer().min(0).optional(),
-    
     is_active: Joi.boolean().optional(),
     is_in_stock: Joi.boolean().optional(),
     is_liquor: Joi.boolean().optional(),
@@ -102,7 +98,7 @@ const validateInventoryUpdate = (req, res, next) => {
   const schema = Joi.object({
     add_quantity: Joi.number().integer().min(0).optional(),
     withdraw_quantity: Joi.number().integer().min(0).optional(),
-    stock_quantity: Joi.number().integer().min(0).optional(),
+    //stock_quantity: Joi.number().integer().min(0).optional(),
     
     updated_at: Joi.date().iso().default(() => new Date().toISOString()),
   })
