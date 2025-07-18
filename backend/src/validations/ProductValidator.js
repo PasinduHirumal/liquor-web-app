@@ -16,6 +16,8 @@ const validateProduct = (req, res, next) => {
     withdraw_quantity: Joi.number().integer().min(0).default(0),
     stock_quantity: Joi.number().integer().min(0).required(),
     
+    stockHistory: Joi.array().items(Joi.string().max(150)).default([]),
+
     is_active: Joi.boolean().default(true),
     is_in_stock: Joi.boolean().default(true),
     is_liquor: Joi.boolean().default(true),
