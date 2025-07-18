@@ -215,8 +215,9 @@ const DriverList = () => {
                     pagination={pagination}
                     loading={loading}
                     onChange={handleTableChange}
-                    scroll={{ x: true }}
+                    scroll={{ x: 'max-content' }}
                     bordered
+                    size="middle"
                 />
             </Card>
 

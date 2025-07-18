@@ -39,7 +39,7 @@ const DeleteLiquorButton = ({ id, onSuccess }) => {
             onClick={handleDelete}
             disabled={isDeleting}
         >
-            <FaTrash className="delete-icon" />
+            <FaTrash/>
             {isDeleting ? "Deleting..." : "Delete"}
         </button>
     );

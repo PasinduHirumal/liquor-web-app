@@ -16,9 +16,7 @@ const UserProfile = () => {
     const fetchUserProfile = async (targetId) => {
         try {
             setLoading(true);
-            const res = await axiosInstance.get(`/users/getUserById/${targetId}`, {
-                withCredentials: true
-            });
+            const res = await axiosInstance.get(`/users/getUserById/${targetId}`);
             setProfile(res.data.data);
             setError(null);
         } catch (err) {

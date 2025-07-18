@@ -9,6 +9,8 @@ import { Navigate, useLocation } from "react-router-dom";
 import DriverList from "../../pages/admin/DriverList";
 import PublicHome from "../PublicHome";
 import LiquorProductDetail from "../../components/admin/LiquorProductDetail";
+import LiquorEditForm from "../../components/admin/LiquorEditForm";
+import OtherProductList from "../../pages/admin/OtherProductList";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -71,26 +73,22 @@ export const adminRoutes = [
     },
     {
         path: "/liquor-list",
-        element: (
-            <AdminProtectedRoute>
-                <LiquorList />
-            </AdminProtectedRoute>
-        ),
+        element: <LiquorList />
     },
     {
         path: "/admin/profile/:id",
-        element: (
-            <AdminProtectedRoute>
-                <AdminProfile />
-            </AdminProtectedRoute>
-        ),
+        element: <AdminProfile />
     },
     {
         path: "/products/:id",
-        element: (
-            <AdminProtectedRoute>
-                <LiquorProductDetail />
-            </AdminProtectedRoute>
-        ),
+        element: <LiquorProductDetail />
+    },
+    {
+        path: "/products/edit/:id",
+        element: <LiquorEditForm />
+    },
+    {
+        path: "/other-product-list",
+        element: <OtherProductList />
     },
 ];

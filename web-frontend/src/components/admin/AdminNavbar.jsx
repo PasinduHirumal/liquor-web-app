@@ -17,7 +17,6 @@ import {
     ListItemText,
 } from "@mui/material";
 import { Menu as MenuIcon, Close as CloseIcon, Logout as LogoutIcon, ExpandMore, ExpandLess } from "@mui/icons-material";
-import { motion, AnimatePresence } from "framer-motion";
 import useAdminAuthStore from "../../stores/adminAuthStore";
 
 const StyledNavLink = styled(NavLink)(({ theme }) => ({
@@ -44,7 +43,8 @@ const AdminNavbar = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [manageOpen, setManageOpen] = useState(false);
+    const [manageMemberOpen, setManageMemberOpen] = useState(false);
+    const [manageProductOpen, setManageProductOpen] = useState(false);
 
     const handleLogout = async () => {
         await logout();
@@ -55,10 +55,9 @@ const AdminNavbar = () => {
     const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
     const closeMobileMenu = () => {
         setMobileMenuOpen(false);
-        setManageOpen(false);
+        setManageMemberOpen(false);
+        setManageProductOpen(false);
     };
-
-    const toggleManage = () => setManageOpen((prev) => !prev);
 
     return (
         <>
@@ -87,32 +86,80 @@ const AdminNavbar = () => {
                             Home
                         </StyledNavLink>
 
-                        <StyledNavLink
-                            to="/liquor-list"
-                            onClick={closeMobileMenu}
-                        >
-                            Manage Liquors
-                        </StyledNavLink>
-
-                        {/* Manage Dropdown simulated */}
+                        {/* ManageProduct Dropdown simulated */}
                         <Box sx={{ position: "relative" }}>
                             <Button
-                                onClick={() => setManageOpen((prev) => !prev)}
+                                onClick={() => setManageProductOpen((prev) => !prev)}
                                 sx={{
                                     color: "white",
                                     textTransform: "none",
-                                    fontWeight: manageOpen ? "bold" : "normal",
-                                    bgcolor: manageOpen ? "#333" : "transparent",
+                                    fontWeight: manageProductOpen ? "bold" : "normal",
+                                    bgcolor: manageProductOpen ? "#333" : "transparent",
                                     "&:hover": {
                                         bgcolor: "#444",
                                     },
                                 }}
-                                endIcon={manageOpen ? <ExpandLess /> : <ExpandMore />}
+                                endIcon={manageProductOpen ? <ExpandLess /> : <ExpandMore />}
+                            >
+                                Manage Products
+                            </Button>
+
+                            {manageProductOpen && (
+                                <Box
+                                    sx={{
+                                        position: "absolute",
+                                        top: "100%",
+                                        left: 0,
+                                        bgcolor: "#1e1e1e",
+                                        borderRadius: 1,
+                                        boxShadow: theme.shadows[5],
+                                        zIndex: theme.zIndex.tooltip,
+                                        minWidth: 140,
+                                    }}
+                                >
+                                    <StyledNavLink
+                                        to="/liquor-list"
+                                        onClick={() => {
+                                            closeMobileMenu();
+                                            setManageProductOpen(false);
+                                        }}
+                                        style={{ display: "block", padding: "8px 16px" }}
+                                    >
+                                        Liquors
+                                    </StyledNavLink>
+                                    <StyledNavLink
+                                        to="/other-product-list"
+                                        onClick={() => {
+                                            closeMobileMenu();
+                                            setManageProductOpen(false);
+                                        }}
+                                        style={{ display: "block", padding: "8px 16px" }}
+                                    >
+                                        Other Product
+                                    </StyledNavLink>
+                                </Box>
+                            )}
+                        </Box>
+
+                        {/* ManageMembers Dropdown simulated */}
+                        <Box sx={{ position: "relative" }}>
+                            <Button
+                                onClick={() => setManageMemberOpen((prev) => !prev)}
+                                sx={{
+                                    color: "white",
+                                    textTransform: "none",
+                                    fontWeight: manageMemberOpen ? "bold" : "normal",
+                                    bgcolor: manageMemberOpen ? "#333" : "transparent",
+                                    "&:hover": {
+                                        bgcolor: "#444",
+                                    },
+                                }}
+                                endIcon={manageMemberOpen ? <ExpandLess /> : <ExpandMore />}
                             >
                                 Manage Memberes
                             </Button>
 
-                            {manageOpen && (
+                            {manageMemberOpen && (
                                 <Box
                                     sx={{
                                         position: "absolute",
@@ -129,7 +176,7 @@ const AdminNavbar = () => {
                                         to="/users-list"
                                         onClick={() => {
                                             closeMobileMenu();
-                                            setManageOpen(false);
+                                            setManageMemberOpen(false);
                                         }}
                                         style={{ display: "block", padding: "8px 16px" }}
                                     >
@@ -139,7 +186,7 @@ const AdminNavbar = () => {
                                         to="/driver-list"
                                         onClick={() => {
                                             closeMobileMenu();
-                                            setManageOpen(false);
+                                            setManageMemberOpen(false);
                                         }}
                                         style={{ display: "block", padding: "8px 16px" }}
                                     >
@@ -149,7 +196,7 @@ const AdminNavbar = () => {
                                         to="/admin-users-list"
                                         onClick={() => {
                                             closeMobileMenu();
-                                            setManageOpen(false);
+                                            setManageMemberOpen(false);
                                         }}
                                         style={{ display: "block", padding: "8px 16px" }}
                                     >
@@ -213,18 +260,45 @@ const AdminNavbar = () => {
                                 Home
                             </StyledNavLink>
 
-                            <StyledNavLink
-                                to="/liquor-list"
-                                onClick={closeMobileMenu}
-                                sx={{ mb: 2 }}
-                            >
-                                Manage Liquors
-                            </StyledNavLink>
-
-                            {/* Mobile Manage section */}
+                            {/* Mobile ManageProduct section */}
                             <List disablePadding sx={{ mb: 2, bgcolor: "transparent" }}>
                                 <ListItemButton
-                                    onClick={() => setManageOpen((prev) => !prev)}
+                                    onClick={() => setManageProductOpen((prev) => !prev)}
+                                    sx={{
+                                        color: "white",
+                                        px: 0,
+                                        "&.Mui-expanded": {
+                                            fontWeight: "bold",
+                                        },
+                                    }}
+                                >
+                                    <ListItemText primary="Manage Products" />
+                                    {manageProductOpen ? <ExpandLess sx={{ color: "white" }} /> : <ExpandMore sx={{ color: "white" }} />}
+                                </ListItemButton>
+                                <Collapse in={manageProductOpen} timeout="auto" unmountOnExit>
+                                    <Box sx={{ pl: 2 }}>
+                                        <StyledNavLink
+                                            to="/users-list"
+                                            onClick={closeMobileMenu}
+                                            sx={{ display: "block", mb: 1 }}
+                                        >
+                                            Liquor
+                                        </StyledNavLink>
+                                        <StyledNavLink
+                                            to="/other-product-list"
+                                            onClick={closeMobileMenu}
+                                            sx={{ display: "block", mb: 1 }}
+                                        >
+                                            Other Product
+                                        </StyledNavLink>
+                                    </Box>
+                                </Collapse>
+                            </List>
+
+                            {/* Mobile ManageMemberes section */}
+                            <List disablePadding sx={{ mb: 2, bgcolor: "transparent" }}>
+                                <ListItemButton
+                                    onClick={() => setManageMemberOpen((prev) => !prev)}
                                     sx={{
                                         color: "white",
                                         px: 0,
@@ -234,9 +308,9 @@ const AdminNavbar = () => {
                                     }}
                                 >
                                     <ListItemText primary="Manage Memberes" />
-                                    {manageOpen ? <ExpandLess sx={{ color: "white" }} /> : <ExpandMore sx={{ color: "white" }} />}
+                                    {manageMemberOpen ? <ExpandLess sx={{ color: "white" }} /> : <ExpandMore sx={{ color: "white" }} />}
                                 </ListItemButton>
-                                <Collapse in={manageOpen} timeout="auto" unmountOnExit>
+                                <Collapse in={manageMemberOpen} timeout="auto" unmountOnExit>
                                     <Box sx={{ pl: 2 }}>
                                         <StyledNavLink
                                             to="/users-list"

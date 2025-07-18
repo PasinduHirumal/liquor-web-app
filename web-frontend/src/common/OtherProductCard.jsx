@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const LiquorProductCard = ({ product, DetaiButton = false }) => {
+const OtherProductCard = ({ product, DetaiButton = false }) => {
   const [activeImage, setActiveImage] = useState(product.images?.[0]);
   const navigate = useNavigate();
 
@@ -74,7 +74,7 @@ const LiquorProductCard = ({ product, DetaiButton = false }) => {
             <small className="text-muted">Stock: {product.stock_quantity || 0}</small>
           </p>
 
-          <div className="mb-3">
+          <div className="mb-2">
             <span className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"}`}>
               {product.is_active ? "Active" : "Inactive"}
             </span>
@@ -86,8 +86,8 @@ const LiquorProductCard = ({ product, DetaiButton = false }) => {
           </div>
 
           {DetaiButton && (
-            <div className="card-footer mt-auto text-center justify-content-center">
-              <button className="btn btn-primary btn-sm w-100" onClick={handleViewDetail}>
+            <div className="mt-auto text-end">
+              <button className="btn btn-primary btn-sm" onClick={handleViewDetail}>
                 View Detail
               </button>
             </div>
@@ -98,4 +98,4 @@ const LiquorProductCard = ({ product, DetaiButton = false }) => {
   );
 };
 
-export default LiquorProductCard;
+export default OtherProductCard;

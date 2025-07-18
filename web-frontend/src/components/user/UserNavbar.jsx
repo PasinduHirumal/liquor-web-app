@@ -81,12 +81,23 @@ const UserNavbar = () => {
             <StyledNavLink to="/user" onClick={closeMobileMenu}>
               Home
             </StyledNavLink>
+
+            <StyledNavLink to="/liquor-all" onClick={closeMobileMenu}>
+              Liquors
+            </StyledNavLink>
+
+            <StyledNavLink to="/other-product-all" onClick={closeMobileMenu}>
+              Other Products
+            </StyledNavLink>
+
             <StyledNavLink to="/address" onClick={closeMobileMenu}>
               Address
             </StyledNavLink>
+
             <StyledNavLink to={`/profile/${user?.id}`} onClick={closeMobileMenu}>
               Profile
             </StyledNavLink>
+
             <Button
               variant="contained"
               color="error"
@@ -135,12 +146,22 @@ const UserNavbar = () => {
                 flexDirection: "column",
               }}
             >
-              <StyledNavLink to="/user" onClick={closeMobileMenu} sx={{ mb: 2 }}>
+              <StyledNavLink to="/user" onClick={closeMobileMenu}>
                 Home
               </StyledNavLink>
-              <StyledNavLink to="/address" onClick={closeMobileMenu} sx={{ mb: 2 }}>
+
+              <StyledNavLink to="/liquor-all" onClick={closeMobileMenu}>
+                Liquors
+              </StyledNavLink>
+
+              <StyledNavLink to="/other-product-all" onClick={closeMobileMenu}>
+                Other Products
+              </StyledNavLink>
+
+              <StyledNavLink to="/address" onClick={closeMobileMenu}>
                 Address
               </StyledNavLink>
+
               <StyledNavLink
                 to={`/profile/${user?.id}`}
                 onClick={closeMobileMenu}
