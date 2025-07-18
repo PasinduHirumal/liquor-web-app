@@ -1,29 +1,36 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
 import OtherProductCard from "../../common/OtherProductcard";
+import { Button } from "react-bootstrap";
+import CreateProductModal from "../../components/admin/forms/CreateProductModal";
 
 const OtherProductList = () => {
     const [products, setProducts] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showCreateModal, setShowCreateModal] = useState(false);
 
     useEffect(() => {
-        const fetchProducts = async () => {
-            try {
-                setLoading(true);
-                const response = await axiosInstance.get("/other-products/getAll");
-                const allProducts = response.data.data || [];
-                setProducts(allProducts);
-            } catch (err) {
-                setError(err.message || "Failed to fetch products");
-                console.error("Fetch products error:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchProducts();
     }, []);
+
+    const fetchProducts = async () => {
+        try {
+            setLoading(true);
+            const response = await axiosInstance.get("/other-products/getAll");
+            const allProducts = response.data.data || [];
+            setProducts(allProducts);
+        } catch (err) {
+            setError(err.message || "Failed to fetch products");
+            console.error("Fetch products error:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleProductCreated = () => {
+        fetchProducts(); // Refresh the product list
+    };
 
     if (loading) {
         return (
@@ -47,7 +54,16 @@ const OtherProductList = () => {
         <div className="container-fluid py-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
                 <h2 className="mb-0">Manage Other Products</h2>
+                <Button variant="primary" onClick={() => setShowCreateModal(true)}>
+                    Create Product
+                </Button>
             </div>
+
+            <CreateProductModal
+                show={showCreateModal}
+                onHide={() => setShowCreateModal(false)}
+                onProductCreated={handleProductCreated}
+            />
 
             <div className="row g-4">
                 {products.length > 0 ? (
