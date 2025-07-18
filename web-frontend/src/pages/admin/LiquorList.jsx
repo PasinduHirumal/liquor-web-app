@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 import { axiosInstance } from "../../lib/axios";
 import LiquorProductCard from "../../common/LiquorProductCard";
-import LiquorCreateForm from "../../components/admin/LiquorCreateForm";
+import LiquorCreateForm from "../../components/admin/forms/LiquorCreateForm";
 
 const LiquorList = () => {
     const [products, setProducts] = useState([]);

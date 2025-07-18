@@ -68,7 +68,7 @@ const OtherProductList = () => {
             <div className="row g-4">
                 {products.length > 0 ? (
                     products.map((product) => (
-                        <OtherProductCard key={product.product_id} product={product} />
+                        <OtherProductCard key={product.product_id} product={product} showDetailButton={true}/>
                     ))
                 ) : (
                     <div className="col-12">

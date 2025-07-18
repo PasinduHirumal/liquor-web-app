@@ -131,9 +131,9 @@ const OtherProductCard = ({ product, showDetailButton = false }) => {
 
                     {/* Detail Button */}
                     {showDetailButton && (
-                        <div className="mt-auto text-center">
+                        <div className="card-footer mt-auto text-center">
                             <button
-                                className="btn btn-outline-primary btn-sm w-100"
+                                className="btn btn-primary btn-sm w-100"
                                 onClick={handleViewDetail}
                             >
                                 View Details

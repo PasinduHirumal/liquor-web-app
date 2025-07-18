@@ -8,8 +8,8 @@ import useAdminAuthStore from "../../stores/adminAuthStore";
 import { Navigate, useLocation } from "react-router-dom";
 import DriverList from "../../pages/admin/DriverList";
 import PublicHome from "../PublicHome";
-import LiquorProductDetail from "../../components/admin/LiquorProductDetail";
-import LiquorEditForm from "../../components/admin/LiquorEditForm";
+import LiquorProductDetail from "../../pages/admin/LiquorProductDetail";
+import LiquorEditForm from "../../components/admin/forms/LiquorEditForm"
 import OtherProductList from "../../pages/admin/OtherProductList";
 
 const Loader = () => (
