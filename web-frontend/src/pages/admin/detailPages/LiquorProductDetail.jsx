@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import "../../styles/LiquorProductDetail.css";
 import { FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit, FaCheckCircle, FaTimesCircle, FaArrowLeft } from "react-icons/fa";
+import "../../../styles/LiquorProductDetail.css";
 import toast from "react-hot-toast";
-import { axiosInstance } from "../../lib/axios";
-import DeleteLiquorButton from "../../components/admin/buttons/DeleteLiquorButton";
+import { axiosInstance } from "../../../lib/axios";
+import DeleteLiquorButton from "../../../components/admin/buttons/DeleteLiquorButton";
 
 const LiquorProductDetail = () => {
     const { id } = useParams();

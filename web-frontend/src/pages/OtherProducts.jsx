@@ -15,7 +15,7 @@ const OtherProduct = () => {
         setLoading(true);
         const response = await axiosInstance.get("/other-products/getAll");
         const allProducts = response.data.data || [];
-        setProducts(allProducts.slice(0, 8)); // Show only first 8 products
+        setProducts(allProducts.slice(0, 8));
       } catch (err) {
         setError(err.message || "Failed to fetch products");
         console.error("Fetch products error:", err);
@@ -28,7 +28,7 @@ const OtherProduct = () => {
   }, []);
 
   const handleViewAll = () => {
-    navigate("/other-products-all");
+    navigate("/other-product-all");
   };
 
   if (loading) {
