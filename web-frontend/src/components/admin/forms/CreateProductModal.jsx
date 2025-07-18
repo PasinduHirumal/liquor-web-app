@@ -1,7 +1,15 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Form, Spinner, Row, Col, Alert, FloatingLabel } from "react-bootstrap";
+import {
+    Modal,
+    Button,
+    Form,
+    Spinner,
+    Row,
+    Col,
+    Alert,
+    FloatingLabel
+} from "react-bootstrap";
 import { axiosInstance } from "../../../lib/axios";
-import { FaUpload, FaTimes } from "react-icons/fa";
 
 const CreateProductModal = ({ show, onHide, onProductCreated }) => {
     const [formData, setFormData] = useState({
@@ -12,14 +20,13 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
         marked_price: 0,
         discount_percentage: 0,
         stock_quantity: 0,
-        image: null,
     });
+
     const [categories, setCategories] = useState([]);
     const [categoriesLoading, setCategoriesLoading] = useState(false);
     const [categoriesError, setCategoriesError] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
-    const [preview, setPreview] = useState(null);
 
     // Fetch categories when modal opens
     useEffect(() => {
@@ -43,35 +50,15 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
         fetchCategories();
     }, [show]);
 
-    // Create preview for selected image
-    useEffect(() => {
-        if (!formData.image) {
-            setPreview(null);
-            return;
-        }
-
-        const objectUrl = URL.createObjectURL(formData.image);
-        setPreview(objectUrl);
-
-        return () => URL.revokeObjectURL(objectUrl);
-    }, [formData.image]);
-
     const handleInputChange = (e) => {
-        const { name, value, type, files } = e.target;
+        const { name, value, type } = e.target;
 
-        if (type === "file") {
-            setFormData(prev => ({
-                ...prev,
-                [name]: files[0]
-            }));
-        } else {
-            setFormData(prev => ({
-                ...prev,
-                [name]: name.includes("price") || name.includes("quantity") || name === "discount_percentage"
-                    ? Number(value)
-                    : value
-            }));
-        }
+        setFormData(prev => ({
+            ...prev,
+            [name]: type === "number"
+                ? Number(value)
+                : value
+        }));
     };
 
     const handleSubmit = async (e) => {
@@ -81,17 +68,14 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
 
         try {
             const data = new FormData();
+
             Object.entries(formData).forEach(([key, value]) => {
                 if (value !== null && value !== "") {
                     data.append(key, value);
                 }
             });
 
-            await axiosInstance.post("/other-products/create", data, {
-                headers: {
-                    "Content-Type": "multipart/form-data",
-                },
-            });
+            await axiosInstance.post("/other-products/create", data);
 
             onProductCreated();
             handleReset();
@@ -113,15 +97,8 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
             marked_price: 0,
             discount_percentage: 0,
             stock_quantity: 0,
-            image: null,
         });
         setError(null);
-        setPreview(null);
-    };
-
-    const removeImage = () => {
-        setFormData(prev => ({ ...prev, image: null }));
-        setPreview(null);
     };
 
     return (
@@ -196,7 +173,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                                         <option value="">-- Select Category --</option>
                                         {categories.map((cat) => (
                                             <option key={cat.category_id} value={cat.category_id}>
-                                                {cat.name}
+                                                {cat.name} {!cat.is_active && "(Inactive)"}
                                             </option>
                                         ))}
                                     </Form.Select>
@@ -268,48 +245,6 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                                     </FloatingLabel>
                                 </Col>
                             </Row>
-
-                            <Form.Group className="mb-4">
-                                <Form.Label>Product Image</Form.Label>
-                                {preview ? (
-                                    <div className="position-relative">
-                                        <img
-                                            src={preview}
-                                            alt="Preview"
-                                            className="img-fluid rounded border mb-2 d-block"
-                                            style={{ maxHeight: '200px' }}
-                                        />
-                                        <Button
-                                            variant="danger"
-                                            size="sm"
-                                            onClick={removeImage}
-                                            className="position-absolute top-0 end-0 m-2 rounded-circle"
-                                            style={{ width: '30px', height: '30px' }}
-                                        >
-                                            <FaTimes />
-                                        </Button>
-                                    </div>
-                                ) : (
-                                    <div className="border rounded p-4 text-center">
-                                        <Form.Control
-                                            type="file"
-                                            name="image"
-                                            accept="image/*"
-                                            onChange={handleInputChange}
-                                            disabled={isSubmitting}
-                                            className="d-none"
-                                            id="productImageUpload"
-                                        />
-                                        <Form.Label htmlFor="productImageUpload" className="d-block cursor-pointer">
-                                            <div className="d-flex flex-column align-items-center text-muted">
-                                                <FaUpload size={24} className="mb-2" />
-                                                <span>Click to upload product image</span>
-                                                <small className="text-muted">(JPEG, PNG, max 5MB)</small>
-                                            </div>
-                                        </Form.Label>
-                                    </div>
-                                )}
-                            </Form.Group>
                         </Col>
                     </Row>
 
