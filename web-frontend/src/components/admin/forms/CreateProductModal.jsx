@@ -7,9 +7,12 @@ import {
     Row,
     Col,
     Alert,
-    FloatingLabel
+    FloatingLabel,
+    Image,
+    Card
 } from "react-bootstrap";
 import { axiosInstance } from "../../../lib/axios";
+import { FiUpload, FiX, FiImage } from "react-icons/fi";
 
 const CreateProductModal = ({ show, onHide, onProductCreated }) => {
     const [formData, setFormData] = useState({
@@ -25,21 +28,34 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
         is_in_stock: true,
     });
 
-    const [images, setImages] = useState([]);
+    const [imagePreviews, setImagePreviews] = useState([]);
     const [categories, setCategories] = useState([]);
     const [categoriesLoading, setCategoriesLoading] = useState(false);
     const [categoriesError, setCategoriesError] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
 
-    // Convert image File to base64 string
-    const convertToBase64 = (file) => {
-        return new Promise((resolve, reject) => {
+    // Convert image File to base64 string and create preview
+    const handleImageChange = (e) => {
+        const files = Array.from(e.target.files);
+
+        files.forEach(file => {
             const reader = new FileReader();
+            reader.onload = () => {
+                if (reader.readyState === 2) {
+                    setImagePreviews(prev => [...prev, {
+                        id: Date.now() + Math.random(),
+                        file,
+                        preview: reader.result
+                    }]);
+                }
+            };
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
-            reader.onerror = error => reject(error);
         });
+    };
+
+    const removeImage = (id) => {
+        setImagePreviews(prev => prev.filter(img => img.id !== id));
     };
 
     useEffect(() => {
@@ -71,11 +87,6 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
         }));
     };
 
-    const handleImageChange = (e) => {
-        const selectedFiles = Array.from(e.target.files);
-        setImages(selectedFiles);
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         setIsSubmitting(true);
@@ -83,7 +94,15 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
 
         try {
             // Convert all images to base64
-            const base64Images = await Promise.all(images.map(convertToBase64));
+            const base64Images = await Promise.all(
+                imagePreviews.map(img => {
+                    return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.readAsDataURL(img.file);
+                        reader.onload = () => resolve(reader.result);
+                    });
+                })
+            );
 
             const payload = {
                 ...formData,
@@ -116,7 +135,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
             is_active: true,
             is_in_stock: true,
         });
-        setImages([]);
+        setImagePreviews([]);
         setError(null);
     };
 
@@ -131,6 +150,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
             keyboard={false}
             size="lg"
             centered
+            className="product-modal mt-5 pb-5"
         >
             <Modal.Header closeButton className="border-0 pb-0">
                 <Modal.Title className="h4 fw-bold">Create New Product</Modal.Title>
@@ -138,7 +158,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
 
             <Modal.Body className="pt-1">
                 {error && (
-                    <Alert variant="danger" className="mb-4">
+                    <Alert variant="danger" className="mb-4" onClose={() => setError(null)} dismissible>
                         {error}
                     </Alert>
                 )}
@@ -201,124 +221,172 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
 
                             <Form.Group controlId="images" className="mb-3">
                                 <Form.Label>Product Images</Form.Label>
-                                <Form.Control
-                                    type="file"
-                                    name="images"
-                                    onChange={handleImageChange}
-                                    multiple
-                                    accept="image/*"
-                                    disabled={isSubmitting}
-                                />
-                                {images.length > 0 && (
-                                    <div className="mt-2 small text-muted">
-                                        Selected: {images.map((file) => file.name).join(", ")}
+                                <div className="border rounded p-3 text-center mb-3">
+                                    <label
+                                        htmlFor="product-images-upload"
+                                        className="d-flex flex-column align-items-center justify-content-center"
+                                        style={{ cursor: 'pointer', minHeight: '100px' }}
+                                    >
+                                        <FiUpload size={24} className="mb-2" />
+                                        <span>Click to upload images</span>
+                                        <small className="text-muted">(JPEG, PNG, etc.)</small>
+                                    </label>
+                                    <Form.Control
+                                        id="product-images-upload"
+                                        type="file"
+                                        name="images"
+                                        onChange={handleImageChange}
+                                        multiple
+                                        accept="image/*"
+                                        disabled={isSubmitting}
+                                        className="d-none"
+                                    />
+                                </div>
+
+                                {imagePreviews.length > 0 && (
+                                    <div className="mb-3">
+                                        <h6 className="mb-2">Selected Images ({imagePreviews.length})</h6>
+                                        <div className="d-flex flex-wrap gap-2">
+                                            {imagePreviews.map((img) => (
+                                                <div key={img.id} className="position-relative" style={{ width: '80px', height: '80px' }}>
+                                                    <Image
+                                                        src={img.preview}
+                                                        alt="Preview"
+                                                        thumbnail
+                                                        className="h-100 w-100 object-fit-cover"
+                                                    />
+                                                    <Button
+                                                        variant="danger"
+                                                        size="sm"
+                                                        className="position-absolute top-0 end-0 p-0 rounded-circle"
+                                                        style={{ width: '20px', height: '20px' }}
+                                                        onClick={() => removeImage(img.id)}
+                                                        disabled={isSubmitting}
+                                                    >
+                                                        <FiX size={12} />
+                                                    </Button>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 )}
                             </Form.Group>
                         </Col>
 
                         <Col md={6}>
-                            <Row className="g-2 mb-3">
-                                <Col>
-                                    <FloatingLabel controlId="cost_price" label="Cost Price">
-                                        <Form.Control
-                                            type="number"
-                                            name="cost_price"
-                                            value={formData.cost_price}
-                                            onChange={handleInputChange}
-                                            required
-                                            min="0"
-                                            step="0.01"
-                                            disabled={isSubmitting}
-                                            placeholder="0.00"
-                                        />
-                                    </FloatingLabel>
-                                </Col>
-                                <Col>
-                                    <FloatingLabel controlId="marked_price" label="Marked Price">
-                                        <Form.Control
-                                            type="number"
-                                            name="marked_price"
-                                            value={formData.marked_price}
-                                            onChange={handleInputChange}
-                                            required
-                                            min="0"
-                                            step="0.01"
-                                            disabled={isSubmitting}
-                                            placeholder="0.00"
-                                        />
-                                    </FloatingLabel>
-                                </Col>
-                            </Row>
+                            <Card className="mb-3">
+                                <Card.Body>
+                                    <h6 className="mb-3">Pricing Information</h6>
+                                    <Row className="g-2 mb-3">
+                                        <Col>
+                                            <FloatingLabel controlId="cost_price" label="Cost Price">
+                                                <Form.Control
+                                                    type="number"
+                                                    name="cost_price"
+                                                    value={formData.cost_price}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                    min="0"
+                                                    step="0.01"
+                                                    disabled={isSubmitting}
+                                                    placeholder="0.00"
+                                                />
+                                            </FloatingLabel>
+                                        </Col>
+                                        <Col>
+                                            <FloatingLabel controlId="marked_price" label="Marked Price">
+                                                <Form.Control
+                                                    type="number"
+                                                    name="marked_price"
+                                                    value={formData.marked_price}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                    min="0"
+                                                    step="0.01"
+                                                    disabled={isSubmitting}
+                                                    placeholder="0.00"
+                                                />
+                                            </FloatingLabel>
+                                        </Col>
+                                    </Row>
 
-                            <Row className="g-2 mb-3">
-                                <Col>
-                                    <FloatingLabel controlId="discount_percentage" label="Discount %">
-                                        <Form.Control
-                                            type="number"
-                                            name="discount_percentage"
-                                            value={formData.discount_percentage}
-                                            onChange={handleInputChange}
-                                            min="0"
-                                            max="100"
-                                            disabled={isSubmitting}
-                                            placeholder="0"
-                                        />
-                                    </FloatingLabel>
-                                </Col>
-                                <Col>
-                                    <FloatingLabel controlId="stock_quantity" label="Stock Quantity">
-                                        <Form.Control
-                                            type="number"
-                                            name="stock_quantity"
-                                            value={formData.stock_quantity}
-                                            onChange={handleInputChange}
-                                            required
-                                            min="0"
-                                            disabled={isSubmitting}
-                                            placeholder="0"
-                                        />
-                                    </FloatingLabel>
-                                </Col>
-                            </Row>
+                                    <Row className="g-2 mb-3">
+                                        <Col>
+                                            <FloatingLabel controlId="discount_percentage" label="Discount %">
+                                                <Form.Control
+                                                    type="number"
+                                                    name="discount_percentage"
+                                                    value={formData.discount_percentage}
+                                                    onChange={handleInputChange}
+                                                    min="0"
+                                                    max="100"
+                                                    disabled={isSubmitting}
+                                                    placeholder="0"
+                                                />
+                                            </FloatingLabel>
+                                        </Col>
+                                        <Col>
+                                            <FloatingLabel controlId="stock_quantity" label="Stock Quantity">
+                                                <Form.Control
+                                                    type="number"
+                                                    name="stock_quantity"
+                                                    value={formData.stock_quantity}
+                                                    onChange={handleInputChange}
+                                                    required
+                                                    min="0"
+                                                    disabled={isSubmitting}
+                                                    placeholder="0"
+                                                />
+                                            </FloatingLabel>
+                                        </Col>
+                                    </Row>
+                                </Card.Body>
+                            </Card>
 
-                            <Row className="g-2 mb-3">
-                                <Col>
-                                    <FloatingLabel controlId="weight" label="Weight (optional)">
-                                        <Form.Control
-                                            type="number"
-                                            name="weight"
-                                            value={formData.weight}
-                                            onChange={handleInputChange}
-                                            min="0"
-                                            step="0.01"
-                                            disabled={isSubmitting}
-                                            placeholder="0"
-                                        />
-                                    </FloatingLabel>
-                                </Col>
-                            </Row>
+                            <Card className="mb-3">
+                                <Card.Body>
+                                    <h6 className="mb-3">Additional Information</h6>
+                                    <Row className="g-2 mb-3">
+                                        <Col>
+                                            <FloatingLabel controlId="weight" label="Weight (optional)">
+                                                <Form.Control
+                                                    type="number"
+                                                    name="weight"
+                                                    value={formData.weight}
+                                                    onChange={handleInputChange}
+                                                    min="0"
+                                                    step="0.01"
+                                                    disabled={isSubmitting}
+                                                    placeholder="0"
+                                                />
+                                            </FloatingLabel>
+                                        </Col>
+                                    </Row>
 
-                            <Form.Check
-                                type="switch"
-                                id="is_active"
-                                name="is_active"
-                                label="Active Product"
-                                className="mb-2"
-                                checked={formData.is_active}
-                                onChange={handleInputChange}
-                                disabled={isSubmitting}
-                            />
-                            <Form.Check
-                                type="switch"
-                                id="is_in_stock"
-                                name="is_in_stock"
-                                label="In Stock"
-                                className="mb-2"
-                                checked={formData.is_in_stock}
-                                onChange={handleInputChange}
-                                disabled={isSubmitting}
-                            />
+                                    <div className="d-flex gap-4">
+                                        <Form.Check
+                                            type="switch"
+                                            id="is_active"
+                                            name="is_active"
+                                            label="Active Product"
+                                            className="mb-2"
+                                            checked={formData.is_active}
+                                            onChange={handleInputChange}
+                                            disabled={isSubmitting}
+                                        />
+                                        <Form.Check
+                                            type="switch"
+                                            id="is_in_stock"
+                                            name="is_in_stock"
+                                            label="In Stock"
+                                            className="mb-2"
+                                            checked={formData.is_in_stock}
+                                            onChange={handleInputChange}
+                                            disabled={isSubmitting}
+                                        />
+                                    </div>
+                                </Card.Body>
+                            </Card>
                         </Col>
                     </Row>
 
