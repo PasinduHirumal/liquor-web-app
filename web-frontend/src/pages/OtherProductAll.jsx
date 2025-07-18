@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../lib/axios";
-import LiquorProductCard from "../common/LiquorProductCard";
+import OtherProductCard from "../common/OtherProductcard";
 
 const OtherProductAll = () => {
   const [products, setProducts] = useState([]);
@@ -68,7 +68,7 @@ const OtherProductAll = () => {
       <div className="row g-4">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
-            <LiquorProductCard key={product.product_id} product={product} />
+            <OtherProductCard key={product.product_id} product={product} />
           ))
         ) : (
           <div className="col-12">
