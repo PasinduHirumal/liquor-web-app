@@ -25,11 +25,22 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
         is_in_stock: true,
     });
 
+    const [images, setImages] = useState([]);
     const [categories, setCategories] = useState([]);
     const [categoriesLoading, setCategoriesLoading] = useState(false);
     const [categoriesError, setCategoriesError] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
+
+    // Convert image File to base64 string
+    const convertToBase64 = (file) => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    };
 
     useEffect(() => {
         if (!show) return;
@@ -54,11 +65,15 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
-
         setFormData(prev => ({
             ...prev,
             [name]: type === "checkbox" ? checked : (type === "number" ? Number(value) : value)
         }));
+    };
+
+    const handleImageChange = (e) => {
+        const selectedFiles = Array.from(e.target.files);
+        setImages(selectedFiles);
     };
 
     const handleSubmit = async (e) => {
@@ -67,15 +82,15 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
         setError(null);
 
         try {
-            const data = new FormData();
+            // Convert all images to base64
+            const base64Images = await Promise.all(images.map(convertToBase64));
 
-            Object.entries(formData).forEach(([key, value]) => {
-                if (value !== null && value !== "") {
-                    data.append(key, value);
-                }
-            });
+            const payload = {
+                ...formData,
+                images: base64Images,
+            };
 
-            await axiosInstance.post("/other-products/create", data);
+            await axiosInstance.post("/other-products/create", payload);
 
             onProductCreated();
             handleReset();
@@ -101,6 +116,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
             is_active: true,
             is_in_stock: true,
         });
+        setImages([]);
         setError(null);
     };
 
@@ -180,6 +196,23 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                                             </option>
                                         ))}
                                     </Form.Select>
+                                )}
+                            </Form.Group>
+
+                            <Form.Group controlId="images" className="mb-3">
+                                <Form.Label>Product Images</Form.Label>
+                                <Form.Control
+                                    type="file"
+                                    name="images"
+                                    onChange={handleImageChange}
+                                    multiple
+                                    accept="image/*"
+                                    disabled={isSubmitting}
+                                />
+                                {images.length > 0 && (
+                                    <div className="mt-2 small text-muted">
+                                        Selected: {images.map((file) => file.name).join(", ")}
+                                    </div>
                                 )}
                             </Form.Group>
                         </Col>
