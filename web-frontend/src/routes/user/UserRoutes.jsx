@@ -43,18 +43,10 @@ export const userRoutes = [
     },
     {
         path: "/profile/:profileId",
-        element: (
-            <UserProtectedRoute>
-                <UserProfile />
-            </UserProtectedRoute>
-        ),
+        element: <UserProfile />
     },
     {
         path: "/address",
-        element: (
-            <UserProtectedRoute>
-                <Address />
-            </UserProtectedRoute>
-        ),
+        element: <Address />
     },
 ];

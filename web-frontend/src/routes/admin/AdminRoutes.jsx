@@ -73,42 +73,22 @@ export const adminRoutes = [
     },
     {
         path: "/liquor-list",
-        element: (
-            <AdminProtectedRoute>
-                <LiquorList />
-            </AdminProtectedRoute>
-        ),
+        element: <LiquorList />
     },
     {
         path: "/admin/profile/:id",
-        element: (
-            <AdminProtectedRoute>
-                <AdminProfile />
-            </AdminProtectedRoute>
-        ),
+        element: <AdminProfile />
     },
     {
         path: "/products/:id",
-        element: (
-            <AdminProtectedRoute>
-                <LiquorProductDetail />
-            </AdminProtectedRoute>
-        ),
+        element: <LiquorProductDetail />
     },
     {
         path: "/products/edit/:id",
-        element: (
-            <AdminProtectedRoute>
-                <LiquorEditForm />
-            </AdminProtectedRoute>
-        ),
+        element: <LiquorEditForm />
     },
     {
         path: "/other-product-list",
-        element: (
-            <AdminProtectedRoute>
-                <OtherProductList />
-            </AdminProtectedRoute>
-        ),
+        element: <OtherProductList />
     },
 ];
