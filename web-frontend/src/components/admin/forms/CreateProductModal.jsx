@@ -20,6 +20,9 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
         marked_price: 0,
         discount_percentage: 0,
         stock_quantity: 0,
+        weight: 0,
+        is_active: true,
+        is_in_stock: true,
     });
 
     const [categories, setCategories] = useState([]);
@@ -28,7 +31,6 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
 
-    // Fetch categories when modal opens
     useEffect(() => {
         if (!show) return;
 
@@ -51,13 +53,11 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
     }, [show]);
 
     const handleInputChange = (e) => {
-        const { name, value, type } = e.target;
+        const { name, value, type, checked } = e.target;
 
         setFormData(prev => ({
             ...prev,
-            [name]: type === "number"
-                ? Number(value)
-                : value
+            [name]: type === "checkbox" ? checked : (type === "number" ? Number(value) : value)
         }));
     };
 
@@ -97,6 +97,9 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
             marked_price: 0,
             discount_percentage: 0,
             stock_quantity: 0,
+            weight: 0,
+            is_active: true,
+            is_in_stock: true,
         });
         setError(null);
     };
@@ -173,7 +176,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                                         <option value="">-- Select Category --</option>
                                         {categories.map((cat) => (
                                             <option key={cat.category_id} value={cat.category_id}>
-                                                {cat.name} {!cat.is_active && "(Inactive)"}
+                                                {cat.name}
                                             </option>
                                         ))}
                                     </Form.Select>
@@ -245,6 +248,44 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                                     </FloatingLabel>
                                 </Col>
                             </Row>
+
+                            <Row className="g-2 mb-3">
+                                <Col>
+                                    <FloatingLabel controlId="weight" label="Weight (optional)">
+                                        <Form.Control
+                                            type="number"
+                                            name="weight"
+                                            value={formData.weight}
+                                            onChange={handleInputChange}
+                                            min="0"
+                                            step="0.01"
+                                            disabled={isSubmitting}
+                                            placeholder="0"
+                                        />
+                                    </FloatingLabel>
+                                </Col>
+                            </Row>
+
+                            <Form.Check
+                                type="switch"
+                                id="is_active"
+                                name="is_active"
+                                label="Active Product"
+                                className="mb-2"
+                                checked={formData.is_active}
+                                onChange={handleInputChange}
+                                disabled={isSubmitting}
+                            />
+                            <Form.Check
+                                type="switch"
+                                id="is_in_stock"
+                                name="is_in_stock"
+                                label="In Stock"
+                                className="mb-2"
+                                checked={formData.is_in_stock}
+                                onChange={handleInputChange}
+                                disabled={isSubmitting}
+                            />
                         </Col>
                     </Row>
 
