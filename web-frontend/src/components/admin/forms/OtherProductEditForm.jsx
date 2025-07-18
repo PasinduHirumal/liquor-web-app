@@ -21,11 +21,9 @@ const OtherProductEditForm = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
-    // Form state
     const [formData, setFormData] = useState({
         name: "",
         description: "",
-        category_id: "",
         cost_price: 0,
         marked_price: 0,
         selling_price: 0,
@@ -36,39 +34,23 @@ const OtherProductEditForm = () => {
         withdraw_quantity: 0,
         is_active: true,
         is_in_stock: true,
-        is_liquor: true,
         weight: 0,
         images: []
     });
 
-    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [submitting, setSubmitting] = useState(false);
     const [errors, setErrors] = useState({});
 
-    // Fetch product and categories data
     useEffect(() => {
-        const fetchData = async () => {
+        const fetchProduct = async () => {
             try {
-                const [categoriesRes, productRes] = await Promise.all([
-                    axiosInstance.get("/categories/getAll"),
-                    axiosInstance.get(`/other-products/getOtherProductById/${id}`)
-                ]);
-
-                const activeCategories = (categoriesRes.data.data || []).filter(cat => cat.is_active);
-                setCategories(activeCategories);
-
+                const productRes = await axiosInstance.get(`/other-products/getOtherProductById/${id}`);
                 const product = productRes.data.data;
-                const productCategoryId = product.category_id?._id || product.category_id || "";
-
-                // Check if category still exists and is active
-                const isValidCategory = activeCategories.some(cat => cat._id === productCategoryId);
-                const fallbackCategory = isValidCategory ? productCategoryId : "";
 
                 setFormData({
                     name: product.name || "",
                     description: product.description || "",
-                    category_id: fallbackCategory,
                     cost_price: product.cost_price || 0,
                     marked_price: product.marked_price || 0,
                     selling_price: product.selling_price || 0,
@@ -79,12 +61,11 @@ const OtherProductEditForm = () => {
                     withdraw_quantity: 0,
                     is_active: product.is_active ?? true,
                     is_in_stock: product.is_in_stock ?? true,
-                    is_liquor: product.is_liquor ?? true,
                     weight: product.weight || 0,
                     images: product.images || []
                 });
             } catch (error) {
-                toast.error("Failed to load product or category data.");
+                toast.error("Failed to load product data.");
                 console.error(error);
                 navigate("/products");
             } finally {
@@ -92,11 +73,9 @@ const OtherProductEditForm = () => {
             }
         };
 
-        fetchData();
+        fetchProduct();
     }, [id, navigate]);
 
-
-    // Handle form field changes
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         const newValue = type === "checkbox" ? checked : value;
@@ -108,31 +87,27 @@ const OtherProductEditForm = () => {
                 : newValue
         }));
 
-        // Recalculate prices when marked price or discount changes
-        if (name === "marked_price" || name === "discount_percentage") {
-            const discountAmount = formData.marked_price * (formData.discount_percentage / 100);
-            const sellingPrice = formData.marked_price - discountAmount;
+        if (["marked_price", "discount_percentage"].includes(name)) {
+            const markedPrice = name === "marked_price" ? parseFloat(value) || 0 : formData.marked_price;
+            const discount = name === "discount_percentage" ? parseFloat(value) || 0 : formData.discount_percentage;
+            const discountAmount = markedPrice * (discount / 100);
+            const sellingPrice = markedPrice - discountAmount;
 
             setFormData(prev => ({
                 ...prev,
+                [name]: parseFloat(value) || 0,
                 discount_amount: discountAmount,
                 selling_price: sellingPrice
             }));
         }
 
-        // Clear error when field is edited
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: undefined }));
         }
     };
 
-    // Handle image uploads
     const handleImageUpload = async (e) => {
         const files = Array.from(e.target.files);
-        if (files.length + formData.images.length > 10) {
-            toast.error("Maximum 10 images allowed");
-            return;
-        }
 
         try {
             const base64Promises = files.map(file => {
@@ -153,7 +128,6 @@ const OtherProductEditForm = () => {
         }
     };
 
-    // Remove an image
     const removeImage = (index) => {
         setFormData(prev => ({
             ...prev,
@@ -161,12 +135,10 @@ const OtherProductEditForm = () => {
         }));
     };
 
-    // Form validation
     const validateForm = () => {
         const newErrors = {};
 
         if (!formData.name.trim()) newErrors.name = "Name is required";
-        if (!formData.category_id) newErrors.category_id = "Category is required";
         if (formData.cost_price <= 0) newErrors.cost_price = "Cost price must be positive";
         if (formData.marked_price <= 0) newErrors.marked_price = "Marked price must be positive";
         if (formData.discount_percentage < 0 || formData.discount_percentage > 100) {
@@ -177,24 +149,49 @@ const OtherProductEditForm = () => {
         return Object.keys(newErrors).length === 0;
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) return;
 
         setSubmitting(true);
         try {
-            // Prepare payload based on what's being updated
-            const payload = {
-                ...formData,
-                // Remove calculated fields that backend will handle
-                selling_price: undefined,
-                discount_amount: undefined
+            const updatePromises = [];
+
+            const generalPayload = {
+                name: formData.name,
+                description: formData.description,
+                is_active: formData.is_active,
+                is_in_stock: formData.is_in_stock,
+                weight: formData.weight,
+                images: formData.images
             };
 
-            await axiosInstance.patch(`/other-products/update/${id}`, payload);
+            updatePromises.push(
+                axiosInstance.patch(`/other-products/update/${id}`, generalPayload)
+            );
+
+            const pricePayload = {
+                cost_price: formData.cost_price,
+                marked_price: formData.marked_price,
+                discount_percentage: formData.discount_percentage
+            };
+            updatePromises.push(
+                axiosInstance.patch(`/other-products/update-price/${id}`, pricePayload)
+            );
+
+            if (formData.add_quantity > 0 || formData.withdraw_quantity > 0) {
+                const quantityPayload = {
+                    add_quantity: formData.add_quantity,
+                    withdraw_quantity: formData.withdraw_quantity
+                };
+                updatePromises.push(
+                    axiosInstance.patch(`/other-products/update-quantity/${id}`, quantityPayload)
+                );
+            }
+
+            await Promise.all(updatePromises);
             toast.success("Product updated successfully!");
-            navigate(`/products/${id}`);
+            navigate('/other-product-list');
         } catch (error) {
             console.error(error);
             toast.error(error.response?.data?.message || "Update failed");
@@ -203,7 +200,6 @@ const OtherProductEditForm = () => {
         }
     };
 
-    // Loading state
     if (loading) {
         return (
             <Container className="d-flex justify-content-center align-items-center" style={{ height: "50vh" }}>
@@ -223,7 +219,7 @@ const OtherProductEditForm = () => {
                     <Form onSubmit={handleSubmit}>
                         <Row>
                             <Col md={8}>
-                                {/* Basic Information Section */}
+                                {/* Basic Information */}
                                 <Card className="mb-4">
                                     <Card.Header>
                                         <h5>Basic Information</h5>
@@ -253,25 +249,6 @@ const OtherProductEditForm = () => {
                                             />
                                         </FloatingLabel>
 
-                                        <FloatingLabel controlId="category" label="Category" className="mb-3">
-                                            <Form.Select
-                                                name="category_id"
-                                                value={formData.category_id}
-                                                onChange={handleChange}
-                                                isInvalid={!!errors.category_id}
-                                            >
-                                                <option value="">Select category</option>
-                                                {categories.map(category => (
-                                                    <option key={category._id} value={category._id}>
-                                                        {category.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                            <Form.Control.Feedback type="invalid">
-                                                {errors.category_id}
-                                            </Form.Control.Feedback>
-                                        </FloatingLabel>
-
                                         <FloatingLabel controlId="weight" label="Weight (grams)" className="mb-3">
                                             <Form.Control
                                                 type="number"
@@ -286,11 +263,9 @@ const OtherProductEditForm = () => {
                                     </Card.Body>
                                 </Card>
 
-                                {/* Pricing Section */}
+                                {/* Pricing */}
                                 <Card className="mb-4">
-                                    <Card.Header>
-                                        <h5>Pricing</h5>
-                                    </Card.Header>
+                                    <Card.Header><h5>Pricing</h5></Card.Header>
                                     <Card.Body>
                                         <Row>
                                             <Col md={6}>
@@ -326,7 +301,6 @@ const OtherProductEditForm = () => {
                                                 </FloatingLabel>
                                             </Col>
                                         </Row>
-
                                         <Row>
                                             <Col md={6}>
                                                 <FloatingLabel controlId="discountPercentage" label="Discount (%)" className="mb-3">
@@ -363,11 +337,9 @@ const OtherProductEditForm = () => {
                                     </Card.Body>
                                 </Card>
 
-                                {/* Inventory Management */}
+                                {/* Inventory */}
                                 <Card className="mb-4">
-                                    <Card.Header>
-                                        <h5>Inventory Management</h5>
-                                    </Card.Header>
+                                    <Card.Header><h5>Inventory Management</h5></Card.Header>
                                     <Card.Body>
                                         <Row>
                                             <Col md={4}>
@@ -376,8 +348,6 @@ const OtherProductEditForm = () => {
                                                         type="number"
                                                         name="stock_quantity"
                                                         value={formData.stock_quantity}
-                                                        onChange={handleChange}
-                                                        min="0"
                                                         readOnly
                                                         plaintext
                                                     />
@@ -391,7 +361,6 @@ const OtherProductEditForm = () => {
                                                         value={formData.add_quantity}
                                                         onChange={handleChange}
                                                         min="0"
-                                                        placeholder="0"
                                                     />
                                                 </FloatingLabel>
                                             </Col>
@@ -403,7 +372,6 @@ const OtherProductEditForm = () => {
                                                         value={formData.withdraw_quantity}
                                                         onChange={handleChange}
                                                         min="0"
-                                                        placeholder="0"
                                                     />
                                                 </FloatingLabel>
                                             </Col>
@@ -413,11 +381,9 @@ const OtherProductEditForm = () => {
                             </Col>
 
                             <Col md={4}>
-                                {/* Status Toggles */}
+                                {/* Status */}
                                 <Card className="mb-4">
-                                    <Card.Header>
-                                        <h5>Status</h5>
-                                    </Card.Header>
+                                    <Card.Header><h5>Status</h5></Card.Header>
                                     <Card.Body>
                                         <Form.Check
                                             type="switch"
@@ -435,29 +401,16 @@ const OtherProductEditForm = () => {
                                             name="is_in_stock"
                                             checked={formData.is_in_stock}
                                             onChange={handleChange}
-                                            className="mb-3"
-                                        />
-                                        <Form.Check
-                                            type="switch"
-                                            id="is_liquor"
-                                            label="Liquor Product"
-                                            name="is_liquor"
-                                            checked={formData.is_liquor}
-                                            onChange={handleChange}
                                         />
                                     </Card.Body>
                                 </Card>
 
-                                {/* Images Section */}
+                                {/* Images */}
                                 <Card>
-                                    <Card.Header>
-                                        <h5>Product Images</h5>
-                                    </Card.Header>
+                                    <Card.Header><h5>Product Images</h5></Card.Header>
                                     <Card.Body>
                                         {errors.images && (
-                                            <Alert variant="danger" className="mb-3">
-                                                {errors.images}
-                                            </Alert>
+                                            <Alert variant="danger" className="mb-3">{errors.images}</Alert>
                                         )}
 
                                         {formData.images.length > 0 ? (
@@ -483,9 +436,7 @@ const OtherProductEditForm = () => {
                                                 ))}
                                             </div>
                                         ) : (
-                                            <Alert variant="info" className="mb-3">
-                                                No images uploaded
-                                            </Alert>
+                                            <Alert variant="info" className="mb-3">No images uploaded</Alert>
                                         )}
 
                                         <Form.Group controlId="imageUpload" className="mb-3">
@@ -506,9 +457,7 @@ const OtherProductEditForm = () => {
                                                 <UploadCloud className="me-2" />
                                                 Select Images
                                             </Button>
-                                            <Form.Text>
-                                                {formData.images.length} image(s) selected
-                                            </Form.Text>
+                                            <Form.Text>{formData.images.length} image(s) selected</Form.Text>
                                         </Form.Group>
                                     </Card.Body>
                                 </Card>
@@ -516,18 +465,8 @@ const OtherProductEditForm = () => {
                         </Row>
 
                         <div className="d-flex justify-content-end gap-3 mt-4">
-                            <Button
-                                variant="outline-secondary"
-                                onClick={() => navigate(-1)}
-                                disabled={submitting}
-                            >
-                                Cancel
-                            </Button>
-                            <Button
-                                variant="primary"
-                                type="submit"
-                                disabled={submitting}
-                            >
+                            <Button variant="outline-secondary" onClick={() => navigate(-1)} disabled={submitting}>Cancel</Button>
+                            <Button variant="primary" type="submit" disabled={submitting}>
                                 {submitting ? (
                                     <>
                                         <Spinner as="span" animation="border" size="sm" className="me-2" />
