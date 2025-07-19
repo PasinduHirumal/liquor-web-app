@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
-import OtherProductCard from "../../common/OtherProductcard";
+import OtherProductCard from "../../common/OtherProductCard";
 import { Button, Form, Row, Col } from "react-bootstrap";
 import CreateProductModal from "../../components/admin/forms/CreateProductModal";
 

@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../lib/axios";
-import OtherProductCard from "../common/OtherProductcard";
+import OtherProductCard from "../common/OtherProductCard";
 
 const OtherProduct = () => {
   const [products, setProducts] = useState([]);
@@ -15,7 +15,7 @@ const OtherProduct = () => {
         setLoading(true);
         const response = await axiosInstance.get("/other-products/getAll");
         const allProducts = response.data.data || [];
-        setProducts(allProducts.slice(0, 8));
+        setProducts(allProducts.slice(0, 12));
       } catch (err) {
         setError(err.message || "Failed to fetch products");
         console.error("Fetch products error:", err);
@@ -53,7 +53,7 @@ const OtherProduct = () => {
     <div className="container-fluid py-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="mb-0">Other Products</h2>
-        {products.length > 0 && (
+        {products.length > 6 && (
           <button className="btn btn-outline-primary" onClick={handleViewAll}>
             View All
           </button>

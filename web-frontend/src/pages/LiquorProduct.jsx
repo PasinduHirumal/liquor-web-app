@@ -40,7 +40,7 @@ const LiquorProduct = () => {
         (p) => p.is_active === filters.is_active && p.is_in_stock === filters.is_in_stock
       );
       setFilteredProducts(filtered);
-      setVisibleProducts(filtered.slice(0, 8));
+      setVisibleProducts(filtered.slice(0, 12));
     };
 
     applyFilters();
@@ -68,7 +68,7 @@ const LiquorProduct = () => {
     <div className="container-fluid py-4">
       <div className="d-flex justify-content-between align-items-center mb-3">
         <h2 className="mb-0">Liquor Products</h2>
-        {filteredProducts.length > 4 && (
+        {filteredProducts.length > 6 && (
           <button className="btn btn-outline-primary" onClick={() => navigate("/liquor-all")}>
             View All
           </button>
