@@ -213,17 +213,32 @@ const ManageCategory = () => {
                             <CircularProgress />
                         </Box>
                     ) : categories.length === 0 ? (
-                        <Typography>No categories found</Typography>
+                        <Typography className='text-center'>No categories found</Typography>
                     ) : (
-                        <TableContainer>
-                            <Table>
+                        <TableContainer
+                            component={Paper}
+                            sx={{
+                                maxHeight: 400,
+                                overflow: 'auto',
+                                '& table': {
+                                    minWidth: 650,
+                                },
+                                '& thead th': {
+                                    position: 'sticky',
+                                    top: 0,
+                                    backgroundColor: '#f5f5f5',
+                                    zIndex: 1,
+                                },
+                            }}
+                        >
+                            <Table stickyHeader>
                                 <TableHead>
                                     <TableRow>
-                                        <TableCell>Name</TableCell>
-                                        <TableCell>Description</TableCell>
-                                        <TableCell>Status</TableCell>
-                                        <TableCell>Type</TableCell>
-                                        <TableCell align="right">Actions</TableCell>
+                                        <TableCell className='fw-bold'>Name</TableCell>
+                                        <TableCell className='fw-bold'>Description</TableCell>
+                                        <TableCell className='fw-bold'>Status</TableCell>
+                                        <TableCell className='fw-bold'>Type</TableCell>
+                                        <TableCell className='fw-bold' align="right">Actions</TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
