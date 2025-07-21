@@ -81,11 +81,11 @@ const PublicNavbar = () => {
             </StyledNavLink>
 
             <StyledNavLink to="/liquor-all" onClick={closeMobileMenu}>
-              Liquors
+              Liquor Items
             </StyledNavLink>
 
             <StyledNavLink to="/other-product-all" onClick={closeMobileMenu}>
-              Other Products
+              Grocery Items
             </StyledNavLink>
 
             <Button
@@ -147,11 +147,11 @@ const PublicNavbar = () => {
               </StyledNavLink>
 
               <StyledNavLink to="/liquor-all" onClick={closeMobileMenu}>
-                Liquors
+                Liquor Items
               </StyledNavLink>
 
               <StyledNavLink to="/other-product-all" onClick={closeMobileMenu} sx={{ mb: 2 }}>
-                Other Products
+                Grocery Items
               </StyledNavLink>
 
               <Button

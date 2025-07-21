@@ -52,7 +52,7 @@ const OtherProductList = () => {
     return (
         <div className="container-fluid py-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
-                <h2 className="mb-0">Manage Other Products</h2>
+                <h2 className="mb-0">Manage Grocery Items</h2>
                 <Button variant="primary" onClick={() => setShowCreateModal(true)}>
                     Create Product
                 </Button>

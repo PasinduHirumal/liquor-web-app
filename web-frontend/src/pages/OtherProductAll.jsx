@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../lib/axios";
-import OtherProductCard from "../common/OtherProductcard";
+import OtherProductCard from "../common/OtherProductCard";
 
 const OtherProductList = () => {
     const [products, setProducts] = useState([]);
@@ -46,7 +46,7 @@ const OtherProductList = () => {
     return (
         <div className="container-fluid py-4">
             <div className="d-flex justify-content-between align-items-center mb-3">
-                <h2 className="mb-0">Other Products</h2>
+                <h2 className="mb-0">Grocery Items</h2>
             </div>
 
             <div className="row g-4">

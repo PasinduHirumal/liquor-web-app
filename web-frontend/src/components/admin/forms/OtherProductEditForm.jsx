@@ -12,8 +12,7 @@ import {
     Button,
     Alert,
     Image,
-    FloatingLabel,
-    InputGroup
+    FloatingLabel
 } from "react-bootstrap";
 import { XCircle, UploadCloud, CheckCircle } from "react-feather";
 
@@ -27,9 +26,7 @@ const OtherProductEditForm = () => {
         category_id: "",
         cost_price: 0,
         marked_price: 0,
-        selling_price: 0,
         discount_percentage: 0,
-        discount_amount: 0,
         stock_quantity: 0,
         add_quantity: 0,
         withdraw_quantity: 0,
@@ -53,7 +50,7 @@ const OtherProductEditForm = () => {
                 setCategoriesLoading(true);
                 const categoriesRes = await axiosInstance.get("/categories/getAll");
                 setCategories(categoriesRes.data.data.filter(cat => cat.is_active));
-                
+
                 // Then fetch product data
                 const productRes = await axiosInstance.get(`/other-products/getOtherProductById/${id}`);
                 const product = productRes.data.data;
@@ -64,9 +61,7 @@ const OtherProductEditForm = () => {
                     category_id: product.category_id?.id || product.category_id || "",
                     cost_price: product.cost_price || 0,
                     marked_price: product.marked_price || 0,
-                    selling_price: product.selling_price || 0,
                     discount_percentage: product.discount_percentage || 0,
-                    discount_amount: product.discount_amount || 0,
                     stock_quantity: product.stock_quantity || 0,
                     add_quantity: 0,
                     withdraw_quantity: 0,
@@ -102,20 +97,6 @@ const OtherProductEditForm = () => {
                 ? parseFloat(newValue) || 0
                 : newValue
         }));
-
-        if (["marked_price", "discount_percentage"].includes(name)) {
-            const markedPrice = name === "marked_price" ? parseFloat(value) || 0 : formData.marked_price;
-            const discount = name === "discount_percentage" ? parseFloat(value) || 0 : formData.discount_percentage;
-            const discountAmount = markedPrice * (discount / 100);
-            const sellingPrice = markedPrice - discountAmount;
-
-            setFormData(prev => ({
-                ...prev,
-                [name]: parseFloat(value) || 0,
-                discount_amount: discountAmount,
-                selling_price: sellingPrice
-            }));
-        }
 
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: undefined }));
@@ -172,9 +153,8 @@ const OtherProductEditForm = () => {
 
         setSubmitting(true);
         try {
-            const updatePromises = [];
-
-            const generalPayload = {
+            // General product update
+            await axiosInstance.patch(`/other-products/update/${id}`, {
                 name: formData.name,
                 description: formData.description,
                 category_id: formData.category_id,
@@ -182,32 +162,23 @@ const OtherProductEditForm = () => {
                 is_in_stock: formData.is_in_stock,
                 weight: formData.weight,
                 images: formData.images
-            };
+            });
 
-            updatePromises.push(
-                axiosInstance.patch(`/other-products/update/${id}`, generalPayload)
-            );
-
-            const pricePayload = {
+            // Price update - let backend handle calculations
+            await axiosInstance.patch(`/other-products/update-price/${id}`, {
                 cost_price: formData.cost_price,
                 marked_price: formData.marked_price,
                 discount_percentage: formData.discount_percentage
-            };
-            updatePromises.push(
-                axiosInstance.patch(`/other-products/update-price/${id}`, pricePayload)
-            );
+            });
 
+            // Quantity update if needed
             if (formData.add_quantity > 0 || formData.withdraw_quantity > 0) {
-                const quantityPayload = {
+                await axiosInstance.patch(`/other-products/update-quantity/${id}`, {
                     add_quantity: formData.add_quantity,
                     withdraw_quantity: formData.withdraw_quantity
-                };
-                updatePromises.push(
-                    axiosInstance.patch(`/other-products/update-quantity/${id}`, quantityPayload)
-                );
+                });
             }
 
-            await Promise.all(updatePromises);
             toast.success("Product updated successfully!");
             navigate('/other-product-list');
         } catch (error) {
@@ -350,7 +321,7 @@ const OtherProductEditForm = () => {
                                             </Col>
                                         </Row>
                                         <Row>
-                                            <Col md={6}>
+                                            <Col md={12}>
                                                 <FloatingLabel controlId="discountPercentage" label="Discount (%)" className="mb-3">
                                                     <Form.Control
                                                         type="number"
@@ -365,17 +336,6 @@ const OtherProductEditForm = () => {
                                                     <Form.Control.Feedback type="invalid">
                                                         {errors.discount_percentage}
                                                     </Form.Control.Feedback>
-                                                </FloatingLabel>
-                                            </Col>
-                                            <Col md={6}>
-                                                <FloatingLabel controlId="sellingPrice" label="Selling Price ($)" className="mb-3">
-                                                    <Form.Control
-                                                        type="number"
-                                                        name="selling_price"
-                                                        value={formData.selling_price.toFixed(2)}
-                                                        readOnly
-                                                        plaintext
-                                                    />
                                                 </FloatingLabel>
                                             </Col>
                                         </Row>

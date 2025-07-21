@@ -13,6 +13,7 @@ import LiquorEditForm from "../../components/admin/forms/LiquorEditForm"
 import OtherProductList from "../../pages/admin/OtherProductList";
 import OtherProductDetail from "../../pages/admin/detailPages/OtherProductDetail";
 import OtherProductEditForm from "../../components/admin/forms/OtherProductEditForm";
+import ManageCategory from "../../pages/admin/ManageCategory";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -100,5 +101,9 @@ export const adminRoutes = [
     {
         path: "/other-product-list",
         element: <OtherProductList />
+    },
+    {
+        path: "/category",
+        element: <ManageCategory />
     },
 ];
