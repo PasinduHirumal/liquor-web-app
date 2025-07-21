@@ -51,37 +51,54 @@ const createDriver = async (req, res) => {
 
 const getAllDrivers = async (req, res) => {
 	try {
-        const { isActive, isAvailable } = req.query;
-
-        if (isAvailable !== undefined && isActive !== undefined) {
-            return res.status(400).json({ success: false, message: "Pass only one query parameter at a time"});
-        }
+        const { isActive, isAvailable, isOnline, isDocumentVerified } = req.query;
 
         const drivers = await driverService.findAll();
         if (!drivers) {
             return res.status(400).json({ success: false, message: "Failed to get all drivers"});
         }
         
-        let filteredDrivers;
+        let filteredDrivers = drivers;
         let filterDescription = [];
+
         if (isActive !== undefined) {
             const isActiveBoolean = isActive === 'true';
-            filteredDrivers = drivers.filter(driver => driver.isActive === isActiveBoolean);
+            filteredDrivers = filteredDrivers.filter(driver => driver.isActive === isActiveBoolean);
             filterDescription.push(`isActive: ${isActive}`);
-        } else if (isAvailable !== undefined) {
+        } 
+        if (isAvailable !== undefined) {
             const isActiveBoolean = isAvailable === 'true';
-            filteredDrivers = drivers.filter(driver => driver.isAvailable === isActiveBoolean);
+            filteredDrivers = filteredDrivers.filter(driver => driver.isAvailable === isActiveBoolean);
             filterDescription.push(`isAvailable: ${isAvailable}`);
-        } else {
-            filteredDrivers = drivers;
         }
+        if (isOnline !== undefined) {
+            const isActiveBoolean = isOnline === 'true';
+            filteredDrivers = filteredDrivers.filter(driver => driver.isOnline === isActiveBoolean);
+            filterDescription.push(`isOnline: ${isOnline}`);
+        }
+        if (isDocumentVerified !== undefined) {
+            const isActiveBoolean = isDocumentVerified === 'true';
+            filteredDrivers = filteredDrivers.filter(driver => driver.isDocumentVerified === isActiveBoolean);
+            filterDescription.push(`isDocumentVerified: ${isDocumentVerified}`);
+        }
+
+        // Remove password field from each driver object
+        const sanitizedDrivers = filteredDrivers.map(driver => {
+            const { password, ...driverWithoutPassword } = driver;
+            return driverWithoutPassword;
+        });
+
+        // Sort by createdAt in descending order (newest at first)
+        const sortedDrivers = sanitizedDrivers.sort((a, b) => {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        });
         
         return res.status(200).json({ 
             success: true, 
             message: "Drivers fetched successfully",
-            count: filteredDrivers.length,
+            count: sortedDrivers.length,
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null,
-            data: filteredDrivers
+            data: sortedDrivers
         });
     } catch (error) {
         console.error("Fetch all drivers error:", error.message);
