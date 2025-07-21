@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { optionalImageSchema, requiredImageSchema } from './imageValidationSchemas';
+import { optionalImageSchema, requiredImageSchema } from './imageValidationSchemas.js';
 
 // CREATE VALIDATOR - With defaults
 const validateOtherProduct = (req, res, next) => {

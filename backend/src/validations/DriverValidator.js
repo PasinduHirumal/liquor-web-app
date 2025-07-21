@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { defaultNullImageSchema, optionalImageSchema } from './imageValidationSchemas';
+import { defaultNullImageSchema, optionalImageSchema } from './imageValidationSchemas.js';
 
 // CREATE VALIDATOR - With defaults
 const validateDriver = (req, res, next) => {
