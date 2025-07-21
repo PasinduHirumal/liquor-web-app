@@ -3,6 +3,7 @@ import CategoryService from '../services/category.service.js';
 import populateCategory from '../utils/populateCategory.js';
 import { uploadImages } from '../utils/firebaseStorage.js';
 import { validateStockOperation } from '../utils/stockCalculator.js';
+import { validatePriceOperation } from '../utils/priceCalculator.js';
 import { createStockHistory } from './stockHistory.controller.js';
 
 const productService = new ProductService();
@@ -10,7 +11,7 @@ const categoryService = new CategoryService();
 
 const createProduct = async (req, res) => {
 	try {
-        const { category_id, images } = req.body;
+        const { marked_price, discount_percentage, category_id, images } = req.body;
 
         const category = await categoryService.findById(category_id);
         if (!category) {
@@ -31,7 +32,27 @@ const createProduct = async (req, res) => {
             }
         }
 
-        const productData = { ...req.body };
+        // calculate price
+        const markedPrice = marked_price ?? 0;
+        const discountPercentage = discount_percentage ?? 0;
+
+        const updatedPrices = validatePriceOperation(markedPrice, discountPercentage);
+        if (!updatedPrices.isValid) {
+            return res.status(400).json({ success: false, message: stockValidation.error });
+        }
+
+        if (req.body.selling_price || req.body.discount_amount) {
+            if (req.body.selling_price) delete req.body.selling_price;
+            if (req.body.discount_amount) delete req.body.discount_amount;
+        }
+
+        const productData = { 
+            price: updatedPrices.newPrice,
+            selling_price: updatedPrices.newPrice,
+            discount_amount: updatedPrices.discount,
+            ...req.body 
+        };
+
         const product = await productService.create(productData);
         if (!product) {
             return res.status(400).json({ success: false, message: "Failed to create product"});
@@ -120,7 +141,7 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
 	try {
         const productId = req.params.id;
-        const { add_quantity, withdraw_quantity, category_id, images } = req.body;
+        const { marked_price, discount_percentage, add_quantity, withdraw_quantity, category_id, images } = req.body;
 
         const product = await productService.findById(productId);
         if (!product) {
@@ -148,6 +169,15 @@ const updateProduct = async (req, res) => {
             }
         }
 
+        // update price
+        const markedPrice = marked_price ?? product.marked_price;
+        const discountPercentage = discount_percentage ?? product.discount_percentage;
+
+        const updatedPrices = validatePriceOperation(markedPrice, discountPercentage);
+        if (!updatedPrices.isValid) {
+            return res.status(400).json({ success: false, message: stockValidation.error });
+        }
+
         // quantity update
         const stockValidation = validateStockOperation(
             product.stock_quantity, 
@@ -161,12 +191,7 @@ const updateProduct = async (req, res) => {
 
         // update history 
         let historyId = '';
-        let isUpdatingHistory = false;
-        if (product.stock_quantity !== stockValidation.newStock) {
-            isUpdatingHistory = true;
-        }
-        
-        if (isUpdatingHistory) {
+        if (add_quantity !== undefined || withdraw_quantity !== undefined) {
             const stockUpdateResult  = await createStockHistory({ 
                 addQuantity: add_quantity,
                 withdrawQuantity: withdraw_quantity,
@@ -180,7 +205,15 @@ const updateProduct = async (req, res) => {
             historyId = stockUpdateResult.historyId;
         }
 
+        if (req.body.selling_price || req.body.discount_amount) {
+            if (req.body.selling_price) delete req.body.selling_price;
+            if (req.body.discount_amount) delete req.body.discount_amount;
+        }
+
         const updateData = { 
+            price: updatedPrices.newPrice,
+            selling_price: updatedPrices.newPrice,
+            discount_amount: updatedPrices.discount,
             stock_quantity: stockValidation.newStock,
             ...req.body 
         };
