@@ -60,6 +60,7 @@ const ManageCategory = () => {
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState(null);
     const [openEditDialog, setOpenEditDialog] = useState(false);
+    const [openCreateDialog, setOpenCreateDialog] = useState(false);
 
     const fetchCategories = async () => {
         setLoading(true);
@@ -101,6 +102,7 @@ const ManageCategory = () => {
             fetchCategories();
             resetForm();
             setOpenEditDialog(false);
+            setOpenCreateDialog(false);
         } catch (error) {
             toast.error(error.response?.data?.message || 'Operation failed');
         } finally {
@@ -160,75 +162,31 @@ const ManageCategory = () => {
         setOpenEditDialog(false);
     };
 
+    const handleOpenCreateDialog = () => {
+        resetForm();
+        setOpenCreateDialog(true);
+    };
+
+    const handleCloseCreateDialog = () => {
+        resetForm();
+        setOpenCreateDialog(false);
+    };
+
     return (
         <ThemeProvider theme={theme}>
             <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
-                <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
-                    Manage Categories
-                </Typography>
-
-                {/* Create Category Form */}
-                <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-                    <Typography variant="h6" gutterBottom>
-                        Create New Category
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
+                    <Typography variant="h4" fontWeight="bold">
+                        Manage Categories
                     </Typography>
-                    <Box component="form" onSubmit={handleSubmit}>
-                        <Grid container spacing={3}>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Name *"
-                                    name="name"
-                                    value={formData.name}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-                            </Grid>
-                            <Grid item xs={12} md={6}>
-                                <TextField
-                                    fullWidth
-                                    label="Description"
-                                    name="description"
-                                    value={formData.description}
-                                    onChange={handleInputChange}
-                                />
-                            </Grid>
-                            <Grid item xs={12}>
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            name="is_active"
-                                            checked={formData.is_active}
-                                            onChange={handleInputChange}
-                                        />
-                                    }
-                                    label="Active"
-                                />
-                                <FormControlLabel
-                                    control={
-                                        <Checkbox
-                                            name="is_liquor"
-                                            checked={formData.is_liquor}
-                                            onChange={handleInputChange}
-                                        />
-                                    }
-                                    label="Liquor Category"
-                                    sx={{ ml: 2 }}
-                                />
-                            </Grid>
-                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
-                                <Button
-                                    type="submit"
-                                    variant="contained"
-                                    startIcon={<AddIcon />}
-                                    disabled={loading}
-                                >
-                                    {loading ? 'Processing...' : 'Create'}
-                                </Button>
-                            </Grid>
-                        </Grid>
-                    </Box>
-                </Paper>
+                    <Button
+                        variant="contained"
+                        startIcon={<AddIcon />}
+                        onClick={handleOpenCreateDialog}
+                    >
+                        Create Category
+                    </Button>
+                </Box>
 
                 {/* Category List */}
                 <Paper elevation={3} sx={{ p: 3 }}>
@@ -294,6 +252,70 @@ const ManageCategory = () => {
                         </TableContainer>
                     )}
                 </Paper>
+
+                {/* Create Dialog */}
+                <Dialog open={openCreateDialog} onClose={handleCloseCreateDialog} maxWidth="sm" fullWidth>
+                    <DialogTitle>Create New Category</DialogTitle>
+                    <DialogContent>
+                        <Grid container spacing={3} sx={{ mt: 1 }}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="Name *"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="Description"
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleInputChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            name="is_active"
+                                            checked={formData.is_active}
+                                            onChange={handleInputChange}
+                                        />
+                                    }
+                                    label="Active"
+                                />
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            name="is_liquor"
+                                            checked={formData.is_liquor}
+                                            onChange={handleInputChange}
+                                        />
+                                    }
+                                    label="Liquor Category"
+                                    sx={{ ml: 2 }}
+                                />
+                            </Grid>
+                        </Grid>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseCreateDialog} startIcon={<CancelIcon />} disabled={loading}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleSubmit}
+                            startIcon={<AddIcon />}
+                            variant="contained"
+                            disabled={loading}
+                        >
+                            {loading ? 'Creating...' : 'Create'}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
 
                 {/* Edit Dialog */}
                 <Dialog open={openEditDialog} onClose={handleCloseEditDialog} maxWidth="sm" fullWidth>
