@@ -5,7 +5,7 @@ import "react-loading-skeleton/dist/skeleton.css";
 import {
     FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit, FaCheckCircle,
     FaTimesCircle, FaArrowLeft, FaWeightHanging, FaPercentage, FaTag,
-    FaHistory
+    FaHistory, FaTimes
 } from "react-icons/fa";
 import { GiSodaCan } from "react-icons/gi";
 import toast from "react-hot-toast";
@@ -20,7 +20,7 @@ const OtherProductDetail = () => {
     const [activeImage, setActiveImage] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showHistory, setShowHistory] = useState(false);
+    const [showHistoryModal, setShowHistoryModal] = useState(false);
     const [stockHistory, setStockHistory] = useState([]);
     const [historyLoading, setHistoryLoading] = useState(false);
 
@@ -69,11 +69,13 @@ const OtherProductDetail = () => {
         navigate("/other-product-list");
     };
 
-    const toggleHistory = () => {
-        if (!showHistory) {
-            fetchStockHistory();
-        }
-        setShowHistory(!showHistory);
+    const openHistoryModal = async () => {
+        setShowHistoryModal(true);
+        await fetchStockHistory();
+    };
+
+    const closeHistoryModal = () => {
+        setShowHistoryModal(false);
     };
 
     const formatDate = (dateString) => {
@@ -81,7 +83,7 @@ const OtherProductDetail = () => {
         try {
             return new Date(dateString).toLocaleDateString('en-US', {
                 year: 'numeric',
-                month: 'long',
+                month: 'short',
                 day: 'numeric',
                 hour: '2-digit',
                 minute: '2-digit'
@@ -117,54 +119,75 @@ const OtherProductDetail = () => {
         );
     };
 
-    const renderStockHistory = () => {
-        if (!showHistory) return null;
+    const renderHistoryModal = () => {
+        if (!showHistoryModal) return null;
 
         return (
-            <div className="stock-history-section">
-                <h3 className="history-title">
-                    <FaBoxOpen className="me-2" />
-                    Stock History
-                </h3>
-                
-                {historyLoading ? (
-                    <div className="history-loading">
-                        <Skeleton count={5} height={40} />
+            <div className="history-modal-overlay mt-4">
+                <div className="history-modal">
+                    <div className="modal-header">
+                        <h3>
+                            <FaHistory className="me-2 mx-3" />
+                            Stock History for {product.name}
+                        </h3>
+                        <button onClick={closeHistoryModal} className="close-button">
+                            <FaTimes />
+                        </button>
                     </div>
-                ) : stockHistory.length > 0 ? (
-                    <div className="history-table">
-                        <table className="table">
-                            <thead>
-                                <tr>
-                                    <th>Type</th>
-                                    <th>Quantity</th>
-                                    <th>User</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {stockHistory.map((history, index) => (
-                                    <tr key={index}>
-                                        <td className={`history-type ${history.type.includes('add') ? 'text-success' : 'text-danger'}`}>
-                                            {history.type}
-                                        </td>
-                                        <td>{history.quantity}</td>
-                                        <td>
-                                            {history.userId?.name || 'System'}
-                                        </td>
-                                        <td>
-                                            {formatDate(history.createdAt)}
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
+
+                    <div className="modal-content">
+                        {historyLoading ? (
+                            <div className="loading-indicator">
+                                <div className="spinner"></div>
+                                <p>Loading history...</p>
+                            </div>
+                        ) : stockHistory.length > 0 ? (
+                            <div className="history-table-container">
+                                <table className="history-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Type</th>
+                                            <th>Quantity</th>
+                                            <th>User</th>
+                                            <th>Creation date</th>
+                                            <th>Updated date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {stockHistory.map((history, index) => (
+                                            <tr key={index}>
+                                                <td className={`history-type ${history.type === 'add items' ? 'text-success' : history.type === 'remove items' ? 'text-danger' : ''}`}>
+                                                    {history.type}
+                                                </td>
+                                                <td>{history.quantity}</td>
+                                                <td>
+                                                    {history.userId?.name || 'System'}
+                                                </td>
+                                                <td>
+                                                    {formatDate(history.createdAt)}
+                                                </td>
+                                                <td>
+                                                    {formatDate(history.updatedAt)}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        ) : (
+                            <div className="no-history">
+                                <FaBoxOpen size={32} />
+                                <p>No stock history available for this product</p>
+                            </div>
+                        )}
                     </div>
-                ) : (
-                    <div className="no-history">
-                        No stock history available for this product
+
+                    <div className="modal-footer">
+                        <button onClick={closeHistoryModal} className="close-modal-btn">
+                            Close
+                        </button>
                     </div>
-                )}
+                </div>
             </div>
         );
     };
@@ -369,10 +392,10 @@ const OtherProductDetail = () => {
 
                                 <button
                                     className="btn-history"
-                                    onClick={toggleHistory}
+                                    onClick={openHistoryModal}
                                 >
                                     <FaHistory className="me-2" />
-                                    {showHistory ? "Hide Stock History" : "View Stock History"}
+                                    View Stock History
                                 </button>
 
                                 <DeleteOtherProductButton
@@ -381,10 +404,10 @@ const OtherProductDetail = () => {
                                     className="btn-delete"
                                 />
                             </div>
-
-                            {renderStockHistory()}
                         </div>
                     </div>
+
+                    {renderHistoryModal()}
                 </>
             ) : null}
         </div>
