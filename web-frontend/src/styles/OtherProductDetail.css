@@ -354,3 +354,76 @@
 .not-found-icon {
     color: #dc3545;
 }
+
+/* Stock History Section */
+.stock-history-section {
+    margin-top: 2rem;
+    padding: 1.5rem;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border: 1px solid #e9ecef;
+}
+
+.history-title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    color: #343a40;
+}
+
+.history-table {
+    overflow-x: auto;
+}
+
+.history-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.history-table th {
+    background-color: #e9ecef;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.history-table td {
+    padding: 0.75rem;
+    border-bottom: 1px solid #dee2e6;
+}
+
+.history-type.text-success {
+    color: #28a745;
+    font-weight: 500;
+}
+
+.history-type.text-danger {
+    color: #dc3545;
+    font-weight: 500;
+}
+
+.no-history {
+    padding: 1rem;
+    text-align: center;
+    color: #6c757d;
+}
+
+.btn-history {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    background-color: #6c757d;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-right: 0.5rem;
+}
+
+.btn-history:hover {
+    background-color: #5a6268;
+}
+
+.history-loading {
+    padding: 1rem 0;
+}

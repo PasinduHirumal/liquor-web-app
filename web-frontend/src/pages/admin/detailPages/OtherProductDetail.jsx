@@ -4,7 +4,8 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import {
     FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit, FaCheckCircle,
-    FaTimesCircle, FaArrowLeft, FaWeightHanging, FaPercentage, FaTag
+    FaTimesCircle, FaArrowLeft, FaWeightHanging, FaPercentage, FaTag,
+    FaHistory
 } from "react-icons/fa";
 import { GiSodaCan } from "react-icons/gi";
 import toast from "react-hot-toast";
@@ -19,6 +20,9 @@ const OtherProductDetail = () => {
     const [activeImage, setActiveImage] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showHistory, setShowHistory] = useState(false);
+    const [stockHistory, setStockHistory] = useState([]);
+    const [historyLoading, setHistoryLoading] = useState(false);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -43,29 +47,34 @@ const OtherProductDetail = () => {
         fetchProduct();
     }, [id, navigate]);
 
+    const fetchStockHistory = async () => {
+        try {
+            setHistoryLoading(true);
+            const { data } = await axiosInstance.get(`/stockHistory/getByProductId/${id}`);
+            if (data.success) {
+                setStockHistory(data.data);
+            } else {
+                throw new Error(data.message || "Failed to fetch stock history");
+            }
+        } catch (err) {
+            console.error("Fetch stock history error:", err);
+            toast.error(err.message || "Failed to load stock history");
+        } finally {
+            setHistoryLoading(false);
+        }
+    };
+
     const handleDeleteSuccess = () => {
         toast.success("Product deleted successfully");
         navigate("/other-product-list");
     };
 
-    if (error) {
-        return (
-            <div className="product-detail-error-container">
-                <div className="product-not-found text-center py-5">
-                    <FaTimesCircle className="not-found-icon text-danger" size={48} />
-                    <h3 className="mt-3">Product not found</h3>
-                    <p className="text-muted">The requested product could not be located.</p>
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="btn btn-back mt-3"
-                    >
-                        <FaArrowLeft className="me-2" />
-                        Back to Products
-                    </button>
-                </div>
-            </div>
-        );
-    }
+    const toggleHistory = () => {
+        if (!showHistory) {
+            fetchStockHistory();
+        }
+        setShowHistory(!showHistory);
+    };
 
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
@@ -73,7 +82,9 @@ const OtherProductDetail = () => {
             return new Date(dateString).toLocaleDateString('en-US', {
                 year: 'numeric',
                 month: 'long',
-                day: 'numeric'
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
             });
         } catch {
             return "N/A";
@@ -105,6 +116,77 @@ const OtherProductDetail = () => {
             </div>
         );
     };
+
+    const renderStockHistory = () => {
+        if (!showHistory) return null;
+
+        return (
+            <div className="stock-history-section">
+                <h3 className="history-title">
+                    <FaBoxOpen className="me-2" />
+                    Stock History
+                </h3>
+                
+                {historyLoading ? (
+                    <div className="history-loading">
+                        <Skeleton count={5} height={40} />
+                    </div>
+                ) : stockHistory.length > 0 ? (
+                    <div className="history-table">
+                        <table className="table">
+                            <thead>
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Quantity</th>
+                                    <th>User</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {stockHistory.map((history, index) => (
+                                    <tr key={index}>
+                                        <td className={`history-type ${history.type.includes('add') ? 'text-success' : 'text-danger'}`}>
+                                            {history.type}
+                                        </td>
+                                        <td>{history.quantity}</td>
+                                        <td>
+                                            {history.userId?.name || 'System'}
+                                        </td>
+                                        <td>
+                                            {formatDate(history.createdAt)}
+                                        </td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                    </div>
+                ) : (
+                    <div className="no-history">
+                        No stock history available for this product
+                    </div>
+                )}
+            </div>
+        );
+    };
+
+    if (error) {
+        return (
+            <div className="product-detail-error-container">
+                <div className="product-not-found text-center py-5">
+                    <FaTimesCircle className="not-found-icon text-danger" size={48} />
+                    <h3 className="mt-3">Product not found</h3>
+                    <p className="text-muted">The requested product could not be located.</p>
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="btn btn-back mt-3"
+                    >
+                        <FaArrowLeft className="me-2" />
+                        Back to Products
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="product-detail-container">
@@ -285,12 +367,22 @@ const OtherProductDetail = () => {
                                     Edit Product
                                 </button>
 
+                                <button
+                                    className="btn-history"
+                                    onClick={toggleHistory}
+                                >
+                                    <FaHistory className="me-2" />
+                                    {showHistory ? "Hide Stock History" : "View Stock History"}
+                                </button>
+
                                 <DeleteOtherProductButton
                                     id={id}
                                     onSuccess={handleDeleteSuccess}
                                     className="btn-delete"
                                 />
                             </div>
+
+                            {renderStockHistory()}
                         </div>
                     </div>
                 </>
