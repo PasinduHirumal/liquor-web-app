@@ -1,6 +1,45 @@
 import { useState, useEffect } from 'react';
 import { axiosInstance } from '../../lib/axios';
 import toast from 'react-hot-toast';
+import {
+    Container,
+    Typography,
+    Paper,
+    Box,
+    Grid,
+    TextField,
+    FormControlLabel,
+    Checkbox,
+    Button,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    CircularProgress,
+    Chip,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    DialogContentText,
+    IconButton,
+    Tooltip
+} from '@mui/material';
+import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon, Cancel as CancelIcon } from '@mui/icons-material';
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+
+const theme = createTheme({
+    palette: {
+        primary: {
+            main: '#1976d2',
+        },
+        secondary: {
+            main: '#dc004e',
+        },
+    },
+});
 
 const ManageCategory = () => {
     const [categories, setCategories] = useState([]);
@@ -13,6 +52,8 @@ const ManageCategory = () => {
     });
     const [editMode, setEditMode] = useState(false);
     const [currentCategoryId, setCurrentCategoryId] = useState(null);
+    const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+    const [categoryToDelete, setCategoryToDelete] = useState(null);
 
     // Fetch all categories
     const fetchCategories = async () => {
@@ -79,20 +120,31 @@ const ManageCategory = () => {
         setEditMode(true);
     };
 
+    // Open delete confirmation dialog
+    const handleDeleteClick = (id) => {
+        setCategoryToDelete(id);
+        setOpenDeleteDialog(true);
+    };
+
+    // Close delete confirmation dialog
+    const handleCloseDeleteDialog = () => {
+        setOpenDeleteDialog(false);
+        setCategoryToDelete(null);
+    };
+
     // Delete category
-    const handleDelete = async (id) => {
-        if (window.confirm('Are you sure you want to delete this category?')) {
-            setLoading(true);
-            try {
-                await axiosInstance.delete(`/categories/delete/${id}`);
-                toast.success('Category deleted successfully');
-                fetchCategories();
-            } catch (error) {
-                toast.error(error.response?.data?.message || 'Failed to delete category');
-                console.error('Delete category error:', error);
-            } finally {
-                setLoading(false);
-            }
+    const handleDelete = async () => {
+        setLoading(true);
+        try {
+            await axiosInstance.delete(`/categories/delete/${categoryToDelete}`);
+            toast.success('Category deleted successfully');
+            fetchCategories();
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to delete category');
+            console.error('Delete category error:', error);
+        } finally {
+            setLoading(false);
+            handleCloseDeleteDialog();
         }
     };
 
@@ -109,146 +161,184 @@ const ManageCategory = () => {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
-            <h1 className="text-3xl font-bold mb-8">Manage Categories</h1>
+        <ThemeProvider theme={theme}>
+            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+                <Typography variant="h4" component="h1" gutterBottom sx={{ fontWeight: 'bold', mb: 4 }}>
+                    Manage Categories
+                </Typography>
 
-            {/* Category Form */}
-            <div className="bg-white rounded-lg shadow-md p-6 mb-8">
-                <h2 className="text-xl font-semibold mb-4">
-                    {editMode ? 'Edit Category' : 'Create New Category'}
-                </h2>
-                <form onSubmit={handleSubmit}>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Name *
-                            </label>
-                            <input
-                                type="text"
-                                name="name"
-                                value={formData.name}
-                                onChange={handleInputChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Description
-                            </label>
-                            <input
-                                type="text"
-                                name="description"
-                                value={formData.description}
-                                onChange={handleInputChange}
-                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            />
-                        </div>
-                    </div>
+                {/* Category Form */}
+                <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
+                    <Typography variant="h6" component="h2" gutterBottom sx={{ mb: 3 }}>
+                        {editMode ? 'Edit Category' : 'Create New Category'}
+                    </Typography>
+                    <Box component="form" onSubmit={handleSubmit}>
+                        <Grid container spacing={3}>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Name *"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    required
+                                    variant="outlined"
+                                />
+                            </Grid>
+                            <Grid item xs={12} md={6}>
+                                <TextField
+                                    fullWidth
+                                    label="Description"
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleInputChange}
+                                    variant="outlined"
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            name="is_active"
+                                            checked={formData.is_active}
+                                            onChange={handleInputChange}
+                                            color="primary"
+                                        />
+                                    }
+                                    label="Active"
+                                />
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            name="is_liquor"
+                                            checked={formData.is_liquor}
+                                            onChange={handleInputChange}
+                                            color="primary"
+                                        />
+                                    }
+                                    label="Liquor Category"
+                                    sx={{ ml: 2 }}
+                                />
+                            </Grid>
+                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
+                                {editMode && (
+                                    <Button
+                                        variant="outlined"
+                                        startIcon={<CancelIcon />}
+                                        onClick={resetForm}
+                                        disabled={loading}
+                                    >
+                                        Cancel
+                                    </Button>
+                                )}
+                                <Button
+                                    type="submit"
+                                    variant="contained"
+                                    startIcon={editMode ? <EditIcon /> : <AddIcon />}
+                                    disabled={loading}
+                                >
+                                    {loading ? 'Processing...' : editMode ? 'Update' : 'Create'}
+                                </Button>
+                            </Grid>
+                        </Grid>
+                    </Box>
+                </Paper>
 
-                    <div className="flex flex-wrap gap-6 mb-4">
-                        <label className="flex items-center space-x-2">
-                            <input
-                                type="checkbox"
-                                name="is_active"
-                                checked={formData.is_active}
-                                onChange={handleInputChange}
-                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            />
-                            <span className="text-sm text-gray-700">Active</span>
-                        </label>
+                {/* Categories List */}
+                <Paper elevation={3} sx={{ p: 3 }}>
+                    <Typography variant="h6" component="h2" gutterBottom sx={{ mb: 3 }}>
+                        Categories List
+                    </Typography>
+                    {loading && categories.length === 0 ? (
+                        <Box sx={{ display: 'flex', justifyContent: 'center', py: 4 }}>
+                            <CircularProgress />
+                        </Box>
+                    ) : categories.length === 0 ? (
+                        <Typography variant="body1" color="text.secondary">
+                            No categories found
+                        </Typography>
+                    ) : (
+                        <TableContainer>
+                            <Table>
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>Description</TableCell>
+                                        <TableCell>Status</TableCell>
+                                        <TableCell>Type</TableCell>
+                                        <TableCell align="right">Actions</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {categories.map((category) => (
+                                        <TableRow key={category.category_id}>
+                                            <TableCell>
+                                                <Typography fontWeight="medium">{category.name}</Typography>
+                                            </TableCell>
+                                            <TableCell>{category.description || '-'}</TableCell>
+                                            <TableCell>
+                                                <Chip
+                                                    label={category.is_active ? 'Active' : 'Inactive'}
+                                                    color={category.is_active ? 'success' : 'error'}
+                                                    size="small"
+                                                />
+                                            </TableCell>
+                                            <TableCell>
+                                                <Chip
+                                                    label={category.is_liquor ? 'Liquor' : 'Regular'}
+                                                    color={category.is_liquor ? 'primary' : 'default'}
+                                                    size="small"
+                                                />
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                <Tooltip title="Edit">
+                                                    <IconButton
+                                                        onClick={() => handleEdit(category)}
+                                                        color="primary"
+                                                        sx={{ mr: 1 }}
+                                                    >
+                                                        <EditIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                                <Tooltip title="Delete">
+                                                    <IconButton
+                                                        onClick={() => handleDeleteClick(category.category_id)}
+                                                        color="error"
+                                                    >
+                                                        <DeleteIcon />
+                                                    </IconButton>
+                                                </Tooltip>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    )}
+                </Paper>
 
-                        <label className="flex items-center space-x-2">
-                            <input
-                                type="checkbox"
-                                name="is_liquor"
-                                checked={formData.is_liquor}
-                                onChange={handleInputChange}
-                                className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                            />
-                            <span className="text-sm text-gray-700">Liquor Category</span>
-                        </label>
-                    </div>
-
-                    <div className="flex justify-end space-x-3">
-                        {editMode && (
-                            <button
-                                type="button"
-                                onClick={resetForm}
-                                className="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-500"
-                                disabled={loading}
-                            >
-                                Cancel
-                            </button>
-                        )}
-                        <button
-                            type="submit"
-                            className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                            disabled={loading}
-                        >
-                            {loading ? 'Processing...' : editMode ? 'Update' : 'Create'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-
-            {/* Categories List */}
-            <div className="bg-white rounded-lg shadow-md p-6">
-                <h2 className="text-xl font-semibold mb-4">Categories List</h2>
-
-                {loading && categories.length === 0 ? (
-                    <div className="flex justify-center items-center py-8">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-                    </div>
-                ) : categories.length === 0 ? (
-                    <p className="text-gray-500">No categories found</p>
-                ) : (
-                    <div className="overflow-x-auto">
-                        <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                                <tr>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-                                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                                {categories.map((category) => (
-                                    <tr key={category.category_id}>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{category.name}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{category.description || '-'}</td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${category.is_active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
-                                                {category.is_active ? 'Active' : 'Inactive'}
-                                            </span>
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                            {category.is_liquor ? 'Liquor' : 'Regular'}
-                                        </td>
-                                        <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                            <button
-                                                onClick={() => handleEdit(category)}
-                                                className="text-blue-600 hover:text-blue-900 mr-3"
-                                            >
-                                                Edit
-                                            </button>
-                                            <button
-                                                onClick={() => handleDelete(category.category_id)}
-                                                className="text-red-600 hover:text-red-900"
-                                            >
-                                                Delete
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
-            </div>
-        </div>
+                {/* Delete Confirmation Dialog */}
+                <Dialog
+                    open={openDeleteDialog}
+                    onClose={handleCloseDeleteDialog}
+                    aria-labelledby="alert-dialog-title"
+                    aria-describedby="alert-dialog-description"
+                >
+                    <DialogTitle id="alert-dialog-title">Confirm Delete</DialogTitle>
+                    <DialogContent>
+                        <DialogContentText id="alert-dialog-description">
+                            Are you sure you want to delete this category? This action cannot be undone.
+                        </DialogContentText>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
+                        <Button onClick={handleDelete} color="error" autoFocus>
+                            Delete
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            </Container>
+        </ThemeProvider>
     );
 };
 
