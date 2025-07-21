@@ -17,7 +17,7 @@ const createStockHistory = async ({ addQuantity, withdrawQuantity, productId, us
             stockAmount = addQuantity;
         }
         if (withdrawQuantity !== undefined) {
-            stockType = "withdraw items";
+            stockType = "remove items";
             stockAmount = withdrawQuantity;
         }
 

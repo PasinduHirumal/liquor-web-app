@@ -1,4 +1,5 @@
 import OtherProductService from '../services/otherProduct.service.js';
+import StockHistoryService from '../services/stockHistory.service.js';
 import CategoryService from '../services/category.service.js';
 import populateCategory from '../utils/populateCategory.js';
 import { uploadImages } from '../utils/firebaseStorage.js';
@@ -8,6 +9,7 @@ import { createStockHistory } from './stockHistory.controller.js';
 
 const categoryService = new CategoryService();
 const productService = new OtherProductService();
+const stockHistoryService = new StockHistoryService();
 
 const createProduct = async (req, res) => {
 	try {
@@ -57,7 +59,31 @@ const createProduct = async (req, res) => {
             return res.status(400).json({ success: false, message: "Failed to create product"});
         }
 
-        const populatedProduct = await populateCategory(product);
+        const stockHistoryData = {
+            type: "default create item",
+            quantity: product.stock_quantity,
+            productId: product.product_id,
+            userId: req.user.id
+        }
+
+        const stockHistory = await stockHistoryService.create(stockHistoryData);
+        if (!stockHistory) {
+            return res.status(400).json({ success: false, message: "Failed to create stock history"});
+        }
+
+        // update stock history array
+        const currentStockHistory = product.stockHistory || [];
+        const updatedStockHistory = [...currentStockHistory, stockHistory.id];
+
+        const updateData = { };
+        updateData.stockHistory = updatedStockHistory;
+
+        const updatedProduct = await productService.updateById(product.product_id, updateData);
+        if (!updatedProduct) {
+            return res.status(400).json({ success: false, message: "Failed to update stock history array"});
+        }
+
+        const populatedProduct = await populateCategory(updatedProduct);
 
         return res.status(201).json({ success: true, message: "Product created successfully", data: populatedProduct });
     } catch (error) {
