@@ -39,7 +39,7 @@ const validateOtherProduct = (req, res, next) => {
                     })
                 )
             ).max(10)
-        ).default([]),
+        ).required(),
         
         weight: Joi.number().positive().optional(),
         

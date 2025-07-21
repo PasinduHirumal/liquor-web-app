@@ -18,19 +18,6 @@ const createProduct = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid category"});
         }
 
-        let discount = 0;
-        if (discount_percentage > 0) {
-            discount = marked_price * (discount_percentage / 100);
-        }
-
-        if (req.body.selling_price) {
-            delete req.body.selling_price;
-        }
-
-        if (req.body.discount_amount) {
-            delete req.body.discount_amount;
-        }
-
         if (images !== undefined) {
             try {
                 const imageUrls = await uploadImages(images, 'products');
@@ -45,9 +32,23 @@ const createProduct = async (req, res) => {
             }
         }
 
+        // calculate price
+        const markedPrice = marked_price ?? 0;
+        const discountPercentage = discount_percentage ?? 0;
+
+        const updatedPrices = validatePriceOperation(markedPrice, discountPercentage);
+        if (!updatedPrices.isValid) {
+            return res.status(400).json({ success: false, message: stockValidation.error });
+        }
+
+        if (req.body.selling_price || req.body.discount_amount) {
+            if (req.body.selling_price) delete req.body.selling_price;
+            if (req.body.discount_amount) delete req.body.discount_amount;
+        }
+
         const productData = { 
-            selling_price: marked_price - discount,
-            discount_amount: discount,
+            selling_price: updatedPrices.newPrice,
+            discount_amount: updatedPrices.discount,
             ...req.body,
         };
 
