@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { optionalImageSchema, requiredImageSchema } from './imageValidationSchemas.js';
 
 // CREATE VALIDATOR - With defaults
 const validateOtherProduct = (req, res, next) => {
@@ -6,40 +7,7 @@ const validateOtherProduct = (req, res, next) => {
         name: Joi.string().min(1).max(200).required(),
         description: Joi.string().min(1).max(500).required(),
         category_id: Joi.string().min(1).max(100).required(),
-        images: Joi.alternatives().try(
-            Joi.string().uri(),
-            Joi.string().pattern(/^data:.*;base64,.*/),
-            Joi.object({
-                buffer: Joi.binary().required(),
-                mimetype: Joi.string().valid(
-                    'image/jpeg', 
-                    'image/jpg', 
-                    'image/png', 
-                    'image/gif', 
-                    'image/webp'
-                ).required(),
-                originalname: Joi.string().required(),
-                size: Joi.number().max(5 * 1024 * 1024).optional()
-            }),
-            Joi.array().items(
-                Joi.alternatives().try(
-                    Joi.string().uri(),
-                    Joi.string().pattern(/^data:.*;base64,.*/),
-                    Joi.object({
-                        buffer: Joi.binary().required(),
-                        mimetype: Joi.string().valid(
-                            'image/jpeg', 
-                            'image/jpg', 
-                            'image/png', 
-                            'image/gif', 
-                            'image/webp'
-                        ).required(),
-                        originalname: Joi.string().required(),
-                        size: Joi.number().max(5 * 1024 * 1024).optional()
-                    })
-                )
-            ).max(10)
-        ).required(),
+        images: requiredImageSchema,
         
         weight: Joi.number().positive().optional(),
         
@@ -93,40 +61,7 @@ const validateOtherProductUpdate = (req, res, next) => {
     name: Joi.string().min(1).max(200).optional(),
     description: Joi.string().min(1).max(500).optional(),
     category_id: Joi.string().min(1).max(100).optional(),
-    images: Joi.alternatives().try(
-            Joi.string().uri(),
-            Joi.string().pattern(/^data:.*;base64,.*/),
-            Joi.object({
-                buffer: Joi.binary().required(),
-                mimetype: Joi.string().valid(
-                    'image/jpeg', 
-                    'image/jpg', 
-                    'image/png', 
-                    'image/gif', 
-                    'image/webp'
-                ).required(),
-                originalname: Joi.string().required(),
-                size: Joi.number().max(5 * 1024 * 1024).optional()
-            }),
-            Joi.array().items(
-                Joi.alternatives().try(
-                    Joi.string().uri(),
-                    Joi.string().pattern(/^data:.*;base64,.*/),
-                    Joi.object({
-                        buffer: Joi.binary().required(),
-                        mimetype: Joi.string().valid(
-                            'image/jpeg', 
-                            'image/jpg', 
-                            'image/png', 
-                            'image/gif', 
-                            'image/webp'
-                        ).required(),
-                        originalname: Joi.string().required(),
-                        size: Joi.number().max(5 * 1024 * 1024).optional()
-                    })
-                )
-            ).max(10)
-        ).optional(),
+    images: optionalImageSchema,
     
     weight: Joi.number().positive().optional(),
     
