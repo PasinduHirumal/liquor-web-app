@@ -27,7 +27,12 @@ import {
     IconButton,
     Tooltip
 } from '@mui/material';
-import { Edit as EditIcon, Delete as DeleteIcon, Add as AddIcon, Cancel as CancelIcon } from '@mui/icons-material';
+import {
+    Edit as EditIcon,
+    Delete as DeleteIcon,
+    Add as AddIcon,
+    Cancel as CancelIcon
+} from '@mui/icons-material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
 const theme = createTheme({
@@ -54,8 +59,8 @@ const ManageCategory = () => {
     const [currentCategoryId, setCurrentCategoryId] = useState(null);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState(null);
+    const [openEditDialog, setOpenEditDialog] = useState(false);
 
-    // Fetch all categories
     const fetchCategories = async () => {
         setLoading(true);
         try {
@@ -63,7 +68,6 @@ const ManageCategory = () => {
             setCategories(response.data.data);
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to fetch categories');
-            console.error('Fetch categories error:', error);
         } finally {
             setLoading(false);
         }
@@ -73,7 +77,6 @@ const ManageCategory = () => {
         fetchCategories();
     }, []);
 
-    // Handle form input changes
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
         setFormData({
@@ -82,33 +85,29 @@ const ManageCategory = () => {
         });
     };
 
-    // Handle form submission
     const handleSubmit = async (e) => {
-        e.preventDefault();
+        if (e) e.preventDefault();
         setLoading(true);
 
         try {
             if (editMode) {
-                // Update existing category
                 await axiosInstance.patch(`/categories/update/${currentCategoryId}`, formData);
                 toast.success('Category updated successfully');
             } else {
-                // Create new category
                 await axiosInstance.post('/categories/create', formData);
                 toast.success('Category created successfully');
             }
 
             fetchCategories();
             resetForm();
+            setOpenEditDialog(false);
         } catch (error) {
             toast.error(error.response?.data?.message || 'Operation failed');
-            console.error('Category operation error:', error);
         } finally {
             setLoading(false);
         }
     };
 
-    // Edit category
     const handleEdit = (category) => {
         setFormData({
             name: category.name,
@@ -118,21 +117,19 @@ const ManageCategory = () => {
         });
         setCurrentCategoryId(category.category_id);
         setEditMode(true);
+        setOpenEditDialog(true);
     };
 
-    // Open delete confirmation dialog
     const handleDeleteClick = (id) => {
         setCategoryToDelete(id);
         setOpenDeleteDialog(true);
     };
 
-    // Close delete confirmation dialog
     const handleCloseDeleteDialog = () => {
         setOpenDeleteDialog(false);
         setCategoryToDelete(null);
     };
 
-    // Delete category
     const handleDelete = async () => {
         setLoading(true);
         try {
@@ -141,14 +138,12 @@ const ManageCategory = () => {
             fetchCategories();
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to delete category');
-            console.error('Delete category error:', error);
         } finally {
             setLoading(false);
             handleCloseDeleteDialog();
         }
     };
 
-    // Reset form
     const resetForm = () => {
         setFormData({
             name: '',
@@ -160,6 +155,11 @@ const ManageCategory = () => {
         setCurrentCategoryId(null);
     };
 
+    const handleCloseEditDialog = () => {
+        resetForm();
+        setOpenEditDialog(false);
+    };
+
     return (
         <ThemeProvider theme={theme}>
             <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
@@ -167,10 +167,10 @@ const ManageCategory = () => {
                     Manage Categories
                 </Typography>
 
-                {/* Category Form */}
+                {/* Create Category Form */}
                 <Paper elevation={3} sx={{ p: 3, mb: 4 }}>
-                    <Typography variant="h6" component="h2" gutterBottom sx={{ mb: 3 }}>
-                        {editMode ? 'Edit Category' : 'Create New Category'}
+                    <Typography variant="h6" gutterBottom>
+                        Create New Category
                     </Typography>
                     <Box component="form" onSubmit={handleSubmit}>
                         <Grid container spacing={3}>
@@ -182,7 +182,6 @@ const ManageCategory = () => {
                                     value={formData.name}
                                     onChange={handleInputChange}
                                     required
-                                    variant="outlined"
                                 />
                             </Grid>
                             <Grid item xs={12} md={6}>
@@ -192,7 +191,6 @@ const ManageCategory = () => {
                                     name="description"
                                     value={formData.description}
                                     onChange={handleInputChange}
-                                    variant="outlined"
                                 />
                             </Grid>
                             <Grid item xs={12}>
@@ -202,7 +200,6 @@ const ManageCategory = () => {
                                             name="is_active"
                                             checked={formData.is_active}
                                             onChange={handleInputChange}
-                                            color="primary"
                                         />
                                     }
                                     label="Active"
@@ -213,40 +210,29 @@ const ManageCategory = () => {
                                             name="is_liquor"
                                             checked={formData.is_liquor}
                                             onChange={handleInputChange}
-                                            color="primary"
                                         />
                                     }
                                     label="Liquor Category"
                                     sx={{ ml: 2 }}
                                 />
                             </Grid>
-                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end', gap: 2 }}>
-                                {editMode && (
-                                    <Button
-                                        variant="outlined"
-                                        startIcon={<CancelIcon />}
-                                        onClick={resetForm}
-                                        disabled={loading}
-                                    >
-                                        Cancel
-                                    </Button>
-                                )}
+                            <Grid item xs={12} sx={{ display: 'flex', justifyContent: 'flex-end' }}>
                                 <Button
                                     type="submit"
                                     variant="contained"
-                                    startIcon={editMode ? <EditIcon /> : <AddIcon />}
+                                    startIcon={<AddIcon />}
                                     disabled={loading}
                                 >
-                                    {loading ? 'Processing...' : editMode ? 'Update' : 'Create'}
+                                    {loading ? 'Processing...' : 'Create'}
                                 </Button>
                             </Grid>
                         </Grid>
                     </Box>
                 </Paper>
 
-                {/* Categories List */}
+                {/* Category List */}
                 <Paper elevation={3} sx={{ p: 3 }}>
-                    <Typography variant="h6" component="h2" gutterBottom sx={{ mb: 3 }}>
+                    <Typography variant="h6" gutterBottom>
                         Categories List
                     </Typography>
                     {loading && categories.length === 0 ? (
@@ -254,9 +240,7 @@ const ManageCategory = () => {
                             <CircularProgress />
                         </Box>
                     ) : categories.length === 0 ? (
-                        <Typography variant="body1" color="text.secondary">
-                            No categories found
-                        </Typography>
+                        <Typography>No categories found</Typography>
                     ) : (
                         <TableContainer>
                             <Table>
@@ -272,9 +256,7 @@ const ManageCategory = () => {
                                 <TableBody>
                                     {categories.map((category) => (
                                         <TableRow key={category.category_id}>
-                                            <TableCell>
-                                                <Typography fontWeight="medium">{category.name}</Typography>
-                                            </TableCell>
+                                            <TableCell>{category.name}</TableCell>
                                             <TableCell>{category.description || '-'}</TableCell>
                                             <TableCell>
                                                 <Chip
@@ -292,11 +274,7 @@ const ManageCategory = () => {
                                             </TableCell>
                                             <TableCell align="right">
                                                 <Tooltip title="Edit">
-                                                    <IconButton
-                                                        onClick={() => handleEdit(category)}
-                                                        color="primary"
-                                                        sx={{ mr: 1 }}
-                                                    >
+                                                    <IconButton onClick={() => handleEdit(category)} color="primary">
                                                         <EditIcon />
                                                     </IconButton>
                                                 </Tooltip>
@@ -317,23 +295,85 @@ const ManageCategory = () => {
                     )}
                 </Paper>
 
+                {/* Edit Dialog */}
+                <Dialog open={openEditDialog} onClose={handleCloseEditDialog} maxWidth="sm" fullWidth>
+                    <DialogTitle>Edit Category</DialogTitle>
+                    <DialogContent>
+                        <Grid container spacing={3} sx={{ mt: 1 }}>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="Name *"
+                                    name="name"
+                                    value={formData.name}
+                                    onChange={handleInputChange}
+                                    required
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <TextField
+                                    fullWidth
+                                    label="Description"
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleInputChange}
+                                />
+                            </Grid>
+                            <Grid item xs={12}>
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            name="is_active"
+                                            checked={formData.is_active}
+                                            onChange={handleInputChange}
+                                        />
+                                    }
+                                    label="Active"
+                                />
+                                <FormControlLabel
+                                    control={
+                                        <Checkbox
+                                            name="is_liquor"
+                                            checked={formData.is_liquor}
+                                            onChange={handleInputChange}
+                                        />
+                                    }
+                                    label="Liquor Category"
+                                    sx={{ ml: 2 }}
+                                />
+                            </Grid>
+                        </Grid>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={handleCloseEditDialog} startIcon={<CancelIcon />} disabled={loading}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={handleSubmit}
+                            startIcon={<EditIcon />}
+                            variant="contained"
+                            disabled={loading}
+                        >
+                            {loading ? 'Updating...' : 'Update'}
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+
                 {/* Delete Confirmation Dialog */}
                 <Dialog
                     open={openDeleteDialog}
                     onClose={handleCloseDeleteDialog}
-                    aria-labelledby="alert-dialog-title"
-                    aria-describedby="alert-dialog-description"
                 >
-                    <DialogTitle id="alert-dialog-title">Confirm Delete</DialogTitle>
+                    <DialogTitle>Confirm Delete</DialogTitle>
                     <DialogContent>
-                        <DialogContentText id="alert-dialog-description">
+                        <DialogContentText>
                             Are you sure you want to delete this category? This action cannot be undone.
                         </DialogContentText>
                     </DialogContent>
                     <DialogActions>
                         <Button onClick={handleCloseDeleteDialog}>Cancel</Button>
                         <Button onClick={handleDelete} color="error" autoFocus>
-                            Delete
+                            {loading ? 'Deleting...' : 'Delete'}
                         </Button>
                     </DialogActions>
                 </Dialog>
