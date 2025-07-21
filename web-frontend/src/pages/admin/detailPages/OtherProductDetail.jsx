@@ -4,14 +4,14 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import {
     FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit, FaCheckCircle,
-    FaTimesCircle, FaArrowLeft, FaWeightHanging, FaPercentage, FaTag,
-    FaHistory, FaTimes
+    FaTimesCircle, FaArrowLeft, FaWeightHanging, FaPercentage, FaTag
 } from "react-icons/fa";
 import { GiSodaCan } from "react-icons/gi";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../../lib/axios";
 import "../../../styles/OtherProductDetail.css";
 import DeleteOtherProductButton from "../../../components/admin/buttons/DeleteOtherProductButton";
+import ViewProductHistory from "../../../common/ViewProductHistory";
 
 const OtherProductDetail = () => {
     const { id } = useParams();
@@ -20,9 +20,6 @@ const OtherProductDetail = () => {
     const [activeImage, setActiveImage] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showHistoryModal, setShowHistoryModal] = useState(false);
-    const [stockHistory, setStockHistory] = useState([]);
-    const [historyLoading, setHistoryLoading] = useState(false);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -47,35 +44,9 @@ const OtherProductDetail = () => {
         fetchProduct();
     }, [id, navigate]);
 
-    const fetchStockHistory = async () => {
-        try {
-            setHistoryLoading(true);
-            const { data } = await axiosInstance.get(`/stockHistory/getByProductId/${id}`);
-            if (data.success) {
-                setStockHistory(data.data);
-            } else {
-                throw new Error(data.message || "Failed to fetch stock history");
-            }
-        } catch (err) {
-            console.error("Fetch stock history error:", err);
-            toast.error(err.message || "Failed to load stock history");
-        } finally {
-            setHistoryLoading(false);
-        }
-    };
-
     const handleDeleteSuccess = () => {
         toast.success("Product deleted successfully");
         navigate("/other-product-list");
-    };
-
-    const openHistoryModal = async () => {
-        setShowHistoryModal(true);
-        await fetchStockHistory();
-    };
-
-    const closeHistoryModal = () => {
-        setShowHistoryModal(false);
     };
 
     const formatDate = (dateString) => {
@@ -115,88 +86,6 @@ const OtherProductDetail = () => {
                         </span>
                     </div>
                 )}
-            </div>
-        );
-    };
-
-    const renderHistoryModal = () => {
-        if (!showHistoryModal) return null;
-
-        return (
-            <div className="history-modal-overlay mt-4">
-                <div className="history-modal">
-                    <div className="modal-header">
-                        <h3>
-                            <FaHistory className="me-2 mx-3" />
-                            Stock History for {product.name}
-                        </h3>
-                        <button onClick={closeHistoryModal} className="close-button">
-                            <FaTimes />
-                        </button>
-                    </div>
-
-                    <div className="modal-content">
-                        {historyLoading ? (
-                            <div className="loading-indicator">
-                                <div className="spinner"></div>
-                                <p>Loading history...</p>
-                            </div>
-                        ) : stockHistory.length > 0 ? (
-                            <div className="history-table-container">
-                                <table className="history-table">
-                                    <thead>
-                                        <tr>
-                                            <th>Type</th>
-                                            <th>Quantity</th>
-                                            <th>User</th>
-                                            <th>Creation date</th>
-                                            <th>Updated date</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {stockHistory.map((history, index) => (
-                                            <tr key={index}>
-                                                <td
-                                                    className={`history-type ${history.type?.toLowerCase() === 'add items'
-                                                        ? 'text-success'
-                                                        : history.type?.toLowerCase() === 'remove items'
-                                                            ? 'text-danger'
-                                                            : ''
-                                                        }`}
-                                                >
-                                                    {history.type?.toLowerCase() === 'add items'
-                                                        ? 'Added'
-                                                        : history.type?.toLowerCase() === 'remove items'
-                                                            ? 'Removed'
-                                                            : history.type || 'Unknown'}
-                                                </td>
-
-                                                <td className={history.type?.toLowerCase() === 'add items' ? 'text-success' : 'text-danger'}>
-                                                    {history.type?.toLowerCase() === 'add items' ? `+${history.quantity}` : `-${history.quantity}`}
-                                                </td>
-
-                                                <td>{history.userId?.name || 'System'}</td>
-                                                <td>{formatDate(history.createdAt)}</td>
-                                                <td>{formatDate(history.updatedAt)}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
-                        ) : (
-                            <div className="no-history">
-                                <FaBoxOpen size={32} />
-                                <p>No stock history available for this product</p>
-                            </div>
-                        )}
-                    </div>
-
-                    <div className="modal-footer">
-                        <button onClick={closeHistoryModal} className="close-modal-btn">
-                            Close
-                        </button>
-                    </div>
-                </div>
             </div>
         );
     };
@@ -399,13 +288,7 @@ const OtherProductDetail = () => {
                                     Edit Product
                                 </button>
 
-                                <button
-                                    className="btn-history"
-                                    onClick={openHistoryModal}
-                                >
-                                    <FaHistory className="me-2" />
-                                    View Stock History
-                                </button>
+                                <ViewProductHistory productId={id} productName={product.name} />
 
                                 <DeleteOtherProductButton
                                     id={id}
@@ -415,8 +298,6 @@ const OtherProductDetail = () => {
                             </div>
                         </div>
                     </div>
-
-                    {renderHistoryModal()}
                 </>
             ) : null}
         </div>

@@ -7,6 +7,7 @@ import "../../../styles/LiquorProductDetail.css";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../../lib/axios";
 import DeleteLiquorButton from "../../../components/admin/buttons/DeleteLiquorButton";
+import ViewProductHistory from "../../../common/ViewProductHistory";
 
 const LiquorProductDetail = () => {
     const { id } = useParams();
@@ -181,9 +182,11 @@ const LiquorProductDetail = () => {
                                         className="edit-button d-flex align-items-center gap-2 px-3 py-2"
                                         onClick={() => navigate(`/products/edit/${id}`)}
                                     >
-                                        <FaEdit/>
+                                        <FaEdit />
                                         Edit
                                     </button>
+
+                                    <ViewProductHistory productId={id} productName={product.name} />
 
                                     <DeleteLiquorButton
                                         id={id}
