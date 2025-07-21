@@ -3,6 +3,7 @@ import CategoryService from '../services/category.service.js';
 import populateCategory from '../utils/populateCategory.js';
 import { uploadImages } from '../utils/firebaseStorage.js';
 import { validateStockOperation } from '../utils/stockCalculator.js';
+import { validatePriceOperation } from '../utils/priceCalculator.js';
 import { createStockHistory } from './stockHistory.controller.js';
 
 const categoryService = new CategoryService();
@@ -167,35 +168,12 @@ const updateProduct = async (req, res) => {
         }
 
         // update price
-        let discount = product.discount_amount;
-        let markedPrice = product.marked_price;
-        let discountPercentage = product.discount_percentage;
-        let isUpdatingPrice = false;
-        if (marked_price !== undefined) {
-            markedPrice = marked_price;
-            isUpdatingPrice = true;
-        }
-        if (discount_percentage !== undefined){
-            discountPercentage = discount_percentage;
-            isUpdatingPrice = true;
-        }
+        const markedPrice = marked_price ?? product.marked_price;
+        const discountPercentage = discount_percentage ?? product.discount_percentage;
 
-        if (isUpdatingPrice){
-            if (discountPercentage > 0) {
-                discount = markedPrice * (discountPercentage / 100);
-            } else if (discountPercentage === 0) {
-                discount = 0;
-            } else {
-                discount = 0;
-            }
-        }
-
-        if (req.body.selling_price) {
-            delete req.body.selling_price;
-        }
-
-        if (req.body.discount_amount) {
-            delete req.body.discount_amount;
+        const updatedPrices = validatePriceOperation(markedPrice, discountPercentage);
+        if (!updatedPrices.isValid) {
+            return res.status(400).json({ success: false, message: stockValidation.error });
         }
 
         // quantity update
@@ -211,12 +189,7 @@ const updateProduct = async (req, res) => {
 
         // update history 
         let historyId = '';
-        let isUpdatingHistory = false;
         if (add_quantity !== undefined || withdraw_quantity !== undefined) {
-            isUpdatingHistory = true;
-        }
-        
-        if (isUpdatingHistory) {
             const stockUpdateResult  = await createStockHistory({ 
                 addQuantity: add_quantity,
                 withdrawQuantity: withdraw_quantity,
@@ -230,9 +203,14 @@ const updateProduct = async (req, res) => {
             historyId = stockUpdateResult.historyId;
         }
 
+        if (req.body.selling_price || req.body.discount_amount) {
+            if (req.body.selling_price) delete req.body.selling_price;
+            if (req.body.discount_amount) delete req.body.discount_amount;
+        }
+
         const updateData = { 
-            selling_price: markedPrice - discount,
-            discount_amount: discount,
+            selling_price: updatedPrices.newPrice,
+            discount_amount: updatedPrices.discount,
             stock_quantity: stockValidation.newStock,
             ...req.body
         };
