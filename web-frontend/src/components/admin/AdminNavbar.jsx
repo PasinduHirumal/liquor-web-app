@@ -206,6 +206,10 @@ const AdminNavbar = () => {
                             )}
                         </Box>
 
+                        <StyledNavLink to="/category" onClick={closeMobileMenu}>
+                            Manage Category
+                        </StyledNavLink>
+
                         <StyledNavLink
                             to={`/admin/profile/${user?._id || user?.id}`}
                             onClick={closeMobileMenu}
@@ -213,6 +217,7 @@ const AdminNavbar = () => {
                         >
                             Profile
                         </StyledNavLink>
+
 
                         <Button variant="contained" color="error" startIcon={<LogoutIcon />} onClick={handleLogout}>
                             Logout
@@ -336,6 +341,10 @@ const AdminNavbar = () => {
                                     </Box>
                                 </Collapse>
                             </List>
+
+                            <StyledNavLink to="/category" onClick={closeMobileMenu} sx={{ mb: 2 }}>
+                                Manage Category
+                            </StyledNavLink>
 
                             <StyledNavLink
                                 to={`/admin/profile/${user?._id || user?.id}`}
