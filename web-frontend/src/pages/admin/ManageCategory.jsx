@@ -2,31 +2,11 @@ import { useState, useEffect } from 'react';
 import { axiosInstance } from '../../lib/axios';
 import toast from 'react-hot-toast';
 import {
-    Container,
-    Typography,
-    Paper,
-    Box,
-    Grid,
-    TextField,
-    FormControlLabel,
-    Checkbox,
-    Button,
-    Table,
-    TableBody,
-    TableCell,
-    TableContainer,
-    TableHead,
-    TableRow,
-    CircularProgress,
-    Chip,
-    Dialog,
-    DialogTitle,
-    DialogContent,
-    DialogActions,
-    DialogContentText,
-    IconButton,
-    Tooltip
+    Container, Typography, Paper, Box, Grid, TextField, FormControlLabel, Checkbox, Button, Table, TableBody, TableCell,
+    TableContainer, TableHead, TableRow, CircularProgress, Chip, Dialog, DialogTitle, DialogContent, DialogActions,
+    DialogContentText, IconButton, Tooltip, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
+
 import {
     Edit as EditIcon,
     Delete as DeleteIcon,
@@ -49,6 +29,11 @@ const theme = createTheme({
 const ManageCategory = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
+
+    const [filters, setFilters] = useState({
+        is_active: '',
+    });
+
     const [formData, setFormData] = useState({
         name: '',
         description: '',
@@ -65,7 +50,10 @@ const ManageCategory = () => {
     const fetchCategories = async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get('/categories/getAll');
+            const params = {};
+            if (filters.is_active !== '') params.is_active = filters.is_active;
+
+            const response = await axiosInstance.get('/categories/getAll', { params });
             setCategories(response.data.data);
         } catch (error) {
             toast.error(error.response?.data?.message || 'Failed to fetch categories');
@@ -76,7 +64,15 @@ const ManageCategory = () => {
 
     useEffect(() => {
         fetchCategories();
-    }, []);
+    }, [filters]);
+
+    const handleFilterChange = (e) => {
+        const { name, value } = e.target;
+        setFilters((prev) => ({
+            ...prev,
+            [name]: value,
+        }));
+    };
 
     const handleInputChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -186,6 +182,25 @@ const ManageCategory = () => {
                     >
                         Create Category
                     </Button>
+                </Box>
+
+                {/* Filters */}
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mb: 2 }}>
+                    <FormControl size="small" sx={{ minWidth: 200 }}>
+                        <InputLabel id="filter-status-label">Filter By Status</InputLabel>
+                        <Select
+                            labelId="filter-status-label"
+                            id="filter-status"
+                            name="is_active"
+                            value={filters.is_active}
+                            label="Filter By Status"
+                            onChange={handleFilterChange}
+                        >
+                            <MenuItem value="">All</MenuItem>
+                            <MenuItem value="true">Active</MenuItem>
+                            <MenuItem value="false">Inactive</MenuItem>
+                        </Select>
+                    </FormControl>
                 </Box>
 
                 {/* Category List */}
