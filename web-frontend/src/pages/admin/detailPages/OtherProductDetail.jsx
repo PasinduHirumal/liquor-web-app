@@ -156,19 +156,28 @@ const OtherProductDetail = () => {
                                     <tbody>
                                         {stockHistory.map((history, index) => (
                                             <tr key={index}>
-                                                <td className={`history-type ${history.type === 'add items' ? 'text-success' : history.type === 'remove items' ? 'text-danger' : ''}`}>
-                                                    {history.type}
+                                                <td
+                                                    className={`history-type ${history.type?.toLowerCase() === 'add items'
+                                                        ? 'text-success'
+                                                        : history.type?.toLowerCase() === 'remove items'
+                                                            ? 'text-danger'
+                                                            : ''
+                                                        }`}
+                                                >
+                                                    {history.type?.toLowerCase() === 'add items'
+                                                        ? 'Added'
+                                                        : history.type?.toLowerCase() === 'remove items'
+                                                            ? 'Removed'
+                                                            : history.type || 'Unknown'}
                                                 </td>
-                                                <td>{history.quantity}</td>
-                                                <td>
-                                                    {history.userId?.name || 'System'}
+
+                                                <td className={history.type?.toLowerCase() === 'add items' ? 'text-success' : 'text-danger'}>
+                                                    {history.type?.toLowerCase() === 'add items' ? `+${history.quantity}` : `-${history.quantity}`}
                                                 </td>
-                                                <td>
-                                                    {formatDate(history.createdAt)}
-                                                </td>
-                                                <td>
-                                                    {formatDate(history.updatedAt)}
-                                                </td>
+
+                                                <td>{history.userId?.name || 'System'}</td>
+                                                <td>{formatDate(history.createdAt)}</td>
+                                                <td>{formatDate(history.updatedAt)}</td>
                                             </tr>
                                         ))}
                                     </tbody>
