@@ -31,13 +31,7 @@ class OtherProducts {
         this.updated_at = data.updated_at;
     }
 
-    // Helper methods
-    getDiscountedPrice() {
-        if (this.discount_percentage > 0) {
-            return this.selling_price * (1 - this.discount_percentage / 100);
-        }
-        return this.selling_price - this.discount_amount;
-    }
+
 }
 
 export default OtherProducts;

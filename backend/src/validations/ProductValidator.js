@@ -9,8 +9,47 @@ const validateProduct = (req, res, next) => {
     brand: Joi.string().min(1).max(100).required(),
     alcohol_content: Joi.number().min(0).max(100).required(),
     volume: Joi.number().positive().required(),
-    images: Joi.array().items(Joi.string().uri()).min(1).default([]),
-    price: Joi.number().positive().required(),
+    images: Joi.alternatives().try(
+                Joi.string().uri(),
+                Joi.string().pattern(/^data:.*;base64,.*/),
+                Joi.object({
+                    buffer: Joi.binary().required(),
+                    mimetype: Joi.string().valid(
+                        'image/jpeg', 
+                        'image/jpg', 
+                        'image/png', 
+                        'image/gif', 
+                        'image/webp'
+                    ).required(),
+                    originalname: Joi.string().required(),
+                    size: Joi.number().max(5 * 1024 * 1024).optional()
+                }),
+                Joi.array().items(
+                    Joi.alternatives().try(
+                        Joi.string().uri(),
+                        Joi.string().pattern(/^data:.*;base64,.*/),
+                        Joi.object({
+                            buffer: Joi.binary().required(),
+                            mimetype: Joi.string().valid(
+                                'image/jpeg', 
+                                'image/jpg', 
+                                'image/png', 
+                                'image/gif', 
+                                'image/webp'
+                            ).required(),
+                            originalname: Joi.string().required(),
+                            size: Joi.number().max(5 * 1024 * 1024).optional()
+                        })
+                    )
+                ).max(10)
+            ).required(),
+
+    // Pricing
+    cost_price: Joi.number().positive().required(),
+    marked_price: Joi.number().positive().required(),
+    selling_price: Joi.number().positive().optional(),
+    discount_percentage: Joi.number().min(0).max(100).required(),
+    discount_amount: Joi.number().min(0).optional(),
     
     add_quantity: Joi.number().integer().min(0).default(0),
     withdraw_quantity: Joi.number().integer().min(0).default(0),
@@ -59,8 +98,40 @@ const validateProductUpdate = (req, res, next) => {
     brand: Joi.string().min(1).max(100).optional(),
     alcohol_content: Joi.number().min(0).max(100).optional(),
     volume: Joi.number().positive().optional(),
-    images: Joi.array().items(Joi.string().uri()).min(1).optional(),
-    price: Joi.number().positive().optional(),
+    images: Joi.alternatives().try(
+                Joi.string().uri(),
+                Joi.string().pattern(/^data:.*;base64,.*/),
+                Joi.object({
+                    buffer: Joi.binary().required(),
+                    mimetype: Joi.string().valid(
+                        'image/jpeg', 
+                        'image/jpg', 
+                        'image/png', 
+                        'image/gif', 
+                        'image/webp'
+                    ).required(),
+                    originalname: Joi.string().required(),
+                    size: Joi.number().max(5 * 1024 * 1024).optional()
+                }),
+                Joi.array().items(
+                    Joi.alternatives().try(
+                        Joi.string().uri(),
+                        Joi.string().pattern(/^data:.*;base64,.*/),
+                        Joi.object({
+                            buffer: Joi.binary().required(),
+                            mimetype: Joi.string().valid(
+                                'image/jpeg', 
+                                'image/jpg', 
+                                'image/png', 
+                                'image/gif', 
+                                'image/webp'
+                            ).required(),
+                            originalname: Joi.string().required(),
+                            size: Joi.number().max(5 * 1024 * 1024).optional()
+                        })
+                    )
+                ).max(10)
+            ).optional(),
     
     is_active: Joi.boolean().optional(),
     is_in_stock: Joi.boolean().optional(),
@@ -129,4 +200,36 @@ const validateInventoryUpdate = (req, res, next) => {
   next();
 };
 
-export { validateProduct, validateProductUpdate, validateInventoryUpdate };
+// Additional validator for quantity operations (if needed separately)
+const validatePriceOperation = (req, res, next) => {
+  const schema = Joi.object({
+    // Pricing
+    cost_price: Joi.number().positive().optional(),
+    marked_price: Joi.number().positive().optional(),
+    discount_percentage: Joi.number().min(0).max(100).optional(),
+  })
+  .min(1) // Require at least one quantity field
+  .options({ stripUnknown: true });
+
+  const { error, value } = schema.validate(req.body, {
+    allowUnknown: false,
+    abortEarly: false
+  });
+
+  if (error) {
+    return res.status(400).json({ 
+        success: false,
+        message: "Validation failed",
+        errors: error.details.map(detail => ({
+          field: detail.path.join('.'),
+          message: detail.message,
+          value: detail.context?.value
+        }))
+    });
+  }
+
+  req.body = value;
+  next();
+};
+
+export { validateProduct, validateProductUpdate, validateInventoryUpdate, validatePriceOperation };
