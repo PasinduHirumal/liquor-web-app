@@ -83,11 +83,11 @@ const UserNavbar = () => {
             </StyledNavLink>
 
             <StyledNavLink to="/liquor-all" onClick={closeMobileMenu}>
-              Liquors
+              Liquors Items
             </StyledNavLink>
 
             <StyledNavLink to="/other-product-all" onClick={closeMobileMenu}>
-              Other Products
+              Grocery Items
             </StyledNavLink>
 
             <StyledNavLink to="/address" onClick={closeMobileMenu}>
@@ -151,11 +151,11 @@ const UserNavbar = () => {
               </StyledNavLink>
 
               <StyledNavLink to="/liquor-all" onClick={closeMobileMenu}>
-                Liquors
+                Liquors Items
               </StyledNavLink>
 
               <StyledNavLink to="/other-product-all" onClick={closeMobileMenu}>
-                Other Products
+                Grocery Items
               </StyledNavLink>
 
               <StyledNavLink to="/address" onClick={closeMobileMenu}>
