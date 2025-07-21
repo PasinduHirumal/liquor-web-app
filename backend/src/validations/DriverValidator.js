@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { defaultNullImageSchema, optionalImageSchema } from './imageValidationSchemas';
 
 // CREATE VALIDATOR - With defaults
 const validateDriver = (req, res, next) => {
@@ -17,7 +18,7 @@ const validateDriver = (req, res, next) => {
       Joi.string().isoDate(),
       Joi.valid(null)
     ).required(),
-    profileImage: Joi.string().uri().allow('').optional(),
+    profileImage: optionalImageSchema,
     address: Joi.string().max(350).allow('').default(null),
     city: Joi.string().max(100).allow('').default(null),
     emergencyContact: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).allow('').default(null),
@@ -114,11 +115,11 @@ const validateDriver = (req, res, next) => {
 
     // Documents
     documents: Joi.object({
-      licenseImage: Joi.string().uri().allow(null).default(null),
-      nicImage: Joi.string().uri().allow(null).default(null),
-      vehicleRegistrationImage: Joi.string().uri().allow(null).default(null),
-      insuranceImage: Joi.string().uri().allow(null).default(null),
-      bankStatementImage: Joi.string().uri().allow(null).default(null)
+      licenseImage: defaultNullImageSchema,
+      nicImage: defaultNullImageSchema,
+      vehicleRegistrationImage: defaultNullImageSchema,
+      insuranceImage: defaultNullImageSchema,
+      bankStatementImage: defaultNullImageSchema,
     }).default({
       licenseImage: null,
       nicImage: null,
@@ -189,7 +190,7 @@ const validateDriverUpdate = (req, res, next) => {
       Joi.string().isoDate(),
       Joi.valid(null)
     ).optional(),
-    profileImage: Joi.string().uri().allow('').optional(),
+    profileImage: optionalImageSchema,
     address: Joi.string().max(350).allow('').optional(),
     city: Joi.string().max(100).allow('').optional(),
     emergencyContact: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).allow('').optional(),
@@ -286,11 +287,11 @@ const validateDriverUpdate = (req, res, next) => {
 
     // Documents
     documents: Joi.object({
-      licenseImage: Joi.string().uri().allow(null).optional(),
-      nicImage: Joi.string().uri().allow(null).optional(),
-      vehicleRegistrationImage: Joi.string().uri().allow(null).optional(),
-      insuranceImage: Joi.string().uri().allow(null).optional(),
-      bankStatementImage: Joi.string().uri().allow(null).optional()
+      licenseImage: optionalImageSchema,
+      nicImage: optionalImageSchema,
+      vehicleRegistrationImage: optionalImageSchema,
+      insuranceImage: optionalImageSchema,
+      bankStatementImage: optionalImageSchema
     }).optional(),
 
     // Verification & Security

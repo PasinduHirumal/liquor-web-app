@@ -75,6 +75,7 @@ const getAllDrivers = async (req, res) => {
         } else {
             filteredDrivers = drivers;
         }
+        
         return res.status(200).json({ 
             success: true, 
             message: "Drivers fetched successfully",

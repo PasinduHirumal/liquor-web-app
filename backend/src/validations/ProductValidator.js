@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { optionalImageSchema, requiredImageSchema } from './imageValidationSchemas';
 
 // CREATE VALIDATOR - With defaults
 const validateProduct = (req, res, next) => {
@@ -9,40 +10,7 @@ const validateProduct = (req, res, next) => {
     brand: Joi.string().min(1).max(100).required(),
     alcohol_content: Joi.number().min(0).max(100).required(),
     volume: Joi.number().positive().required(),
-    images: Joi.alternatives().try(
-                Joi.string().uri(),
-                Joi.string().pattern(/^data:.*;base64,.*/),
-                Joi.object({
-                    buffer: Joi.binary().required(),
-                    mimetype: Joi.string().valid(
-                        'image/jpeg', 
-                        'image/jpg', 
-                        'image/png', 
-                        'image/gif', 
-                        'image/webp'
-                    ).required(),
-                    originalname: Joi.string().required(),
-                    size: Joi.number().max(5 * 1024 * 1024).optional()
-                }),
-                Joi.array().items(
-                    Joi.alternatives().try(
-                        Joi.string().uri(),
-                        Joi.string().pattern(/^data:.*;base64,.*/),
-                        Joi.object({
-                            buffer: Joi.binary().required(),
-                            mimetype: Joi.string().valid(
-                                'image/jpeg', 
-                                'image/jpg', 
-                                'image/png', 
-                                'image/gif', 
-                                'image/webp'
-                            ).required(),
-                            originalname: Joi.string().required(),
-                            size: Joi.number().max(5 * 1024 * 1024).optional()
-                        })
-                    )
-                ).max(10)
-            ).required(),
+    images: requiredImageSchema,
 
     // Pricing
     cost_price: Joi.number().positive().required(),
@@ -98,40 +66,7 @@ const validateProductUpdate = (req, res, next) => {
     brand: Joi.string().min(1).max(100).optional(),
     alcohol_content: Joi.number().min(0).max(100).optional(),
     volume: Joi.number().positive().optional(),
-    images: Joi.alternatives().try(
-                Joi.string().uri(),
-                Joi.string().pattern(/^data:.*;base64,.*/),
-                Joi.object({
-                    buffer: Joi.binary().required(),
-                    mimetype: Joi.string().valid(
-                        'image/jpeg', 
-                        'image/jpg', 
-                        'image/png', 
-                        'image/gif', 
-                        'image/webp'
-                    ).required(),
-                    originalname: Joi.string().required(),
-                    size: Joi.number().max(5 * 1024 * 1024).optional()
-                }),
-                Joi.array().items(
-                    Joi.alternatives().try(
-                        Joi.string().uri(),
-                        Joi.string().pattern(/^data:.*;base64,.*/),
-                        Joi.object({
-                            buffer: Joi.binary().required(),
-                            mimetype: Joi.string().valid(
-                                'image/jpeg', 
-                                'image/jpg', 
-                                'image/png', 
-                                'image/gif', 
-                                'image/webp'
-                            ).required(),
-                            originalname: Joi.string().required(),
-                            size: Joi.number().max(5 * 1024 * 1024).optional()
-                        })
-                    )
-                ).max(10)
-            ).optional(),
+    images: optionalImageSchema,
     
     is_active: Joi.boolean().optional(),
     is_in_stock: Joi.boolean().optional(),
