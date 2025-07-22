@@ -121,7 +121,7 @@ const updateAdmin = async (req, res) => {
             isUpdatingTokenValue = true;
         }
 
-        let updateData = { ...req.body };
+        const updateData = { ...req.body };
         
         // Handle isAdminAccepted logic
         if (updateData.isAdminAccepted === true && admin.role === ADMIN_ROLES.PENDING) {
@@ -130,7 +130,7 @@ const updateAdmin = async (req, res) => {
         }
 
         // Update the admin
-        let updatedAdmin = await adminService.updateById(admin.id, updateData);
+        const updatedAdmin = await adminService.updateById(admin.id, updateData);
         if (!updatedAdmin) {
             return res.status(400).json({ success: false, message: "Failed to update admin"});
         }
