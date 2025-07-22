@@ -20,7 +20,8 @@ const createDefaultSuperAdmin = async () => {
 
                 role: 'super_admin',
                 isAccountVerified: true,
-                isAdminAccepted: true
+                isAdminAccepted: true,
+                isActive: true
             };
 
             await adminService.create(superAdminData);

@@ -112,13 +112,13 @@ const updateAdmin = async (req, res) => {
             }
 
             // Validate role value
-            if (!Object.values(ADMIN_ROLES).includes(req.body.role)) {
+            if (req.body.role && !Object.values(ADMIN_ROLES).includes(req.body.role)) {
                 return res.status(400).json({ success: false, message: "Invalid role value" });
             }
         }
 
         let isUpdatingTokenValue = false;
-        if (req.body.role && isUpdatingSelf) {
+        if ((req.body.role && isUpdatingSelf) || (isActive && isUpdatingSelf)) {
             isUpdatingTokenValue = true;
         }
 
