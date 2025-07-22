@@ -123,9 +123,6 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
 
     return (
         <Card>
-            <Card.Header>
-                <h5 className="mb-0">Create New Liquor Product</h5>
-            </Card.Header>
             <Card.Body>
                 <Formik
                     initialValues={{
