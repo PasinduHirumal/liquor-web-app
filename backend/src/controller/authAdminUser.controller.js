@@ -37,7 +37,8 @@ const login = async (req, res) => {
         let user;
         if (email !== undefined) {
             user = await adminService.findByEmail(email);
-        } else if (phone !== undefined) {
+        } 
+        else if (phone !== undefined) {
             user = await adminService.findByPhone(phone);
         }
         
@@ -55,7 +56,11 @@ const login = async (req, res) => {
         }
 
         if (!user.isAdminAccepted) {
-            return res.status(400).json({ success: false, message: "Your account is at pending" });
+            return res.status(400).json({ success: false, message: "Your account is not accepted by admin panel" });
+        }
+
+        if (!user.isActive) {
+            return res.status(400).json({ success: false, message: "Your account is not in active" });
         }
 
         // create JWT token
@@ -69,9 +74,9 @@ const login = async (req, res) => {
         generateToken(payload, res); 
 
         // block password displaying
-        user.password = undefined;
+        const { password: userPassword, ...adminWithoutPassword } = user;
 
-        return res.status(200).json({ success: true, message: "Login successful", data: user });
+        return res.status(200).json({ success: true, message: "Login successful", data: adminWithoutPassword });
     } catch (error) {
         console.error('Login error:', error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
