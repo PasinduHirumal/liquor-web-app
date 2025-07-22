@@ -85,6 +85,7 @@ const updateAdmin = async (req, res) => {
 	try {
         const adminIdToUpdate = req.params.id;
         const currentUserId = req.user.id;
+        const { email, phone, isActive, isAdminAccepted, isAccountVerified } = req.body;
 
         const admin = await adminService.findById(adminIdToUpdate);
         if (!admin) {
@@ -104,7 +105,7 @@ const updateAdmin = async (req, res) => {
         }
         
         // Role change restrictions
-        if (req.body.role || req.body.isAdminAccepted || req.body.isActive || req.body.isAccountVerified) {
+        if (req.body.role || isAdminAccepted || isActive || isAccountVerified) {
             // Only super admin can change roles
             if (!isSuperAdmin) {
                 return res.status(403).json({ success: false, message: "Not authorized to change roles" });
@@ -122,6 +123,10 @@ const updateAdmin = async (req, res) => {
         }
 
         const updateData = { ...req.body };
+
+        if (email !== undefined || phone !== undefined) {
+            updateData.isAccountVerified = false;
+        }
         
         // Handle isAdminAccepted logic
         if (updateData.isAdminAccepted === true && admin.role === ADMIN_ROLES.PENDING) {

@@ -129,6 +129,7 @@ const updateDriver = async (req, res) => {
 	try {
         const driverId = req.params.id;
         const currentUserId = req.user.id;
+        const { email, phone, isActive, isDocumentVerified, isAccountVerified } = req.body;
 
         const driver = await driverService.findById(driverId);
         if (!driver) {
@@ -144,8 +145,20 @@ const updateDriver = async (req, res) => {
             return res.status(403).json({ success: false, message: "Not authorized to update" });
         }
 
-        const driverData = { ...req.body };
-        const updatedDriver = await driverService.updateById(driverId, driverData)
+        // Only super admin can change these
+        if (isActive || isDocumentVerified || isAccountVerified) {
+            if (!isSuperAdmin) {
+                return res.status(403).json({ success: false, message: "Not authorized to change roles" });
+            }
+        }
+
+        const updateData = { ...req.body };
+
+        if (email !== undefined || phone !== undefined) {
+            updateData.isAccountVerified = false;
+        }
+
+        const updatedDriver = await driverService.updateById(driverId, updateData);
 
         const { password, ...driverWithoutPassword } = updatedDriver;
 

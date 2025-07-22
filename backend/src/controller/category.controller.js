@@ -42,22 +42,25 @@ const getCategoryById = async (req, res) => {
 
 const getAllCategories = async (req, res) => {
 	try {
-        const { is_active } = req.query;
+        const { is_active, is_liquor } = req.query;
 
         const categories = await categoryService.findAll();
         if (!categories) {
             return res.status(400).json({ success: false, message: "Failed to fetch categories"});
         }
         
-        let filteredCategories;
+        let filteredCategories = categories;
         let filterDescription = [];
+
         if (is_active !== undefined) {
-            // Convert string to boolean since query params are strings
             const isActiveBoolean = is_active === 'true';
-            filteredCategories = categories.filter(category => category.is_active === isActiveBoolean);
+            filteredCategories = filteredCategories.filter(category => category.is_active === isActiveBoolean);
             filterDescription.push(`isActive: ${is_active}`);
-        } else {
-            filteredCategories = categories;
+        }
+        if (is_liquor !== undefined) {
+            const isActiveBoolean = is_liquor === 'true';
+            filteredCategories = filteredCategories.filter(category => category.is_liquor === isActiveBoolean);
+            filterDescription.push(`is_liquor: ${is_liquor}`);
         }
 
         return res.status(200).json({ 
