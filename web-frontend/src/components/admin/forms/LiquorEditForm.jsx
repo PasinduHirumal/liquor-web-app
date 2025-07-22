@@ -184,7 +184,7 @@ const LiquorEditForm = () => {
         e.preventDefault();
 
         const { add_quantity, withdraw_quantity } = formData;
-        const currentStock = formData.stock_quantity - (add_quantity || 0) + (withdraw_quantity || 0);
+        const currentStock = formData.stock_quantity + (add_quantity || 0) - (withdraw_quantity || 0);
 
         if (currentStock < 0) {
             setErrors({ stock_quantity: "Insufficient stock for this operation" });
