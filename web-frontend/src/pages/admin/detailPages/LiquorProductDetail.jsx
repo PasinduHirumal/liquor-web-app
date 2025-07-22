@@ -2,7 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit, FaCheckCircle, FaTimesCircle, FaArrowLeft } from "react-icons/fa";
+import {
+    FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit,
+    FaCheckCircle, FaTimesCircle, FaArrowLeft, FaPercentage
+} from "react-icons/fa";
 import "../../../styles/LiquorProductDetail.css";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../../lib/axios";
@@ -20,8 +23,11 @@ const LiquorProductDetail = () => {
         const fetchProduct = async () => {
             try {
                 const res = await axiosInstance.get(`/products/getProductById/${id}`);
-                setProduct(res.data.data);
-                setActiveImage(res.data.data.images?.[0] || null);
+                const productData = res.data?.data;
+                if (!productData) throw new Error("Product not found");
+
+                setProduct(productData);
+                setActiveImage(productData.images?.[0] || null);
             } catch (err) {
                 toast.error("Failed to load product details. Please try again later.");
                 navigate("/liquor-list");
@@ -31,11 +37,36 @@ const LiquorProductDetail = () => {
         };
 
         fetchProduct();
-    }, [id]);
+    }, [id, navigate]);
 
     const handleDeleteSuccess = () => {
+        toast.success("Product deleted successfully");
         navigate("/liquor-list");
     };
+
+    const formatDate = (dateStr) => {
+        if (!dateStr) return "N/A";
+        try {
+            return new Date(dateStr).toLocaleDateString('en-US', {
+                year: "numeric",
+                month: "short",
+                day: "numeric",
+                hour: "2-digit",
+                minute: "2-digit"
+            });
+        } catch {
+            return "Invalid date";
+        }
+    };
+
+    const getDiscountPercentage = () => {
+        const marked = product.marked_price;
+        const selling = product.selling_price;
+        if (!marked || !selling || marked <= selling) return null;
+        return Math.round(((marked - selling) / marked) * 100);
+    };
+
+    const discountPercentage = product ? getDiscountPercentage() : null;
 
     return (
         <div className="container-fluid px-4 pb-2 mt-3">
@@ -43,9 +74,9 @@ const LiquorProductDetail = () => {
                 <div className="product-detail-loading">
                     <div className="loading-left">
                         <Skeleton height={400} />
-                        <div className="loading-thumbnails">
-                            {[1, 2, 3].map((item) => (
-                                <Skeleton key={item} height={60} width={60} />
+                        <div className="loading-thumbnails mt-3">
+                            {[1, 2, 3].map((_, i) => (
+                                <Skeleton key={i} height={60} width={60} />
                             ))}
                         </div>
                     </div>
@@ -57,11 +88,13 @@ const LiquorProductDetail = () => {
             ) : product ? (
                 <>
                     <div className="product-header d-flex align-items-center gap-4">
-                        <button onClick={() => navigate(-1)} className="btn btn-outline-dark d-flex align-items-center gap-2">
+                        <button
+                            onClick={() => navigate(-1)}
+                            className="btn btn-outline-dark d-flex align-items-center gap-2"
+                        >
                             <FaArrowLeft />
                             Back
                         </button>
-
                         <h1>{product.name}</h1>
                     </div>
 
@@ -91,7 +124,7 @@ const LiquorProductDetail = () => {
                                     {product.images.map((img, index) => (
                                         <div
                                             key={index}
-                                            className={`thumbnail ${activeImage === img ? 'active' : ''}`}
+                                            className={`thumbnail ${activeImage === img ? "active" : ""}`}
                                             onClick={() => setActiveImage(img)}
                                         >
                                             <img
@@ -109,15 +142,31 @@ const LiquorProductDetail = () => {
 
                         {/* Product Details */}
                         <div className="product-info">
-                            <div className="price-section">
-                                <span className="current-price">${product.price?.toFixed(2)}</span>
-                                {product.originalPrice && product.originalPrice > product.price && (
-                                    <span className="original-price">${product.originalPrice.toFixed(2)}</span>
+                            {/* Price & Discount */}
+                            <div className="price-section d-flex align-items-center gap-3 flex-wrap m-0">
+                                <span className="current-price text-success">
+                                    ${product.selling_price?.toFixed(2) || "N/A"}
+                                </span>
+
+                                {product.marked_price > product.selling_price && (
+                                    <>
+                                        <span className="original-price text-muted text-decoration-line-through">
+                                            ${product.marked_price?.toFixed(2)}
+                                        </span>
+
+                                        {discountPercentage && (
+                                            <span className="badge bg-danger d-flex align-items-center gap-1 px-2 py-1">
+                                                <FaPercentage />
+                                                {discountPercentage}% OFF
+                                            </span>
+                                        )}
+                                    </>
                                 )}
                             </div>
 
-                            <div className="availability-section">
-                                <div className={`stock-status ${product.is_in_stock ? 'in-stock' : 'out-of-stock'}`}>
+                            {/* Stock */}
+                            <div className="availability-section m-0">
+                                <div className={`stock-status ${product.is_in_stock ? "in-stock" : "out-of-stock"}`}>
                                     {product.is_in_stock ? (
                                         <>
                                             <FaCheckCircle className="status-icon" />
@@ -132,23 +181,27 @@ const LiquorProductDetail = () => {
                                 </div>
                                 <div className="stock-quantity">
                                     <FaBoxOpen className="quantity-icon" />
-                                    <span>{product.stock_quantity} units available</span>
+                                    <span>{product.stock_quantity || 0} units available</span>
                                 </div>
                             </div>
 
-                            <div className="description-section">
+                            {/* Description */}
+                            <div className="description-section m-0">
                                 <h3>Description</h3>
                                 <p>{product.description || "No description provided."}</p>
                             </div>
 
-                            <div className="details-grid">
+                            {/* Metadata Grid */}
+                            <div className="details-grid m-0">
                                 <div className="detail-item">
                                     <span className="detail-label">Category:</span>
-                                    <span className="detail-value">{product.category_id?.name || "Uncategorized"}</span>
+                                    <span className="detail-value">
+                                        {product.category_id?.name || "Uncategorized"}
+                                    </span>
                                 </div>
                                 <div className="detail-item">
                                     <span className="detail-label">ABV:</span>
-                                    <span className="detail-value">{product.alcohol_content || "N/A"}%</span>
+                                    <span className="detail-value">{product.alcohol_content || 0}%</span>
                                 </div>
                                 <div className="detail-item">
                                     <span className="detail-label">Volume:</span>
@@ -156,7 +209,7 @@ const LiquorProductDetail = () => {
                                 </div>
                                 <div className="detail-item">
                                     <span className="detail-label">Status:</span>
-                                    <span className={`detail-value status-badge ${product.is_active ? 'active' : 'inactive'}`}>
+                                    <span className={`detail-value status-badge ${product.is_active ? "active" : "inactive"}`}>
                                         {product.is_active ? "Active" : "Inactive"}
                                     </span>
                                 </div>
@@ -164,44 +217,50 @@ const LiquorProductDetail = () => {
                                     <span className="detail-label">Created:</span>
                                     <span className="detail-value">
                                         <FaCalendarAlt className="calendar-icon" />
-                                        {new Date(product.createdAt).toLocaleDateString()}
+                                        {formatDate(product.created_at)}
                                     </span>
                                 </div>
                                 <div className="detail-item">
                                     <span className="detail-label">Last Updated:</span>
                                     <span className="detail-value">
                                         <FaEdit className="edit-icon" />
-                                        {new Date(product.updatedAt).toLocaleDateString()}
+                                        {formatDate(product.updated_at)}
                                     </span>
                                 </div>
                             </div>
 
-                            <div className="action-buttons">
-                                <div className="action-buttons">
-                                    <button
-                                        className="edit-button d-flex align-items-center gap-2 px-3 py-2"
-                                        onClick={() => navigate(`/products/edit/${id}`)}
-                                    >
-                                        <FaEdit />
-                                        Edit
-                                    </button>
+                            {/* Action Buttons */}
+                            <div className="action-buttons d-flex gap-3 flex-wrap m-0">
+                                <button
+                                    className="edit-button d-flex align-items-center gap-2 px-3 py-2"
+                                    onClick={() => navigate(`/products/edit/${id}`)}
+                                >
+                                    <FaEdit />
+                                    Edit
+                                </button>
 
-                                    <ViewProductHistory productId={id} productName={product.name} />
+                                <ViewProductHistory productId={id} productName={product.name} />
 
-                                    <DeleteLiquorButton
-                                        id={id}
-                                        onSuccess={handleDeleteSuccess}
-                                    />
-                                </div>
+                                <DeleteLiquorButton
+                                    id={id}
+                                    onSuccess={handleDeleteSuccess}
+                                />
                             </div>
                         </div>
                     </div>
                 </>
             ) : (
-                <div className="product-not-found">
-                    <FaTimesCircle className="not-found-icon" />
+                <div className="product-not-found text-center py-5">
+                    <FaTimesCircle className="not-found-icon text-danger" size={48} />
                     <h3>Product not found</h3>
-                    <p>The requested product could not be located.</p>
+                    <p className="text-muted">The requested product could not be located.</p>
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="btn btn-outline-dark mt-3"
+                    >
+                        <FaArrowLeft className="me-2" />
+                        Back to Products
+                    </button>
                 </div>
             )}
         </div>
