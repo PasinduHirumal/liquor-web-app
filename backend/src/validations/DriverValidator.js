@@ -176,7 +176,6 @@ const validateDriver = (req, res, next) => {
 // UPDATE VALIDATOR - NO defaults, all fields optional
 const validateDriverUpdate = (req, res, next) => {
   const schema = Joi.object({
-    
     // Personal Information
     email: Joi.string().email().lowercase().optional(),
     password: Joi.string().min(6).max(128).optional(),
@@ -195,15 +194,6 @@ const validateDriverUpdate = (req, res, next) => {
     city: Joi.string().max(100).allow('').optional(),
     emergencyContact: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).allow('').optional(),
 
-    // Vehicle Information
-    vehicleType: Joi.string().valid('car', 'motorcycle', 'bicycle', 'van', 'truck').optional(),
-    vehicleModel: Joi.string().max(100).allow('').optional(),
-    vehicleNumber: Joi.string().max(50).allow('').optional(),
-    vehicleColor: Joi.string().max(50).allow('').optional(),
-    vehicleYear: Joi.number().integer().min(1900).max(new Date().getFullYear() + 1).optional(),
-    vehicleInsurance: Joi.string().allow('').optional(),
-    vehicleRegistration: Joi.string().allow('').optional(),
-
     // Account & Status
     role: Joi.string().valid('driver').optional(),
     googleId: Joi.string().allow('').optional(),
@@ -213,6 +203,93 @@ const validateDriverUpdate = (req, res, next) => {
     isDocumentVerified: Joi.boolean().optional(),
     backgroundCheckStatus: Joi.string().valid('pending', 'approved', 'rejected').optional(),
 
+    // Verification & Security
+    verifyOtp: Joi.string().allow('').optional(),
+    verifyOtpExpiredAt: Joi.alternatives().try(
+      Joi.date(),
+      Joi.string().isoDate(),
+      Joi.valid(null)
+    ).optional(),
+    isAccountVerified: Joi.boolean().optional(),
+    resetOtp: Joi.string().allow('').optional(),
+    resetOtpExpiredAt: Joi.alternatives().try(
+      Joi.date(),
+      Joi.string().isoDate(),
+      Joi.valid(null)
+    ).optional(),
+    deviceTokens: Joi.array().items(Joi.string()).optional(),
+    lastLoginAt: Joi.alternatives().try(
+      Joi.date(),
+      Joi.string().isoDate(),
+      Joi.valid(null)
+    ).optional(),
+
+  })
+  .min(1) // Require at least one field to update
+  .options({ stripUnknown: true });
+
+  const { error, value } = schema.validate(req.body, {
+    allowUnknown: false,
+    abortEarly: false
+  });
+
+  if (error) {
+    console.log("Validation error: " + error.details[0].message);
+    return res.status(400).json({ 
+        success: false,
+        message: "Validation failed",
+        errors: error.details.map(detail => ({
+          field: detail.path.join('.'),
+          message: detail.message,
+          value: detail.context?.value
+        }))
+    });
+  }
+
+  req.body = value;
+  next();
+};
+
+// Additional validator for vehicle information updates
+const validateVehicleInformationUpdate = (req, res, next) => {
+  const schema = Joi.object({
+    // Vehicle Information
+    vehicleType: Joi.string().valid('car', 'motorcycle', 'bicycle', 'van', 'truck').optional(),
+    vehicleModel: Joi.string().max(100).allow('').optional(),
+    vehicleNumber: Joi.string().max(50).allow('').optional(),
+    vehicleColor: Joi.string().max(50).allow('').optional(),
+    vehicleYear: Joi.number().integer().min(1900).max(new Date().getFullYear() + 1).optional(),
+    vehicleInsurance: Joi.string().allow('').optional(),
+    vehicleRegistration: Joi.string().allow('').optional(),
+  })
+  .min(1) // Require at least one field to update
+  .options({ stripUnknown: true });
+
+  const { error, value } = schema.validate(req.body, {
+    allowUnknown: false,
+    abortEarly: false
+  });
+
+  if (error) {
+    console.log("Validation error: " + error.details[0].message);
+    return res.status(400).json({ 
+        success: false,
+        message: "Validation failed",
+        errors: error.details.map(detail => ({
+          field: detail.path.join('.'),
+          message: detail.message,
+          value: detail.context?.value
+        }))
+    });
+  }
+
+  req.body = value;
+  next();
+};
+
+// Additional validator for location and delivery updates
+const validateLocationAndDeliveryUpdate = (req, res, next) => {
+  const schema = Joi.object({
     // Location & Delivery
     currentLocation: Joi.object({
       lat: Joi.number().min(-90).max(90).required(),
@@ -264,57 +341,6 @@ const validateDriverUpdate = (req, res, next) => {
     preferredDeliveryTypes: Joi.array().items(
       Joi.string().valid('food', 'grocery', 'pharmacy', 'electronics', 'documents', 'other')
     ).optional(),
-
-    // Performance & Ratings
-    rating: Joi.number().min(0).max(5).optional(),
-    totalRatings: Joi.number().integer().min(0).optional(),
-    totalDeliveries: Joi.number().integer().min(0).optional(),
-    completedDeliveries: Joi.number().integer().min(0).optional(),
-    cancelledDeliveries: Joi.number().integer().min(0).optional(),
-    averageDeliveryTime: Joi.number().min(0).optional(),
-    onTimeDeliveryRate: Joi.number().min(0).max(100).optional(),
-    ordersHistory: Joi.array().items(Joi.string()).optional(),
-
-    // Financial
-    bankAccountNumber: Joi.string().min(5).max(50).allow('').optional(),
-    bankName: Joi.string().max(100).allow('').optional(),
-    bankBranch: Joi.string().max(100).allow('').optional(),
-    taxId: Joi.string().max(50).allow('').optional(),
-    commissionRate: Joi.number().min(0).max(1).optional(),
-    totalEarnings: Joi.number().min(0).optional(),
-    currentBalance: Joi.number().min(0).optional(),
-    paymentMethod: Joi.string().valid('bank_transfer', 'mobile_money', 'cash', 'digital_wallet').optional(),
-
-    // Documents
-    documents: Joi.object({
-      licenseImage: optionalImageSchema,
-      nicImage: optionalImageSchema,
-      vehicleRegistrationImage: optionalImageSchema,
-      insuranceImage: optionalImageSchema,
-      bankStatementImage: optionalImageSchema
-    }).optional(),
-
-    // Verification & Security
-    verifyOtp: Joi.string().allow('').optional(),
-    verifyOtpExpiredAt: Joi.alternatives().try(
-      Joi.date(),
-      Joi.string().isoDate(),
-      Joi.valid(null)
-    ).optional(),
-    isAccountVerified: Joi.boolean().optional(),
-    resetOtp: Joi.string().allow('').optional(),
-    resetOtpExpiredAt: Joi.alternatives().try(
-      Joi.date(),
-      Joi.string().isoDate(),
-      Joi.valid(null)
-    ).optional(),
-    deviceTokens: Joi.array().items(Joi.string()).optional(),
-    lastLoginAt: Joi.alternatives().try(
-      Joi.date(),
-      Joi.string().isoDate(),
-      Joi.valid(null)
-    ).optional(),
-
   })
   .min(1) // Require at least one field to update
   .options({ stripUnknown: true });
@@ -341,12 +367,21 @@ const validateDriverUpdate = (req, res, next) => {
   next();
 };
 
-// Additional validator for location updates
-const validateLocationUpdate = (req, res, next) => {
+// Additional validator for performance and rating updates
+const validatePerformanceAndRatingUpdate = (req, res, next) => {
   const schema = Joi.object({
-    lat: Joi.number().min(-90).max(90).required(),
-    lng: Joi.number().min(-180).max(180).required()
-  });
+    // Performance & Ratings
+    rating: Joi.number().min(0).max(5).optional(),
+    totalRatings: Joi.number().integer().min(0).optional(),
+    totalDeliveries: Joi.number().integer().min(0).optional(),
+    completedDeliveries: Joi.number().integer().min(0).optional(),
+    cancelledDeliveries: Joi.number().integer().min(0).optional(),
+    averageDeliveryTime: Joi.number().min(0).optional(),
+    onTimeDeliveryRate: Joi.number().min(0).max(100).optional(),
+    ordersHistory: Joi.array().items(Joi.string()).optional(),
+  })
+  .min(1) // Require at least one field to update
+  .options({ stripUnknown: true });
 
   const { error, value } = schema.validate(req.body, {
     allowUnknown: false,
@@ -354,9 +389,10 @@ const validateLocationUpdate = (req, res, next) => {
   });
 
   if (error) {
+    console.log("Validation error: " + error.details[0].message);
     return res.status(400).json({ 
         success: false,
-        message: error.details[0].message,
+        message: "Validation failed",
         errors: error.details.map(detail => ({
           field: detail.path.join('.'),
           message: detail.message,
@@ -369,11 +405,21 @@ const validateLocationUpdate = (req, res, next) => {
   next();
 };
 
-// Additional validator for availability updates
-const validateAvailabilityUpdate = (req, res, next) => {
+// Additional validator for financial updates
+const validateFinancialUpdate = (req, res, next) => {
   const schema = Joi.object({
-    isAvailable: Joi.boolean().required()
-  });
+    // Financial
+    bankAccountNumber: Joi.string().min(5).max(50).allow('').optional(),
+    bankName: Joi.string().max(100).allow('').optional(),
+    bankBranch: Joi.string().max(100).allow('').optional(),
+    taxId: Joi.string().max(50).allow('').optional(),
+    commissionRate: Joi.number().min(0).max(1).optional(),
+    totalEarnings: Joi.number().min(0).optional(),
+    currentBalance: Joi.number().min(0).optional(),
+    paymentMethod: Joi.string().valid('bank_transfer', 'mobile_money', 'cash', 'digital_wallet').optional(),
+  })
+  .min(1) // Require at least one field to update
+  .options({ stripUnknown: true });
 
   const { error, value } = schema.validate(req.body, {
     allowUnknown: false,
@@ -381,9 +427,47 @@ const validateAvailabilityUpdate = (req, res, next) => {
   });
 
   if (error) {
+    console.log("Validation error: " + error.details[0].message);
     return res.status(400).json({ 
         success: false,
-        message: error.details[0].message,
+        message: "Validation failed",
+        errors: error.details.map(detail => ({
+          field: detail.path.join('.'),
+          message: detail.message,
+          value: detail.context?.value
+        }))
+    });
+  }
+
+  req.body = value;
+  next();
+};
+
+// Additional validator for document updates
+const validateDocumentUpdate = (req, res, next) => {
+  const schema = Joi.object({
+    // Documents
+    documents: Joi.object({
+      licenseImage: optionalImageSchema,
+      nicImage: optionalImageSchema,
+      vehicleRegistrationImage: optionalImageSchema,
+      insuranceImage: optionalImageSchema,
+      bankStatementImage: optionalImageSchema
+    }).optional(),
+  })
+  .min(1) // Require at least one field to update
+  .options({ stripUnknown: true });
+
+  const { error, value } = schema.validate(req.body, {
+    allowUnknown: false,
+    abortEarly: false
+  });
+
+  if (error) {
+    console.log("Validation error: " + error.details[0].message);
+    return res.status(400).json({ 
+        success: false,
+        message: "Validation failed",
         errors: error.details.map(detail => ({
           field: detail.path.join('.'),
           message: detail.message,
@@ -399,6 +483,9 @@ const validateAvailabilityUpdate = (req, res, next) => {
 export { 
   validateDriver, 
   validateDriverUpdate, 
-  validateLocationUpdate, 
-  validateAvailabilityUpdate 
+  validateVehicleInformationUpdate, 
+  validateLocationAndDeliveryUpdate,
+  validatePerformanceAndRatingUpdate,
+  validateFinancialUpdate,
+  validateDocumentUpdate
 };
