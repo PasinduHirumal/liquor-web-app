@@ -133,12 +133,17 @@ const getAllProducts = async (req, res) => {
             filterDescription.push('category.isActive: true');
         }
 
+        // Sort by stock_quantity in ascending order (lowest at first)
+        const sortedProducts = populatedProducts.sort((a, b) => {
+            return new Date(a.stock_quantity) - new Date(b.stock_quantity);
+        });
+
         return res.status(200).json({ 
             success: true, 
             message: "Fetching products successful",
-            count: populatedProducts.length,
+            count: sortedProducts.length,
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
-            data: populatedProducts
+            data: sortedProducts
         });
     } catch (error) {
         console.error("Fetch products error:", error.message);
