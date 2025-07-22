@@ -110,8 +110,15 @@ const AdminUserList = () => {
     {
       title: 'Admin Accepted',
       dataIndex: 'isAdminAccepted',
-      render: (val) => <Tag color={val ? 'blue' : 'orange'}>{val ? 'Yes' : 'No'}</Tag>,
-      width: 100,
+      render: (_, admin) => (
+        <AdminUserRowEditable
+          admin={admin}
+          onDeleteSuccess={handleDeleteSuccess}
+          onUpdateLocal={handleUpdateLocal}
+          part="isAdminAccepted"
+        />
+      ),
+      width: 120,
     },
     {
       title: 'Actions',

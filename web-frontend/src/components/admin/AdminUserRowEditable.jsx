@@ -9,6 +9,7 @@ const ROLES = ['pending', 'admin', 'super_admin'];
 const AdminUserRowEditable = ({ admin, onDeleteSuccess, onUpdateLocal, part }) => {
     const [role, setRole] = useState(admin.role);
     const [isActive, setIsActive] = useState(admin.isActive);
+    const [isAdminAccepted, setIsAdminAccepted] = useState(admin.isAdminAccepted);
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
@@ -16,14 +17,17 @@ const AdminUserRowEditable = ({ admin, onDeleteSuccess, onUpdateLocal, part }) =
             if (role !== admin.role || isActive !== admin.isActive) {
                 handleUpdate();
             }
+            if (role !== admin.role || isAdminAccepted !== admin.isAdminAccepted) {
+                handleUpdate();
+            }
         }, 700);
         return () => clearTimeout(timer);
-    }, [role, isActive]);
+    }, [role, isActive, isAdminAccepted]);
 
     const handleUpdate = async () => {
         setSaving(true);
         try {
-            const updatedData = { role, isActive };
+            const updatedData = { role, isActive, isAdminAccepted };
             const response = await axiosInstance.patch(`/admin/update/${admin.id}`, updatedData);
             toast.success('Admin updated successfully');
             onUpdateLocal(response.data.data);
@@ -32,6 +36,7 @@ const AdminUserRowEditable = ({ admin, onDeleteSuccess, onUpdateLocal, part }) =
             toast.error(error?.response?.data?.message || 'Failed to update admin');
             setRole(admin.role);
             setIsActive(admin.isActive);
+            setIsAdminAccepted(admin.isAdminAccepted);
         } finally {
             setSaving(false);
         }
@@ -63,6 +68,18 @@ const AdminUserRowEditable = ({ admin, onDeleteSuccess, onUpdateLocal, part }) =
                 loading={saving}
                 checkedChildren="Active"
                 unCheckedChildren="Inactive"
+            />
+        );
+    }
+
+    if (part === 'isAdminAccepted') {
+        return (
+            <Switch
+                checked={isAdminAccepted}
+                onChange={setIsAdminAccepted}
+                loading={saving}
+                checkedChildren="Yes"
+                unCheckedChildren="No"
             />
         );
     }
