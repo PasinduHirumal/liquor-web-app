@@ -12,27 +12,35 @@ const createDriver = async (req, res) => {
         const driverByPhone = await driverService.findByPhone(phone);
 
         if (driverByEmail || driverByPhone) {
-            return res.status(400).json({ success: false, message: "User already exists" });
+            return res.status(400).json({ success: false, message: "Driver already exists" });
+        }
+        
+        if (profileImage !== undefined) {
+            try {
+                const imageUrl = await uploadSingleImage(profileImage, 'driver_profile_images');
+                req.body.profileImage = imageUrl || null;
+                console.log('✅ Images uploaded successfully:', imageUrl);
+            } catch (uploadError) {
+                console.error('Image upload failed:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload images" 
+                });
+            }
+        } 
+
+        if (req.body.profileImage === null || req.body.profileImage === undefined) {
+            const index = Math.floor(Math.random() * 100) + 1;
+            const randomAvatar = `https://avatar.iran.liara.run/public/${index}.png`;
+
+            req.body.profileImage = randomAvatar;
         }
 
-        if (req.body.password) {
-            delete req.body.password;
-        }
+        const driverData = { ...req.body };
 
-        if (req.body.profileImage) {
-            delete req.body.profileImage;
-        }
-
-        const index = Math.floor(Math.random() * 100) + 1;
-        const randomAvatar = `https://avatar.iran.liara.run/public/${index}.png`;
-
+        // random password
         const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-
-        const driverData = {
-            password: `DRI@${random}`,
-            profileImage: profileImage || randomAvatar,
-            ...req.body
-        }
+        driverData.password = `DRI@${random}`;
 
         const driver = await driverService.create(driverData);
 
