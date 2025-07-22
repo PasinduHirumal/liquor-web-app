@@ -134,7 +134,7 @@ const ViewProductHistory = ({ productId, productName }) => {
                                                             : `-${history.quantity}`}
                                                     </td>
 
-                                                    <td>{history.userId?.name || "System"}</td>
+                                                    <td>{history.userId?.username || "System"}</td>
                                                     <td>{formatDate(history.createdAt)}</td>
                                                 </tr>
                                             ))}
