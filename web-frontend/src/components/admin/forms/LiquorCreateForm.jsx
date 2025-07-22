@@ -1,27 +1,45 @@
 import React, { useEffect, useState } from 'react';
-import { Form, Button, Spinner } from 'react-bootstrap';
+import { Form, Button, Spinner, Row, Col, Card, Alert } from 'react-bootstrap';
 import { toast } from 'react-hot-toast';
-import { FaTrash } from 'react-icons/fa';
+import { FaTrash, FaUpload } from 'react-icons/fa';
+import { Formik } from 'formik';
+import * as Yup from 'yup';
 import { axiosInstance } from '../../../lib/axios';
+import ImagePreview from '../../../common/ImagePreview';
+
+// Validation schema
+const productSchema = Yup.object().shape({
+    name: Yup.string().required('Product name is required'),
+    description: Yup.string().required('Description is required'),
+    category_id: Yup.string().required('Category is required'),
+    brand: Yup.string().required('Brand is required'),
+    alcohol_content: Yup.number()
+        .required('Alcohol content is required')
+        .min(0, 'Must be at least 0%')
+        .max(100, 'Cannot exceed 100%'),
+    volume: Yup.number()
+        .required('Volume is required')
+        .min(1, 'Must be at least 1ml'),
+    cost_price: Yup.number()
+        .required('Cost price is required')
+        .min(0, 'Cannot be negative'),
+    marked_price: Yup.number()
+        .required('Marked price is required')
+        .min(0, 'Cannot be negative'),
+    discount_percentage: Yup.number()
+        .required('Discount percentage is required')
+        .min(0, 'Cannot be negative')
+        .max(100, 'Cannot exceed 100%'),
+    stock_quantity: Yup.number()
+        .required('Stock quantity is required')
+        .min(0, 'Cannot be negative')
+        .integer('Must be a whole number'),
+});
 
 const LiquorCreateForm = ({ onSuccess, onCancel }) => {
-    const [formData, setFormData] = useState({
-        name: '',
-        description: '',
-        category_id: '',
-        brand: '',
-        alcohol_content: 0,
-        volume: 0,
-        price: 0,
-        stock_quantity: 0,
-        is_active: true,
-        is_in_stock: true,
-        is_liquor: true,
-    });
-
-    const [images, setImages] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [images, setImages] = useState([]);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -36,20 +54,16 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
         fetchCategories();
     }, []);
 
-    const handleChange = (e) => {
-        const { name, value, type, checked } = e.target;
-        const newValue =
-            type === 'checkbox' ? checked :
-                type === 'number' ? (value === '' ? '' : parseFloat(value)) :
-                    value;
-
-        setFormData((prev) => ({ ...prev, [name]: newValue }));
-    };
-
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
+
         const readers = files.map(file =>
             new Promise((resolve, reject) => {
+                if (!file.type.match('image.*')) {
+                    reject(new Error('File is not an image'));
+                    return;
+                }
+
                 const reader = new FileReader();
                 reader.onload = (event) => resolve(event.target.result);
                 reader.onerror = reject;
@@ -58,38 +72,40 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
         );
 
         Promise.all(readers)
-            .then((base64Images) => setImages(base64Images))
+            .then((base64Images) => {
+                setImages(prev => [...prev, ...base64Images]);
+            })
             .catch((err) => {
-                toast.error('Failed to read image files');
+                toast.error(err.message || 'Failed to read image files');
                 console.error('Image read error:', err);
             });
     };
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
+    const removeImage = (index) => {
+        setImages(images.filter((_, i) => i !== index));
+    };
+
+    const handleSubmit = async (values) => {
+        if (images.length === 0) {
+            toast.error('Please upload at least one product image.');
+            return;
+        }
+
         setLoading(true);
 
         try {
-            const payload = { ...formData, images };
+            const payload = {
+                ...values,
+                images: images,
+                is_liquor: true,
+                add_quantity: 0,
+                withdraw_quantity: 0
+            };
+
             const res = await axiosInstance.post('/products/create', payload);
 
             toast.success('Product created successfully!');
             onSuccess(res.data.data);
-
-            // Reset
-            setFormData({
-                name: '',
-                description: '',
-                category_id: '',
-                brand: '',
-                alcohol_content: 0,
-                volume: 0,
-                price: 0,
-                stock_quantity: 0,
-                is_active: true,
-                is_in_stock: true,
-                is_liquor: true,
-            });
             setImages([]);
         } catch (err) {
             const resData = err.response?.data;
@@ -106,214 +122,343 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
     };
 
     return (
-        <Form onSubmit={handleSubmit}>
-            <Form.Group className="mb-3">
-                <Form.Label>Product Name</Form.Label>
-                <Form.Control
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    disabled={loading}
-                    required
-                />
-            </Form.Group>
+        <Card>
+            <Card.Body>
+                <Formik
+                    initialValues={{
+                        name: '',
+                        description: '',
+                        category_id: '',
+                        brand: '',
+                        alcohol_content: '',
+                        volume: '',
+                        cost_price: '',
+                        marked_price: '',
+                        discount_percentage: '',
+                        stock_quantity: '',
+                        is_active: true,
+                        is_in_stock: true,
+                    }}
+                    validationSchema={productSchema}
+                    onSubmit={handleSubmit}
+                >
+                    {({
+                        values,
+                        errors,
+                        touched,
+                        handleChange,
+                        handleBlur,
+                        handleSubmit,
+                        setFieldValue,
+                    }) => (
+                        <Form onSubmit={handleSubmit}>
+                            <Row>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Product Name *</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name="name"
+                                            value={values.name}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            isInvalid={touched.name && !!errors.name}
+                                            disabled={loading}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.name}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Brand *</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name="brand"
+                                            value={values.brand}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            isInvalid={touched.brand && !!errors.brand}
+                                            disabled={loading}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.brand}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
 
-            <Form.Group className="mb-3">
-                <Form.Label>Description</Form.Label>
-                <Form.Control
-                    as="textarea"
-                    name="description"
-                    value={formData.description}
-                    onChange={handleChange}
-                    disabled={loading}
-                    required
-                />
-            </Form.Group>
-
-            <div className="row">
-                <Form.Group className="col-md-6 mb-3">
-                    <Form.Label>Brand</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="brand"
-                        value={formData.brand}
-                        onChange={handleChange}
-                        disabled={loading}
-                        required
-                    />
-                </Form.Group>
-
-                <Form.Group className="col-md-6 mb-3">
-                    <Form.Label>Category</Form.Label>
-                    <Form.Select
-                        name="category_id"
-                        value={formData.category_id}
-                        onChange={handleChange}
-                        disabled={loading}
-                        required
-                    >
-                        <option value="">Select a category</option>
-                        {categories.map((cat) => (
-                            <option key={cat.category_id} value={cat.category_id}>
-                                {cat.name}
-                            </option>
-                        ))}
-                    </Form.Select>
-                </Form.Group>
-            </div>
-
-            <div className="row">
-                <Form.Group className="col-md-4 mb-3">
-                    <Form.Label>Alcohol Content (%)</Form.Label>
-                    <Form.Control
-                        type="number"
-                        name="alcohol_content"
-                        value={formData.alcohol_content}
-                        onChange={handleChange}
-                        min="0"
-                        max="100"
-                        disabled={loading}
-                        required
-                    />
-                </Form.Group>
-
-                <Form.Group className="col-md-4 mb-3">
-                    <Form.Label>Volume (ml)</Form.Label>
-                    <Form.Control
-                        type="number"
-                        name="volume"
-                        value={formData.volume}
-                        onChange={handleChange}
-                        min="0"
-                        disabled={loading}
-                        required
-                    />
-                </Form.Group>
-
-                <Form.Group className="col-md-4 mb-3">
-                    <Form.Label>Price</Form.Label>
-                    <Form.Control
-                        type="number"
-                        name="price"
-                        value={formData.price}
-                        onChange={handleChange}
-                        min="0"
-                        step="0.01"
-                        disabled={loading}
-                        required
-                    />
-                </Form.Group>
-            </div>
-
-            <Form.Group className="mb-3">
-                <Form.Label>Stock Quantity</Form.Label>
-                <Form.Control
-                    type="number"
-                    name="stock_quantity"
-                    value={formData.stock_quantity}
-                    onChange={handleChange}
-                    min="0"
-                    disabled={loading}
-                    required
-                />
-            </Form.Group>
-
-            <Form.Group className="mb-3">
-                <Form.Label>Product Images</Form.Label>
-                <Form.Control
-                    type="file"
-                    name="images"
-                    onChange={handleImageChange}
-                    multiple
-                    accept="image/*"
-                    disabled={loading}
-                />
-            </Form.Group>
-
-            <Form.Group className="mb-3 d-flex gap-3">
-                <Form.Check
-                    type="checkbox"
-                    label="Active"
-                    name="is_active"
-                    checked={formData.is_active}
-                    onChange={handleChange}
-                    disabled={loading}
-                />
-                <Form.Check
-                    type="checkbox"
-                    label="In Stock"
-                    name="is_in_stock"
-                    checked={formData.is_in_stock}
-                    onChange={handleChange}
-                    disabled={loading}
-                />
-            </Form.Group>
-
-            {images.length > 0 && (
-                <div className="mb-3">
-                    <Form.Label>Image Preview</Form.Label>
-                    <div className="d-flex flex-wrap gap-3">
-                        {images.map((img, index) => (
-                            <div
-                                key={index}
-                                className="position-relative"
-                                style={{
-                                    width: '150px',
-                                    height: '150px',
-                                    border: '1px solid #ccc',
-                                    borderRadius: '8px',
-                                    overflow: 'hidden',
-                                }}
-                            >
-                                <img
-                                    src={img}
-                                    alt={`preview-${index}`}
-                                    style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        objectFit: 'contain',
-                                    }}
+                            <Form.Group className="mb-3">
+                                <Form.Label>Description *</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    rows={3}
+                                    name="description"
+                                    value={values.description}
+                                    onChange={handleChange}
+                                    onBlur={handleBlur}
+                                    isInvalid={touched.description && !!errors.description}
+                                    disabled={loading}
                                 />
+                                <Form.Control.Feedback type="invalid">
+                                    {errors.description}
+                                </Form.Control.Feedback>
+                            </Form.Group>
+
+                            <Row>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Category *</Form.Label>
+                                        <Form.Select
+                                            name="category_id"
+                                            value={values.category_id}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            isInvalid={touched.category_id && !!errors.category_id}
+                                            disabled={loading}
+                                        >
+                                            <option value="">Select a category</option>
+                                            {categories.map((cat) => (
+                                                <option key={cat.category_id} value={cat.category_id}>
+                                                    {cat.name}
+                                                </option>
+                                            ))}
+                                        </Form.Select>
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.category_id}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={3}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Alcohol Content (%) *</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            name="alcohol_content"
+                                            value={values.alcohol_content}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            min="0"
+                                            max="100"
+                                            step="0.1"
+                                            isInvalid={touched.alcohol_content && !!errors.alcohol_content}
+                                            disabled={loading}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.alcohol_content}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={3}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Volume (ml) *</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            name="volume"
+                                            value={values.volume}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            min="1"
+                                            step="1"
+                                            isInvalid={touched.volume && !!errors.volume}
+                                            disabled={loading}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.volume}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+
+                            <Row>
+                                <Col md={4}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Cost Price *</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            name="cost_price"
+                                            value={values.cost_price}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            min="0"
+                                            step="0.01"
+                                            isInvalid={touched.cost_price && !!errors.cost_price}
+                                            disabled={loading}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.cost_price}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={4}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Marked Price *</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            name="marked_price"
+                                            value={values.marked_price}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            min="0"
+                                            step="0.01"
+                                            isInvalid={touched.marked_price && !!errors.marked_price}
+                                            disabled={loading}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.marked_price}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={4}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Discount (%) *</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            name="discount_percentage"
+                                            value={values.discount_percentage}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            min="0"
+                                            max="100"
+                                            step="0.01"
+                                            isInvalid={touched.discount_percentage && !!errors.discount_percentage}
+                                            disabled={loading}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.discount_percentage}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+
+                            <Row>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Stock Quantity *</Form.Label>
+                                        <Form.Control
+                                            type="number"
+                                            name="stock_quantity"
+                                            value={values.stock_quantity}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            min="0"
+                                            step="1"
+                                            isInvalid={touched.stock_quantity && !!errors.stock_quantity}
+                                            disabled={loading}
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.stock_quantity}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </Col>
+                                <Col md={6}>
+                                    <Form.Group className="mb-3 d-flex align-items-end h-100">
+                                        <div className="d-flex gap-4">
+                                            <Form.Check
+                                                type="switch"
+                                                id="is_active"
+                                                label="Active"
+                                                name="is_active"
+                                                checked={values.is_active}
+                                                onChange={() => setFieldValue('is_active', !values.is_active)}
+                                                disabled={loading}
+                                            />
+                                            <Form.Check
+                                                type="switch"
+                                                id="is_in_stock"
+                                                label="In Stock"
+                                                name="is_in_stock"
+                                                checked={values.is_in_stock}
+                                                onChange={() => setFieldValue('is_in_stock', !values.is_in_stock)}
+                                                disabled={loading}
+                                            />
+                                        </div>
+                                    </Form.Group>
+                                </Col>
+                            </Row>
+
+                            <Form.Group className="mb-3">
+                                <Form.Label>Product Images *</Form.Label>
+                                <div className="border rounded p-3 text-center">
+                                    <label htmlFor="product-images" className="btn btn-outline-primary">
+                                        <FaUpload className="me-2" />
+                                        {images.length > 0 ? 'Add More Images' : 'Upload Images'}
+                                        <input
+                                            id="product-images"
+                                            type="file"
+                                            name="images"
+                                            onChange={handleImageChange}
+                                            multiple
+                                            accept="image/*"
+                                            disabled={loading || images.length >= 5}
+                                            className="d-none"
+                                        />
+                                    </label>
+                                    <p className="small text-muted mt-2 mb-0">
+                                        Upload images
+                                    </p>
+                                    {images.length > 0 && (
+                                        <p className="small text-muted">
+                                            {images.length} image(s) selected
+                                        </p>
+                                    )}
+                                </div>
+                            </Form.Group>
+
+                            {images.length > 0 && (
+                                <div className="mb-4">
+                                    <Form.Label>Image Preview</Form.Label>
+                                    <div className="d-flex flex-wrap gap-3">
+                                        {images.map((img, index) => (
+                                            <ImagePreview
+                                                key={index}
+                                                src={img}
+                                                onRemove={() => removeImage(index)}
+                                            />
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {images.length === 0 && touched.category_id && (
+                                <Alert variant="warning" className="mb-4">
+                                    Please upload at least one product image
+                                </Alert>
+                            )}
+
+                            <div className="d-flex justify-content-end gap-3 mt-4">
                                 <Button
-                                    variant="danger"
-                                    size="sm"
-                                    className="position-absolute top-0 end-0"
-                                    style={{
-                                        padding: '0.2rem 0.5rem',
-                                        fontSize: '0.8rem',
-                                        lineHeight: 1,
-                                        borderRadius: '0 0 0 6px',
-                                    }}
+                                    variant="outline-secondary"
                                     onClick={() => {
-                                        setImages(images.filter((_, i) => i !== index));
+                                        onCancel();
+                                        toast.info('Creation cancelled.');
                                     }}
-                                    title="Remove"
+                                    disabled={loading}
                                 >
-                                    <FaTrash size={14} />
+                                    Cancel
+                                </Button>
+                                <Button
+                                    variant="primary"
+                                    type="submit"
+                                    disabled={loading}
+                                    className="d-flex align-items-center gap-2"
+                                >
+                                    {loading ? (
+                                        <>
+                                            <Spinner animation="border" size="sm" />
+                                            Creating...
+                                        </>
+                                    ) : (
+                                        'Create Product'
+                                    )}
                                 </Button>
                             </div>
-                        ))}
-                    </div>
-                </div>
-            )}
-
-            <div className="d-flex justify-content-end gap-2">
-                <Button
-                    variant="secondary"
-                    onClick={() => {
-                        onCancel();
-                        toast.info('Creation cancelled.');
-                    }}
-                    disabled={loading}
-                >
-                    Cancel
-                </Button>
-                <Button variant="primary" type="submit" disabled={loading}>
-                    {loading ? <Spinner animation="border" size="sm" /> : 'Create Product'}
-                </Button>
-            </div>
-        </Form>
+                        </Form>
+                    )}
+                </Formik>
+            </Card.Body>
+        </Card>
     );
 };
 
