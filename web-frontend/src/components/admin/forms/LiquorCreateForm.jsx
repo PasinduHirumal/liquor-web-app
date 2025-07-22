@@ -45,7 +45,9 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
         const fetchCategories = async () => {
             try {
                 const res = await axiosInstance.get('/categories/getAll');
-                setCategories(res.data.data || []);
+                const liquorCategories = (res.data.data || []).filter(cat => cat.is_active && cat.is_liquor);
+                setCategories(liquorCategories);
+
             } catch (err) {
                 toast.error('Failed to fetch categories');
                 console.error('Category fetch error:', err);

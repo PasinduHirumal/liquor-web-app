@@ -49,7 +49,7 @@ const OtherProductEditForm = () => {
                 // Fetch categories first
                 setCategoriesLoading(true);
                 const categoriesRes = await axiosInstance.get("/categories/getAll");
-                setCategories(categoriesRes.data.data.filter(cat => cat.is_active));
+                setCategories(categoriesRes.data.data.filter(cat => cat.is_active && !cat.is_liquor));
 
                 // Then fetch product data
                 const productRes = await axiosInstance.get(`/other-products/getOtherProductById/${id}`);

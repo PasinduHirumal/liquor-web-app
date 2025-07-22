@@ -66,7 +66,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
             setCategoriesError(null);
             try {
                 const res = await axiosInstance.get("/categories/getAll");
-                const activeCategories = (res.data.data || []).filter(cat => cat.is_active);
+                const activeCategories = (res.data.data || []).filter(cat => cat.is_active && !cat.is_liquor);
                 setCategories(activeCategories);
             } catch (err) {
                 setCategoriesError("Failed to fetch categories. Please try again.");
