@@ -3,16 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { axiosInstance } from "../../../lib/axios";
 import toast from "react-hot-toast";
 import {
-    Container,
-    Form,
-    Row,
-    Col,
-    Card,
-    Spinner,
-    Button,
-    Alert,
-    Image,
-    FloatingLabel
+    Container, Form, Row, Col, Card, Spinner, Button, Alert, Image, FloatingLabel
 } from "react-bootstrap";
 import { XCircle, UploadCloud, CheckCircle } from "react-feather";
 
@@ -108,8 +99,8 @@ const LiquorEditForm = () => {
         const { name, value, type, checked } = e.target;
         let newValue = type === "checkbox" ? checked : value;
 
-        if (["cost_price", "marked_price", "discount_percentage", 
-             "stock_quantity", "alcohol_content", "volume"].includes(name)) {
+        if (["cost_price", "marked_price", "discount_percentage",
+            "stock_quantity", "alcohol_content", "volume"].includes(name)) {
             newValue = parseFloat(newValue) || 0;
         }
 
@@ -130,7 +121,7 @@ const LiquorEditForm = () => {
 
     const handlePriceUpdate = async (e) => {
         e.preventDefault();
-        
+
         if (formData.marked_price <= 0) {
             setErrors({ marked_price: "Price must be greater than 0" });
             return;
@@ -144,6 +135,7 @@ const LiquorEditForm = () => {
         setPriceUpdating(true);
         try {
             const priceData = {
+                cost_price: formData.cost_price,
                 marked_price: formData.marked_price,
                 discount_percentage: formData.discount_percentage
             };
@@ -303,12 +295,12 @@ const LiquorEditForm = () => {
                                     </Card.Body>
                                 </Card>
 
-                                {/* Pricing & Inventory Section */}
+                                {/* Pricing Section */}
                                 <Card className="mb-4">
                                     <Card.Header className="d-flex justify-content-between align-items-center">
                                         <h5 className="mb-0">Pricing & Inventory</h5>
-                                        <Button 
-                                            variant="outline-primary" 
+                                        <Button
+                                            variant="outline-primary"
                                             size="sm"
                                             onClick={handlePriceUpdate}
                                             disabled={priceUpdating}
