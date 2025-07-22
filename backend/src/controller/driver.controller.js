@@ -1,11 +1,12 @@
 import DriverService from "../services/driver.service.js";
 import ADMIN_ROLES from '../enums/adminRoles.js';
+import { uploadImages, uploadSingleImage } from '../utils/firebaseStorage.js';
 
 const driverService = new DriverService();
 
 const createDriver = async (req, res) => {
 	try {
-        const { email, phone } = req.body;
+        const { email, phone, profileImage } = req.body;
 
         const driverByEmail  = await driverService.findByEmail(email);
         const driverByPhone = await driverService.findByPhone(phone);
@@ -29,7 +30,7 @@ const createDriver = async (req, res) => {
 
         const driverData = {
             password: `DRI@${random}`,
-            profileImage: randomAvatar,
+            profileImage: profileImage || randomAvatar,
             ...req.body
         }
 
@@ -41,6 +42,7 @@ const createDriver = async (req, res) => {
         return res.status(200).json({ 
             success: true, 
             message: "Driver created successfully",
+            password: `DRI@${random}`,
             data: driverWithoutPassword
         });
     } catch (error) {
@@ -129,7 +131,7 @@ const updateDriver = async (req, res) => {
 	try {
         const driverId = req.params.id;
         const currentUserId = req.user.id;
-        const { email, phone, isActive, isDocumentVerified, isAccountVerified } = req.body;
+        const { email, phone, profileImage, documents, isActive, isDocumentVerified, isAccountVerified } = req.body;
 
         const driver = await driverService.findById(driverId);
         if (!driver) {
@@ -152,13 +154,68 @@ const updateDriver = async (req, res) => {
             }
         }
 
+        // handle profile image uploading
+        if (profileImage !== undefined) {
+            try {
+                const imageUrl = await uploadSingleImage(profileImage, 'driver_profile_images');
+                req.body.profileImage = imageUrl || null;
+                console.log('✅ Images uploaded successfully:', imageUrl);
+            } catch (uploadError) {
+                console.error('Image upload failed:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload images" 
+                });
+            }
+        }
+
+        // Handle document uploads
+        if (documents && typeof documents === 'object') {
+            try {
+                const updatedDocuments = { ...documents };
+                
+                // Process each document type that might contain images
+                const documentTypes = ['licenseImage', 'nicImage', 'vehicleRegistrationImage', 'insuranceImage', 'bankStatementImage'];
+                
+                for (const docType of documentTypes) {
+                    if (updatedDocuments[docType] !== undefined) {
+                        // If it's null or empty, keep as is (for deletion)
+                        if (updatedDocuments[docType] === null || updatedDocuments[docType] === '') {
+                            updatedDocuments[docType] = null;
+                        } else {
+                            // Upload the document image
+                            const docImageUrls = await uploadImages(updatedDocuments[docType], 'driver_documents', docType);
+                            updatedDocuments[docType] = docImageUrls[0] || null; // Take first image
+                            console.log(`✅ ${docType} uploaded successfully:`, docImageUrls[0]);
+                        }
+                    }
+                }
+                
+                req.body.documents = updatedDocuments;
+            } catch (uploadError) {
+                console.error('Document upload failed:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload documents" 
+                });
+            }
+        }
+
         const updateData = { ...req.body };
 
         if (email !== undefined || phone !== undefined) {
             updateData.isAccountVerified = false;
         }
 
+        // If documents are updated, mark as unverified for re-verification
+        if (documents && typeof documents === 'object') {
+            updateData.isDocumentVerified = false;
+        }
+
         const updatedDriver = await driverService.updateById(driverId, updateData);
+        if (!updatedDriver) {
+            return res.status(500).json({ success: false, message: "Failed to update driver" });
+        }
 
         const { password, ...driverWithoutPassword } = updatedDriver;
 
