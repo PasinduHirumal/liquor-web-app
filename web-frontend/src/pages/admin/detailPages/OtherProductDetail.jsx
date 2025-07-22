@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { axiosInstance } from "../../../lib/axios";
 import "../../../styles/OtherProductDetail.css";
 import DeleteOtherProductButton from "../../../components/admin/buttons/DeleteOtherProductButton";
+import ViewProductHistory from "../../../common/ViewProductHistory";
 
 const OtherProductDetail = () => {
     const { id } = useParams();
@@ -48,32 +49,15 @@ const OtherProductDetail = () => {
         navigate("/other-product-list");
     };
 
-    if (error) {
-        return (
-            <div className="product-detail-error-container">
-                <div className="product-not-found text-center py-5">
-                    <FaTimesCircle className="not-found-icon text-danger" size={48} />
-                    <h3 className="mt-3">Product not found</h3>
-                    <p className="text-muted">The requested product could not be located.</p>
-                    <button
-                        onClick={() => navigate(-1)}
-                        className="btn btn-back mt-3"
-                    >
-                        <FaArrowLeft className="me-2" />
-                        Back to Products
-                    </button>
-                </div>
-            </div>
-        );
-    }
-
     const formatDate = (dateString) => {
         if (!dateString) return "N/A";
         try {
             return new Date(dateString).toLocaleDateString('en-US', {
                 year: 'numeric',
-                month: 'long',
-                day: 'numeric'
+                month: 'short',
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
             });
         } catch {
             return "N/A";
@@ -105,6 +89,25 @@ const OtherProductDetail = () => {
             </div>
         );
     };
+
+    if (error) {
+        return (
+            <div className="product-detail-error-container">
+                <div className="product-not-found text-center py-5">
+                    <FaTimesCircle className="not-found-icon text-danger" size={48} />
+                    <h3 className="mt-3">Product not found</h3>
+                    <p className="text-muted">The requested product could not be located.</p>
+                    <button
+                        onClick={() => navigate(-1)}
+                        className="btn btn-back mt-3"
+                    >
+                        <FaArrowLeft className="me-2" />
+                        Back to Products
+                    </button>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="product-detail-container">
@@ -284,6 +287,8 @@ const OtherProductDetail = () => {
                                     <FaEdit />
                                     Edit Product
                                 </button>
+
+                                <ViewProductHistory productId={id} productName={product.name} />
 
                                 <DeleteOtherProductButton
                                     id={id}
