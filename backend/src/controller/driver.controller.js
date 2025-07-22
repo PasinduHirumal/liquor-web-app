@@ -106,6 +106,25 @@ const getAllDrivers = async (req, res) => {
     }
 };
 
+const getDriverById = async (req, res) => {
+	try {
+        const driverId = req.params.id;
+
+        const driver = await driverService.findById(driverId);
+        if (!driver) {
+            return res.status(404).json({ success: false, message: "Driver not found"});
+        }
+        
+        // Remove password before sending 
+        const { password, ...driverWithoutPassword } = driver;
+
+        return res.status(200).json({ success: true, message: "Driver fetched successfully", data: driverWithoutPassword });
+    } catch (error) {
+        console.error("Get driver by id error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
 const updateDriver = async (req, res) => {
 	try {
         const driverId = req.params.id;
@@ -155,4 +174,4 @@ const deleteDriver = async (req, res) => {
     }
 };
 
-export { createDriver, getAllDrivers, updateDriver, deleteDriver};
+export { createDriver, getAllDrivers, getDriverById, updateDriver, deleteDriver};
