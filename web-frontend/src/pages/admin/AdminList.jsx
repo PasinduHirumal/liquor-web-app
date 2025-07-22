@@ -110,8 +110,15 @@ const AdminUserList = () => {
     {
       title: 'Admin Accepted',
       dataIndex: 'isAdminAccepted',
-      render: (val) => <Tag color={val ? 'blue' : 'orange'}>{val ? 'Yes' : 'No'}</Tag>,
-      width: 100,
+      render: (_, admin) => (
+        <AdminUserRowEditable
+          admin={admin}
+          onDeleteSuccess={handleDeleteSuccess}
+          onUpdateLocal={handleUpdateLocal}
+          part="isAdminAccepted"
+        />
+      ),
+      width: 120,
     },
     {
       title: 'Actions',
@@ -135,17 +142,6 @@ const AdminUserList = () => {
       {/* Filters */}
       <Space wrap size="large" className="mb-4 d-flex justify-content-center">
         <Select
-          placeholder="Filter by Admin Accepted"
-          style={{ width: 220 }}
-          value={filter.isAdminAccepted || undefined}
-          onChange={(value) => handleFilterChange('isAdminAccepted', value)}
-          allowClear
-        >
-          <Option value="true">Accepted</Option>
-          <Option value="false">Not Accepted</Option>
-        </Select>
-
-        <Select
           placeholder="Filter by Active Status"
           style={{ width: 220 }}
           value={filter.isActive || undefined}
@@ -154,6 +150,17 @@ const AdminUserList = () => {
         >
           <Option value="true">Active</Option>
           <Option value="false">Inactive</Option>
+        </Select>
+
+        <Select
+          placeholder="Filter by Admin Accepted"
+          style={{ width: 220 }}
+          value={filter.isAdminAccepted || undefined}
+          onChange={(value) => handleFilterChange('isAdminAccepted', value)}
+          allowClear
+        >
+          <Option value="true">Accepted</Option>
+          <Option value="false">Not Accepted</Option>
         </Select>
 
         {(filter.isAdminAccepted || filter.isActive) && (
