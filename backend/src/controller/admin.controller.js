@@ -104,7 +104,7 @@ const updateAdmin = async (req, res) => {
         }
         
         // Role change restrictions
-        if (req.body.role) {
+        if (req.body.role || req.body.isAdminAccepted || req.body.isActive || req.body.isAccountVerified) {
             // Only super admin can change roles
             if (!isSuperAdmin) {
                 return res.status(403).json({ success: false, message: "Not authorized to change roles" });
