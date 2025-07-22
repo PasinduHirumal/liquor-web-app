@@ -12,9 +12,7 @@ import {
     Button,
     Alert,
     Image,
-    Badge,
-    FloatingLabel,
-    Accordion
+    FloatingLabel
 } from "react-bootstrap";
 import { XCircle, UploadCloud, CheckCircle } from "react-feather";
 
@@ -29,7 +27,9 @@ const LiquorEditForm = () => {
         category_id: "",
         alcohol_content: 0,
         volume: 0,
-        price: 0,
+        cost_price: 0,
+        marked_price: 0,
+        discount_percentage: 0,
         stock_quantity: 0,
         is_active: true,
         is_in_stock: true,
@@ -41,6 +41,7 @@ const LiquorEditForm = () => {
     const [newImagesBase64, setNewImagesBase64] = useState([]);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
+    const [priceUpdating, setPriceUpdating] = useState(false);
     const [errors, setErrors] = useState({});
 
     useEffect(() => {
@@ -63,10 +64,12 @@ const LiquorEditForm = () => {
                     name: product.name || "",
                     description: product.description || "",
                     brand: product.brand || "",
-                    category_id: product.category_id?._id || "",
+                    category_id: product.category_id?._id || product.category_id || "",
                     alcohol_content: product.alcohol_content || 0,
                     volume: product.volume || 0,
-                    price: product.price || 0,
+                    cost_price: product.cost_price || 0,
+                    marked_price: product.marked_price || 0,
+                    discount_percentage: product.discount_percentage || 0,
                     stock_quantity: product.stock_quantity || 0,
                     is_active: product.is_active ?? true,
                     is_in_stock: product.is_in_stock ?? true,
@@ -90,7 +93,11 @@ const LiquorEditForm = () => {
         const newErrors = {};
         if (!formData.name.trim()) newErrors.name = "Name is required";
         if (!formData.category_id) newErrors.category_id = "Category is required";
-        if (formData.price <= 0) newErrors.price = "Price must be greater than 0";
+        if (formData.cost_price < 0) newErrors.cost_price = "Cost price cannot be negative";
+        if (formData.marked_price <= 0) newErrors.marked_price = "Price must be greater than 0";
+        if (formData.discount_percentage < 0 || formData.discount_percentage > 100) {
+            newErrors.discount_percentage = "Discount must be between 0-100%";
+        }
         if (formData.stock_quantity < 0) newErrors.stock_quantity = "Stock cannot be negative";
 
         setErrors(newErrors);
@@ -101,13 +108,12 @@ const LiquorEditForm = () => {
         const { name, value, type, checked } = e.target;
         let newValue = type === "checkbox" ? checked : value;
 
-        if (
-            ["price", "stock_quantity", "alcohol_content", "volume"].includes(name)
-        ) {
+        if (["cost_price", "marked_price", "discount_percentage", 
+             "stock_quantity", "alcohol_content", "volume"].includes(name)) {
             newValue = parseFloat(newValue) || 0;
         }
 
-        setFormData((prev) => ({
+        setFormData(prev => ({
             ...prev,
             [name]: newValue,
         }));
@@ -119,6 +125,36 @@ const LiquorEditForm = () => {
                 delete newErrors[name];
                 return newErrors;
             });
+        }
+    };
+
+    const handlePriceUpdate = async (e) => {
+        e.preventDefault();
+        
+        if (formData.marked_price <= 0) {
+            setErrors({ marked_price: "Price must be greater than 0" });
+            return;
+        }
+
+        if (formData.discount_percentage < 0 || formData.discount_percentage > 100) {
+            setErrors({ discount_percentage: "Discount must be between 0-100%" });
+            return;
+        }
+
+        setPriceUpdating(true);
+        try {
+            const priceData = {
+                marked_price: formData.marked_price,
+                discount_percentage: formData.discount_percentage
+            };
+
+            await axiosInstance.patch(`/products/update-price/${id}`, priceData);
+            toast.success("Price updated successfully!");
+        } catch (err) {
+            console.error(err);
+            toast.error(err.response?.data?.message || "Price update failed.");
+        } finally {
+            setPriceUpdating(false);
         }
     };
 
@@ -165,16 +201,17 @@ const LiquorEditForm = () => {
         setUpdating(true);
 
         try {
-            const finalImages = [...existingImages, ...newImagesBase64];
-
             const payload = {
                 ...formData,
-                images: finalImages,
+                images: [...existingImages, ...newImagesBase64],
+                marked_price: undefined,
+                discount_percentage: undefined,
+                cost_price: undefined
             };
 
             await axiosInstance.patch(`/products/update/${id}`, payload);
             toast.success("Product updated successfully!");
-            navigate(`/liquor/${id}`);
+            navigate(`/products/${id}`);
         } catch (err) {
             console.error(err);
             toast.error(err.response?.data?.message || "Update failed.");
@@ -268,24 +305,74 @@ const LiquorEditForm = () => {
 
                                 {/* Pricing & Inventory Section */}
                                 <Card className="mb-4">
-                                    <Card.Header>
+                                    <Card.Header className="d-flex justify-content-between align-items-center">
                                         <h5 className="mb-0">Pricing & Inventory</h5>
+                                        <Button 
+                                            variant="outline-primary" 
+                                            size="sm"
+                                            onClick={handlePriceUpdate}
+                                            disabled={priceUpdating}
+                                        >
+                                            {priceUpdating ? (
+                                                <Spinner as="span" animation="border" size="sm" />
+                                            ) : (
+                                                "Update Price Only"
+                                            )}
+                                        </Button>
                                     </Card.Header>
                                     <Card.Body>
                                         <Row>
                                             <Col md={6}>
-                                                <FloatingLabel controlId="price" label="Price ($)" className="mb-3">
+                                                <FloatingLabel controlId="cost_price" label="Cost Price ($)" className="mb-3">
                                                     <Form.Control
-                                                        name="price"
+                                                        name="cost_price"
                                                         type="number"
-                                                        value={formData.price}
+                                                        value={formData.cost_price}
                                                         onChange={handleChange}
                                                         step="0.01"
-                                                        isInvalid={!!errors.price}
+                                                        min="0"
+                                                        isInvalid={!!errors.cost_price}
                                                         placeholder="0.00"
                                                     />
                                                     <Form.Control.Feedback type="invalid">
-                                                        {errors.price}
+                                                        {errors.cost_price}
+                                                    </Form.Control.Feedback>
+                                                </FloatingLabel>
+                                            </Col>
+                                            <Col md={6}>
+                                                <FloatingLabel controlId="marked_price" label="Marked Price ($)" className="mb-3">
+                                                    <Form.Control
+                                                        name="marked_price"
+                                                        type="number"
+                                                        value={formData.marked_price}
+                                                        onChange={handleChange}
+                                                        step="0.01"
+                                                        min="0.01"
+                                                        isInvalid={!!errors.marked_price}
+                                                        placeholder="0.00"
+                                                    />
+                                                    <Form.Control.Feedback type="invalid">
+                                                        {errors.marked_price}
+                                                    </Form.Control.Feedback>
+                                                </FloatingLabel>
+                                            </Col>
+                                        </Row>
+                                        <Row>
+                                            <Col md={6}>
+                                                <FloatingLabel controlId="discount_percentage" label="Discount (%)" className="mb-3">
+                                                    <Form.Control
+                                                        name="discount_percentage"
+                                                        type="number"
+                                                        value={formData.discount_percentage}
+                                                        onChange={handleChange}
+                                                        step="1"
+                                                        min="0"
+                                                        max="100"
+                                                        isInvalid={!!errors.discount_percentage}
+                                                        placeholder="0"
+                                                    />
+                                                    <Form.Control.Feedback type="invalid">
+                                                        {errors.discount_percentage}
                                                     </Form.Control.Feedback>
                                                 </FloatingLabel>
                                             </Col>
@@ -296,6 +383,7 @@ const LiquorEditForm = () => {
                                                         type="number"
                                                         value={formData.stock_quantity}
                                                         onChange={handleChange}
+                                                        min="0"
                                                         isInvalid={!!errors.stock_quantity}
                                                         placeholder="0"
                                                     />
@@ -323,6 +411,8 @@ const LiquorEditForm = () => {
                                                         value={formData.alcohol_content}
                                                         onChange={handleChange}
                                                         step="0.1"
+                                                        min="0"
+                                                        max="100"
                                                         placeholder="0.0"
                                                     />
                                                 </FloatingLabel>
@@ -334,6 +424,7 @@ const LiquorEditForm = () => {
                                                         type="number"
                                                         value={formData.volume}
                                                         onChange={handleChange}
+                                                        min="0"
                                                         placeholder="0"
                                                     />
                                                 </FloatingLabel>
@@ -467,14 +558,14 @@ const LiquorEditForm = () => {
                             <Button
                                 variant="outline-secondary"
                                 onClick={() => navigate(-1)}
-                                disabled={updating}
+                                disabled={updating || priceUpdating}
                             >
                                 Cancel
                             </Button>
                             <Button
                                 variant="primary"
                                 type="submit"
-                                disabled={updating}
+                                disabled={updating || priceUpdating}
                             >
                                 {updating ? (
                                     <>

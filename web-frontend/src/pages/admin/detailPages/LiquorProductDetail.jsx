@@ -40,7 +40,6 @@ const LiquorProductDetail = () => {
     }, [id, navigate]);
 
     const handleDeleteSuccess = () => {
-        toast.success("Product deleted successfully");
         navigate("/liquor-list");
     };
 
