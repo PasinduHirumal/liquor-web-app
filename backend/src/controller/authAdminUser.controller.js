@@ -104,6 +104,13 @@ const logout = async (req, res) => {
 const checkAuth = async (req, res) => {
   try {
     const user = await adminService.findById(req.user.id);
+    if (!user) {
+        return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    if (!user.isAdminAccepted || !user.isActive || !user.isAccountVerified) {
+        return res.status(403).json({ success: false, message: "Account not authorized - please contact administrator" });
+    }
 
     const userData = {
         id: user.id,
