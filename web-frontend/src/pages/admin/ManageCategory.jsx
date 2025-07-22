@@ -32,6 +32,7 @@ const ManageCategory = () => {
 
     const [filters, setFilters] = useState({
         is_active: '',
+        is_liquor: '',
     });
 
     const [formData, setFormData] = useState({
@@ -52,6 +53,7 @@ const ManageCategory = () => {
         try {
             const params = {};
             if (filters.is_active !== '') params.is_active = filters.is_active;
+            if (filters.is_liquor !== '') params.is_liquor = filters.is_liquor;
 
             const response = await axiosInstance.get('/categories/getAll', { params });
             setCategories(response.data.data);
@@ -199,6 +201,21 @@ const ManageCategory = () => {
                             <MenuItem value="">All</MenuItem>
                             <MenuItem value="true">Active</MenuItem>
                             <MenuItem value="false">Inactive</MenuItem>
+                        </Select>
+                    </FormControl>
+                    <FormControl size="small" sx={{ minWidth: 200 }}>
+                        <InputLabel id="filter-type-label">Filter By Type</InputLabel>
+                        <Select
+                            labelId="filter-type-label"
+                            id="filter-type"
+                            name="is_liquor"
+                            value={filters.is_liquor}
+                            label="Filter By Type"
+                            onChange={handleFilterChange}
+                        >
+                            <MenuItem value="">All</MenuItem>
+                            <MenuItem value="true">Liquor</MenuItem>
+                            <MenuItem value="false">Regular</MenuItem>
                         </Select>
                     </FormControl>
                 </Box>
