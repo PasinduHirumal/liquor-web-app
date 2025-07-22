@@ -19,8 +19,7 @@ const LiquorProductCard = ({ product, detailButton = false }) => {
       <div
         className="card h-100 shadow-sm"
         style={{
-          transition: "transform 0.2s ease-in-out",
-          border: product.is_liquor ? "1px solid #dc3545" : "1px solid #dee2e6",
+          transition: "transform 0.2s ease-in-out"
         }}
         onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
         onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}

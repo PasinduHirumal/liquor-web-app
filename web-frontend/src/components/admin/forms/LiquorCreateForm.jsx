@@ -10,10 +10,12 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
         description: '',
         category_id: '',
         brand: '',
-        alcohol_content: 0,
-        volume: 0,
-        price: 0,
-        stock_quantity: 0,
+        alcohol_content: '',
+        volume: '',
+        cost_price: '',
+        marked_price: '',
+        discount_percentage: '',
+        stock_quantity: '',
         is_active: true,
         is_in_stock: true,
         is_liquor: true,
@@ -67,25 +69,38 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (images.length === 0) {
+            toast.error('Please upload at least one product image.');
+            return;
+        }
+
         setLoading(true);
 
         try {
-            const payload = { ...formData, images };
+            const payload = {
+                ...formData,
+                images: images,
+                add_quantity: 0,
+                withdraw_quantity: 0
+            };
+
             const res = await axiosInstance.post('/products/create', payload);
 
             toast.success('Product created successfully!');
             onSuccess(res.data.data);
 
-            // Reset
             setFormData({
                 name: '',
                 description: '',
                 category_id: '',
                 brand: '',
-                alcohol_content: 0,
-                volume: 0,
-                price: 0,
-                stock_quantity: 0,
+                alcohol_content: '',
+                volume: '',
+                cost_price: '',
+                marked_price: '',
+                discount_percentage: '',
+                stock_quantity: '',
                 is_active: true,
                 is_in_stock: true,
                 is_liquor: true,
@@ -173,6 +188,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                         onChange={handleChange}
                         min="0"
                         max="100"
+                        step="0.1"
                         disabled={loading}
                         required
                     />
@@ -186,19 +202,51 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                         value={formData.volume}
                         onChange={handleChange}
                         min="0"
+                        step="1"
                         disabled={loading}
                         required
                     />
                 </Form.Group>
 
                 <Form.Group className="col-md-4 mb-3">
-                    <Form.Label>Price</Form.Label>
+                    <Form.Label>Cost Price</Form.Label>
                     <Form.Control
                         type="number"
-                        name="price"
-                        value={formData.price}
+                        name="cost_price"
+                        value={formData.cost_price}
                         onChange={handleChange}
                         min="0"
+                        step="0.01"
+                        disabled={loading}
+                        required
+                    />
+                </Form.Group>
+            </div>
+
+            <div className="row">
+                <Form.Group className="col-md-6 mb-3">
+                    <Form.Label>Marked Price</Form.Label>
+                    <Form.Control
+                        type="number"
+                        name="marked_price"
+                        value={formData.marked_price}
+                        onChange={handleChange}
+                        min="0"
+                        step="0.01"
+                        disabled={loading}
+                        required
+                    />
+                </Form.Group>
+
+                <Form.Group className="col-md-6 mb-3">
+                    <Form.Label>Discount (%)</Form.Label>
+                    <Form.Control
+                        type="number"
+                        name="discount_percentage"
+                        value={formData.discount_percentage}
+                        onChange={handleChange}
+                        min="0"
+                        max="100"
                         step="0.01"
                         disabled={loading}
                         required
@@ -214,6 +262,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                     value={formData.stock_quantity}
                     onChange={handleChange}
                     min="0"
+                    step="1"
                     disabled={loading}
                     required
                 />
