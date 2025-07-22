@@ -79,7 +79,12 @@ const AdminUserList = () => {
       title: 'Role',
       dataIndex: 'role',
       render: (_, admin) => (
-        <AdminUserRowEditable admin={admin} onDeleteSuccess={handleDeleteSuccess} onUpdateLocal={handleUpdateLocal} part="role" />
+        <AdminUserRowEditable
+          admin={admin}
+          onDeleteSuccess={handleDeleteSuccess}
+          onUpdateLocal={handleUpdateLocal}
+          part="role"
+        />
       ),
       width: 140,
     },
@@ -87,7 +92,12 @@ const AdminUserList = () => {
       title: 'Active',
       dataIndex: 'isActive',
       render: (_, admin) => (
-        <AdminUserRowEditable admin={admin} onDeleteSuccess={handleDeleteSuccess} onUpdateLocal={handleUpdateLocal} part="isActive" />
+        <AdminUserRowEditable
+          admin={admin}
+          onDeleteSuccess={handleDeleteSuccess}
+          onUpdateLocal={handleUpdateLocal}
+          part="isActive"
+        />
       ),
       width: 100,
     },
@@ -107,7 +117,12 @@ const AdminUserList = () => {
       title: 'Actions',
       key: 'actions',
       render: (_, admin) => (
-        <AdminUserRowEditable admin={admin} onDeleteSuccess={handleDeleteSuccess} onUpdateLocal={handleUpdateLocal} part="actions" />
+        <AdminUserRowEditable
+          admin={admin}
+          onDeleteSuccess={handleDeleteSuccess}
+          onUpdateLocal={handleUpdateLocal}
+          part="actions"
+        />
       ),
       width: 100,
     },
