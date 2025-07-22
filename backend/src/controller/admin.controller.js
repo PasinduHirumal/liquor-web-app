@@ -118,7 +118,7 @@ const updateAdmin = async (req, res) => {
         }
 
         let isUpdatingTokenValue = false;
-        if ((req.body.role && isUpdatingSelf) || (isActive && isUpdatingSelf) || (isAdminAccepted && isUpdatingSelf)) {
+        if (req.body.role && isUpdatingSelf) {
             isUpdatingTokenValue = true;
         }
 
