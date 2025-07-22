@@ -100,7 +100,8 @@ const LiquorEditForm = () => {
         let newValue = type === "checkbox" ? checked : value;
 
         if (["cost_price", "marked_price", "discount_percentage",
-            "stock_quantity", "alcohol_content", "volume"].includes(name)) {
+            "stock_quantity", "alcohol_content", "volume",
+            "add_quantity", "withdraw_quantity"].includes(name)) {
             newValue = parseFloat(newValue) || 0;
         }
 
@@ -178,6 +179,42 @@ const LiquorEditForm = () => {
         setNewImagesBase64((prev) => prev.filter((_, i) => i !== index));
     };
 
+
+    const handleInventoryUpdate = async (e) => {
+        e.preventDefault();
+
+        const { add_quantity, withdraw_quantity } = formData;
+        const currentStock = formData.stock_quantity - (add_quantity || 0) + (withdraw_quantity || 0);
+
+        if (currentStock < 0) {
+            setErrors({ stock_quantity: "Insufficient stock for this operation" });
+            return;
+        }
+
+        setUpdating(true);
+        try {
+            const inventoryData = {
+                add_quantity: add_quantity || 0,
+                withdraw_quantity: withdraw_quantity || 0
+            };
+
+            await axiosInstance.patch(`/products/update-quantity/${id}`, inventoryData);
+            toast.success("Inventory updated successfully!");
+
+            setFormData(prev => ({
+                ...prev,
+                stock_quantity: currentStock,
+                add_quantity: 0,
+                withdraw_quantity: 0
+            }));
+        } catch (err) {
+            console.error(err);
+            toast.error(err.response?.data?.message || "Inventory update failed.");
+        } finally {
+            setUpdating(false);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -198,7 +235,9 @@ const LiquorEditForm = () => {
                 images: [...existingImages, ...newImagesBase64],
                 marked_price: undefined,
                 discount_percentage: undefined,
-                cost_price: undefined
+                cost_price: undefined,
+                add_quantity: undefined,
+                withdraw_quantity: undefined
             };
 
             await axiosInstance.patch(`/products/update/${id}`, payload);
@@ -368,20 +407,58 @@ const LiquorEditForm = () => {
                                                     </Form.Control.Feedback>
                                                 </FloatingLabel>
                                             </Col>
+                                        </Row>
+                                    </Card.Body>
+                                </Card>
+
+                                {/* Inventory Section */}
+                                <Card className="mb-4">
+                                    <Card.Header className="d-flex justify-content-between align-items-center">
+                                        <h5 className="mb-0">Manage Inventory</h5>
+                                        <Button
+                                            variant="outline-primary"
+                                            size="sm"
+                                            onClick={handleInventoryUpdate}
+                                            disabled={updating}
+                                        >
+                                            {updating ? (
+                                                <Spinner as="span" animation="border" size="sm" />
+                                            ) : (
+                                                "Update Stock Only"
+                                            )}
+                                        </Button>
+                                    </Card.Header>
+                                    <Card.Body>
+                                        <Row>
                                             <Col md={6}>
-                                                <FloatingLabel controlId="stock" label="Stock Quantity" className="mb-3">
+                                                <div className="mb-3">
+                                                    <div className={`p-3 rounded ${formData.stock_quantity > 10 ? 'bg-success' : formData.stock_quantity > 0 ? 'bg-warning' : 'bg-danger'} text-white`}>
+                                                        {formData.stock_quantity} units available
+                                                    </div>
+                                                </div>
+                                            </Col>
+                                            <Col md={6}>
+                                                <FloatingLabel controlId="add_quantity" label="Add Quantity" className="mb-3">
                                                     <Form.Control
-                                                        name="stock_quantity"
+                                                        name="add_quantity"
                                                         type="number"
-                                                        value={formData.stock_quantity}
+                                                        value={formData.add_quantity || 0}
                                                         onChange={handleChange}
                                                         min="0"
-                                                        isInvalid={!!errors.stock_quantity}
                                                         placeholder="0"
                                                     />
-                                                    <Form.Control.Feedback type="invalid">
-                                                        {errors.stock_quantity}
-                                                    </Form.Control.Feedback>
+                                                </FloatingLabel>
+                                            </Col>
+                                            <Col md={6}>
+                                                <FloatingLabel controlId="withdraw_quantity" label="Withdraw Quantity" className="mb-3">
+                                                    <Form.Control
+                                                        name="withdraw_quantity"
+                                                        type="number"
+                                                        value={formData.withdraw_quantity || 0}
+                                                        onChange={handleChange}
+                                                        min="0"
+                                                        placeholder="0"
+                                                    />
                                                 </FloatingLabel>
                                             </Col>
                                         </Row>
