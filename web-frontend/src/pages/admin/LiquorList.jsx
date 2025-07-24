@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col, InputGroup } from "react-bootstrap";
 import { axiosInstance } from "../../lib/axios";
 import LiquorProductCard from "../../common/LiquorProductCard";
 import LiquorCreateForm from "../../components/admin/forms/LiquorCreateForm";
@@ -22,7 +22,9 @@ const LiquorList = () => {
                 setLoading(true);
 
                 const categoriesResponse = await axiosInstance.get("/categories/getAll");
-                const activeCategories = (categoriesResponse.data.data || []).filter(cat => cat.is_active && cat.is_liquor);
+                const activeCategories = (categoriesResponse.data.data || []).filter(
+                    (cat) => cat.is_active && cat.is_liquor
+                );
                 setCategories(activeCategories);
 
                 const params = {
@@ -33,7 +35,9 @@ const LiquorList = () => {
                     params.categoryId = filters.categoryId;
                 }
 
-                const productsResponse = await axiosInstance.get("/products/getAll", { params });
+                const productsResponse = await axiosInstance.get("/products/getAll", {
+                    params,
+                });
                 setProducts(productsResponse.data.data);
                 setError(null);
             } catch (err) {
@@ -46,7 +50,6 @@ const LiquorList = () => {
 
         fetchInitialData();
     }, [filters]);
-
 
     const handleFilterChange = (e) => {
         const { name, value, type, checked } = e.target;
@@ -63,7 +66,7 @@ const LiquorList = () => {
     };
 
     const clearCategoryFilter = () => {
-        setFilters(prev => ({ ...prev, categoryId: "" }));
+        setFilters((prev) => ({ ...prev, categoryId: "" }));
     };
 
     return (
@@ -80,66 +83,71 @@ const LiquorList = () => {
             <div className="card mb-4">
                 <div className="card-body">
                     <h5 className="card-title mb-3">Filters</h5>
-                    <div className="d-flex gap-4 flex-wrap">
-                        <div className="form-check">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                id="filterActive"
-                                name="is_active"
-                                checked={filters.is_active}
-                                onChange={handleFilterChange}
-                            />
-                            <label className="form-check-label" htmlFor="filterActive">
-                                Active
-                            </label>
-                        </div>
-                        <div className="form-check">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                id="filterInStock"
-                                name="is_in_stock"
-                                checked={filters.is_in_stock}
-                                onChange={handleFilterChange}
-                            />
-                            <label className="form-check-label" htmlFor="filterInStock">
-                                In Stock
-                            </label>
-                        </div>
 
-                        {/* Category Filter */}
-                        <div className="d-flex align-items-center gap-2">
-                            <Form.Select
-                                name="categoryId"
-                                value={filters.categoryId}
-                                onChange={handleFilterChange}
-                                style={{ width: "200px" }}
-                            >
-                                <option value="">All Categories</option>
-                                {categories.map((category) => (
-                                    <option key={category.category_id} value={category.category_id}>
-                                        {category.name}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                            {filters.categoryId && (
-                                <Button
-                                    variant="outline-secondary"
-                                    size="sm"
-                                    onClick={clearCategoryFilter}
-                                >
-                                    Clear
-                                </Button>
-                            )}
-                        </div>
-                    </div>
+                    <Form>
+                        <Row className="align-items-center">
+                            {/* Active Checkbox */}
+                            <Col xs="auto" className="mb-3">
+                                <Form.Check
+                                    type="checkbox"
+                                    id="filterActive"
+                                    label="Active"
+                                    name="is_active"
+                                    checked={filters.is_active}
+                                    onChange={handleFilterChange}
+                                />
+                            </Col>
+
+                            {/* In Stock Checkbox */}
+                            <Col xs="auto" className="mb-3">
+                                <Form.Check
+                                    type="checkbox"
+                                    id="filterInStock"
+                                    label="In Stock"
+                                    name="is_in_stock"
+                                    checked={filters.is_in_stock}
+                                    onChange={handleFilterChange}
+                                />
+                            </Col>
+
+                            {/* Category Select with Clear Button */}
+                            <Col xs={12} sm={4} md={3} className="mb-3">
+                                <InputGroup>
+                                    <Form.Select
+                                        name="categoryId"
+                                        value={filters.categoryId}
+                                        onChange={handleFilterChange}
+                                        aria-label="Category Filter"
+                                    >
+                                        <option value="">All Categories</option>
+                                        {categories.map((category) => (
+                                            <option key={category.category_id} value={category.category_id}>
+                                                {category.name}
+                                            </option>
+                                        ))}
+                                    </Form.Select>
+                                    {filters.categoryId && (
+                                        <Button
+                                            variant="outline-secondary"
+                                            onClick={clearCategoryFilter}
+                                            aria-label="Clear category filter"
+                                        >
+                                            Clear
+                                        </Button>
+                                    )}
+                                </InputGroup>
+                            </Col>
+                        </Row>
+                    </Form>
                 </div>
             </div>
 
             {/* Loading State */}
             {loading && (
-                <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
+                <div
+                    className="d-flex justify-content-center align-items-center"
+                    style={{ minHeight: "60vh" }}
+                >
                     <div className="spinner-border" role="status" />
                 </div>
             )}
@@ -156,7 +164,11 @@ const LiquorList = () => {
                 <div className="row g-4">
                     {products.length > 0 ? (
                         products.map((product) => (
-                            <LiquorProductCard key={product.product_id} product={product} detailButton={true} />
+                            <LiquorProductCard
+                                key={product.product_id}
+                                product={product}
+                                detailButton={true}
+                            />
                         ))
                     ) : (
                         <div className="col-12">
