@@ -195,7 +195,6 @@ const LiquorList = () => {
                     <LiquorCreateForm
                         onSuccess={handleCreateSuccess}
                         onCancel={() => setShowCreateModal(false)}
-                        categories={categories}
                     />
                 </Modal.Body>
             </Modal>

@@ -1,28 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
 import OtherProductCard from "../../common/OtherProductCard";
-import { Button, Form, Row, Col } from "react-bootstrap";
+import { Button, Form, Row, Col, InputGroup } from "react-bootstrap";
 import CreateProductModal from "../../components/admin/forms/CreateProductModal";
 
 const OtherProductList = () => {
     const [products, setProducts] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [showCreateModal, setShowCreateModal] = useState(false);
 
-    // 🟨 Filter state (no is_liquor)
     const [filters, setFilters] = useState({
         is_active: "",
         is_in_stock: "",
+        categoryId: "",
     });
+
+    useEffect(() => {
+        fetchCategories();
+    }, []);
 
     useEffect(() => {
         fetchProducts();
     }, [filters]);
 
+    const fetchCategories = async () => {
+        try {
+            const response = await axiosInstance.get("/categories/getAll");
+            const activeCategories = (response.data.data || []).filter((cat) => cat.is_active && !cat.is_liquor);
+            setCategories(activeCategories);
+        } catch (err) {
+            console.error("Failed to fetch categories:", err);
+        }
+    };
+
     const fetchProducts = async () => {
         try {
             setLoading(true);
+            setError(null);
 
             const queryParams = new URLSearchParams();
             Object.entries(filters).forEach(([key, value]) => {
@@ -42,11 +58,16 @@ const OtherProductList = () => {
 
     const handleProductCreated = () => {
         fetchProducts();
+        setShowCreateModal(false);
     };
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         setFilters((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const clearCategoryFilter = () => {
+        setFilters((prev) => ({ ...prev, categoryId: "" }));
     };
 
     return (
@@ -65,8 +86,8 @@ const OtherProductList = () => {
             />
 
             <div className="bg-light p-3 rounded mb-4">
-                <Row>
-                    <Col md={3}>
+                <Row className="align-items-center">
+                    <Col md={3} className="mb-3">
                         <Form.Group controlId="is_active">
                             <Form.Label>Active Status</Form.Label>
                             <Form.Select name="is_active" value={filters.is_active} onChange={handleFilterChange}>
@@ -76,7 +97,7 @@ const OtherProductList = () => {
                             </Form.Select>
                         </Form.Group>
                     </Col>
-                    <Col md={3}>
+                    <Col md={3} className="mb-3">
                         <Form.Group controlId="is_in_stock">
                             <Form.Label>Stock Status</Form.Label>
                             <Form.Select name="is_in_stock" value={filters.is_in_stock} onChange={handleFilterChange}>
@@ -85,6 +106,33 @@ const OtherProductList = () => {
                                 <option value="false">Out of Stock</option>
                             </Form.Select>
                         </Form.Group>
+                    </Col>
+                    <Col md={4} className="mb-3">
+                        <Form.Label>Category</Form.Label>
+                        <InputGroup>
+                            <Form.Select
+                                name="categoryId"
+                                value={filters.categoryId}
+                                onChange={handleFilterChange}
+                                aria-label="Category Filter"
+                            >
+                                <option value="">All Categories</option>
+                                {categories.map((category) => (
+                                    <option key={category.category_id} value={category.category_id}>
+                                        {category.name}
+                                    </option>
+                                ))}
+                            </Form.Select>
+                            {filters.categoryId && (
+                                <Button
+                                    variant="outline-secondary"
+                                    onClick={clearCategoryFilter}
+                                    aria-label="Clear category filter"
+                                >
+                                    Clear
+                                </Button>
+                            )}
+                        </InputGroup>
                     </Col>
                 </Row>
             </div>
