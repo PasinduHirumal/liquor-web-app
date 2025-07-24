@@ -88,6 +88,7 @@ const PublicNavbar = () => {
               Grocery Items
             </StyledNavLink>
 
+            {/* 
             <Button
               variant="contained"
               sx={{
@@ -103,6 +104,8 @@ const PublicNavbar = () => {
             >
               Login
             </Button>
+            */}
+
           </Box>
 
           {/* Mobile Menu Icon */}
@@ -153,7 +156,8 @@ const PublicNavbar = () => {
               <StyledNavLink to="/other-product-all" onClick={closeMobileMenu} sx={{ mb: 2 }}>
                 Grocery Items
               </StyledNavLink>
-
+              
+              {/* 
               <Button
                 fullWidth
                 variant="contained"
@@ -172,6 +176,8 @@ const PublicNavbar = () => {
               >
                 Login
               </Button>
+              */}
+
             </Box>
           </Slide>
         )}
