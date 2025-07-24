@@ -5,41 +5,61 @@ import LiquorProductCard from "../common/LiquorProductCard";
 const LiquorAll = () => {
   const [products, setProducts] = useState([]);
   const [filteredProducts, setFilteredProducts] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filters] = useState({
-    is_active: true,
-    is_in_stock: true,
+  const [filters, setFilters] = useState({
+    category_id: "",
+    is_liquor: true,
   });
 
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchData = async () => {
       try {
         setLoading(true);
-        const response = await axiosInstance.get("/products/getAll");
-        const allProducts = response.data.data || [];
-        setProducts(allProducts);
+        const [productsRes, categoriesRes] = await Promise.all([
+          axiosInstance.get("/products/getAll"),
+          axiosInstance.get("/categories/getAll"),
+        ]);
+
+        setProducts(productsRes.data.data || []);
+        const activeCategories = (categoriesRes.data.data || []).filter(cat => cat.is_active && cat.is_liquor);
+        setCategories(activeCategories);
       } catch (err) {
-        setError(err.message || "Failed to fetch products");
-        console.error("Fetch products error:", err);
+        setError(err.message || "Failed to fetch data");
+        console.error("Fetch error:", err);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchProducts();
+    fetchData();
   }, []);
 
   useEffect(() => {
     const applyFilters = () => {
-      const filtered = products.filter(
-        (p) => p.is_active === filters.is_active && p.is_in_stock === filters.is_in_stock
-      );
+      let filtered = [...products];
+
+      filtered = filtered.filter(product => {
+        return (
+          (filters.is_liquor === undefined || product.is_liquor === filters.is_liquor) &&
+          (!filters.category_id || product.category_id?.id === filters.category_id)
+        );
+      });
+
       setFilteredProducts(filtered);
     };
 
     applyFilters();
   }, [products, filters]);
+
+  const handleFilterChange = (e) => {
+    const { name, value } = e.target;
+    setFilters(prev => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
 
   if (loading) {
     return (
@@ -61,19 +81,44 @@ const LiquorAll = () => {
 
   return (
     <div className="container-fluid py-4">
-      <div className="d-flex justify-content-between align-items-center mb-3">
+      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap">
         <h2 className="mb-0">Liquor Products</h2>
+
+        <div className="d-flex gap-3 align-items-center flex-wrap mt-2 mt-sm-0">
+          {/* Category Filter */}
+          <div className="form-group">
+            <select
+              name="category_id"
+              value={filters.category_id}
+              onChange={handleFilterChange}
+              className="form-select form-select-sm"
+            >
+              <option value="">All Categories</option>
+              {categories
+                .filter(c => c.is_active)
+                .map(category => (
+                  <option key={category.category_id} value={category.category_id}>
+                    {category.name}
+                  </option>
+                ))}
+            </select>
+          </div>
+        </div>
       </div>
 
       <div className="row g-4">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
-            <LiquorProductCard key={product.product_id} product={product} />
+            <LiquorProductCard
+              key={product.product_id}
+              product={product}
+              detailButton={false}
+            />
           ))
         ) : (
           <div className="col-12">
             <div className="alert alert-info" role="alert">
-              No products available based on filters.
+              No products match the current filters.
             </div>
           </div>
         )}
