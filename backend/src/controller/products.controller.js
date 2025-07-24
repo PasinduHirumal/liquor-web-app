@@ -79,6 +79,10 @@ const createProduct = async (req, res) => {
         const updateData = { };
         updateData.stockHistory = updatedStockHistory;
 
+        if (product.stock_quantity <= 0) {
+            updateData.is_in_stock = false;
+        }
+
         const updatedProduct = await productService.updateById(product.product_id, updateData);
         if (!updatedProduct) {
             return res.status(400).json({ success: false, message: "Failed to update stock history array"});
@@ -258,6 +262,10 @@ const updateProduct = async (req, res) => {
             stock_quantity: stockValidation.newStock,
             ...req.body 
         };
+
+        if (updateData.stock_quantity <= 0) {
+            updateData.is_in_stock = false;
+        }
 
         if (historyId !== '') {
             const currentStockHistory = product.stockHistory || [];
