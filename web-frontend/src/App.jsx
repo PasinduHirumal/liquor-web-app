@@ -6,6 +6,9 @@ import {
   Navigate,
 } from "react-router-dom";
 
+import AdminLogin from "./pages/admin/AdminLogin";
+import AdminRegister from "./pages/admin/AdminRegister";
+
 import ToastProvider from "./common/ToastProvider";
 import Login from "./routes/Login";
 import Register from "./routes/Register";
@@ -57,7 +60,7 @@ function App() {
             element={
               adminAuth || userAuth ? <Navigate to="/" replace /> : <Login />
             }
-          />
+          /> 
 
           <Route
             path="register"

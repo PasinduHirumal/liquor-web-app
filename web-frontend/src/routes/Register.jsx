@@ -10,10 +10,10 @@ const Register = () => {
     switch (activeComponent) {
       case 'AdminRegister':
         return <AdminRegister />;
-      case 'UserRegister':
-        return <UserRegister />;
+    {/*  case 'UserRegister':
+        return <UserRegister />; */}
       default:
-        return <UserRegister />;
+        return <AdminRegister />;
     }
   };
 
@@ -30,12 +30,16 @@ const Register = () => {
         >
           {/* Toggle Buttons */}
           <div className="btn-group w-100 gap-1 mb-4" role="group" aria-label="Register Toggle">
+            
+            {/*
             <button
               className={`btn ${activeComponent === 'UserRegister' ? 'btn-primary' : 'btn-outline-primary'}`}
               onClick={() => setActiveComponent('UserRegister')}
             >
               User Register
-            </button>
+            </button> 
+            */}
+
             <button
               className={`btn ${activeComponent === 'AdminRegister' ? 'btn-primary' : 'btn-outline-primary'}`}
               onClick={() => setActiveComponent('AdminRegister')}
