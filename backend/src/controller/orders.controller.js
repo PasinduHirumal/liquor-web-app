@@ -1,4 +1,5 @@
 import OrdersService from '../services/orders.service.js';
+import populateUser from '../utils/populateUser.js';
 
 const orderService = new OrdersService();
 
@@ -20,8 +21,10 @@ const getAllOrders = async (req, res) => {
             filterDescription.push(`status: ${status}`);
         }
 
+        const populatedOrders = await populateUser(filteredOrders);
+
         // Sort by created_at in descending order (newest first)
-        const sortedOrders = filteredOrders.sort((a, b) => {
+        const sortedOrders = populatedOrders.sort((a, b) => {
             return new Date(b.created_at) - new Date(a.created_at);
         });
 
