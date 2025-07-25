@@ -15,6 +15,12 @@ import OtherProductDetail from "../../pages/admin/detailPages/OtherProductDetail
 import OtherProductEditForm from "../../components/admin/forms/OtherProductEditForm";
 import ManageCategory from "../../pages/admin/ManageCategory";
 import DriverDetaiPage from "../../pages/admin/detailPages/DriverDetaiPage";
+import DriverProfileInfo from "../../components/admin/forms/DriverProfileInfo";
+import DriverVehicleInfo from "../../components/admin/forms/DriverVehicleInfo";
+import DriverLocationInfo from "../../components/admin/forms/DriverLocationInfo";
+import DriverPerformanceInfo from "../../components/admin/forms/DriverPerformanceInfo";
+import DriverFinancialInfo from "../../components/admin/forms/DriverFinancialInfo";
+import DriverDocumentInfo from "../../components/admin/forms/DriverDocumentInfo";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -110,5 +116,29 @@ export const adminRoutes = [
     {
         path: "/admin/drivers/:id",
         element: <DriverDetaiPage />
+    },
+    {
+        path: "/admin/drivers/:id/edit-profile",
+        element: <DriverProfileInfo />
+    },
+    {
+        path: "/admin/drivers/:id/edit-vehicles",
+        element: <DriverVehicleInfo />
+    },
+    {
+        path: "/admin/drivers/:id/edit-location",
+        element: <DriverLocationInfo />
+    },
+    {
+        path: "/admin/drivers/:id/edit-performance",
+        element: <DriverPerformanceInfo />
+    },
+    {
+        path: "/admin/drivers/:id/edit-financial",
+        element: <DriverFinancialInfo />
+    },
+    {
+        path: "/admin/drivers/:id/edit-documents",
+        element: <DriverDocumentInfo />
     },
 ];
