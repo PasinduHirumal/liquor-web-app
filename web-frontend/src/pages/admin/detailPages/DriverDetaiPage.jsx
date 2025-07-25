@@ -136,7 +136,13 @@ const DriverDetailPage = () => {
                             <div className="driver-detail-info-item">
                                 <span className="driver-detail-info-label">Address:</span>
                                 <span className="driver-detail-info-value">
-                                    {driver.address || "N/A"}, {driver.city || ""}
+                                    {driver.address || "N/A"}
+                                </span>
+                            </div>
+                            <div className="driver-detail-info-item">
+                                <span className="driver-detail-info-label">City:</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.city || "N/A"}
                                 </span>
                             </div>
                             <div className="driver-detail-info-item">
