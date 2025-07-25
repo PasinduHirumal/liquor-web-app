@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from "react-router-dom";
 import { useParams } from 'react-router-dom';
 import { axiosInstance } from '../../../lib/axios';
 import { Typography, Divider, Avatar, Chip, CircularProgress, IconButton, Tooltip, } from '@mui/material';
@@ -10,6 +11,31 @@ const DriverDetailPage = () => {
     const [driver, setDriver] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const navigate = useNavigate();
+
+    const handleEditProfile = () => {
+        navigate(`/admin/drivers/${id}/edit-profile`);
+    };
+
+    const handleEditVehicles = () => {
+        navigate(`/admin/drivers/${id}/edit-vehicles`);
+    };
+
+    const handleEditLocation = () => {
+        navigate(`/admin/drivers/${id}/edit-location`);
+    };
+
+    const handleEditPerformance = () => {
+        navigate(`/admin/drivers/${id}/edit-performance`);
+    };
+
+    const handleEditFinancial = () => {
+        navigate(`/admin/drivers/${id}/edit-financial`);
+    };
+
+    const handleEditDocuments = () => {
+        navigate(`/admin/drivers/${id}/edit-documents`);
+    };
 
     useEffect(() => {
         const fetchDriver = async () => {
@@ -28,7 +54,7 @@ const DriverDetailPage = () => {
 
     if (loading) {
         return (
-            <div className="driver-detail-loading">
+            <div className="driver-detail-loading text-center mt-5 pt-5">
                 <CircularProgress />
             </div>
         );
@@ -79,6 +105,7 @@ const DriverDetailPage = () => {
                         {/* Edit Button */}
                         <Tooltip title="Edit Personal Detail">
                             <IconButton
+                                onClick={handleEditProfile}
                                 style={{ position: "absolute", top: 8, right: 8 }}
                                 aria-label="edit profile"
                             >
@@ -154,7 +181,7 @@ const DriverDetailPage = () => {
                                 <Typography variant="h6">Vehicle Information</Typography>
                             </div>
                             <Tooltip title="Edit Vehicle Information">
-                                <IconButton aria-label="edit vehicle info">
+                                <IconButton onClick={handleEditVehicles} aria-label="edit vehicle info">
                                     <Edit />
                                 </IconButton>
                             </Tooltip>
@@ -201,7 +228,7 @@ const DriverDetailPage = () => {
                                 <Typography variant="h6">Location & Status</Typography>
                             </div>
                             <Tooltip title="Edit Location & Status">
-                                <IconButton aria-label="edit location">
+                                <IconButton onClick={handleEditLocation} aria-label="edit location">
                                     <Edit />
                                 </IconButton>
                             </Tooltip>
@@ -257,7 +284,7 @@ const DriverDetailPage = () => {
                                 <Typography variant="h6">Performance & Ratings</Typography>
                             </div>
                             <Tooltip title="Edit Performance Details">
-                                <IconButton aria-label="edit performance">
+                                <IconButton onClick={handleEditPerformance} aria-label="edit performance">
                                     <Edit />
                                 </IconButton>
                             </Tooltip>
@@ -311,7 +338,7 @@ const DriverDetailPage = () => {
                                 <Typography variant="h6">Financial Information</Typography>
                             </div>
                             <Tooltip title="Edit Financial Informations">
-                                <IconButton aria-label="edit financial information">
+                                <IconButton onClick={handleEditFinancial} aria-label="edit financial information">
                                     <Edit />
                                 </IconButton>
                             </Tooltip>
@@ -362,7 +389,7 @@ const DriverDetailPage = () => {
                                 <Typography variant="h6">Documents</Typography>
                             </div>
                             <Tooltip title="Edit Documents">
-                                <IconButton aria-label="edit documents">
+                                <IconButton onClick={handleEditDocuments} aria-label="edit documents">
                                     <Edit />
                                 </IconButton>
                             </Tooltip>
