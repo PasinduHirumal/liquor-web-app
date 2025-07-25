@@ -1,7 +1,7 @@
 import StockHistoryService from '../services/stockHistory.service.js';
 import OtherProductService from '../services/otherProduct.service.js';
 import ProductService from '../services/product.service.js';
-import populateUser from '../utils/populateUser.js';
+import populateAdmin from '../utils/populateAdmin.js';
 
 const stockHistoryService = new StockHistoryService();
 const otherProductService = new OtherProductService();
@@ -65,7 +65,7 @@ const getStockHistoryByProductId = async (req, res) => {
             return res.status(400).json({ success: false, message: "Failed to find stock history"});
         }
         
-        const populatedHistory = await populateUser(history);
+        const populatedHistory = await populateAdmin(history);
 
         // Sort by createdAt in ascending order (oldest first)
         const sortedHistory = populatedHistory.sort((a, b) => {
