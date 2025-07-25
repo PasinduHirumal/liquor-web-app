@@ -1,6 +1,6 @@
 import OrdersService from '../services/orders.service.js';
 import populateUser from '../utils/populateUser.js';
-import populateAddress from '../utils/populateAddress.js';
+import { populateAddressWithUserIdInData } from '../utils/populateAddress.js';
 
 const orderService = new OrdersService();
 
@@ -22,10 +22,10 @@ const getAllOrders = async (req, res) => {
             filterDescription.push(`status: ${status}`);
         }
 
-        let populatedOrders
+        let populatedOrders;
         try {
+            //populatedOrders = await populateAddressWithUserIdInData(filteredOrders);
             populatedOrders = await populateUser(filteredOrders);
-            //populatedOrders = await populateAddress(populatedOrders);
         } catch (error) {
             console.error("Error populating orders:", error);
             return res.status(500).json({ success: false, message: "Failed to populate orders" });
