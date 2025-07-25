@@ -201,14 +201,14 @@ const DriverList = () => {
             key: 'actions',
             render: (_, record) => (
                 <Space size="middle">
+                    <DeleteDriverButton
+                        driverId={record.id}
+                        onDeleted={fetchDrivers}
+                    />
                     <Button
                         icon={<EditOutlined />}
                         type="text"
                         onClick={() => console.log('Edit', record.id)}
-                    />
-                    <DeleteDriverButton
-                        driverId={record.id}
-                        onDeleted={fetchDrivers}
                     />
                 </Space>
             ),
