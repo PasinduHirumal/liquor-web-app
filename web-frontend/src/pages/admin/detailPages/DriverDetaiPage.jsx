@@ -14,27 +14,27 @@ const DriverDetailPage = () => {
     const navigate = useNavigate();
 
     const handleEditProfile = () => {
-        navigate(`/admin/drivers/${id}/edit-profile`);
+        navigate(`/driver-list/${id}/edit-profile`);
     };
 
     const handleEditVehicles = () => {
-        navigate(`/admin/drivers/${id}/edit-vehicles`);
+        navigate(`/driver-list/${id}/edit-vehicles`);
     };
 
     const handleEditLocation = () => {
-        navigate(`/admin/drivers/${id}/edit-location`);
+        navigate(`/driver-list/${id}/edit-location`);
     };
 
     const handleEditPerformance = () => {
-        navigate(`/admin/drivers/${id}/edit-performance`);
+        navigate(`/driver-list/${id}/edit-performance`);
     };
 
     const handleEditFinancial = () => {
-        navigate(`/admin/drivers/${id}/edit-financial`);
+        navigate(`/adriver-list/${id}/edit-financial`);
     };
 
     const handleEditDocuments = () => {
-        navigate(`/admin/drivers/${id}/edit-documents`);
+        navigate(`/driver-list/${id}/edit-documents`);
     };
 
     useEffect(() => {

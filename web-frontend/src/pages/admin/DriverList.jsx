@@ -206,7 +206,7 @@ const DriverList = () => {
                     <Button
                         icon={<RightOutlined />}
                         type="text"
-                        onClick={() => navigate(`/admin/drivers/${record.id}`)}
+                        onClick={() => navigate(`/driver-list/${record.id}`)}
                     />
                 </Space>
             ),

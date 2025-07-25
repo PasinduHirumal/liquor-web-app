@@ -114,31 +114,31 @@ export const adminRoutes = [
         element: <ManageCategory />
     },
     {
-        path: "/admin/drivers/:id",
+        path: "/driver-list/:id",
         element: <DriverDetaiPage />
     },
     {
-        path: "/admin/drivers/:id/edit-profile",
+        path: "/driver-list/:id/edit-profile",
         element: <DriverProfileInfo />
     },
     {
-        path: "/admin/drivers/:id/edit-vehicles",
+        path: "/driver-list/:id/edit-vehicles",
         element: <DriverVehicleInfo />
     },
     {
-        path: "/admin/drivers/:id/edit-location",
+        path: "/driver-list/:id/edit-location",
         element: <DriverLocationInfo />
     },
     {
-        path: "/admin/drivers/:id/edit-performance",
+        path: "/driver-list/:id/edit-performance",
         element: <DriverPerformanceInfo />
     },
     {
-        path: "/admin/drivers/:id/edit-financial",
+        path: "/driver-list/:id/edit-financial",
         element: <DriverFinancialInfo />
     },
     {
-        path: "/admin/drivers/:id/edit-documents",
+        path: "/driver-list/:id/edit-documents",
         element: <DriverDocumentInfo />
     },
 ];
