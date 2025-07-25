@@ -1,6 +1,7 @@
 import OrdersService from '../services/orders.service.js';
 import populateUser from '../utils/populateUser.js';
-import populateAddress from '../utils/populateAddress.js';
+import ORDER_STATUS from '../enums/orderStatus.js';
+import { populateAddressWithUserIdInData } from '../utils/populateAddress.js';
 
 const orderService = new OrdersService();
 
@@ -9,6 +10,10 @@ const getAllOrders = async (req, res) => {
 	try {
         const { status } = req.query;
 
+        if (!Object.values(ORDER_STATUS).includes(status)) {
+            return res.status(400).json({ success: false, message: "Invalid status value" });
+        }
+        
         const orders = await orderService.findAll();
         if (!orders) {
             return res.status(400).json({ success: false, message: "Failed to fetch orders"});
@@ -22,10 +27,10 @@ const getAllOrders = async (req, res) => {
             filterDescription.push(`status: ${status}`);
         }
 
-        let populatedOrders
+        let populatedOrders;
         try {
-            populatedOrders = await populateUser(filteredOrders);
-            //populatedOrders = await populateAddress(populatedOrders);
+            populatedOrders = await populateAddressWithUserIdInData(filteredOrders);
+            populatedOrders = await populateUser(populatedOrders);
         } catch (error) {
             console.error("Error populating orders:", error);
             return res.status(500).json({ success: false, message: "Failed to populate orders" });
