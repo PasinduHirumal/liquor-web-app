@@ -1,0 +1,261 @@
+/* Base Styles */
+:root {
+    --primary-color: #3f51b5 !important;
+    --secondary-color: #2c3e50 !important;
+    --text-color: #333 !important;
+    --text-secondary: #666 !important;
+    --border-color: #e0e0e0 !important;
+    --success-color: #4caf50 !important;
+    --warning-color: #ff9800 !important;
+    --error-color: #f44336 !important;
+    --background-color: #f5f7fa !important;
+    --card-bg: #ffffff !important;
+}
+
+/* Main Container */
+.driver-detail-container {
+    width: 100% !important;
+    min-height: 100vh !important;
+    padding: 20px !important;
+    background-color: var(--background-color) !important;
+}
+
+/* Header Section */
+.driver-detail-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    margin-bottom: 24px !important;
+    padding-bottom: 16px !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.driver-detail-title {
+    font-size: 1.8rem !important;
+    font-weight: 600 !important;
+    color: var(--secondary-color) !important;
+}
+
+.driver-detail-status {
+    display: flex !important;
+    gap: 10px !important;
+}
+
+/* Content Layout */
+.driver-detail-content {
+    display: grid !important;
+    grid-template-columns: 300px 1fr !important;
+    gap: 24px !important;
+    width: 100% !important;
+}
+
+/* Profile Section */
+.driver-detail-profile {
+    position: sticky !important;
+    top: 20px !important;
+    height: fit-content !important;
+}
+
+.driver-detail-profile-card {
+    background: var(--card-bg) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1) !important;
+    padding: 24px !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.driver-detail-avatar {
+    width: 180px !important;
+    height: 180px !important;
+    margin-bottom: 20px;
+    border: 4px solid var(--primary-color) !important;
+    object-fit: cover !important;
+}
+
+.driver-detail-contact,
+.driver-detail-identification {
+    width: 100% !important;
+    margin-top: 16px !important;
+}
+
+.driver-detail-section-title {
+    font-size: 1.1rem !important;
+    font-weight: 600 !important;
+    color: var(--secondary-color) !important;
+    margin-bottom: 16px !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.driver-detail-info-item {
+    display: flex !important;
+    justify-content: space-between !important;
+    margin-bottom: 12px !important;
+    padding: 8px 0 !important;
+}
+
+.driver-detail-info-label {
+    font-size: 0.9rem !important;
+    color: var(--text-secondary) !important;
+    font-weight: 500 !important;
+}
+
+.driver-detail-info-value {
+    font-size: 0.95rem !important;
+    color: var(--text-color) !important;
+    font-weight: 400 !important;
+    text-align: start !important;
+}
+
+.driver-detail-divider {
+    margin: 20px 0 !important;
+    background-color: var(--border-color) !important;
+    width: 100% !important;
+}
+
+/* Details Sections */
+.driver-detail-sections {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 20px !important;
+}
+
+.driver-detail-section-card {
+    background: var(--card-bg) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1) !important;
+    padding: 10px !important;
+    width: 100% !important;
+}
+
+.driver-detail-section-header {
+    display: flex !important;
+    align-items: center !important;
+    margin-bottom: 20px !important;
+    padding-bottom: 12px !important;
+    border-bottom: 1px solid var(--border-color) !important;
+}
+
+.driver-detail-section-icon {
+    color: var(--primary-color) !important;
+    margin-right: 12px !important;
+    font-size: 1.8rem !important;
+}
+
+.driver-detail-section-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)) !important;
+    gap: 16px !important;
+}
+
+.driver-detail-grid-item {
+    display: flex !important;
+    flex-direction: column !important;
+    padding: 12px !important;
+    background-color: rgba(245, 247, 250, 0.5) !important;
+    border-radius: 6px !important;
+}
+
+.driver-detail-grid-item.wide {
+    grid-column: 1 / -1 !important;
+}
+
+/* Status Chips */
+.driver-detail-status-chips {
+    display: flex !important;
+    gap: 8px !important;
+    margin-top: 4px !important;
+}
+
+/* Rating */
+.driver-detail-rating {
+    display: flex !important;
+    align-items: center !important;
+    gap: 4px !important;
+}
+
+.driver-detail-star-icon {
+    color: #f1c40f !important;
+    font-size: 1.2rem !important;
+}
+
+/* Document Links */
+.driver-detail-document-link {
+    color: var(--primary-color);
+    text-decoration: none !important;
+    font-weight: 500 !important;
+    transition: color 0.2s !important;
+}
+
+.driver-detail-document-link:hover {
+    color: #303f9f !important;
+    text-decoration: underline !important;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .driver-detail-content {
+        grid-template-columns: 280px 1fr !important;
+    }
+}
+
+@media (max-width: 992px) {
+    .driver-detail-content {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .driver-detail-profile {
+        position: static !important;
+    }
+    
+    .driver-detail-section-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
+    }
+}
+
+@media (max-width: 768px) {
+    .driver-detail-header {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 12px !important;
+    }
+    
+    .driver-detail-title {
+        font-size: 1.5rem !important;
+    }
+    
+    .driver-detail-status {
+        width: 100% !important;
+        justify-content: flex-start !important;
+    }
+    
+    .driver-detail-section-grid {
+        grid-template-columns: 1fr 1fr !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .driver-detail-container {
+        padding: 15px !important;
+    }
+    
+    .driver-detail-avatar {
+        width: 140px !important;
+        height: 140px !important;
+    }
+    
+    .driver-detail-section-grid {
+        grid-template-columns: 1fr !important;
+    }
+    
+    .driver-detail-info-item {
+        flex-direction: column !important;
+        gap: 4px !important;
+    }
+    
+    .driver-detail-info-value {
+        max-width: 100% !important;
+        text-align: left !important;
+    }
+}

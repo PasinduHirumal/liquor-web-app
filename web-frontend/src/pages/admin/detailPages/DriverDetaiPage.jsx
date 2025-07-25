@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { axiosInstance } from '../../../lib/axios';
 import { Box, Typography, Divider, Grid, Avatar, Chip, CircularProgress } from '@mui/material';
 import { LocationOn, DirectionsCar, AccountBalance, Star, Description } from '@mui/icons-material';
-import './DriverDetailPage.css';
+import '../../../styles/DriverDetailPage.css';
 
 const DriverDetailPage = () => {
     const { id } = useParams();
