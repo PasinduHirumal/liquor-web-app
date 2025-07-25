@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { axiosInstance } from '../../lib/axios';
 import CreateDriverForm from '../../components/admin/forms/CreateDriverForm';
 import toast from 'react-hot-toast';
@@ -8,7 +9,7 @@ import {
     Card, Row, Col, Typography, Select, Badge, Input
 } from 'antd';
 import {
-    EditOutlined, PlusOutlined, ReloadOutlined, FilterOutlined, SearchOutlined
+    EditOutlined, PlusOutlined, ReloadOutlined, FilterOutlined, SearchOutlined, RightOutlined
 } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
@@ -33,6 +34,8 @@ const DriverList = () => {
         isDocumentVerified: undefined,
         search: '',
     });
+
+    const navigate = useNavigate();
 
     const fetchDrivers = useCallback(async () => {
         setLoading(true);
@@ -79,13 +82,8 @@ const DriverList = () => {
     };
 
     const handleFilterChange = (name, value) => {
-        setPagination(prev => ({ ...prev, current: 1 })); // Reset to first page when filters change
-        setFilters(prev => ({ ...prev, [name]: value }));
-    };
-
-    const handleSearch = (e) => {
         setPagination(prev => ({ ...prev, current: 1 }));
-        setFilters(prev => ({ ...prev, search: e.target.value }));
+        setFilters(prev => ({ ...prev, [name]: value }));
     };
 
     const clearFilters = () => {
@@ -206,9 +204,9 @@ const DriverList = () => {
                         onDeleted={fetchDrivers}
                     />
                     <Button
-                        icon={<EditOutlined />}
+                        icon={<RightOutlined />}
                         type="text"
-                        onClick={() => console.log('Edit', record.id)}
+                        onClick={() => navigate(`/admin/drivers/${record.id}`)}
                     />
                 </Space>
             ),
