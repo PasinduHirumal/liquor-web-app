@@ -8,7 +8,7 @@ const router = express.Router();
 // http://localhost:5000/api/addresses
 
 router.post('/createAddress', authenticateUser, validateAddress, createAddress);
-router.get('/myAddresses', authenticateUser, getAllAddressesForUser);
+router.get('/getAddressesByUserId/:id', authenticateUser, getAllAddressesForUser);
 router.patch('/update/:id', authenticateUser, validateAddressUpdate, updateAddress);
 
 export default router;

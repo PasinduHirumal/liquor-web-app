@@ -6,12 +6,14 @@ const userService = new UserService();
 
 const createAddress = async (req, res) => {
 	try {
+        const userId = req.user.id;
+
         const addressData = {
-            userId: req.user.id,
+            userId: userId,
             ...req.body
         };
 
-        const address = await addressService.create(addressData);
+        const address = await addressService.create(userId, addressData);
         if (!address) {
             return res.status(400).json({ success: false, message: "Failed to create address"});
         }
@@ -43,23 +45,22 @@ const createAddress = async (req, res) => {
 
 const getAllAddressesForUser = async (req, res) => {
 	try {
-        const userId = req.user.id;
-        const { isActive } = req.query;
+        const userId = req.params.id;
+        const { isDefault } = req.query;
 
-        const addresses = await addressService.findByFilter('userId', '==', userId);
+        const addresses = await addressService.findByFilter(userId, 'userId', '==', userId);
         if (!addresses) {
             return res.status(400).json({ success: false, message: "Failed to find addresses for user"});
         }
 
-        let filteredAddresses;
+        let filteredAddresses = addresses;
         let filterDescription = [];
-        if (isActive !== undefined) {
+        
+        if (isDefault !== undefined) {
             // Convert string to boolean since query params are strings
-            const isActiveBoolean = isActive === 'true';
-            filteredAddresses = addresses.filter(address => address.isActive === isActiveBoolean);
-            filterDescription.push(`isActive: ${isActive}`);
-        } else {
-            filteredAddresses = addresses;
+            const isActiveBoolean = isDefault === 'true';
+            filteredAddresses = filteredAddresses.filter(address => address.isDefault === isActiveBoolean);
+            filterDescription.push(`isDefault: ${isDefault}`);
         }
         
         return res.status(200).json({ 
@@ -78,8 +79,9 @@ const getAllAddressesForUser = async (req, res) => {
 const updateAddress = async (req, res) => {
 	try {
         const addressId = req.params.id;
+        const userId = req.user.id;
 
-        const address = await addressService.findById(addressId);
+        const address = await addressService.findById(userId, addressId);
         if (!address) {
             return res.status(404).json({ success: false, message: "Address not found"});
         }
@@ -89,7 +91,7 @@ const updateAddress = async (req, res) => {
         }
 
         const addressData = { ...req.body };
-        const updatedAddress = await addressService.updateById(addressId, addressData);
+        const updatedAddress = await addressService.updateById(userId, addressId, addressData);
         
         return res.status(200).json({ success: true, message: "Address updated successfully", data: updatedAddress});
     } catch (error) {

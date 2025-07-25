@@ -7,10 +7,17 @@ const validateAddress = (req, res, next) => {
     state: Joi.string().min(1).max(100).required(),
     postalCode: Joi.string().pattern(/^[A-Za-z0-9\s\-]{3,10}$/).required(),
     country: Joi.string().min(2).max(100).required(),
-    
+    streetAddress: Joi.string().min(2).max(300).required(),
+    phoneNumber: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).min(10).max(18).trim().default(null),
+
     latitude: Joi.number().min(-90).max(90).precision(6).optional(),
     longitude: Joi.number().min(-180).max(180).precision(6).optional(),
     
+    fullName: Joi.string().min(1).max(100).default(''),
+    buildingName: Joi.string().min(1).max(100).default(''),
+    landmark: Joi.string().min(1).max(100).default(''),
+    notes: Joi.string().min(1).max(100).default(''),
+
     isDefault: Joi.boolean().default(false),
     isActive: Joi.boolean().default(true),
   });
@@ -46,10 +53,17 @@ const validateAddressUpdate = (req, res, next) => {
     state: Joi.string().min(1).max(100).optional(),
     postalCode: Joi.string().pattern(/^[A-Za-z0-9\s\-]{3,10}$/).optional(),
     country: Joi.string().min(2).max(100).optional(),
-    
+    streetAddress: Joi.string().min(2).max(300).optional(),
+    phoneNumber: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).min(10).max(18).trim().optional(),
+
     latitude: Joi.number().min(-90).max(90).precision(6).optional(),
     longitude: Joi.number().min(-180).max(180).precision(6).optional(),
     
+    fullName: Joi.string().min(1).max(100).optional(),
+    buildingName: Joi.string().min(1).max(100).optional(),
+    landmark: Joi.string().min(1).max(100).optional(),
+    notes: Joi.string().min(1).max(100).optional(),
+
     isDefault: Joi.boolean().optional(),
     isActive: Joi.boolean().optional(),
   })

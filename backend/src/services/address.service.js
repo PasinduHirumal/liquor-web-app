@@ -4,94 +4,123 @@ import Addresses from "../models/Addresses.js";
 const { db } = initializeFirebase();
 
 class AddressService {
-    constructor () {
-        this.collection = db.collection('addresses');
+    constructor() {
+        this.usersCollection = db.collection('users');
     }
 
-    async findById(id) {
+    // Get addresses sub-collection for a specific user
+    getAddressesCollection(userId) {
+        return this.usersCollection.doc(userId).collection('addresses');
+    }
+
+    async findById(userId, addressId) {
         try {
-            const userDoc = await this.collection.doc(id).get();
-            if (!userDoc.exists) {
+            const addressDoc = await this.getAddressesCollection(userId).doc(addressId).get();
+            if (!addressDoc.exists) {
                 return null;
             }
         
-            const userData = userDoc.data();
-            return new Addresses(userDoc.id, userData);
+            const addressData = addressDoc.data();
+            return new Addresses(addressDoc.id, addressData);
         } catch (error) {
             throw error;
         }
     }
 
-    async findAll() {
+    async findAllByUserId(userId) {
         try {
-            const usersRef = await this.collection.get();
+            const addressesRef = await this.getAddressesCollection(userId).get();
 
-            if (usersRef.empty) {
+            if (addressesRef.empty) {
                 return [];
             }
 
-            return usersRef.docs.map(doc => new Addresses(doc.id, doc.data()));
+            return addressesRef.docs.map(doc => new Addresses(doc.id, doc.data()));
         } catch (error) {
             throw error;
         }
     }
 
-    async findByFilter(field, operator, value) {
+    async findByFilter(userId, field, operator, value) {
         try {
-            const usersRef = await this.collection.where(field, operator, value).get();
+            const addressesRef = await this.getAddressesCollection(userId)
+                .where(field, operator, value)
+                .get();
 
-            if (usersRef.empty) {
+            if (addressesRef.empty) {
                 return [];
             }
 
-            return usersRef.docs.map(doc => new Addresses(doc.id, doc.data()));
+            return addressesRef.docs.map(doc => new Addresses(doc.id, doc.data()));
         } catch (error) {
             throw error;
         }
     }
 
-    async create(data) {
+    async create(userId, data) {
         try {
-            const userRef = await this.collection.add({...data,
+            const addressRef = await this.getAddressesCollection(userId).add({
+                ...data,
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString()
             });
 
-            return new Addresses(userRef.id, data);
+            return new Addresses(addressRef.id, data);
         } catch (error) {
             throw error;
         }
     }
 
-    async updateById(id, updateData) {
+    async updateById(userId, addressId, updateData) {
         try {
-            const userDoc = await this.collection.doc(id).get();
+            const addressDoc = await this.getAddressesCollection(userId).doc(addressId).get();
 
-            if (!userDoc.exists) {
+            if (!addressDoc.exists) {
                 return false;
             }
             
             updateData.updatedAt = new Date().toISOString();
         
-            await this.collection.doc(id).update(updateData);
+            await this.getAddressesCollection(userId).doc(addressId).update(updateData);
         
-            const updatedData = await this.findById(id);
+            const updatedData = await this.findById(userId, addressId);
             return updatedData;
         } catch (error) {
             throw error;
         }
     }
 
-    async deleteById(id) {
+    async deleteById(userId, addressId) {
         try {
-            const userDoc = await this.collection.doc(id).get();
+            const addressDoc = await this.getAddressesCollection(userId).doc(addressId).get();
 
-            if (!userDoc.exists) {
+            if (!addressDoc.exists) {
                 return false;
             }
 
-            await this.collection.doc(id).delete();
+            await this.getAddressesCollection(userId).doc(addressId).delete();
             return true;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Additional method to get all addresses across all users (if needed)
+    async findAllAddressesGlobally() {
+        try {
+            const usersSnapshot = await this.usersCollection.get();
+            const allAddresses = [];
+
+            for (const userDoc of usersSnapshot.docs) {
+                const addressesSnapshot = await userDoc.ref.collection('addresses').get();
+                const userAddresses = addressesSnapshot.docs.map(doc => ({
+                    ...new Addresses(doc.id, doc.data()),
+                    userId: userDoc.id // Include userId for reference
+                }));
+                allAddresses.push(...userAddresses);
+            }
+
+            return allAddresses;
         } catch (error) {
             throw error;
         }
