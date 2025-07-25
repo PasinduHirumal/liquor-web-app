@@ -2,7 +2,7 @@ import AdminUserService from '../services/adminUsers.service.js';
 
 const adminService = new AdminUserService();
 
-const populateUser = async (data) => {
+const populateAdmin = async (data) => {
     const populateOne = async (category) => {
         // Handle both string ID and object with ID
         const authorId = typeof category.userId === 'string' 
@@ -36,4 +36,4 @@ const populateUser = async (data) => {
     }
 };
 
-export default populateUser;
+export default populateAdmin;
