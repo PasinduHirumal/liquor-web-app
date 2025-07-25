@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { axiosInstance } from '../../../lib/axios';
-import { Box, Typography, Divider, Grid, Avatar, Chip, CircularProgress } from '@mui/material';
-import { LocationOn, DirectionsCar, AccountBalance, Star, Description } from '@mui/icons-material';
+import { Typography, Divider, Avatar, Chip, CircularProgress, IconButton, Tooltip, } from '@mui/material';
+import { LocationOn, DirectionsCar, AccountBalance, Star, Description, Edit } from '@mui/icons-material';
 import '../../../styles/DriverDetailPage.css';
 
 const DriverDetailPage = () => {
@@ -75,7 +75,17 @@ const DriverDetailPage = () => {
             <div className="driver-detail-content">
                 {/* Left Column - Profile Section */}
                 <div className="driver-detail-profile">
-                    <div className="driver-detail-profile-card">
+                    <div className="driver-detail-profile-card" style={{ position: "relative" }}>
+                        {/* Edit Button */}
+                        <Tooltip title="Edit Personal Detail">
+                            <IconButton
+                                style={{ position: "absolute", top: 8, right: 8 }}
+                                aria-label="edit profile"
+                            >
+                                <Edit />
+                            </IconButton>
+                        </Tooltip>
+
                         <Avatar
                             src={driver.profileImage}
                             className="driver-detail-avatar"
@@ -83,27 +93,28 @@ const DriverDetailPage = () => {
                         <Typography variant="h6" className="driver-detail-section-title border-0">
                             {driver.firstName} {driver.lastName}
                         </Typography>
+
                         <div className="driver-detail-contact">
                             <Typography variant="h6" className="driver-detail-section-title">
                                 Contact Information
                             </Typography>
                             <div className="driver-detail-info-item">
                                 <span className="driver-detail-info-label">Email:</span>
-                                <span className="driver-detail-info-value">{driver.email || 'N/A'}</span>
+                                <span className="driver-detail-info-value">{driver.email || "N/A"}</span>
                             </div>
                             <div className="driver-detail-info-item">
                                 <span className="driver-detail-info-label">Phone:</span>
-                                <span className="driver-detail-info-value">{driver.phone || 'N/A'}</span>
+                                <span className="driver-detail-info-value">{driver.phone || "N/A"}</span>
                             </div>
                             <div className="driver-detail-info-item">
                                 <span className="driver-detail-info-label">Address:</span>
                                 <span className="driver-detail-info-value">
-                                    {driver.address || 'N/A'}, {driver.city || ''}
+                                    {driver.address || "N/A"}, {driver.city || ""}
                                 </span>
                             </div>
                             <div className="driver-detail-info-item">
                                 <span className="driver-detail-info-label">Emergency Contact:</span>
-                                <span className="driver-detail-info-value">{driver.emergencyContact || 'N/A'}</span>
+                                <span className="driver-detail-info-value">{driver.emergencyContact || "N/A"}</span>
                             </div>
                         </div>
 
@@ -115,16 +126,18 @@ const DriverDetailPage = () => {
                             </Typography>
                             <div className="driver-detail-info-item">
                                 <span className="driver-detail-info-label">NIC Number:</span>
-                                <span className="driver-detail-info-value">{driver.nic_number || 'N/A'}</span>
+                                <span className="driver-detail-info-value">{driver.nic_number || "N/A"}</span>
                             </div>
                             <div className="driver-detail-info-item">
                                 <span className="driver-detail-info-label">License Number:</span>
-                                <span className="driver-detail-info-value">{driver.license_number || 'N/A'}</span>
+                                <span className="driver-detail-info-value">{driver.license_number || "N/A"}</span>
                             </div>
                             <div className="driver-detail-info-item">
                                 <span className="driver-detail-info-label">Date of Birth:</span>
                                 <span className="driver-detail-info-value">
-                                    {driver.dateOfBirth ? new Date(driver.dateOfBirth).toLocaleDateString() : 'N/A'}
+                                    {driver.dateOfBirth
+                                        ? new Date(driver.dateOfBirth).toLocaleDateString()
+                                        : "N/A"}
                                 </span>
                             </div>
                         </div>
@@ -135,9 +148,16 @@ const DriverDetailPage = () => {
                 <div className="driver-detail-sections">
                     {/* Vehicle Information */}
                     <div className="driver-detail-section-card">
-                        <div className="driver-detail-section-header">
-                            <DirectionsCar className="driver-detail-section-icon" />
-                            <Typography variant="h6">Vehicle Information</Typography>
+                        <div className="driver-detail-section-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <DirectionsCar className="driver-detail-section-icon" />
+                                <Typography variant="h6">Vehicle Information</Typography>
+                            </div>
+                            <Tooltip title="Edit Vehicle Information">
+                                <IconButton aria-label="edit vehicle info">
+                                    <Edit />
+                                </IconButton>
+                            </Tooltip>
                         </div>
                         <div className="driver-detail-section-grid">
                             <div className="driver-detail-grid-item">
@@ -171,9 +191,20 @@ const DriverDetailPage = () => {
 
                     {/* Location & Status */}
                     <div className="driver-detail-section-card">
-                        <div className="driver-detail-section-header">
-                            <LocationOn className="driver-detail-section-icon" />
-                            <Typography variant="h6">Location & Status</Typography>
+                        <div className="driver-detail-section-header" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <LocationOn className="driver-detail-section-icon" />
+                                <Typography variant="h6">Location & Status</Typography>
+                            </div>
+                            <Tooltip title="Edit Location & Status">
+                                <IconButton aria-label="edit location">
+                                    <Edit />
+                                </IconButton>
+                            </Tooltip>
                         </div>
                         <div className="driver-detail-section-grid">
                             {driver.currentLocation ? (
@@ -216,9 +247,20 @@ const DriverDetailPage = () => {
 
                     {/* Performance & Ratings */}
                     <div className="driver-detail-section-card">
-                        <div className="driver-detail-section-header">
-                            <Star className="driver-detail-section-icon" />
-                            <Typography variant="h6">Performance & Ratings</Typography>
+                        <div className="driver-detail-section-header" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Star className="driver-detail-section-icon" />
+                                <Typography variant="h6">Performance & Ratings</Typography>
+                            </div>
+                            <Tooltip title="Edit Performance Details">
+                                <IconButton aria-label="edit performance">
+                                    <Edit />
+                                </IconButton>
+                            </Tooltip>
                         </div>
                         <div className="driver-detail-section-grid">
                             <div className="driver-detail-grid-item">
@@ -259,9 +301,20 @@ const DriverDetailPage = () => {
 
                     {/* Financial Information */}
                     <div className="driver-detail-section-card">
-                        <div className="driver-detail-section-header">
-                            <AccountBalance className="driver-detail-section-icon" />
-                            <Typography variant="h6">Financial Information</Typography>
+                        <div className="driver-detail-section-header" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <AccountBalance className="driver-detail-section-icon" />
+                                <Typography variant="h6">Financial Information</Typography>
+                            </div>
+                            <Tooltip title="Edit Financial Informations">
+                                <IconButton aria-label="edit financial information">
+                                    <Edit />
+                                </IconButton>
+                            </Tooltip>
                         </div>
                         <div className="driver-detail-section-grid">
                             <div className="driver-detail-grid-item">
@@ -299,9 +352,20 @@ const DriverDetailPage = () => {
 
                     {/* Documents */}
                     <div className="driver-detail-section-card">
-                        <div className="driver-detail-section-header">
-                            <Description className="driver-detail-section-icon" />
-                            <Typography variant="h6">Documents</Typography>
+                        <div className="driver-detail-section-header" style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'space-between'
+                        }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <Description className="driver-detail-section-icon" />
+                                <Typography variant="h6">Documents</Typography>
+                            </div>
+                            <Tooltip title="Edit Documents">
+                                <IconButton aria-label="edit documents">
+                                    <Edit />
+                                </IconButton>
+                            </Tooltip>
                         </div>
                         <div className="driver-detail-section-grid">
                             {driver.documents ? (
