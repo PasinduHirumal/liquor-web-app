@@ -1,9 +1,13 @@
 import OrdersService from '../services/orders.service.js';
+import DriverService from "../services/driver.service.js";
+import DriverDutyService from '../services/driverDuty.service.js';
 import populateUser from '../utils/populateUser.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
 import { populateAddressWithUserIdInData } from '../utils/populateAddress.js';
 
 const orderService = new OrdersService();
+const driverService = new DriverService();
+const dutyService = new DriverDutyService();
 
 
 const getAllOrders = async (req, res) => {
@@ -81,12 +85,94 @@ const getOrderById = async (req, res) => {
 
 const updateOrder = async (req, res) => {
 	try {
-        return res.status(400).json({ success: false, message: ""});
-        return res.status(200).json({ success: true, message: ""});
+        const orderId = req.params.id;
+        const { status, assigned_driver_id } = req.body;
+
+        const order = await orderService.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found"});
+        }
+
+        let assigned_driver;
+        let isAssigningDriver = false;
+        if (assigned_driver_id !== undefined) {
+            const driver = await driverService.findById(assigned_driver_id);
+            if (!driver) {
+                return res.status(404).json({ success: false, message: "Driver not found"});
+            }
+
+            const failedChecks = [];
+            
+            if (!driver.isDocumentVerified) failedChecks.push("Documents not verified");
+            if (!driver.isAccountVerified) failedChecks.push("Account not verified");
+            if (!driver.isAvailable) failedChecks.push("Not available");
+            if (!driver.isActive) failedChecks.push("Account not active");
+            if (driver.backgroundCheckStatus !== "approved") {
+                failedChecks.push(`Background check ${driver.backgroundCheckStatus} (must be approved)`);
+            }
+
+            if (failedChecks.length > 0) {
+                return res.status(400).json({ success: false, message: failedChecks });
+            }
+
+            assigned_driver = driver;
+            isAssigningDriver = true;
+        }
+
+        let isUpdatingStatus = false;
+        if (status !== undefined) {
+            isUpdatingStatus = true;
+        }
+
+        // create driver duty
+        let driver_duty = null;
+        if (isAssigningDriver) {
+            try {
+                const driverDutyData = {
+                    driver_id: assigned_driver_id,
+                    order_id: order.order_id,
+                    is_completed: false,
+                    is_driver_accepted: false
+                }
+
+                const driverDuty = await dutyService.create(driverDutyData);
+                if (!driverDuty){
+                    return res.status(500).json({ success: false, message: "Failed to creating driver duty" });
+                }
+
+                driver_duty = driverDuty;
+            } catch (error) {
+                console.error("Error creating driver duty:", error);
+                return res.status(500).json({ success: false, message: "Failed to creating driver duty" });
+            }
+        }
+
+        const updateData = { ...req.body };
+
+        if (isAssigningDriver) updateData.status = ORDER_STATUS.OUT_FOR_DELIVERY;
+
+        const updatedOrder = await orderService.updateById(orderId, updateData);
+        if (!updatedOrder) {
+            return res.status(500).json({ success: true, message: "Failed to update order"});
+        }
+
+        let successMessage = "Order updated successfully";
+        if (isAssigningDriver) successMessage = "Driver assigned successfully";
+        if (isUpdatingStatus) successMessage = "Order status updated successfully";
+        if (isAssigningDriver && isUpdatingStatus) successMessage = "Order status updated and Driver assigned successfully";
+
+        return res.status(200).json({ 
+            success: true, 
+            message: successMessage, 
+            data: {
+                duty: driver_duty,
+                order: updatedOrder
+            }
+        });
     } catch (error) {
         console.error("Update Order error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
 
-export { getAllOrders, getOrderById };
+export { getAllOrders, getOrderById, updateOrder};
