@@ -480,6 +480,41 @@ const validateDocumentUpdate = (req, res, next) => {
   next();
 };
 
+// Additional validator for driver qualifications updates
+const validateQualificationsUpdate = (req, res, next) => {
+  const schema = Joi.object({
+    // Qualifications
+    isActive: Joi.boolean().optional(),
+    isAvailable: Joi.boolean().optional(),
+    isAccountVerified: Joi.boolean().optional(),
+    isDocumentVerified: Joi.boolean().optional(),
+    backgroundCheckStatus: Joi.string().valid('pending', 'approved', 'rejected').optional(),
+  })
+  .min(1) // Require at least one field to update
+  .options({ stripUnknown: true });
+
+  const { error, value } = schema.validate(req.body, {
+    allowUnknown: false,
+    abortEarly: false
+  });
+
+  if (error) {
+    console.log("Validation error: " + error.details[0].message);
+    return res.status(400).json({ 
+        success: false,
+        message: "Validation failed",
+        errors: error.details.map(detail => ({
+          field: detail.path.join('.'),
+          message: detail.message,
+          value: detail.context?.value
+        }))
+    });
+  }
+
+  req.body = value;
+  next();
+};
+
 export { 
   validateDriver, 
   validateDriverUpdate, 
@@ -487,5 +522,6 @@ export {
   validateLocationAndDeliveryUpdate,
   validatePerformanceAndRatingUpdate,
   validateFinancialUpdate,
-  validateDocumentUpdate
+  validateDocumentUpdate,
+  validateQualificationsUpdate
 };

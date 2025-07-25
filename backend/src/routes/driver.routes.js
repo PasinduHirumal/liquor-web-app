@@ -1,6 +1,6 @@
 import express from 'express';
 import { authenticateUser, authorizeRoles } from '../middleware/authMiddleware.js';
-import { validateDocumentUpdate, validateDriver, validateDriverUpdate, validateFinancialUpdate, validateLocationAndDeliveryUpdate, validatePerformanceAndRatingUpdate, validateVehicleInformationUpdate } from '../validations/DriverValidator.js';
+import { validateDocumentUpdate, validateDriver, validateDriverUpdate, validateFinancialUpdate, validateLocationAndDeliveryUpdate, validatePerformanceAndRatingUpdate, validateQualificationsUpdate, validateVehicleInformationUpdate } from '../validations/DriverValidator.js';
 import { createDriver, deleteDriver, getAllDrivers, getDriverById, updateDriver } from '../controller/driver.controller.js';
 
 
@@ -17,6 +17,7 @@ router.patch('/update-locationAndDelivery/:id', authenticateUser, authorizeRoles
 router.patch('/update-performanceAndRating/:id', authenticateUser, authorizeRoles("super_admin", "admin", "user"), validatePerformanceAndRatingUpdate, updateDriver);
 router.patch('/update-financial/:id', authenticateUser, authorizeRoles("super_admin", "admin", "driver"), validateFinancialUpdate, updateDriver);
 router.patch('/update-document/:id', authenticateUser, authorizeRoles("super_admin", "admin", "driver"), validateDocumentUpdate, updateDriver);
+router.patch('/update-qualifications/:id', authenticateUser, authorizeRoles("super_admin"), validateQualificationsUpdate, updateDriver);
 router.delete('/delete/:id', authenticateUser, authorizeRoles("super_admin"), deleteDriver);
 
 export default router;
