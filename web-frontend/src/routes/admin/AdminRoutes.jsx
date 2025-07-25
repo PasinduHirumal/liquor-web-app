@@ -14,7 +14,7 @@ import OtherProductList from "../../pages/admin/OtherProductList";
 import OtherProductDetail from "../../pages/admin/detailPages/OtherProductDetail";
 import OtherProductEditForm from "../../components/admin/forms/OtherProductEditForm";
 import ManageCategory from "../../pages/admin/ManageCategory";
-import EditDriverPage from "../../pages/admin/EditDriverPage";
+import DriverDetaiPage from "../../pages/admin/detailPages/DriverDetaiPage";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -109,6 +109,6 @@ export const adminRoutes = [
     },
     {
         path: "/admin/drivers/:id",
-        element: <EditDriverPage />
+        element: <DriverDetaiPage />
     },
 ];
