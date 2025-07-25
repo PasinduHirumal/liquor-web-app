@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../../lib/axios";
 import {
     TextField,
@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 
 function DriverProfileInfo() {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [driver, setDriver] = useState(null);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
@@ -36,7 +37,7 @@ function DriverProfileInfo() {
         const fetchDriver = async () => {
             try {
                 const response = await axiosInstance.get(`/drivers/getDriverById/${id}`);
-                const data = response.data;
+                const data = response.data.data;
 
                 setDriver(data);
                 setFormData({
@@ -77,7 +78,7 @@ function DriverProfileInfo() {
         reader.onloadend = () => {
             setFormData((prev) => ({
                 ...prev,
-                profileImage: reader.result // base64 string
+                profileImage: reader.result
             }));
         };
         reader.readAsDataURL(file);
@@ -90,6 +91,7 @@ function DriverProfileInfo() {
 
             await axiosInstance.patch(`/drivers/update/${id}`, updatePayload);
             toast.success("Driver profile updated successfully");
+            navigate(-1)
         } catch (error) {
             const msg = error?.response?.data?.message || "Failed to update driver";
             toast.error(msg);
@@ -114,7 +116,7 @@ function DriverProfileInfo() {
                         <Avatar
                             src={formData.profileImage}
                             alt={formData.firstName}
-                            sx={{ width: 64, height: 64 }}
+                            sx={{ width: 74, height: 74 }}
                         />
                     </Grid>
                     <Grid item xs>
