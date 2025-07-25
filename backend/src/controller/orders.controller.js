@@ -14,7 +14,7 @@ const getAllOrders = async (req, res) => {
 	try {
         const { status } = req.query;
 
-        if (!Object.values(ORDER_STATUS).includes(status)) {
+        if (status && !Object.values(ORDER_STATUS).includes(status)) {
             return res.status(400).json({ success: false, message: "Invalid status value" });
         }
 
