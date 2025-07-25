@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from "react-router-dom";
-import { useParams } from 'react-router-dom';
-import { axiosInstance } from '../../../lib/axios';
+import { useParams, useNavigate } from "react-router-dom";
 import { Typography, Divider, Avatar, Chip, CircularProgress, IconButton, Tooltip, } from '@mui/material';
 import { LocationOn, DirectionsCar, AccountBalance, Star, Description, Edit } from '@mui/icons-material';
 import '../../../styles/DriverDetailPage.css';
+import { axiosInstance } from '../../../lib/axios';
+import DriverAccountStatus from '../../../components/admin/forms/DriverAccountStatus';
+import { Modal } from "react-bootstrap";
 
 const DriverDetailPage = () => {
     const { id } = useParams();
@@ -12,6 +13,10 @@ const DriverDetailPage = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
+
+    const [showModal, setShowModal] = useState(false);
+    const handleOpen = () => setShowModal(true);
+    const handleClose = () => setShowModal(false);
 
     const handleEditProfile = () => {
         navigate(`/driver-list/${id}/edit-profile`);
@@ -78,23 +83,32 @@ const DriverDetailPage = () => {
 
     return (
         <div className="driver-detail-container">
-            <div className="driver-detail-header">
+            <div className="driver-detail-header" style={{ position: "relative" }}>
                 <Typography variant="h4" className="driver-detail-title">
                     Driver Profile
                 </Typography>
+
                 <div className="driver-detail-status">
                     <Chip
-                        label={driver.isActive ? 'Active' : 'Inactive'}
-                        color={driver.isActive ? 'success' : 'error'}
+                        label={driver.isActive ? "Active" : "Inactive"}
+                        color={driver.isActive ? "success" : "error"}
                         size="medium"
+                        style={{ marginRight: 8 }}
                     />
                     {driver.isDocumentVerified && (
-                        <Chip
-                            label="Verified"
-                            color="success"
-                            size="medium"
-                        />
+                        <Chip label="Verified" color="success" size="medium" />
                     )}
+                </div>
+                <div>
+                    <Tooltip title="Edit Account & Status">
+                        <IconButton
+                            aria-label="edit profile"
+                            onClick={handleOpen}
+                            style={{ position: "absolute", top: 8, right: 8 }}
+                        >
+                            <Edit />
+                        </IconButton>
+                    </Tooltip>
                 </div>
             </div>
 
@@ -477,6 +491,15 @@ const DriverDetailPage = () => {
                     </div>
                 </div>
             </div>
+            {/* Modal to show DriverAccountStatus */}
+            <Modal show={showModal} onHide={handleClose} size="lg" centered>
+                <Modal.Header closeButton>
+                    <Modal.Title>Edit Account & Status</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <DriverAccountStatus driverId={driver.id} onClose={handleClose} />
+                </Modal.Body>
+            </Modal>
         </div>
     );
 };
