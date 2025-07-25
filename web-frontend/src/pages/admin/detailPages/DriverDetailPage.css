@@ -1,0 +1,261 @@
+/* Base Styles */
+:root {
+    --primary-color: #3f51b5;
+    --secondary-color: #2c3e50;
+    --text-color: #333;
+    --text-secondary: #666;
+    --border-color: #e0e0e0;
+    --success-color: #4caf50;
+    --warning-color: #ff9800;
+    --error-color: #f44336;
+    --background-color: #f5f7fa;
+    --card-bg: #ffffff;
+}
+
+/* Main Container */
+.driver-detail-container {
+    width: 100%;
+    min-height: 100vh;
+    padding: 20px;
+    background-color: var(--background-color);
+}
+
+/* Header Section */
+.driver-detail-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.driver-detail-title {
+    font-size: 1.8rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+}
+
+.driver-detail-status {
+    display: flex;
+    gap: 10px;
+}
+
+/* Content Layout */
+.driver-detail-content {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 24px;
+    width: 100%;
+}
+
+/* Profile Section */
+.driver-detail-profile {
+    position: sticky;
+    top: 20px;
+    height: fit-content;
+}
+
+.driver-detail-profile-card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.driver-detail-avatar {
+    width: 180px;
+    height: 180px;
+    margin-bottom: 20px;
+    border: 4px solid var(--primary-color);
+    object-fit: cover;
+}
+
+.driver-detail-contact,
+.driver-detail-identification {
+    width: 100%;
+    margin-top: 16px;
+}
+
+.driver-detail-section-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--secondary-color);
+    margin-bottom: 16px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.driver-detail-info-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    padding: 8px 0;
+}
+
+.driver-detail-info-label {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.driver-detail-info-value {
+    font-size: 0.95rem;
+    color: var(--text-color);
+    font-weight: 400;
+    text-align: start;
+}
+
+.driver-detail-divider {
+    margin: 20px 0;
+    background-color: var(--border-color);
+    width: 100%;
+}
+
+/* Details Sections */
+.driver-detail-sections {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.driver-detail-section-card {
+    background: var(--card-bg);
+    border-radius: 10px;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    width: 100%;
+}
+
+.driver-detail-section-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.driver-detail-section-icon {
+    color: var(--primary-color);
+    margin-right: 12px;
+    font-size: 1.8rem !important;
+}
+
+.driver-detail-section-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 16px;
+}
+
+.driver-detail-grid-item {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    background-color: rgba(245, 247, 250, 0.5);
+    border-radius: 6px;
+}
+
+.driver-detail-grid-item.wide {
+    grid-column: 1 / -1;
+}
+
+/* Status Chips */
+.driver-detail-status-chips {
+    display: flex;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+/* Rating */
+.driver-detail-rating {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.driver-detail-star-icon {
+    color: #f1c40f;
+    font-size: 1.2rem !important;
+}
+
+/* Document Links */
+.driver-detail-document-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s;
+}
+
+.driver-detail-document-link:hover {
+    color: #303f9f;
+    text-decoration: underline;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+    .driver-detail-content {
+        grid-template-columns: 280px 1fr;
+    }
+}
+
+@media (max-width: 992px) {
+    .driver-detail-content {
+        grid-template-columns: 1fr;
+    }
+    
+    .driver-detail-profile {
+        position: static;
+    }
+    
+    .driver-detail-section-grid {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .driver-detail-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+    }
+    
+    .driver-detail-title {
+        font-size: 1.5rem;
+    }
+    
+    .driver-detail-status {
+        width: 100%;
+        justify-content: flex-start;
+    }
+    
+    .driver-detail-section-grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 576px) {
+    .driver-detail-container {
+        padding: 15px;
+    }
+    
+    .driver-detail-avatar {
+        width: 140px;
+        height: 140px;
+    }
+    
+    .driver-detail-section-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .driver-detail-info-item {
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .driver-detail-info-value {
+        max-width: 100%;
+        text-align: left;
+    }
+}
