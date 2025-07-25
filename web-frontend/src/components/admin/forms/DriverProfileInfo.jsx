@@ -7,7 +7,9 @@ import {
     Box,
     Typography,
     CircularProgress,
-    Paper
+    Paper,
+    Avatar,
+    Grid
 } from "@mui/material";
 import toast from "react-hot-toast";
 
@@ -17,10 +19,17 @@ function DriverProfileInfo() {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [formData, setFormData] = useState({
+        email: "",
         firstName: "",
         lastName: "",
         phone: "",
-        address: ""
+        nic_number: "",
+        license_number: "",
+        dateOfBirth: "",
+        profileImage: "",
+        address: "",
+        city: "",
+        emergencyContact: ""
     });
 
     useEffect(() => {
@@ -28,12 +37,20 @@ function DriverProfileInfo() {
             try {
                 const response = await axiosInstance.get(`/drivers/getDriverById/${id}`);
                 const data = response.data;
+
                 setDriver(data);
                 setFormData({
+                    email: data.email || "",
                     firstName: data.firstName || "",
                     lastName: data.lastName || "",
                     phone: data.phone || "",
-                    address: data.address || ""
+                    nic_number: data.nic_number || "",
+                    license_number: data.license_number || "",
+                    dateOfBirth: data.dateOfBirth || "",
+                    profileImage: data.profileImage || "",
+                    address: data.address || "",
+                    city: data.city || "",
+                    emergencyContact: data.emergencyContact || ""
                 });
             } catch (error) {
                 toast.error("Failed to fetch driver data");
@@ -46,38 +63,80 @@ function DriverProfileInfo() {
     }, [id]);
 
     const handleChange = (e) => {
-        setFormData(prev => ({
+        setFormData((prev) => ({
             ...prev,
             [e.target.name]: e.target.value
         }));
     };
 
+    const handleImageUpload = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setFormData((prev) => ({
+                ...prev,
+                profileImage: reader.result // base64 string
+            }));
+        };
+        reader.readAsDataURL(file);
+    };
+
     const handleUpdate = async () => {
         setUpdating(true);
         try {
-            await axiosInstance.patch(`/drivers/update/${id}`, formData);
-            toast.success("Driver updated successfully");
+            const updatePayload = { ...formData };
+
+            await axiosInstance.patch(`/drivers/update/${id}`, updatePayload);
+            toast.success("Driver profile updated successfully");
         } catch (error) {
-            toast.error(error.response?.data?.message || "Failed to update driver");
+            const msg = error?.response?.data?.message || "Failed to update driver";
+            toast.error(msg);
         } finally {
             setUpdating(false);
         }
     };
 
-    if (loading) {
-        return <CircularProgress />;
-    }
+    if (loading) return <CircularProgress sx={{ mt: 4, mx: "auto", display: "block" }} />;
 
-    if (!driver) {
-        return <Typography color="error">Driver not found</Typography>;
-    }
+    if (!driver) return <Typography color="error">Driver not found</Typography>;
 
     return (
-        <Paper elevation={3} sx={{ p: 3, maxWidth: 600, mx: "auto", mt: 4 }}>
+        <Paper elevation={3} sx={{ p: 4, maxWidth: 700, mx: "auto", mt: 4 }}>
             <Typography variant="h5" gutterBottom>
-                Edit Driver Profile
+                Edit Driver Personal Information
             </Typography>
+
             <Box display="flex" flexDirection="column" gap={2}>
+                <Grid container spacing={2} alignItems="center">
+                    <Grid item>
+                        <Avatar
+                            src={formData.profileImage}
+                            alt={formData.firstName}
+                            sx={{ width: 64, height: 64 }}
+                        />
+                    </Grid>
+                    <Grid item xs>
+                        <Button variant="outlined" component="label" fullWidth>
+                            Upload Profile Image
+                            <input
+                                type="file"
+                                hidden
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                            />
+                        </Button>
+                    </Grid>
+                </Grid>
+
+                <TextField
+                    label="Email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    fullWidth
+                />
                 <TextField
                     label="First Name"
                     name="firstName"
@@ -100,9 +159,46 @@ function DriverProfileInfo() {
                     fullWidth
                 />
                 <TextField
+                    label="NIC Number"
+                    name="nic_number"
+                    value={formData.nic_number}
+                    onChange={handleChange}
+                    fullWidth
+                />
+                <TextField
+                    label="License Number"
+                    name="license_number"
+                    value={formData.license_number}
+                    onChange={handleChange}
+                    fullWidth
+                />
+                <TextField
+                    label="Date of Birth"
+                    name="dateOfBirth"
+                    type="date"
+                    InputLabelProps={{ shrink: true }}
+                    value={formData.dateOfBirth}
+                    onChange={handleChange}
+                    fullWidth
+                />
+                <TextField
+                    label="Emergency Contact"
+                    name="emergencyContact"
+                    value={formData.emergencyContact}
+                    onChange={handleChange}
+                    fullWidth
+                />
+                <TextField
                     label="Address"
                     name="address"
                     value={formData.address}
+                    onChange={handleChange}
+                    fullWidth
+                />
+                <TextField
+                    label="City"
+                    name="city"
+                    value={formData.city}
                     onChange={handleChange}
                     fullWidth
                 />
