@@ -1,7 +1,10 @@
+import ORDER_STATUS from "../enums/orderStatus";
+
 // UPDATE VALIDATOR - NO defaults, all fields optional
 const validateOrdersStatusUpdate = (req, res, next) => {
   const schema = Joi.object({
-    status: Joi.string().valid('pending', 'processing', 'out_for_delivery').optional(),
+    status: Joi.string().valid(...Object.values(ORDER_STATUS)).optional(),
+    //status: Joi.string().valid(ORDER_STATUS.PENDING, ORDER_STATUS.PROCESSING, ORDER_STATUS.OUT_FOR_DELIVERY).optional(),
   })
   .min(1) // Require at least one field to update
   .options({ stripUnknown: true });; 

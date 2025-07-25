@@ -1,5 +1,6 @@
 import OrdersService from '../services/orders.service.js';
 import populateUser from '../utils/populateUser.js';
+import ORDER_STATUS from '../enums/orderStatus.js';
 import { populateAddressWithUserIdInData } from '../utils/populateAddress.js';
 
 const orderService = new OrdersService();
@@ -13,6 +14,10 @@ const getAllOrders = async (req, res) => {
         if (!orders) {
             return res.status(400).json({ success: false, message: "Failed to fetch orders"});
         }
+
+        if (!Object.values(ORDER_STATUS).includes(status)) {
+            return res.status(400).json({ success: false, message: "Invalid status value" });
+        }
         
         let filteredOrders = orders;
         let filterDescription = [];
@@ -24,8 +29,8 @@ const getAllOrders = async (req, res) => {
 
         let populatedOrders;
         try {
-            //populatedOrders = await populateAddressWithUserIdInData(filteredOrders);
-            populatedOrders = await populateUser(filteredOrders);
+            populatedOrders = await populateAddressWithUserIdInData(filteredOrders);
+            populatedOrders = await populateUser(populatedOrders);
         } catch (error) {
             console.error("Error populating orders:", error);
             return res.status(500).json({ success: false, message: "Failed to populate orders" });
