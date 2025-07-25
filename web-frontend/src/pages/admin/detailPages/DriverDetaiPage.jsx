@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { axiosInstance } from '../../../lib/axios';
-import { Box, Typography, Card, CardContent, Divider, Grid, Avatar, Chip, CircularProgress } from '@mui/material';
-import { LocationOn, DirectionsCar, AccountBalance, Star, Work, Description } from '@mui/icons-material';
+import { Box, Typography, Divider, Grid, Avatar, Chip, CircularProgress } from '@mui/material';
+import { LocationOn, DirectionsCar, AccountBalance, Star, Description } from '@mui/icons-material';
+import './DriverDetailPage.css';
 
 const DriverDetailPage = () => {
     const { id } = useParams();
@@ -27,204 +28,165 @@ const DriverDetailPage = () => {
 
     if (loading) {
         return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+            <div className="driver-detail-loading">
                 <CircularProgress />
-            </Box>
+            </div>
         );
     }
 
     if (error) {
         return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+            <div className="driver-detail-error">
                 <Typography color="error">{error}</Typography>
-            </Box>
+            </div>
         );
     }
 
     if (!driver) {
         return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="80vh">
+            <div className="driver-detail-not-found">
                 <Typography>Driver not found</Typography>
-            </Box>
+            </div>
         );
     }
 
     return (
-        <Box sx={{ p: 3 }}>
-            <Typography variant="h4" gutterBottom>
-                Driver Details
-            </Typography>
+        <div className="driver-detail-container">
+            <div className="driver-detail-header">
+                <Typography variant="h4" className="driver-detail-title">
+                    Driver Profile
+                </Typography>
+                <div className="driver-detail-status">
+                    <Chip
+                        label={driver.isActive ? 'Active' : 'Inactive'}
+                        color={driver.isActive ? 'success' : 'error'}
+                        size="medium"
+                    />
+                    {driver.isDocumentVerified && (
+                        <Chip
+                            label="Verified"
+                            color="success"
+                            size="medium"
+                        />
+                    )}
+                </div>
+            </div>
 
-            <Grid container spacing={3}>
-                {/* Personal Information */}
-                <Grid item xs={12} md={4}>
-                    <Card>
-                        <CardContent>
-                            <Box display="flex" flexDirection="column" alignItems="center" mb={2}>
-                                <Avatar
-                                    src={driver.profileImage}
-                                    sx={{ width: 120, height: 120, mb: 2 }}
-                                />
-                                <Typography variant="h5">
-                                    {driver.firstName} {driver.lastName}
-                                </Typography>
-                                <Typography color="textSecondary">
-                                    {driver.email}
-                                </Typography>
-                                <Box mt={1}>
-                                    <Chip
-                                        label={driver.isActive ? 'Active' : 'Inactive'}
-                                        color={driver.isActive ? 'success' : 'error'}
-                                        size="small"
-                                    />
-                                    {driver.isDocumentVerified && (
-                                        <Chip
-                                            label="Verified"
-                                            color="success"
-                                            size="small"
-                                            sx={{ ml: 1 }}
-                                        />
-                                    )}
-                                </Box>
-                            </Box>
-
-                            <Divider sx={{ my: 2 }} />
-
-                            <Typography variant="subtitle1" gutterBottom>
-                                Personal Information
+            <div className="driver-detail-content">
+                {/* Left Column - Profile Section */}
+                <div className="driver-detail-profile">
+                    <div className="driver-detail-profile-card">
+                        <Avatar
+                            src={driver.profileImage}
+                            className="driver-detail-avatar"
+                        />
+                        <Typography variant="h6" className="driver-detail-section-title border-0">
+                            {driver.firstName} {driver.lastName}
+                        </Typography>
+                        <div className="driver-detail-contact">
+                            <Typography variant="h6" className="driver-detail-section-title">
+                                Contact Information
                             </Typography>
-                            <Grid container spacing={1}>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Phone:
-                                    </Typography>
-                                    <Typography>{driver.phone}</Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        NIC:
-                                    </Typography>
-                                    <Typography>{driver.nic_number || 'N/A'}</Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        License:
-                                    </Typography>
-                                    <Typography>{driver.license_number || 'N/A'}</Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Date of Birth:
-                                    </Typography>
-                                    <Typography>
-                                        {driver.dateOfBirth ? new Date(driver.dateOfBirth).toLocaleDateString() : 'N/A'}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Address:
-                                    </Typography>
-                                    <Typography>
-                                        {driver.address || 'N/A'}, {driver.city || ''}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={12}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Emergency Contact:
-                                    </Typography>
-                                    <Typography>{driver.emergencyContact || 'N/A'}</Typography>
-                                </Grid>
-                            </Grid>
-                        </CardContent>
-                    </Card>
-                </Grid>
+                            <div className="driver-detail-info-item">
+                                <span className="driver-detail-info-label">Email:</span>
+                                <span className="driver-detail-info-value">{driver.email || 'N/A'}</span>
+                            </div>
+                            <div className="driver-detail-info-item">
+                                <span className="driver-detail-info-label">Phone:</span>
+                                <span className="driver-detail-info-value">{driver.phone || 'N/A'}</span>
+                            </div>
+                            <div className="driver-detail-info-item">
+                                <span className="driver-detail-info-label">Address:</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.address || 'N/A'}, {driver.city || ''}
+                                </span>
+                            </div>
+                            <div className="driver-detail-info-item">
+                                <span className="driver-detail-info-label">Emergency Contact:</span>
+                                <span className="driver-detail-info-value">{driver.emergencyContact || 'N/A'}</span>
+                            </div>
+                        </div>
 
-                {/* Vehicle Information */}
-                <Grid item xs={12} md={4}>
-                    <Card>
-                        <CardContent>
-                            <Box display="flex" alignItems="center" mb={2}>
-                                <DirectionsCar color="primary" sx={{ mr: 1 }} />
-                                <Typography variant="subtitle1">
-                                    Vehicle Information
-                                </Typography>
-                            </Box>
+                        <Divider className="driver-detail-divider" />
 
-                            <Grid container spacing={1}>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Type:
-                                    </Typography>
-                                    <Typography>{driver.vehicleType || 'N/A'}</Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Model:
-                                    </Typography>
-                                    <Typography>{driver.vehicleModel || 'N/A'}</Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Number:
-                                    </Typography>
-                                    <Typography>{driver.vehicleNumber || 'N/A'}</Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Color:
-                                    </Typography>
-                                    <Typography>{driver.vehicleColor || 'N/A'}</Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Year:
-                                    </Typography>
-                                    <Typography>{driver.vehicleYear || 'N/A'}</Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Insurance:
-                                    </Typography>
-                                    <Typography>
-                                        {driver.vehicleInsurance ? 'Yes' : 'No'}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Registration:
-                                    </Typography>
-                                    <Typography>
-                                        {driver.vehicleRegistration ? 'Valid' : 'N/A'}
-                                    </Typography>
-                                </Grid>
-                            </Grid>
+                        <div className="driver-detail-identification">
+                            <Typography variant="h6" className="driver-detail-section-title">
+                                Identification
+                            </Typography>
+                            <div className="driver-detail-info-item">
+                                <span className="driver-detail-info-label">NIC Number:</span>
+                                <span className="driver-detail-info-value">{driver.nic_number || 'N/A'}</span>
+                            </div>
+                            <div className="driver-detail-info-item">
+                                <span className="driver-detail-info-label">License Number:</span>
+                                <span className="driver-detail-info-value">{driver.license_number || 'N/A'}</span>
+                            </div>
+                            <div className="driver-detail-info-item">
+                                <span className="driver-detail-info-label">Date of Birth:</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.dateOfBirth ? new Date(driver.dateOfBirth).toLocaleDateString() : 'N/A'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
-                            <Divider sx={{ my: 2 }} />
+                {/* Right Column - Details Section */}
+                <div className="driver-detail-sections">
+                    {/* Vehicle Information */}
+                    <div className="driver-detail-section-card">
+                        <div className="driver-detail-section-header">
+                            <DirectionsCar className="driver-detail-section-icon" />
+                            <Typography variant="h6">Vehicle Information</Typography>
+                        </div>
+                        <div className="driver-detail-section-grid">
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Type</span>
+                                <span className="driver-detail-info-value">{driver.vehicleType || 'N/A'}</span>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Model</span>
+                                <span className="driver-detail-info-value">{driver.vehicleModel || 'N/A'}</span>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Number</span>
+                                <span className="driver-detail-info-value">{driver.vehicleNumber || 'N/A'}</span>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Color</span>
+                                <span className="driver-detail-info-value">{driver.vehicleColor || 'N/A'}</span>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Year</span>
+                                <span className="driver-detail-info-value">{driver.vehicleYear || 'N/A'}</span>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Insurance</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.vehicleInsurance ? 'Valid' : 'N/A'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
 
-                            {/* Location & Delivery */}
-                            <Box display="flex" alignItems="center" mb={2}>
-                                <LocationOn color="primary" sx={{ mr: 1 }} />
-                                <Typography variant="subtitle1">
-                                    Location & Delivery
-                                </Typography>
-                            </Box>
-
+                    {/* Location & Status */}
+                    <div className="driver-detail-section-card">
+                        <div className="driver-detail-section-header">
+                            <LocationOn className="driver-detail-section-icon" />
+                            <Typography variant="h6">Location & Status</Typography>
+                        </div>
+                        <div className="driver-detail-section-grid">
                             {driver.currentLocation ? (
-                                <Grid container spacing={1}>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" color="textSecondary">
-                                            Current Location:
-                                        </Typography>
-                                        <Typography>
-                                            Lat: {driver.currentLocation.lat?.toFixed(4)}, 
-                                            Lng: {driver.currentLocation.lng?.toFixed(4)}
-                                        </Typography>
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" color="textSecondary">
-                                            Status:
-                                        </Typography>
-                                        <Box display="flex" alignItems="center">
+                                <>
+                                    <div className="driver-detail-grid-item wide">
+                                        <span className="driver-detail-info-label">Current Location</span>
+                                        <span className="driver-detail-info-value">
+                                            Lat: {driver.currentLocation.lat?.toFixed(4)}, Lng: {driver.currentLocation.lng?.toFixed(4)}
+                                        </span>
+                                    </div>
+                                    <div className="driver-detail-grid-item">
+                                        <span className="driver-detail-info-label">Status</span>
+                                        <div className="driver-detail-status-chips">
                                             <Chip
                                                 label={driver.isOnline ? 'Online' : 'Offline'}
                                                 color={driver.isOnline ? 'success' : 'default'}
@@ -234,204 +196,187 @@ const DriverDetailPage = () => {
                                                 label={driver.isAvailable ? 'Available' : 'Busy'}
                                                 color={driver.isAvailable ? 'success' : 'warning'}
                                                 size="small"
-                                                sx={{ ml: 1 }}
                                             />
-                                        </Box>
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <Typography variant="body2" color="textSecondary">
-                                            Max Delivery Radius:
-                                        </Typography>
-                                        <Typography>{driver.maxDeliveryRadius || 'N/A'} km</Typography>
-                                    </Grid>
-                                </Grid>
+                                        </div>
+                                    </div>
+                                    <div className="driver-detail-grid-item">
+                                        <span className="driver-detail-info-label">Max Delivery Radius</span>
+                                        <span className="driver-detail-info-value">
+                                            {driver.maxDeliveryRadius || 'N/A'} km
+                                        </span>
+                                    </div>
+                                </>
                             ) : (
-                                <Typography>Location data not available</Typography>
+                                <div className="driver-detail-grid-item wide">
+                                    <span className="driver-detail-info-value">Location data not available</span>
+                                </div>
                             )}
-                        </CardContent>
-                    </Card>
-                </Grid>
+                        </div>
+                    </div>
 
-                {/* Performance & Financial */}
-                <Grid item xs={12} md={4}>
-                    <Card>
-                        <CardContent>
-                            {/* Performance & Ratings */}
-                            <Box display="flex" alignItems="center" mb={2}>
-                                <Star color="primary" sx={{ mr: 1 }} />
-                                <Typography variant="subtitle1">
-                                    Performance & Ratings
-                                </Typography>
-                            </Box>
+                    {/* Performance & Ratings */}
+                    <div className="driver-detail-section-card">
+                        <div className="driver-detail-section-header">
+                            <Star className="driver-detail-section-icon" />
+                            <Typography variant="h6">Performance & Ratings</Typography>
+                        </div>
+                        <div className="driver-detail-section-grid">
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Rating</span>
+                                <div className="driver-detail-rating">
+                                    <Star className="driver-detail-star-icon" />
+                                    <span className="driver-detail-info-value">
+                                        {driver.rating?.toFixed(1) || '0.0'} ({driver.totalRatings || 0})
+                                    </span>
+                                </div>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Deliveries</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.completedDeliveries || 0} completed
+                                </span>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Cancelled</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.cancelledDeliveries || 0}
+                                </span>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">On Time Rate</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.onTimeDeliveryRate ? `${driver.onTimeDeliveryRate}%` : 'N/A'}
+                                </span>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Avg. Time</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.averageDeliveryTime || 'N/A'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
 
-                            <Grid container spacing={1}>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Rating:
-                                    </Typography>
-                                    <Box display="flex" alignItems="center">
-                                        <Star color="warning" sx={{ mr: 0.5 }} />
-                                        <Typography>
-                                            {driver.rating?.toFixed(1) || '0.0'} ({driver.totalRatings || 0})
-                                        </Typography>
-                                    </Box>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Deliveries:
-                                    </Typography>
-                                    <Typography>
-                                        {driver.completedDeliveries || 0} completed
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Cancelled:
-                                    </Typography>
-                                    <Typography>
-                                        {driver.cancelledDeliveries || 0}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        On Time Rate:
-                                    </Typography>
-                                    <Typography>
-                                        {driver.onTimeDeliveryRate ? `${driver.onTimeDeliveryRate}%` : 'N/A'}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Avg. Time:
-                                    </Typography>
-                                    <Typography>
-                                        {driver.averageDeliveryTime || 'N/A'}
-                                    </Typography>
-                                </Grid>
-                            </Grid>
+                    {/* Financial Information */}
+                    <div className="driver-detail-section-card">
+                        <div className="driver-detail-section-header">
+                            <AccountBalance className="driver-detail-section-icon" />
+                            <Typography variant="h6">Financial Information</Typography>
+                        </div>
+                        <div className="driver-detail-section-grid">
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Bank</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.bankName || 'N/A'}
+                                </span>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Account</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.bankAccountNumber ? `••••${driver.bankAccountNumber.slice(-4)}` : 'N/A'}
+                                </span>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Commission</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.commissionRate ? `${driver.commissionRate}%` : 'N/A'}
+                                </span>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Total Earnings</span>
+                                <span className="driver-detail-info-value">
+                                    ${driver.totalEarnings?.toFixed(2) || '0.00'}
+                                </span>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Current Balance</span>
+                                <span className="driver-detail-info-value">
+                                    ${driver.currentBalance?.toFixed(2) || '0.00'}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
 
-                            <Divider sx={{ my: 2 }} />
-
-                            {/* Financial Information */}
-                            <Box display="flex" alignItems="center" mb={2}>
-                                <AccountBalance color="primary" sx={{ mr: 1 }} />
-                                <Typography variant="subtitle1">
-                                    Financial Information
-                                </Typography>
-                            </Box>
-
-                            <Grid container spacing={1}>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Bank:
-                                    </Typography>
-                                    <Typography>
-                                        {driver.bankName || 'N/A'}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Account:
-                                    </Typography>
-                                    <Typography>
-                                        {driver.bankAccountNumber ? `••••${driver.bankAccountNumber.slice(-4)}` : 'N/A'}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Commission:
-                                    </Typography>
-                                    <Typography>
-                                        {driver.commissionRate ? `${driver.commissionRate}%` : 'N/A'}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Total Earnings:
-                                    </Typography>
-                                    <Typography>
-                                        ${driver.totalEarnings?.toFixed(2) || '0.00'}
-                                    </Typography>
-                                </Grid>
-                                <Grid item xs={6}>
-                                    <Typography variant="body2" color="textSecondary">
-                                        Current Balance:
-                                    </Typography>
-                                    <Typography>
-                                        ${driver.currentBalance?.toFixed(2) || '0.00'}
-                                    </Typography>
-                                </Grid>
-                            </Grid>
-
-                            <Divider sx={{ my: 2 }} />
-
-                            {/* Documents */}
-                            <Box display="flex" alignItems="center" mb={2}>
-                                <Description color="primary" sx={{ mr: 1 }} />
-                                <Typography variant="subtitle1">
-                                    Documents
-                                </Typography>
-                            </Box>
-
+                    {/* Documents */}
+                    <div className="driver-detail-section-card">
+                        <div className="driver-detail-section-header">
+                            <Description className="driver-detail-section-icon" />
+                            <Typography variant="h6">Documents</Typography>
+                        </div>
+                        <div className="driver-detail-section-grid">
                             {driver.documents ? (
-                                <Grid container spacing={1}>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" color="textSecondary">
-                                            License:
-                                        </Typography>
+                                <>
+                                    <div className="driver-detail-grid-item">
+                                        <span className="driver-detail-info-label">License</span>
                                         {driver.documents.licenseImage ? (
-                                            <a href={driver.documents.licenseImage} target="_blank" rel="noopener noreferrer">
-                                                View
+                                            <a
+                                                href={driver.documents.licenseImage}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="driver-detail-document-link"
+                                            >
+                                                View Document
                                             </a>
                                         ) : (
-                                            <Typography>N/A</Typography>
+                                            <span className="driver-detail-info-value">N/A</span>
                                         )}
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" color="textSecondary">
-                                            NIC:
-                                        </Typography>
+                                    </div>
+                                    <div className="driver-detail-grid-item">
+                                        <span className="driver-detail-info-label">NIC</span>
                                         {driver.documents.nicImage ? (
-                                            <a href={driver.documents.nicImage} target="_blank" rel="noopener noreferrer">
-                                                View
+                                            <a
+                                                href={driver.documents.nicImage}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="driver-detail-document-link"
+                                            >
+                                                View Document
                                             </a>
                                         ) : (
-                                            <Typography>N/A</Typography>
+                                            <span className="driver-detail-info-value">N/A</span>
                                         )}
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" color="textSecondary">
-                                            Vehicle Registration:
-                                        </Typography>
+                                    </div>
+                                    <div className="driver-detail-grid-item">
+                                        <span className="driver-detail-info-label">Vehicle Registration</span>
                                         {driver.documents.vehicleRegistrationImage ? (
-                                            <a href={driver.documents.vehicleRegistrationImage} target="_blank" rel="noopener noreferrer">
-                                                View
+                                            <a
+                                                href={driver.documents.vehicleRegistrationImage}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="driver-detail-document-link"
+                                            >
+                                                View Document
                                             </a>
                                         ) : (
-                                            <Typography>N/A</Typography>
+                                            <span className="driver-detail-info-value">N/A</span>
                                         )}
-                                    </Grid>
-                                    <Grid item xs={6}>
-                                        <Typography variant="body2" color="textSecondary">
-                                            Insurance:
-                                        </Typography>
+                                    </div>
+                                    <div className="driver-detail-grid-item">
+                                        <span className="driver-detail-info-label">Insurance</span>
                                         {driver.documents.insuranceImage ? (
-                                            <a href={driver.documents.insuranceImage} target="_blank" rel="noopener noreferrer">
-                                                View
+                                            <a
+                                                href={driver.documents.insuranceImage}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="driver-detail-document-link"
+                                            >
+                                                View Document
                                             </a>
                                         ) : (
-                                            <Typography>N/A</Typography>
+                                            <span className="driver-detail-info-value">N/A</span>
                                         )}
-                                    </Grid>
-                                </Grid>
+                                    </div>
+                                </>
                             ) : (
-                                <Typography>No documents uploaded</Typography>
+                                <div className="driver-detail-grid-item wide">
+                                    <span className="driver-detail-info-value">No documents uploaded</span>
+                                </div>
                             )}
-                        </CardContent>
-                    </Card>
-                </Grid>
-            </Grid>
-        </Box>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     );
 };
 
