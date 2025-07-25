@@ -1,4 +1,4 @@
-import ORDER_STATUS from "../enums/orderStatus";
+import ORDER_STATUS from "../enums/orderStatus.js";
 
 // UPDATE VALIDATOR - NO defaults, all fields optional
 const validateOrdersStatusUpdate = (req, res, next) => {
