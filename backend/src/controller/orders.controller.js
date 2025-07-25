@@ -10,13 +10,13 @@ const getAllOrders = async (req, res) => {
 	try {
         const { status } = req.query;
 
+        if (!Object.values(ORDER_STATUS).includes(status)) {
+            return res.status(400).json({ success: false, message: "Invalid status value" });
+        }
+        
         const orders = await orderService.findAll();
         if (!orders) {
             return res.status(400).json({ success: false, message: "Failed to fetch orders"});
-        }
-
-        if (!Object.values(ORDER_STATUS).includes(status)) {
-            return res.status(400).json({ success: false, message: "Invalid status value" });
         }
         
         let filteredOrders = orders;
