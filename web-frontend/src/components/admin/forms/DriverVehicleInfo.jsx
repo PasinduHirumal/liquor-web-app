@@ -54,6 +54,7 @@ function DriverVehicleInfo() {
         try {
             await axiosInstance.patch(`/drivers/update-vehicleInfo/${id}`, vehicleData);
             toast.success("Vehicle info updated successfully!");
+            navigate(-1)
         } catch (err) {
             const message = err.response?.data?.error || "Update failed";
             toast.error(message);
@@ -85,13 +86,19 @@ function DriverVehicleInfo() {
                     <Col md={6}>
                         <Form.Group className="mb-3">
                             <Form.Label>Vehicle Type</Form.Label>
-                            <Form.Control
-                                type="text"
+                            <Form.Select
                                 name="vehicleType"
                                 value={vehicleData.vehicleType}
                                 onChange={handleChange}
                                 required
-                            />
+                            >
+                                <option value="">Select Vehicle Type</option>
+                                <option value="car">Car</option>
+                                <option value="motorcycle">Motorcycle</option>
+                                <option value="bicycle">Bicycle</option>
+                                <option value="van">Van</option>
+                                <option value="truck">Truck</option>
+                            </Form.Select>
                         </Form.Group>
                     </Col>
                     <Col md={6}>
