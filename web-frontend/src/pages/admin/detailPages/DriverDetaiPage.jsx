@@ -214,6 +214,10 @@ const DriverDetailPage = () => {
                                 <span className="driver-detail-info-value">{driver.vehicleYear || 'N/A'}</span>
                             </div>
                             <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Registration</span>
+                                <span className="driver-detail-info-value">{driver.vehicleRegistration || 'N/A'}</span>
+                            </div>
+                            <div className="driver-detail-grid-item">
                                 <span className="driver-detail-info-label">Insurance</span>
                                 <span className="driver-detail-info-value">
                                     {driver.vehicleInsurance ? 'Valid' : 'N/A'}
