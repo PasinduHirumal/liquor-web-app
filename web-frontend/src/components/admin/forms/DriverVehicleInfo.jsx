@@ -5,9 +5,10 @@ import { Form, Button, Container, Row, Col, Spinner } from "react-bootstrap";
 import toast from "react-hot-toast";
 
 function DriverVehicleInfo() {
-    const { id } = useParams(); // Driver ID from URL
+    const { id } = useParams();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    const [saving, setSaving] = useState(false);
 
     const [vehicleData, setVehicleData] = useState({
         vehicleType: "",
@@ -51,6 +52,7 @@ function DriverVehicleInfo() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setSaving(true);
         try {
             await axiosInstance.patch(`/drivers/update-vehicleInfo/${id}`, vehicleData);
             toast.success("Vehicle info updated successfully!");
@@ -58,6 +60,8 @@ function DriverVehicleInfo() {
         } catch (err) {
             const message = err.response?.data?.error || "Update failed";
             toast.error(message);
+        } finally {
+            setSaving(false);
         }
     };
 
@@ -86,7 +90,9 @@ function DriverVehicleInfo() {
                 <Row className="mb-3">
                     <Col md={6}>
                         <Form.Group controlId="vehicleType">
-                            <Form.Label>Vehicle Type <span className="text-danger">*</span></Form.Label>
+                            <Form.Label>
+                                Vehicle Type <span className="text-danger">*</span>
+                            </Form.Label>
                             <Form.Select
                                 name="vehicleType"
                                 value={vehicleData.vehicleType}
@@ -105,7 +111,9 @@ function DriverVehicleInfo() {
                     </Col>
                     <Col md={6}>
                         <Form.Group controlId="vehicleModel">
-                            <Form.Label>Vehicle Model <span className="text-danger">*</span></Form.Label>
+                            <Form.Label>
+                                Vehicle Model <span className="text-danger">*</span>
+                            </Form.Label>
                             <Form.Control
                                 type="text"
                                 name="vehicleModel"
@@ -121,7 +129,9 @@ function DriverVehicleInfo() {
                 <Row className="mb-3">
                     <Col md={6}>
                         <Form.Group controlId="vehicleNumber">
-                            <Form.Label>Vehicle Number <span className="text-danger">*</span></Form.Label>
+                            <Form.Label>
+                                Vehicle Number <span className="text-danger">*</span>
+                            </Form.Label>
                             <Form.Control
                                 type="text"
                                 name="vehicleNumber"
@@ -191,8 +201,22 @@ function DriverVehicleInfo() {
                 </Row>
 
                 <div className="d-flex justify-content-end">
-                    <Button variant="primary" type="submit" className="px-4">
-                        Save Changes
+                    <Button variant="primary" type="submit" className="px-4" disabled={saving}>
+                        {saving ? (
+                            <>
+                                <Spinner
+                                    as="span"
+                                    animation="border"
+                                    size="sm"
+                                    role="status"
+                                    aria-hidden="true"
+                                    className="me-2"
+                                />
+                                Saving...
+                            </>
+                        ) : (
+                            "Save Changes"
+                        )}
                     </Button>
                 </div>
             </Form>
