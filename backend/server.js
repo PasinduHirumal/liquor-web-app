@@ -15,6 +15,7 @@ import categoryRoutes from "./src/routes/category.routes.js";
 import productRoutes from "./src/routes/product.routes.js";
 import otherProductRoutes from "./src/routes/otherProducts.routes.js";
 import stockHistoryRoutes from "./src/routes/stockHistory.routes.js";
+import ordersRoutes from "./src/routes/orders.routes.js";
 
 
 dotenv.config();
@@ -43,6 +44,7 @@ app.use("/api/categories", categoryRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/other-products", otherProductRoutes);
 app.use("/api/stockHistory", stockHistoryRoutes);
+app.use("/api/orders", ordersRoutes);
 
 
 //  Route handler for the root path
