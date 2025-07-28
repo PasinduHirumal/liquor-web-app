@@ -1,16 +1,31 @@
 import CategoryService from '../services/category.service.js';
+import { uploadImages } from '../utils/firebaseStorage.js';
 
 const categoryService = new CategoryService();
 
 const createCategory = async (req, res) => {
 	try {
-        const { name, is_liquor } = req.body;
+        const { icon, name, is_liquor } = req.body;
 
         const categories = await categoryService.findByFilter('name', '==', name);
         if (categories.length !== 0) {
             const filtered = categories.filter(category => category.is_liquor === is_liquor);
             if (filtered.length !== 0) {
                 return res.status(400).json({ success: false, message: "Category already created"});
+            }
+        }
+
+        if (icon !== undefined) {
+            try {
+                const imageUrls = await uploadImages(images, 'category_icons');
+                req.body.icon = imageUrls;
+                console.log('✅ Images uploaded successfully:', imageUrls);
+            } catch (uploadError) {
+                console.error('Image upload failed:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload images" 
+                });
             }
         }
 
@@ -79,10 +94,25 @@ const getAllCategories = async (req, res) => {
 const updateCategory = async (req, res) => {
 	try {
         const categoryId = req.params.id;
+        const { icon } = req.body;
 
         const category = await categoryService.findById(categoryId);
         if (!category) {
             return res.status(404).json({ success: false, message: "Category not found"});
+        }
+
+        if (icon !== undefined) {
+            try {
+                const imageUrls = await uploadImages(images, 'category_icons');
+                req.body.icon = imageUrls;
+                console.log('✅ Images uploaded successfully:', imageUrls);
+            } catch (uploadError) {
+                console.error('Image upload failed:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload images" 
+                });
+            }
         }
         
         const categoryData = { ...req.body };

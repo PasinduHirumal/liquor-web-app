@@ -3,6 +3,7 @@ class Categories {
     constructor(id, data) {
         this.category_id = id;
 
+        this.icon = data.icon;
         this.name = data.name;
         this.description = data.description;
 
