@@ -1,6 +1,7 @@
 import Joi from 'joi';
 import { defaultNullImageSchema, optionalImageSchema } from './imageValidationSchemas.js';
 import phoneValidator from './phoneNumberValidationSchema.js';
+import nicValidator from './nicValidationSchema.js';
 
 // CREATE VALIDATOR - With defaults
 const validateDriver = (req, res, next) => {
@@ -11,7 +12,7 @@ const validateDriver = (req, res, next) => {
     firstName: Joi.string().min(2).max(50).required(),
     lastName: Joi.string().min(2).max(50).required(),
     phone: phoneValidator.required(),
-    nic_number: Joi.string().min(12).max(12).required(),
+    nic_number: nicValidator.required(),
     license_number: Joi.string().min(5).max(50).required(),
     dateOfBirth: Joi.alternatives().try(
       Joi.date(),
@@ -182,7 +183,7 @@ const validateDriverUpdate = (req, res, next) => {
     firstName: Joi.string().min(2).max(50).optional(),
     lastName: Joi.string().min(2).max(50).optional(),
     phone: phoneValidator.optional(),
-    nic_number: Joi.string().min(12).max(12).optional(),
+    nic_number: nicValidator.optional(),
     license_number: Joi.string().min(5).max(50).optional(),
     dateOfBirth: Joi.alternatives().try(
       Joi.date(),
