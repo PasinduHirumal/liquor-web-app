@@ -35,7 +35,7 @@ const DriverDetailPage = () => {
     };
 
     const handleEditFinancial = () => {
-        navigate(`/adriver-list/${id}/edit-financial`);
+        navigate(`/driver-list/${id}/edit-financial`);
     };
 
     const handleEditDocuments = () => {
@@ -417,15 +417,33 @@ const DriverDetailPage = () => {
                                 </span>
                             </div>
                             <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Bank Branch</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.bankBranch || 'N/A'}
+                                </span>
+                            </div>
+                            <div className="driver-detail-grid-item">
                                 <span className="driver-detail-info-label">Account</span>
                                 <span className="driver-detail-info-value">
                                     {driver.bankAccountNumber ? `••••${driver.bankAccountNumber.slice(-4)}` : 'N/A'}
                                 </span>
                             </div>
                             <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Tax ID</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.taxId || 'N/A'}
+                                </span>
+                            </div>
+                            <div className="driver-detail-grid-item">
                                 <span className="driver-detail-info-label">Commission</span>
                                 <span className="driver-detail-info-value">
                                     {driver.commissionRate ? `${driver.commissionRate}%` : 'N/A'}
+                                </span>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Payment Method</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.paymentMethod || 'N/A'}
                                 </span>
                             </div>
                             <div className="driver-detail-grid-item">
