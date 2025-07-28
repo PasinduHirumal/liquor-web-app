@@ -75,19 +75,24 @@ function DriverDocumentInfo() {
         try {
             const documentsPayload = {};
 
-            for (const [key, value] of Object.entries(formData)) {
-                if (value) {
-                    documentsPayload[key] = await toBase64(value);
+            for (const key of Object.keys(formData)) {
+                if (formData[key]) {
+                    documentsPayload[key] = await toBase64(formData[key]);
+                } else if (preview[key]) {
+                    documentsPayload[key] = preview[key];
                 }
             }
 
             if (Object.keys(documentsPayload).length === 0) {
-                toast.error("Please select at least one document to update.");
+                toast.error("Please select or confirm at least one document to update.");
                 setLoading(false);
                 return;
             }
 
-            await axiosInstance.patch(`/drivers/update-document/${id}`, { documents: documentsPayload });
+            await axiosInstance.patch(`/drivers/update-document/${id}`, {
+                documents: documentsPayload
+            });
+
             toast.success("Documents updated successfully!");
             navigate(-1);
         } catch (err) {
