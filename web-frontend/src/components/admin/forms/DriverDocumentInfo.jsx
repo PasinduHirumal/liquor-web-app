@@ -60,6 +60,11 @@ function DriverDocumentInfo() {
         }
     };
 
+    const handleRemoveImage = (key) => {
+        setFormData(prev => ({ ...prev, [key]: null }));
+        setPreview(prev => ({ ...prev, [key]: "" }));
+    };
+
     const toBase64 = file =>
         new Promise((resolve, reject) => {
             const reader = new FileReader();
@@ -124,11 +129,21 @@ function DriverDocumentInfo() {
                             disabled={loading}
                         />
                         {preview[key] && (
-                            <img
-                                src={preview[key]}
-                                alt={`${label} Preview`}
-                                className="mt-2 h-40 rounded border object-contain"
-                            />
+                            <div className="relative mt-2 inline-block">
+                                <img
+                                    src={preview[key]}
+                                    alt={`${label} Preview`}
+                                    className="h-40 rounded border object-contain"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => handleRemoveImage(key)}
+                                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700"
+                                    title="Remove Image"
+                                >
+                                    &times;
+                                </button>
+                            </div>
                         )}
                     </div>
                 ))}
