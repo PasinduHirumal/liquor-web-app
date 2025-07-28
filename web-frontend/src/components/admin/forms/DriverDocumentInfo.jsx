@@ -11,16 +11,16 @@ function DriverDocumentInfo() {
         licenseImage: null,
         nicImage: null,
         insuranceImage: null,
-        registrationCertificateImage: null,
-        policeReportImage: null,
+        vehicleRegistrationImage: null,
+        bankStatementImage: null,
     });
 
     const [preview, setPreview] = useState({
         licenseImage: "",
         nicImage: "",
         insuranceImage: "",
-        registrationCertificateImage: "",
-        policeReportImage: "",
+        vehicleRegistrationImage: "",
+        bankStatementImage: "",
     });
 
     const [loading, setLoading] = useState(false);
@@ -35,8 +35,8 @@ function DriverDocumentInfo() {
                     licenseImage: documents.licenseImage || "",
                     nicImage: documents.nicImage || "",
                     insuranceImage: documents.insuranceImage || "",
-                    registrationCertificateImage: documents.registrationCertificateImage || "",
-                    policeReportImage: documents.policeReportImage || "",
+                    vehicleRegistrationImage: documents.vehicleRegistrationImage || "",
+                    bankStatementImage: documents.bankStatementImage || "",
                 });
             } catch (err) {
                 console.error("Failed to fetch driver documents:", err);
@@ -106,7 +106,7 @@ function DriverDocumentInfo() {
                     { label: "License Image", key: "licenseImage" },
                     { label: "NIC Image", key: "nicImage" },
                     { label: "Insurance Image", key: "insuranceImage" },
-                    { label: "Registration Certificate", key: "registrationCertificateImage" },
+                    { label: "Registration Certificate", key: "vehicleRegistrationImage" },
                     { label: "Bank Statement Image", key: "bankStatementImage" },
                 ].map(({ label, key }) => (
                     <div key={key} className="space-y-2">

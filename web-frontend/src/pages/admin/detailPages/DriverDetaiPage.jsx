@@ -541,6 +541,21 @@ const DriverDetailPage = () => {
                                             <span className="driver-detail-info-value">N/A</span>
                                         )}
                                     </div>
+                                    <div className="driver-detail-grid-item">
+                                        <span className="driver-detail-info-label">Bank Statement</span>
+                                        {driver.documents.bankStatementImage ? (
+                                            <a
+                                                href={driver.documents.bankStatementImage}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="driver-detail-document-link"
+                                            >
+                                                View Document
+                                            </a>
+                                        ) : (
+                                            <span className="driver-detail-info-value">N/A</span>
+                                        )}
+                                    </div>
                                 </>
                             ) : (
                                 <div className="driver-detail-grid-item wide">
