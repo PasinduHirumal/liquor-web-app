@@ -1,0 +1,21 @@
+.driver-performance-info {
+    max-width: 800px;
+}
+
+.driver-performance-form {
+    border: 1px solid #dee2e6;
+    background-color: #f9f9f9;
+}
+
+.driver-performance-form input::placeholder {
+    color: #aaa;
+}
+
+.driver-performance-form .form-label {
+    font-weight: 500;
+    color: #333;
+}
+
+.driver-performance-form .btn {
+    min-width: 140px;
+}

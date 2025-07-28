@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../../lib/axios"
+import '../../../styles/DriverPerformanceInfo.css'
 import toast from "react-hot-toast";
 
 function DriverPerformanceInfo() {
@@ -129,112 +130,123 @@ function DriverPerformanceInfo() {
     if (loading) return <p className="mt-5 text-center">Loading...</p>;
 
     return (
-        <div className="driver-performance-info-container" style={{ maxWidth: 600, margin: "0 auto" }}>
-            <h1>Driver Performance & Rating Info</h1>
-            <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                <label>
-                    Rating (0-5):
-                    <input
-                        type="number"
-                        name="rating"
-                        value={formData.rating}
-                        min={0}
-                        max={5}
-                        step={0.1}
-                        onChange={handleChange}
-                        required
-                    />
-                </label>
+        <div className="container driver-performance-info mt-5">
+            <h2 className="mb-4 text-center text-primary">Driver Performance & Rating Info</h2>
+            <form onSubmit={handleSubmit} className="driver-performance-form bg-light p-4 rounded shadow-sm">
+                <div className="row g-3">
+                    <div className="col-md-6">
+                        <label className="form-label">Rating (0-5)</label>
+                        <input
+                            type="number"
+                            name="rating"
+                            value={formData.rating}
+                            min={0}
+                            max={5}
+                            step={0.1}
+                            onChange={handleChange}
+                            className="form-control"
+                            required
+                        />
+                    </div>
 
-                <label>
-                    Total Ratings:
-                    <input
-                        type="number"
-                        name="totalRatings"
-                        value={formData.totalRatings}
-                        min={0}
-                        onChange={handleChange}
-                        required
-                    />
-                </label>
+                    <div className="col-md-6">
+                        <label className="form-label">Total Ratings</label>
+                        <input
+                            type="number"
+                            name="totalRatings"
+                            value={formData.totalRatings}
+                            min={0}
+                            onChange={handleChange}
+                            className="form-control"
+                            required
+                        />
+                    </div>
 
-                <label>
-                    Total Deliveries:
-                    <input
-                        type="number"
-                        name="totalDeliveries"
-                        value={formData.totalDeliveries}
-                        min={0}
-                        onChange={handleChange}
-                        required
-                    />
-                </label>
+                    <div className="col-md-6">
+                        <label className="form-label">Total Deliveries</label>
+                        <input
+                            type="number"
+                            name="totalDeliveries"
+                            value={formData.totalDeliveries}
+                            min={0}
+                            onChange={handleChange}
+                            className="form-control"
+                            required
+                        />
+                    </div>
 
-                <label>
-                    Completed Deliveries:
-                    <input
-                        type="number"
-                        name="completedDeliveries"
-                        value={formData.completedDeliveries}
-                        min={0}
-                        onChange={handleChange}
-                        required
-                    />
-                </label>
+                    <div className="col-md-6">
+                        <label className="form-label">Completed Deliveries</label>
+                        <input
+                            type="number"
+                            name="completedDeliveries"
+                            value={formData.completedDeliveries}
+                            min={0}
+                            onChange={handleChange}
+                            className="form-control"
+                            required
+                        />
+                    </div>
 
-                <label>
-                    Cancelled Deliveries:
-                    <input
-                        type="number"
-                        name="cancelledDeliveries"
-                        value={formData.cancelledDeliveries}
-                        min={0}
-                        onChange={handleChange}
-                        required
-                    />
-                </label>
+                    <div className="col-md-6">
+                        <label className="form-label">Cancelled Deliveries</label>
+                        <input
+                            type="number"
+                            name="cancelledDeliveries"
+                            value={formData.cancelledDeliveries}
+                            min={0}
+                            onChange={handleChange}
+                            className="form-control"
+                            required
+                        />
+                    </div>
 
-                <label>
-                    Average Delivery Time (minutes):
-                    <input
-                        type="number"
-                        name="averageDeliveryTime"
-                        value={formData.averageDeliveryTime}
-                        min={0}
-                        onChange={handleChange}
-                        required
-                    />
-                </label>
+                    <div className="col-md-6">
+                        <label className="form-label">Average Delivery Time (min)</label>
+                        <input
+                            type="number"
+                            name="averageDeliveryTime"
+                            value={formData.averageDeliveryTime}
+                            min={0}
+                            onChange={handleChange}
+                            className="form-control"
+                            required
+                        />
+                    </div>
 
-                <label>
-                    On-Time Delivery Rate (%):
-                    <input
-                        type="number"
-                        name="onTimeDeliveryRate"
-                        value={formData.onTimeDeliveryRate}
-                        min={0}
-                        max={100}
-                        onChange={handleChange}
-                        required
-                    />
-                </label>
+                    <div className="col-md-6">
+                        <label className="form-label">On-Time Delivery Rate (%)</label>
+                        <input
+                            type="number"
+                            name="onTimeDeliveryRate"
+                            value={formData.onTimeDeliveryRate}
+                            min={0}
+                            max={100}
+                            onChange={handleChange}
+                            className="form-control"
+                            required
+                        />
+                    </div>
 
-                <label>
-                    Orders History (comma separated IDs):
-                    <input
-                        type="text"
-                        name="ordersHistoryInput"
-                        value={ordersHistoryInput}
-                        onChange={handleOrdersHistoryChange}
-                        onBlur={handleOrdersHistoryBlur}
-                        placeholder="order1, order2, order3"
-                    />
-                </label>
-                <div style={{ display: "flex", gap: 10 }}>
+                    <div className="col-md-12">
+                        <label className="form-label">Orders History (comma-separated)</label>
+                        <input
+                            type="text"
+                            name="ordersHistoryInput"
+                            value={ordersHistoryInput}
+                            onChange={handleOrdersHistoryChange}
+                            onBlur={handleOrdersHistoryBlur}
+                            placeholder="order1, order2, order3"
+                            className="form-control"
+                        />
+                    </div>
+                </div>
+
+                <div className="d-flex justify-content-end mt-4 gap-3">
                     <button
                         type="button"
                         onClick={() => navigate(-1)}
-                        style={{ padding: "8px 16px" }}
+                        className="btn btn-secondary"
                         disabled={submitting}
                     >
                         Cancel
@@ -242,16 +254,16 @@ function DriverPerformanceInfo() {
 
                     <button
                         type="submit"
-                        style={{ padding: "8px 16px" }}
+                        className="btn btn-primary"
                         disabled={submitting}
                     >
                         {submitting ? "Saving..." : "Save Performance Info"}
                     </button>
                 </div>
-
             </form>
         </div>
     );
+
 }
 
 export default DriverPerformanceInfo;
