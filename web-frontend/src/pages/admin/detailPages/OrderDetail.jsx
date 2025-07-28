@@ -4,7 +4,7 @@ import { axiosInstance } from "../../../lib/axios";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { Card, Container, Row, Col, Badge } from "react-bootstrap";
-import "../../../styles/OrderDetail.css"; 
+import "../../../styles/OrderDetail.css";
 
 function OrderDetail() {
     const { id } = useParams();
@@ -34,10 +34,10 @@ function OrderDetail() {
 
     const renderStatusBadge = () => {
         if (!order.status) return null;
-        
+
         let variant = "secondary";
         switch (order.status.toLowerCase()) {
-            case "completed":
+            case "delivered":
                 variant = "success";
                 break;
             case "pending":
@@ -49,17 +49,17 @@ function OrderDetail() {
             case "processing":
                 variant = "info";
                 break;
-            case "shipped":
+            case "out_for_delivery":
                 variant = "primary";
                 break;
         }
-        
+
         return <Badge bg={variant} className="text-capitalize">{order.status}</Badge>;
     };
 
     const renderPaymentStatusBadge = () => {
         if (!order.payment_status) return null;
-        
+
         let variant = "secondary";
         switch (order.payment_status.toLowerCase()) {
             case "paid":
@@ -75,16 +75,16 @@ function OrderDetail() {
                 variant = "info";
                 break;
         }
-        
+
         return <Badge bg={variant} className="text-capitalize">{order.payment_status}</Badge>;
     };
 
     return (
         <Container className="order-detail-container py-4">
             <h1 className="mb-4">
-                Order Details <small className="text-muted">#{order.order_number || order.order_id || order._id}</small>
+                Order Details <small className="text-muted">#{order.order_number || order.order_id}</small>
             </h1>
-            
+
             <Row className="g-4">
                 {/* Order Summary Card */}
                 <Col md={6}>
@@ -185,7 +185,7 @@ function OrderDetail() {
                         <Card.Body>
                             <p><strong>Delivery Address:</strong></p>
                             <p className="mb-3">{order.delivery_address?.full_address || order.delivery_address?.address || "N/A"}</p>
-                            
+
                             <Row>
                                 <Col sm={6}>
                                     <p><strong>Distance:</strong></p>
