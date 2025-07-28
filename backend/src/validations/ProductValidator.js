@@ -10,6 +10,7 @@ const validateProduct = (req, res, next) => {
     brand: Joi.string().min(1).max(100).required(),
     alcohol_content: Joi.number().min(0).max(100).required(),
     volume: Joi.number().positive().required(),
+    main_image: requiredImageSchema,
     images: requiredImageSchema,
 
     // Pricing
@@ -66,6 +67,7 @@ const validateProductUpdate = (req, res, next) => {
     brand: Joi.string().min(1).max(100).optional(),
     alcohol_content: Joi.number().min(0).max(100).optional(),
     volume: Joi.number().positive().optional(),
+    main_image: optionalImageSchema,
     images: optionalImageSchema,
     
     is_active: Joi.boolean().optional(),

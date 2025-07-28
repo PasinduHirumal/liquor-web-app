@@ -2,7 +2,7 @@ import ProductService from '../services/product.service.js';
 import StockHistoryService from '../services/stockHistory.service.js';
 import CategoryService from '../services/category.service.js';
 import populateCategory from '../utils/populateCategory.js';
-import { uploadImages } from '../utils/firebaseStorage.js';
+import { uploadImages, uploadSingleImage } from '../utils/firebaseStorage.js';
 import { validateStockOperation } from '../utils/stockCalculator.js';
 import { validatePriceOperation } from '../utils/priceCalculator.js';
 import { createStockHistory } from './stockHistory.controller.js';
@@ -13,7 +13,7 @@ const stockHistoryService = new StockHistoryService();
 
 const createProduct = async (req, res) => {
 	try {
-        const { marked_price, discount_percentage, category_id, images } = req.body;
+        const { marked_price, discount_percentage, category_id, main_image, images } = req.body;
 
         const category = await categoryService.findById(category_id);
         if (!category) {
@@ -24,6 +24,20 @@ const createProduct = async (req, res) => {
             try {
                 const imageUrls = await uploadImages(images, 'products');
                 req.body.images = imageUrls;
+                console.log('✅ Images uploaded successfully:', imageUrls);
+            } catch (uploadError) {
+                console.error('Image upload failed:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload images" 
+                });
+            }
+        }
+
+        if (main_image !== undefined) {
+            try {
+                const imageUrls = await uploadSingleImage(main_image, 'products');
+                req.body.main_image = imageUrls;
                 console.log('✅ Images uploaded successfully:', imageUrls);
             } catch (uploadError) {
                 console.error('Image upload failed:', uploadError);
@@ -186,7 +200,7 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
 	try {
         const productId = req.params.id;
-        const { marked_price, discount_percentage, add_quantity, withdraw_quantity, category_id, images } = req.body;
+        const { marked_price, discount_percentage, add_quantity, withdraw_quantity, category_id, images, main_image } = req.body;
 
         const product = await productService.findById(productId);
         if (!product) {
@@ -204,6 +218,20 @@ const updateProduct = async (req, res) => {
             try {
                 const imageUrls = await uploadImages(images, 'products');
                 req.body.images = imageUrls;
+                console.log('✅ Images uploaded successfully:', imageUrls);
+            } catch (uploadError) {
+                console.error('Image upload failed:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload images" 
+                });
+            }
+        }
+
+        if (main_image !== undefined) {
+            try {
+                const imageUrls = await uploadSingleImage(main_image, 'products');
+                req.body.main_image = imageUrls;
                 console.log('✅ Images uploaded successfully:', imageUrls);
             } catch (uploadError) {
                 console.error('Image upload failed:', uploadError);

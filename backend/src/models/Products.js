@@ -9,6 +9,7 @@ class Products {
         this.brand = data.brand;
         this.alcohol_content = data.alcohol_content
         this.volume = data.volume;
+        this.main_image = data.main_image;
         this.images = data.images;
         this.price = data.price;
 
