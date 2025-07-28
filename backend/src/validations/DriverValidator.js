@@ -1,16 +1,16 @@
 import Joi from 'joi';
 import { defaultNullImageSchema, optionalImageSchema } from './imageValidationSchemas.js';
+import phoneValidator from './phoneNumberValidationSchema.js';
 
 // CREATE VALIDATOR - With defaults
 const validateDriver = (req, res, next) => {
   const schema = Joi.object({
-    
     // Personal Information
     email: Joi.string().email().lowercase().required(),
     password: Joi.string().min(6).max(128).optional(),
     firstName: Joi.string().min(2).max(50).required(),
     lastName: Joi.string().min(2).max(50).required(),
-    phone: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).min(10).max(18).trim().required(),
+    phone: phoneValidator.required(),
     nic_number: Joi.string().min(12).max(12).required(),
     license_number: Joi.string().min(5).max(50).required(),
     dateOfBirth: Joi.alternatives().try(
@@ -181,7 +181,7 @@ const validateDriverUpdate = (req, res, next) => {
     password: Joi.string().min(6).max(128).optional(),
     firstName: Joi.string().min(2).max(50).optional(),
     lastName: Joi.string().min(2).max(50).optional(),
-    phone: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).min(10).max(18).trim().optional(),
+    phone: phoneValidator.optional(),
     nic_number: Joi.string().min(12).max(12).optional(),
     license_number: Joi.string().min(5).max(50).optional(),
     dateOfBirth: Joi.alternatives().try(

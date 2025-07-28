@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import phoneValidator from './phoneNumberValidationSchema.js';
 
 // CREATE VALIDATOR - With defaults
 const validateAdminUser = (req, res, next) => {
@@ -7,7 +8,7 @@ const validateAdminUser = (req, res, next) => {
     password: Joi.string().min(6).max(128).required(),
     firstName: Joi.string().min(2).max(50).required(),
     lastName: Joi.string().min(2).max(50).required(),
-    phone: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).min(10).max(18).trim().required(),
+    phone: phoneValidator.required(),
     
     role: Joi.string().valid('pending', 'admin', 'super_admin').default('pending'),
     googleId: Joi.string().allow('').default(''),
@@ -61,7 +62,7 @@ const validateAdminUserUpdate = (req, res, next) => {
     password: Joi.string().min(6).max(128).optional(),
     firstName: Joi.string().min(2).max(50).optional(),
     lastName: Joi.string().min(2).max(50).optional(),
-    phone: Joi.string().pattern(/^(?:\+?\d{9,15})$/).min(9).trim().optional(),
+    phone: phoneValidator.optional(),
     
     role: Joi.string().valid('pending', 'admin', 'super_admin').optional(),
     googleId: Joi.string().allow('').optional(),
