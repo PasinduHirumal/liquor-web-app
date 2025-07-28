@@ -266,6 +266,34 @@ const DriverDetailPage = () => {
                                             Lat: {driver.currentLocation.lat?.toFixed(4)}, Lng: {driver.currentLocation.lng?.toFixed(4)}
                                         </span>
                                     </div>
+
+                                    {driver.currentLocation.address && (
+                                        <div className="driver-detail-grid-item wide">
+                                            <span className="driver-detail-info-label">Address</span>
+                                            <span className="driver-detail-info-value">
+                                                {driver.currentLocation.address}
+                                            </span>
+                                        </div>
+                                    )}
+
+                                    <div className="driver-detail-grid-item wide">
+                                        <span className="driver-detail-info-label">Delivery Zones</span>
+                                        <span className="driver-detail-info-value">
+                                            {Array.isArray(driver.deliveryZones) && driver.deliveryZones.length > 0
+                                                ? driver.deliveryZones.join(', ')
+                                                : 'N/A'}
+                                        </span>
+                                    </div>
+
+                                    <div className="driver-detail-grid-item wide">
+                                        <span className="driver-detail-info-label">Delivery Zones</span>
+                                        <span className="driver-detail-info-value">
+                                            {Array.isArray(driver.preferredDeliveryTypes) && driver.preferredDeliveryTypes.length > 0
+                                                ? driver.preferredDeliveryTypes.join(', ')
+                                                : 'N/A'}
+                                        </span>
+                                    </div>
+
                                     <div className="driver-detail-grid-item">
                                         <span className="driver-detail-info-label">Status</span>
                                         <div className="driver-detail-status-chips">
