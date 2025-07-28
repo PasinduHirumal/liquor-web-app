@@ -7,6 +7,7 @@ const validateOtherProduct = (req, res, next) => {
         name: Joi.string().min(1).max(200).required(),
         description: Joi.string().min(1).max(500).required(),
         category_id: Joi.string().min(1).max(100).required(),
+        main_image: requiredImageSchema,
         images: requiredImageSchema,
         
         weight: Joi.number().positive().optional(),
@@ -61,6 +62,7 @@ const validateOtherProductUpdate = (req, res, next) => {
     name: Joi.string().min(1).max(200).optional(),
     description: Joi.string().min(1).max(500).optional(),
     category_id: Joi.string().min(1).max(100).optional(),
+    main_image: optionalImageSchema,
     images: optionalImageSchema,
     
     weight: Joi.number().positive().optional(),

@@ -6,6 +6,7 @@ class OtherProducts {
         this.name = data.name;
         this.description = data.description;
         this.category_id = data.category_id;
+        this.main_image = data.main_image;
         this.images = data.images;
 
         this.weight = data.weight;
