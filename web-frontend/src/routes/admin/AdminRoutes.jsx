@@ -22,6 +22,7 @@ import DriverPerformanceInfo from "../../components/admin/forms/DriverPerformanc
 import DriverFinancialInfo from "../../components/admin/forms/DriverFinancialInfo";
 import DriverDocumentInfo from "../../components/admin/forms/DriverDocumentInfo";
 import OrderLIst from "../../pages/admin/OrderList";
+import OrderDetail from "../../pages/admin/detailPages/OrderDetail";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -89,6 +90,10 @@ export const adminRoutes = [
                 <OrderLIst />
             </AdminProtectedRoute>
         ),
+    },
+    {
+        path: "/orders/:id",
+        element: <OrderDetail />
     },
     {
         path: "/liquor-list",
