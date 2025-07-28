@@ -7,6 +7,7 @@ function DriverPerformanceInfo() {
     const { id } = useParams();
     const navigate = useNavigate()
     const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         rating: 0,
         totalRatings: 0,
@@ -82,6 +83,7 @@ function DriverPerformanceInfo() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        setSubmitting(true);
 
         try {
             if (formData.rating < 0 || formData.rating > 5) {
@@ -111,17 +113,20 @@ function DriverPerformanceInfo() {
 
             if (response.data.success) {
                 toast.success("Performance info updated successfully!");
-                navigate(-1)
+                navigate(-1);
             } else {
                 toast.error("Failed to update performance info");
             }
         } catch (error) {
             console.error(error);
             toast.error("Error updating performance info");
+        } finally {
+            setSubmitting(false);
         }
     };
 
-    if (loading) return <p>Loading...</p>;
+
+    if (loading) return <p className="mt-5 text-center">Loading...</p>;
 
     return (
         <div className="driver-performance-info-container" style={{ maxWidth: 600, margin: "0 auto" }}>
@@ -225,12 +230,25 @@ function DriverPerformanceInfo() {
                         placeholder="order1, order2, order3"
                     />
                 </label>
-                <button style={{ padding: "8px 16px" }} onClick={() => navigate(-1)}>
-                    Cancel
-                </button>
-                <button type="submit" style={{ padding: "8px 16px" }}>
-                    Save Performance Info
-                </button>
+                <div style={{ display: "flex", gap: 10 }}>
+                    <button
+                        type="button"
+                        onClick={() => navigate(-1)}
+                        style={{ padding: "8px 16px" }}
+                        disabled={submitting}
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        style={{ padding: "8px 16px" }}
+                        disabled={submitting}
+                    >
+                        {submitting ? "Saving..." : "Save Performance Info"}
+                    </button>
+                </div>
+
             </form>
         </div>
     );
