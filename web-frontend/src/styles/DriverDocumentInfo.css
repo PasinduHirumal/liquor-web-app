@@ -1,0 +1,187 @@
+.document-form-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2rem;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.document-form-header {
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.document-form-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a202c;
+    margin-bottom: 0.5rem;
+}
+
+.document-form-subtitle {
+    font-size: 0.875rem;
+    color: #718096;
+}
+
+.document-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.document-form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.document-form-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #4a5568;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.document-form-input {
+    display: none;
+}
+
+.document-form-file-cta {
+    padding: 0.5rem 1rem;
+    background-color: #edf2f7;
+    color: #2d3748;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: center;
+    font-size: 0.875rem;
+    border: 1px dashed #cbd5e0;
+}
+
+.document-form-file-cta:hover {
+    background-color: #e2e8f0;
+}
+
+.document-preview-container {
+    margin-top: 0.5rem;
+}
+
+.document-preview {
+    position: relative;
+    display: inline-block;
+    margin-top: 0.5rem;
+}
+
+.document-preview-image {
+    max-height: 160px;
+    max-width: 100%;
+    border-radius: 6px;
+    border: 1px solid #e2e8f0;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.document-preview-remove {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    width: 24px;
+    height: 24px;
+    background-color: #e53e3e;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    transition: all 0.2s;
+}
+
+.document-preview-remove:hover {
+    background-color: #c53030;
+}
+
+.document-preview-remove:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.document-preview-text {
+    font-size: 0.75rem;
+    color: #718096;
+    margin-top: 0.25rem;
+}
+
+.document-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.document-form-button {
+    padding: 0.625rem 1.25rem;
+    border-radius: 6px;
+    font-weight: 500;
+    font-size: 0.875rem;
+    transition: all 0.2s;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    border: 1px solid transparent;
+}
+
+.document-form-button--primary {
+    background-color: #4299e1;
+    color: white;
+}
+
+.document-form-button--primary:hover {
+    background-color: #3182ce;
+}
+
+.document-form-button--primary:disabled {
+    background-color: #bee3f8;
+    cursor: not-allowed;
+}
+
+.document-form-button--secondary {
+    background-color: white;
+    color: #4a5568;
+    border-color: #cbd5e0;
+}
+
+.document-form-button--secondary:hover {
+    background-color: #f7fafc;
+    border-color: #a0aec0;
+}
+
+.document-form-button--secondary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.document-form-button-spinner {
+    width: 1rem;
+    height: 1rem;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: white;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}

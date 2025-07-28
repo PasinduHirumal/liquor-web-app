@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../../lib/axios";
+import "../../../styles/DriverDocumentInfo.css"
 import toast from "react-hot-toast";
 
 function DriverDocumentInfo() {
@@ -109,51 +110,63 @@ function DriverDocumentInfo() {
     };
 
     return (
-        <div className="max-w-3xl mx-auto p-6 bg-white rounded-lg shadow-md">
-            <h2 className="text-2xl font-bold mb-6 text-gray-800">Update Driver Documents</h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="document-form-container">
+            <div className="document-form-header">
+                <h2 className="document-form-title">Update Driver Documents</h2>
+                <p className="document-form-subtitle">Upload or update the required documents for this driver</p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="document-form">
                 {[
-                    { label: "License Image", key: "licenseImage" },
-                    { label: "NIC Image", key: "nicImage" },
-                    { label: "Insurance Image", key: "insuranceImage" },
+                    { label: "Driver's License", key: "licenseImage" },
+                    { label: "National ID Card", key: "nicImage" },
+                    { label: "Vehicle Insurance", key: "insuranceImage" },
                     { label: "Registration Certificate", key: "vehicleRegistrationImage" },
-                    { label: "Bank Statement Image", key: "bankStatementImage" },
+                    { label: "Bank Statement", key: "bankStatementImage" },
                 ].map(({ label, key }) => (
-                    <div key={key} className="space-y-2">
-                        <label className="block font-medium text-gray-700">{label}</label>
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) => handleFileChange(e, key)}
-                            className="border rounded px-3 py-2 w-full"
-                            disabled={loading}
-                        />
+                    <div key={key} className="document-form-group">
+                        <label className="document-form-label">
+                            {label}
+                            <input
+                                type="file"
+                                accept="image/*,.pdf"
+                                onChange={(e) => handleFileChange(e, key)}
+                                className="document-form-input"
+                                disabled={loading}
+                            />
+                            <span className="document-form-file-cta">Choose file</span>
+                        </label>
+
                         {preview[key] && (
-                            <div className="relative mt-2 inline-block">
-                                <img
-                                    src={preview[key]}
-                                    alt={`${label} Preview`}
-                                    className="h-40 rounded border object-contain"
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => handleRemoveImage(key)}
-                                    className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-700"
-                                    title="Remove Image"
-                                >
-                                    &times;
-                                </button>
+                            <div className="document-preview-container">
+                                <div className="document-preview">
+                                    <img
+                                        src={preview[key]}
+                                        alt={`${label} Preview`}
+                                        className="document-preview-image"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => handleRemoveImage(key)}
+                                        className="document-preview-remove"
+                                        title="Remove Image"
+                                        disabled={loading}
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+                                <p className="document-preview-text">Current {label.toLowerCase()}</p>
                             </div>
                         )}
                     </div>
                 ))}
 
-                <div className="flex space-x-4">
+                <div className="document-form-actions">
                     <button
                         type="button"
                         onClick={() => navigate(-1)}
                         disabled={loading}
-                        className="bg-gray-400 text-white px-4 py-2 rounded hover:bg-gray-500 disabled:opacity-50"
+                        className="document-form-button document-form-button--secondary"
                     >
                         Cancel
                     </button>
@@ -161,9 +174,16 @@ function DriverDocumentInfo() {
                     <button
                         type="submit"
                         disabled={loading}
-                        className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 disabled:opacity-50"
+                        className="document-form-button document-form-button--primary"
                     >
-                        {loading ? "Updating..." : "Update Documents"}
+                        {loading ? (
+                            <>
+                                <span className="document-form-button-spinner"></span>
+                                Updating...
+                            </>
+                        ) : (
+                            "Update Documents"
+                        )}
                     </button>
                 </div>
             </form>
