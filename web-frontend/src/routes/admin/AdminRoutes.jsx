@@ -92,7 +92,7 @@ export const adminRoutes = [
         ),
     },
     {
-        path: "/orders/:id",
+        path: "/order-list/:id",
         element: <OrderDetail />
     },
     {

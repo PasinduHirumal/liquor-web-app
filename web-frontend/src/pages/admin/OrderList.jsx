@@ -88,7 +88,7 @@ function OrderList() {
                     type="primary"
                     shape="circle"
                     icon={<ArrowRightOutlined />}
-                    onClick={() => navigate(`/orders/${record.order_id}`)}
+                    onClick={() => navigate(`/order-list/${record.order_id}`)}
                 />
             ),
         },
