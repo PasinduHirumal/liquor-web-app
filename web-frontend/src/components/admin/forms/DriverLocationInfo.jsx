@@ -8,7 +8,7 @@ function DriverLocationInfo() {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [formData, setFormData] = useState({
-        currentLocation: { lat: '', lng: '' },
+        currentLocation: { lat: '', lng: '', timestamp: new Date().toISOString() },
         deliveryZones: '',
         maxDeliveryRadius: 10,
         preferredDeliveryTypes: [],
@@ -26,7 +26,7 @@ function DriverLocationInfo() {
 
     const deliveryTypes = [
         'food', 'grocery', 'pharmacy', 'electronics',
-        'documents', 'liquor', 'other'
+        'documents', 'other'
     ];
 
     useEffect(() => {
@@ -36,23 +36,19 @@ function DriverLocationInfo() {
                 const driverData = response.data.data;
 
                 setFormData({
-                    currentLocation: driverData.currentLocation || { lat: '', lng: '' },
-                    deliveryZones: driverData.deliveryZones?.join(', ') || '',
+                    currentLocation: driverData.currentLocation || {
+                        lat: '', lng: '', timestamp: new Date().toISOString()
+                    },
+                    deliveryZones: (driverData.deliveryZones || []).join(', '),
                     maxDeliveryRadius: driverData.maxDeliveryRadius || 10,
-                    preferredDeliveryTypes: driverData.preferredDeliveryTypes || [],
-                    workingHours: driverData.workingHours || {
-                        monday: { start: '', end: '', isWorking: true },
-                        tuesday: { start: '', end: '', isWorking: true },
-                        wednesday: { start: '', end: '', isWorking: true },
-                        thursday: { start: '', end: '', isWorking: true },
-                        friday: { start: '', end: '', isWorking: true },
-                        saturday: { start: '', end: '', isWorking: true },
-                        sunday: { start: '', end: '', isWorking: true }
-                    }
+                    preferredDeliveryTypes: (driverData.preferredDeliveryTypes || []).filter(t =>
+                        deliveryTypes.includes(t)
+                    ),
+                    workingHours: driverData.workingHours || formData.workingHours
                 });
             } catch (error) {
                 toast.error('Failed to fetch driver data');
-                console.error('Error fetching driver:', error);
+                console.error(error);
             } finally {
                 setLoading(false);
             }
@@ -63,10 +59,7 @@ function DriverLocationInfo() {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+        setFormData(prev => ({ ...prev, [name]: value }));
     };
 
     const handleLocationChange = (e) => {
@@ -75,21 +68,18 @@ function DriverLocationInfo() {
             ...prev,
             currentLocation: {
                 ...prev.currentLocation,
-                [name]: parseFloat(value)
+                [name]: value,
+                timestamp: new Date().toISOString()
             }
         }));
     };
 
     const handleDeliveryTypeToggle = (type) => {
         setFormData(prev => {
-            const newTypes = prev.preferredDeliveryTypes.includes(type)
+            const updated = prev.preferredDeliveryTypes.includes(type)
                 ? prev.preferredDeliveryTypes.filter(t => t !== type)
                 : [...prev.preferredDeliveryTypes, type];
-
-            return {
-                ...prev,
-                preferredDeliveryTypes: newTypes
-            };
+            return { ...prev, preferredDeliveryTypes: updated };
         });
     };
 
@@ -98,10 +88,7 @@ function DriverLocationInfo() {
             ...prev,
             workingHours: {
                 ...prev.workingHours,
-                [day]: {
-                    ...prev.workingHours[day],
-                    [field]: value
-                }
+                [day]: { ...prev.workingHours[day], [field]: value }
             }
         }));
     };
@@ -124,33 +111,53 @@ function DriverLocationInfo() {
         setErrors({});
 
         try {
-            // Prepare data for API
+            const lat = parseFloat(formData.currentLocation.lat);
+            const lng = parseFloat(formData.currentLocation.lng);
+
+            if (isNaN(lat) || isNaN(lng)) {
+                return setErrors({ 'currentLocation.lat': 'Invalid coordinates', 'currentLocation.lng': 'Invalid coordinates' });
+            }
+
+            const deliveryZonesArray = formData.deliveryZones
+                .split(',')
+                .map(zone => zone.trim())
+                .filter(zone => zone.length > 0);
+
+            const preferredTypes = formData.preferredDeliveryTypes.filter(t => deliveryTypes.includes(t));
+
             const payload = {
-                currentLocation: formData.currentLocation,
+                currentLocation: {
+                    lat,
+                    lng,
+                    timestamp: new Date().toISOString()
+                },
+                deliveryZones: deliveryZonesArray,
                 maxDeliveryRadius: Number(formData.maxDeliveryRadius),
-                preferredDeliveryTypes: formData.preferredDeliveryTypes,
-                deliveryZones: formData.deliveryZones.split(',').map(zone => zone.trim()),
+                preferredDeliveryTypes: preferredTypes,
                 workingHours: formData.workingHours
             };
 
             await axiosInstance.patch(`/drivers/update-locationAndDelivery/${id}`, payload);
-            toast.success('Driver location and delivery info updated successfully');
+
+            toast.success('Driver location info updated');
             navigate(-1);
         } catch (error) {
-            if (error.response?.data?.errors) {
-                setErrors(error.response.data.errors.reduce((acc, curr) => {
+            const res = error.response;
+            if (res?.data?.errors) {
+                const parsed = res.data.errors.reduce((acc, curr) => {
                     acc[curr.field] = curr.message;
                     return acc;
-                }, {}));
+                }, {});
+                setErrors(parsed);
             } else {
-                toast.error(error.response?.data?.message || 'Failed to update driver');
+                toast.error(res?.data?.message || 'Update failed');
             }
-            console.error('Error updating driver:', error);
         }
     };
 
+
     if (loading) {
-        return <div className="text-center py-8">Loading driver data...</div>;
+        return <div className="text-center py-8 mt-5">Loading driver data...</div>;
     }
 
     return (
@@ -170,6 +177,7 @@ function DriverLocationInfo() {
                             step="0.000001"
                             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Enter latitude"
+                            required
                         />
                         {errors['currentLocation.lat'] && (
                             <p className="mt-1 text-sm text-red-600">{errors['currentLocation.lat']}</p>
@@ -185,6 +193,7 @@ function DriverLocationInfo() {
                             step="0.000001"
                             className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                             placeholder="Enter longitude"
+                            required
                         />
                         {errors['currentLocation.lng'] && (
                             <p className="mt-1 text-sm text-red-600">{errors['currentLocation.lng']}</p>
@@ -221,6 +230,7 @@ function DriverLocationInfo() {
                         value={formData.maxDeliveryRadius}
                         onChange={handleInputChange}
                         className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        required
                     />
                     {errors.maxDeliveryRadius && (
                         <p className="mt-1 text-sm text-red-600">{errors.maxDeliveryRadius}</p>
