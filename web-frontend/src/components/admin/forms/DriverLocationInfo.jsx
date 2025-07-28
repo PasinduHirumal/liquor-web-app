@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { axiosInstance } from '../../../lib/axios';
+import '../../../styles/LocationEditForm.css'
 import toast from 'react-hot-toast';
 
 function DriverLocationInfo() {
@@ -161,67 +162,65 @@ function DriverLocationInfo() {
     }
 
     return (
-        <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-            <h1 className="text-2xl font-bold mb-6 text-gray-800">Driver Location & Delivery Information</h1>
+        <div className="driver-location-delivery-form">
+            <h1 className="section-title">Driver Location & Delivery Information</h1>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="driver-form">
                 {/* Current Location */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Latitude</label>
+                <div className="row mb-4">
+                    <div className="col-md-6">
+                        <label className="form-label">Latitude</label>
                         <input
                             type="number"
                             name="lat"
                             value={formData.currentLocation.lat || ''}
                             onChange={handleLocationChange}
                             step="0.000001"
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="form-control"
                             placeholder="Enter latitude"
                             required
                         />
                         {errors['currentLocation.lat'] && (
-                            <p className="mt-1 text-sm text-red-600">{errors['currentLocation.lat']}</p>
+                            <p className="error-text">{errors['currentLocation.lat']}</p>
                         )}
                     </div>
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Longitude</label>
+                    <div className="col-md-6">
+                        <label className="form-label">Longitude</label>
                         <input
                             type="number"
                             name="lng"
                             value={formData.currentLocation.lng || ''}
                             onChange={handleLocationChange}
                             step="0.000001"
-                            className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="form-control"
                             placeholder="Enter longitude"
                             required
                         />
                         {errors['currentLocation.lng'] && (
-                            <p className="mt-1 text-sm text-red-600">{errors['currentLocation.lng']}</p>
+                            <p className="error-text">{errors['currentLocation.lng']}</p>
                         )}
                     </div>
                 </div>
 
                 {/* Delivery Zones */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Delivery Zones (comma separated)</label>
+                <div className="mb-4">
+                    <label className="form-label">Delivery Zones (comma separated)</label>
                     <input
                         type="text"
                         name="deliveryZones"
                         value={formData.deliveryZones}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="form-control"
                         placeholder="e.g. Downtown, Midtown, Uptown"
                     />
                     {errors.deliveryZones && (
-                        <p className="mt-1 text-sm text-red-600">{errors.deliveryZones}</p>
+                        <p className="error-text">{errors.deliveryZones}</p>
                     )}
                 </div>
 
                 {/* Max Delivery Radius */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Max Delivery Radius (km)
-                    </label>
+                <div className="mb-4">
+                    <label className="form-label">Max Delivery Radius (km)</label>
                     <input
                         type="number"
                         name="maxDeliveryRadius"
@@ -229,102 +228,98 @@ function DriverLocationInfo() {
                         max="100"
                         value={formData.maxDeliveryRadius}
                         onChange={handleInputChange}
-                        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        className="form-control"
                         required
                     />
                     {errors.maxDeliveryRadius && (
-                        <p className="mt-1 text-sm text-red-600">{errors.maxDeliveryRadius}</p>
+                        <p className="error-text">{errors.maxDeliveryRadius}</p>
                     )}
                 </div>
 
                 {/* Preferred Delivery Types */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Preferred Delivery Types
-                    </label>
-                    <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                <div className="mb-4">
+                    <label className="form-label">Preferred Delivery Types</label>
+                    <div className="row">
                         {deliveryTypes.map(type => (
-                            <div key={type} className="flex items-center">
-                                <input
-                                    type="checkbox"
-                                    id={`type-${type}`}
-                                    checked={formData.preferredDeliveryTypes.includes(type)}
-                                    onChange={() => handleDeliveryTypeToggle(type)}
-                                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
-                                />
-                                <label htmlFor={`type-${type}`} className="ml-2 text-sm text-gray-700 capitalize">
-                                    {type}
-                                </label>
+                            <div key={type} className="col-md-4 mb-2">
+                                <div className="form-check">
+                                    <input
+                                        type="checkbox"
+                                        id={`type-${type}`}
+                                        checked={formData.preferredDeliveryTypes.includes(type)}
+                                        onChange={() => handleDeliveryTypeToggle(type)}
+                                        className="form-check-input"
+                                    />
+                                    <label htmlFor={`type-${type}`} className="form-check-label text-capitalize">
+                                        {type}
+                                    </label>
+                                </div>
                             </div>
                         ))}
                     </div>
                     {errors.preferredDeliveryTypes && (
-                        <p className="mt-1 text-sm text-red-600">{errors.preferredDeliveryTypes}</p>
+                        <p className="error-text">{errors.preferredDeliveryTypes}</p>
                     )}
                 </div>
 
                 {/* Working Hours */}
-                <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
-                        Working Hours
-                    </label>
-                    <div className="space-y-3">
+                <div className="mb-4">
+                    <label className="form-label">Working Hours</label>
+                    <div className="working-hours-wrapper">
                         {Object.entries(formData.workingHours).map(([day, hours]) => (
-                            <div key={day} className="flex flex-col md:flex-row md:items-center gap-3 p-2 bg-gray-50 rounded-md">
-                                <div className="flex items-center w-24">
+                            <div key={day} className="working-day row align-items-center mb-3 gx-2">
+                                <div className="col-md-2 d-flex align-items-center">
                                     <input
                                         type="checkbox"
                                         checked={hours.isWorking}
                                         onChange={() => handleDayToggle(day)}
-                                        className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                        className="form-check-input me-2"
                                     />
-                                    <label className="ml-2 text-sm font-medium text-gray-700 capitalize">
-                                        {day}
-                                    </label>
+                                    <label className="form-label mb-0 text-capitalize">{day}</label>
                                 </div>
 
                                 {hours.isWorking && (
-                                    <div className="flex-1 grid grid-cols-2 gap-2">
-                                        <div>
-                                            <label className="block text-xs text-gray-500 mb-1">Start</label>
-                                            <input
-                                                type="time"
-                                                value={hours.start || ''}
-                                                onChange={(e) => handleWorkingHoursChange(day, 'start', e.target.value)}
-                                                className="w-full px-2 py-1 text-sm border rounded-md"
-                                            />
-                                        </div>
-                                        <div>
-                                            <label className="block text-xs text-gray-500 mb-1">End</label>
-                                            <input
-                                                type="time"
-                                                value={hours.end || ''}
-                                                onChange={(e) => handleWorkingHoursChange(day, 'end', e.target.value)}
-                                                className="w-full px-2 py-1 text-sm border rounded-md"
-                                            />
-                                        </div>
+                                    <div className="col-md-5">
+                                        <label className="form-label small">Start</label>
+                                        <input
+                                            type="time"
+                                            value={hours.start || ''}
+                                            onChange={(e) => handleWorkingHoursChange(day, 'start', e.target.value)}
+                                            className="form-control"
+                                        />
+                                    </div>
+                                )}
+                                {hours.isWorking && (
+                                    <div className="col-md-5">
+                                        <label className="form-label small">End</label>
+                                        <input
+                                            type="time"
+                                            value={hours.end || ''}
+                                            onChange={(e) => handleWorkingHoursChange(day, 'end', e.target.value)}
+                                            className="form-control"
+                                        />
                                     </div>
                                 )}
                             </div>
                         ))}
                     </div>
                     {errors.workingHours && (
-                        <p className="mt-1 text-sm text-red-600">{errors.workingHours}</p>
+                        <p className="error-text">{errors.workingHours}</p>
                     )}
                 </div>
 
                 {/* Form Actions */}
-                <div className="flex justify-end space-x-3 pt-4">
+                <div className="form-footer mt-4 d-flex justify-content-end gap-2">
                     <button
                         type="button"
                         onClick={() => navigate(-1)}
-                        className="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="btn btn-outline-secondary"
                     >
                         Cancel
                     </button>
                     <button
                         type="submit"
-                        className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                        className="btn btn-primary"
                     >
                         Save Changes
                     </button>

@@ -1,0 +1,31 @@
+.driver-location-delivery-form {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.section-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 1.5rem;
+}
+
+.error-text {
+    font-size: 0.875rem;
+    color: #dc3545;
+    margin-top: 0.25rem;
+}
+
+.working-hours-wrapper {
+    padding-top: 0.5rem;
+}
+
+.working-day {
+    background-color: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+}
