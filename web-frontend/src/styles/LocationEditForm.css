@@ -1,31 +1,129 @@
 .driver-location-delivery-form {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 2rem;
-    background-color: #ffffff;
-    border-radius: 12px;
-    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    max-width: 960px !important;
+    margin: 2rem auto !important;
+    padding: 2.5rem 2rem !important;
+    background-color: #ffffff !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08) !important;
+    font-family: 'Segoe UI', Roboto, sans-serif !important;
+    transition: all 0.3s ease-in-out !important;
 }
 
 .section-title {
-    font-size: 1.75rem;
-    font-weight: 700;
-    color: #1f2937;
-    margin-bottom: 1.5rem;
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    color: #1f2937 !important;
+    margin-bottom: 2rem !important;
+    text-align: center !important;
+    border-bottom: 2px solid #e2e8f0 !important;
+    padding-bottom: 0.5rem !important;
+}
+
+.driver-form .form-label {
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+}
+
+.driver-form input[type="text"],
+.driver-form input[type="number"],
+.driver-form input[type="time"] {
+    border-radius: 6px !important;
+    padding: 0.5rem 0.75rem !important;
+    border: 1px solid #ced4da !important;
+    font-size: 0.95rem !important;
+    transition: border-color 0.2s, box-shadow 0.2s !important;
+}
+
+.driver-form input:focus {
+    border-color: #0d6efd !important;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15) !important;
+    outline: none !important;
 }
 
 .error-text {
-    font-size: 0.875rem;
-    color: #dc3545;
-    margin-top: 0.25rem;
+    font-size: 0.85rem !important;
+    color: #dc3545 !important;
+    margin-top: 0.25rem !important;
+    font-weight: 500 !important;
+}
+
+.driver-form .form-check {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+    padding: 0.25rem 0.5rem !important;
+    border-radius: 4px !important;
+    background-color: #f8f9fa !important;
+    transition: background-color 0.2s ease !important;
+}
+
+.driver-form .form-check:hover {
+    background-color: #eef1f5 !important;
+}
+
+.driver-form .form-check-input {
+    cursor: pointer !important;
+    width: 1rem !important;
+    height: 1rem !important;
+}
+
+.driver-form .form-check-label {
+    cursor: pointer !important;
+    font-size: 0.95rem !important;
+    color: #495057 !important;
 }
 
 .working-hours-wrapper {
-    padding-top: 0.5rem;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 1rem !important;
+    margin-top: 0.5rem !important;
 }
 
 .working-day {
-    background-color: #f8f9fa;
-    padding: 1rem;
-    border-radius: 8px;
+    background-color: #f9fafb !important;
+    padding: 1rem !important;
+    border-radius: 10px !important;
+    border: 1px solid #e5e7eb !important;
+    transition: box-shadow 0.2s ease-in-out !important;
+}
+
+.working-day:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06) !important;
+}
+
+.working-day .form-check-input {
+    margin-top: 0.25rem !important;
+}
+
+.working-day .form-label {
+    margin-bottom: 0 !important;
+    font-size: 0.95rem !important;
+    font-weight: 600 !important;
+    color: #374151 !important;
+}
+
+.form-footer {
+    margin-top: 2rem !important;
+    display: flex !important;
+    justify-content: flex-end !important;
+    gap: 0.75rem !important;
+}
+
+.form-footer .btn {
+    min-width: 120px !important;
+    padding: 0.6rem 1rem !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    border-radius: 6px !important;
+    transition: all 0.2s ease-in-out !important;
+}
+
+.form-footer .btn-outline-secondary:hover {
+    background-color: #f8f9fa !important;
+}
+
+.form-footer .btn-primary:hover {
+    background-color: #0b5ed7 !important;
 }

@@ -8,6 +8,7 @@ function DriverLocationInfo() {
     const { id } = useParams();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
+    const [submitLoading, setSubmitLoading] = useState(false);
     const [formData, setFormData] = useState({
         currentLocation: { lat: '', lng: '', timestamp: new Date().toISOString() },
         deliveryZones: '',
@@ -110,13 +111,16 @@ function DriverLocationInfo() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrors({});
+        setSubmitLoading(true);
 
         try {
             const lat = parseFloat(formData.currentLocation.lat);
             const lng = parseFloat(formData.currentLocation.lng);
 
             if (isNaN(lat) || isNaN(lng)) {
-                return setErrors({ 'currentLocation.lat': 'Invalid coordinates', 'currentLocation.lng': 'Invalid coordinates' });
+                setErrors({ 'currentLocation.lat': 'Invalid coordinates', 'currentLocation.lng': 'Invalid coordinates' });
+                setSubmitLoading(false);
+                return;
             }
 
             const deliveryZonesArray = formData.deliveryZones
@@ -153,6 +157,8 @@ function DriverLocationInfo() {
             } else {
                 toast.error(res?.data?.message || 'Update failed');
             }
+        } finally {
+            setSubmitLoading(false);
         }
     };
 
@@ -320,8 +326,16 @@ function DriverLocationInfo() {
                     <button
                         type="submit"
                         className="btn btn-primary"
+                        disabled={submitLoading}
                     >
-                        Save Changes
+                        {submitLoading ? (
+                            <>
+                                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                Saving...
+                            </>
+                        ) : (
+                            'Save Changes'
+                        )}
                     </button>
                 </div>
             </form>
