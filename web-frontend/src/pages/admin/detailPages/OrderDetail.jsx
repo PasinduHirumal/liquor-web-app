@@ -32,10 +32,36 @@ function OrderDetail() {
 
     return (
         <div style={{ padding: "20px" }}>
-            <h2>Order Detail - #{order.order_id}</h2>
-            <p><strong>Status:</strong> {order.status}</p>
+            <h1>Order Detail - {order.order_id}</h1>
+
+            <h3>order Detail</h3>
+            <p><strong>Order Number:</strong> {order.order_number}</p>
+            <p><strong>Order Date:</strong> {new Date(order.order_date).toLocaleString()}</p>
+            <p><strong>User ID:</strong> </p>
+            <p><strong>Items:</strong> </p>
+
+            <h3>Delevery Detail</h3>
+            <p><strong>Delivery Address Id:</strong> </p>
+            <p><strong>Distance:</strong> {order.distance}</p>
+            <p><strong>Estimated Delivery:</strong></p>
+            <p><strong>Delivered At:</strong> {new Date(order.delivered_at).toLocaleString()}</p>
+
+            <h3>Price Details</h3>
+            <p><strong>Delivery Fee:</strong> {order.delivery_fee}</p>
+            <p><strong>Subtotal:</strong> {order.subtotal}</p>
+            <p><strong>TAX Amount:</strong> {order.tax_amount}</p>
             <p><strong>Total:</strong> {order.total_amount}</p>
-            <p><strong>Created At:</strong> {new Date(order.created_at).toLocaleString()}</p>
+
+            <h3>Payment Type</h3>
+            <p><strong>Payment Method:</strong> {order.payment_method}</p>
+            <p><strong>Payment Status:</strong> {order.payment_status}</p>
+
+            <h3>Status</h3>
+            <p><strong>Note:</strong></p>
+            <p><strong>Status:</strong> {order.status}</p>
+            <p><strong>Assigned Driver ID:</strong> {order.assigned_driver_id}</p>
+
+            <p><strong>Created At:</strong> {new Date(order.order_date).toLocaleString()}</p>
 
             {order.user && (
                 <div>
@@ -45,20 +71,6 @@ function OrderDetail() {
                 </div>
             )}
 
-            {order.driver && (
-                <div>
-                    <h4>Assigned Driver:</h4>
-                    <p><strong>Name:</strong> {order.driver.name}</p>
-                    <p><strong>Phone:</strong> {order.driver.phone}</p>
-                </div>
-            )}
-
-            {order.address && (
-                <div>
-                    <h4>Delivery Address:</h4>
-                    <p>{order.address.street}, {order.address.city}, {order.address.zip}</p>
-                </div>
-            )}
         </div>
     );
 }
