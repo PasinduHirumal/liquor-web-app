@@ -210,6 +210,10 @@ const AdminNavbar = () => {
                             Manage Category
                         </StyledNavLink>
 
+                        <StyledNavLink to="/order-list" onClick={closeMobileMenu}>
+                            Manage Orders
+                        </StyledNavLink>
+
                         <StyledNavLink
                             to={`/admin/profile/${user?._id || user?.id}`}
                             onClick={closeMobileMenu}
@@ -344,6 +348,10 @@ const AdminNavbar = () => {
 
                             <StyledNavLink to="/category" onClick={closeMobileMenu} sx={{ mb: 2 }}>
                                 Manage Category
+                            </StyledNavLink>
+
+                            <StyledNavLink to="/order-list" onClick={closeMobileMenu} sx={{ mb: 2 }}>
+                                Manage Orders
                             </StyledNavLink>
 
                             <StyledNavLink
