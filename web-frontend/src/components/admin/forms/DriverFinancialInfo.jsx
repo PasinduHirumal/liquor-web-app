@@ -2,12 +2,14 @@ import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../../lib/axios";
 import toast from "react-hot-toast";
+import "../../../styles/DriverFinancialInfo.css";
 
 function DriverFinancialInfo() {
     const { id } = useParams();
     const navigate = useNavigate();
 
     const [loading, setLoading] = useState(true);
+    const [submitting, setSubmitting] = useState(false);
     const [formData, setFormData] = useState({
         bankAccountNumber: "",
         bankName: "",
@@ -50,8 +52,6 @@ function DriverFinancialInfo() {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        // Parse numeric fields
         const numericFields = ["commissionRate", "totalEarnings", "currentBalance"];
         setFormData((prev) => ({
             ...prev,
@@ -62,11 +62,13 @@ function DriverFinancialInfo() {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setErrors([]);
+        setSubmitting(true);
 
         try {
             await axiosInstance.patch(`/drivers/update-financial/${id}`, formData);
             toast.success("Financial information updated successfully");
-            navigate(-1);
+            setSubmitting(false);
+            setTimeout(() => navigate(-1), 1000);
         } catch (err) {
             const serverErrors = err.response?.data?.errors;
             if (serverErrors) {
@@ -75,115 +77,56 @@ function DriverFinancialInfo() {
             } else {
                 toast.error(err.response?.data?.message || "Update failed");
             }
+            setSubmitting(false);
         }
     };
 
-    if (loading) return <p>Loading...</p>;
+    if (loading) return <p className="text-center mt-4">Loading...</p>;
 
     return (
-        <div className="max-w-3xl mx-auto p-6 bg-white shadow-md rounded-lg mt-6">
-            <h2 className="text-2xl font-semibold mb-4 text-gray-800">Driver Financial Information</h2>
+        <div className="container mt-5 driver-financial-container shadow-sm p-4 rounded bg-white">
+            <h2 className="mb-4 text-center text-primary">Driver Financial Information</h2>
 
             {errors.length > 0 && (
-                <div className="bg-red-100 text-red-700 p-3 rounded mb-4">
-                    <ul className="list-disc ml-5">
+                <div className="alert alert-danger">
+                    <ul className="mb-0">
                         {errors.map((err, idx) => (
-                            <li key={idx}>
-                                <strong>{err.field}:</strong> {err.message}
-                            </li>
+                            <li key={idx}><strong>{err.field}</strong>: {err.message}</li>
                         ))}
                     </ul>
                 </div>
             )}
 
-            <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                    <label className="block font-medium text-gray-700 mb-1">Bank Account Number</label>
-                    <input
-                        type="text"
-                        name="bankAccountNumber"
-                        value={formData.bankAccountNumber}
-                        onChange={handleChange}
-                        className="w-full border px-4 py-2 rounded"
-                    />
-                </div>
+            <form onSubmit={handleSubmit} className="row g-4">
+                {[
+                    { label: "Bank Account Number", name: "bankAccountNumber", type: "text" },
+                    { label: "Bank Name", name: "bankName", type: "text" },
+                    { label: "Bank Branch", name: "bankBranch", type: "text" },
+                    { label: "Tax ID", name: "taxId", type: "text" },
+                    { label: "Commission Rate (%)", name: "commissionRate", type: "number", step: "0.01" },
+                    { label: "Total Earnings (LKR)", name: "totalEarnings", type: "number" },
+                    { label: "Current Balance (LKR)", name: "currentBalance", type: "number" }
+                ].map(({ label, name, type, step }) => (
+                    <div className="col-md-6" key={name}>
+                        <label className="form-label">{label}</label>
+                        <input
+                            type={type}
+                            name={name}
+                            value={formData[name]}
+                            onChange={handleChange}
+                            className="form-control"
+                            step={step}
+                        />
+                    </div>
+                ))}
 
-                <div>
-                    <label className="block font-medium text-gray-700 mb-1">Bank Name</label>
-                    <input
-                        type="text"
-                        name="bankName"
-                        value={formData.bankName}
-                        onChange={handleChange}
-                        className="w-full border px-4 py-2 rounded"
-                    />
-                </div>
-
-                <div>
-                    <label className="block font-medium text-gray-700 mb-1">Bank Branch</label>
-                    <input
-                        type="text"
-                        name="bankBranch"
-                        value={formData.bankBranch}
-                        onChange={handleChange}
-                        className="w-full border px-4 py-2 rounded"
-                    />
-                </div>
-
-                <div>
-                    <label className="block font-medium text-gray-700 mb-1">Tax ID</label>
-                    <input
-                        type="text"
-                        name="taxId"
-                        value={formData.taxId}
-                        onChange={handleChange}
-                        className="w-full border px-4 py-2 rounded"
-                    />
-                </div>
-
-                <div>
-                    <label className="block font-medium text-gray-700 mb-1">Commission Rate (%)</label>
-                    <input
-                        type="number"
-                        name="commissionRate"
-                        value={formData.commissionRate}
-                        onChange={handleChange}
-                        className="w-full border px-4 py-2 rounded"
-                        step="0.01"
-                        min="0"
-                        max="100"
-                    />
-                </div>
-
-                <div>
-                    <label className="block font-medium text-gray-700 mb-1">Total Earnings (LKR)</label>
-                    <input
-                        type="number"
-                        name="totalEarnings"
-                        value={formData.totalEarnings}
-                        onChange={handleChange}
-                        className="w-full border px-4 py-2 rounded"
-                    />
-                </div>
-
-                <div>
-                    <label className="block font-medium text-gray-700 mb-1">Current Balance (LKR)</label>
-                    <input
-                        type="number"
-                        name="currentBalance"
-                        value={formData.currentBalance}
-                        onChange={handleChange}
-                        className="w-full border px-4 py-2 rounded"
-                    />
-                </div>
-
-                <div>
-                    <label className="block font-medium text-gray-700 mb-1">Preferred Payment Method</label>
+                <div className="col-md-6">
+                    <label className="form-label">Preferred Payment Method</label>
                     <select
                         name="paymentMethod"
                         value={formData.paymentMethod}
                         onChange={handleChange}
-                        className="w-full border px-4 py-2 rounded"
+                        className="form-select"
                     >
                         <option value="">Select</option>
                         <option value="bank_transfer">Bank Transfer</option>
@@ -193,12 +136,27 @@ function DriverFinancialInfo() {
                     </select>
                 </div>
 
-                <div className="md:col-span-2 text-right">
+                <div className="form-footer mt-4 d-flex justify-content-end gap-2">
+                    <button
+                        type="button"
+                        onClick={() => navigate(-1)}
+                        className="btn btn-outline-secondary"
+                    >
+                        Cancel
+                    </button>
                     <button
                         type="submit"
-                        className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700"
+                        className="btn btn-primary driver-financial-submit-btn"
+                        disabled={submitting}
                     >
-                        Save Changes
+                        {submitting ? (
+                            <>
+                                <span className="spinner-border spinner-border-sm me-2" role="status" />
+                                Saving...
+                            </>
+                        ) : (
+                            "Save Changes"
+                        )}
                     </button>
                 </div>
             </form>

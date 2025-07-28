@@ -1,0 +1,10 @@
+.driver-financial-container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+.driver-financial-submit-btn {
+    min-width: 160px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+}
