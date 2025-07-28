@@ -286,7 +286,7 @@ const DriverDetailPage = () => {
                                     </div>
 
                                     <div className="driver-detail-grid-item wide">
-                                        <span className="driver-detail-info-label">Delivery Zones</span>
+                                        <span className="driver-detail-info-label">Delivery Types</span>
                                         <span className="driver-detail-info-value">
                                             {Array.isArray(driver.preferredDeliveryTypes) && driver.preferredDeliveryTypes.length > 0
                                                 ? driver.preferredDeliveryTypes.join(', ')
@@ -341,6 +341,14 @@ const DriverDetailPage = () => {
                                 </IconButton>
                             </Tooltip>
                         </div>
+                        <div className="driver-detail-grid-item wide">
+                            <span className="driver-detail-info-label">Orders History</span>
+                            <span className="driver-detail-info-value">
+                                {Array.isArray(driver.ordersHistory) && driver.ordersHistory.length > 0
+                                    ? driver.ordersHistory.join(', ')
+                                    : 'N/A'}
+                            </span>
+                        </div>
                         <div className="driver-detail-section-grid">
                             <div className="driver-detail-grid-item">
                                 <span className="driver-detail-info-label">Rating</span>
@@ -350,6 +358,12 @@ const DriverDetailPage = () => {
                                         {driver.rating?.toFixed(1) || '0.0'} ({driver.totalRatings || 0})
                                     </span>
                                 </div>
+                            </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Total Deliveries</span>
+                                <span className="driver-detail-info-value">
+                                    {driver.totalDeliveries || 0}
+                                </span>
                             </div>
                             <div className="driver-detail-grid-item">
                                 <span className="driver-detail-info-label">Deliveries</span>
