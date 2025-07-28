@@ -1,5 +1,5 @@
 import CategoryService from '../services/category.service.js';
-import { uploadImages } from '../utils/firebaseStorage.js';
+import { uploadSingleImage } from '../utils/firebaseStorage.js';
 
 const categoryService = new CategoryService();
 
@@ -17,7 +17,7 @@ const createCategory = async (req, res) => {
 
         if (icon !== undefined) {
             try {
-                const imageUrls = await uploadImages(images, 'category_icons');
+                const imageUrls = await uploadSingleImage(icon, 'category_icons');
                 req.body.icon = imageUrls;
                 console.log('✅ Images uploaded successfully:', imageUrls);
             } catch (uploadError) {
@@ -103,7 +103,7 @@ const updateCategory = async (req, res) => {
 
         if (icon !== undefined) {
             try {
-                const imageUrls = await uploadImages(images, 'category_icons');
+                const imageUrls = await uploadSingleImage(icon, 'category_icons');
                 req.body.icon = imageUrls;
                 console.log('✅ Images uploaded successfully:', imageUrls);
             } catch (uploadError) {
