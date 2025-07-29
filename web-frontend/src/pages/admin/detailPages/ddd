@@ -1,0 +1,75 @@
+{
+    "success": true,
+    "message": "Fetching orders successfully",
+    "count": 1,
+    "filtered": null,
+    "data": [
+        {
+            "order_id": "l2dyaWm4CDkwrFKPOjhs",
+            "order_number": "LD64231128",
+            "order_date": {
+                "_seconds": 1753388264,
+                "_nanoseconds": 233345000
+            },
+            "user_id": {
+                "id": "vN9XkT62UMKHoEPwmThZ",
+                "email": "shahiru@gmail.com",
+                "username": "Shahiru Hasranga"
+            },
+            "items": [
+                {
+                    "quantity": 1,
+                    "total_price": 58.8,
+                    "product_image": "https://firebasestorage.googleapis.com/v0/b/liquor-app-d32c3.firebasestorage.app/o/product_images%2Fjack_daniels_1.png?alt=media&token=19950209-5ebf-4562-a430-3e9f7abd70bf",
+                    "product_id": "Mv8h6zgcZEzo3i1gidKQ",
+                    "unit_price": 58.8,
+                    "product_name": "Jack Daniel's"
+                },
+                {
+                    "quantity": 1,
+                    "total_price": 45.99,
+                    "product_image": "https://firebasestorage.googleapis.com/v0/b/liquor-app-d32c3.firebasestorage.app/o/product_images%2Fabsolut_vodka_1.png?alt=media&token=c0423584-f3cd-4fa7-a12a-cf3410966f44",
+                    "product_id": "injwcpVSvM1JVqHIKh2T",
+                    "unit_price": 45.99,
+                    "product_name": "Absolut Vodka"
+                }
+            ],
+            "delivery_address_id": {
+                "id": "A6LpADOal5EAodcbFeOb",
+                "savedAddress": "Sri Jayawardenepura Kotte, Western Province, , Sri Lanka",
+                "streetAddress": "WV9R+FGV, Welikada, Sri Jayawardenepura Kotte, Western Province, Sri Lanka"
+            },
+            "distance": 0.7372076627171985,
+            "estimated_delivery": {
+                "_seconds": 1753393664,
+                "_nanoseconds": 233369000
+            },
+            "delivered_at": {
+                "_seconds": 1753738955,
+                "_nanoseconds": 68000000
+            },
+            "delivery_fee": 110.58114940757977,
+            "subtotal": 104.78999999999999,
+            "tax_amount": 26.197499999999998,
+            "total_amount": 241.56864940757976,
+            "payment_method": "cash_on_delivery",
+            "payment_status": "pending",
+            "notes": null,
+            "status": "delivered",
+            "assigned_driver_id": {
+                "id": "tCLncjn4hHG8hw9glcgE",
+                "email": "imeshchandula@gmail.com",
+                "username": "Imesh Chandula"
+            },
+            "is_driver_accepted": true,
+            "created_at": {
+                "_seconds": 1753388264,
+                "_nanoseconds": 233345000
+            },
+            "updated_at": {
+                "_seconds": 1753738955,
+                "_nanoseconds": 68000000
+            }
+        }
+    ]
+}

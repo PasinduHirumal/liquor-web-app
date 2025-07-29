@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
-import { Table, Spin, message, Tag, Button } from "antd";
+import { Table, Spin, message, Tag, Button, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
 import { ArrowRightOutlined } from "@ant-design/icons";
 
@@ -75,13 +75,6 @@ function OrderList() {
         },
         {
             title: "Driver Accepted",
-            dataIndex: "status",
-            key: "status",
-            render: getStatusTag,
-            width: 140,
-        },
-        {
-            title: "Driver Accepted",
             dataIndex: "is_driver_accepted",
             key: "is_driver_accepted",
             render: (accepted) => (
@@ -90,6 +83,13 @@ function OrderList() {
                 </Tag>
             ),
             width: 140,
+        },
+        {
+            title: "Status",
+            dataIndex: "status",
+            key: "status",
+            render: getStatusTag,
+            width: 100,
         },
         {
             title: "Payment",
@@ -107,12 +107,14 @@ function OrderList() {
             key: "action",
             width: 50,
             render: (_, record) => (
-                <Button
-                    type="primary"
-                    shape="circle"
-                    icon={<ArrowRightOutlined />}
-                    onClick={() => navigate(`/order-list/${record.order_id}`)}
-                />
+                <Tooltip title="View Order Details">
+                    <Button
+                        type="primary"
+                        shape="circle"
+                        icon={<ArrowRightOutlined />}
+                        onClick={() => navigate(`/order-list/${record.order_id}`)}
+                    />
+                </Tooltip>
             ),
         },
     ];
