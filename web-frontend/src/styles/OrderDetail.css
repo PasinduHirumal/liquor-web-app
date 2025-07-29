@@ -1,56 +1,100 @@
 .order-detail-container {
-    max-width: 1200px;
-    margin: 0 auto;
+    min-height: 100vh !important;
+    border-radius: 12px !important;
+    padding-bottom: 40px !important;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif !important;
 }
 
-.card {
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
-    border: none;
+.order-detail-container h1 {
+    font-weight: 700 !important;
+    color: #333 !important;
+    font-size: 2rem !important;
 }
 
-.card-header {
-    border-radius: 10px 10px 0 0 !important;
-    padding: 15px 20px;
+.order-detail-container h1 small {
+    font-size: 1rem !important;
+    color: #888 !important;
 }
 
-.card-title {
-    margin-bottom: 0;
-    font-size: 1.25rem;
+.order-detail-card {
+    border-radius: 12px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+    overflow: hidden !important;
+    transition: transform 0.2s ease !important;
 }
 
-.price-details div {
-    margin-bottom: 8px;
+.order-detail-card:hover {
+    transform: scale(1.01) !important;
 }
 
-.table {
-    margin-bottom: 0;
+.order-detail-card .card-header {
+    background: linear-gradient(135deg, #007bff, #0056b3) !important;
+    color: #fff !important;
+    font-weight: 600 !important;
+    padding: 0.75rem 1.25rem !important;
 }
 
-.table th {
-    border-top: none;
-    font-weight: 600;
+.order-detail-card .card-body {
+    padding: 1.25rem !important;
 }
 
-.badge {
-    font-size: 0.875rem;
-    padding: 5px 10px;
+.order-detail-price-line {
+    display: flex !important;
+    justify-content: space-between !important;
+    padding: 0.4rem 0 !important;
+    font-size: 1rem !important;
 }
 
-.alert {
-    margin: 20px;
-    padding: 15px;
-    border-radius: 5px;
+.order-detail-price-line.fw-bold {
+    font-weight: 700 !important;
 }
 
-.text-muted {
-    color: #6c757d !important;
+.order-detail-table th {
+    background-color: #f0f0f0 !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
 }
 
-/* Responsive adjustments */
-@media (max-width: 768px) {
-    .card-body .row > div {
-        margin-bottom: 10px;
-    }
+.order-detail-table td {
+    vertical-align: middle !important;
+    font-size: 0.95rem !important;
+}
+
+.order-detail-table img {
+    border-radius: 6px !important;
+}
+
+.order-detail-badge .badge {
+    font-size: 0.85rem !important;
+    padding: 0.4em 0.6em !important;
+}
+
+.order-detail-section p {
+    margin-bottom: 0.4rem !important;
+}
+
+.order-detail-section strong {
+    display: inline-block !important;
+    width: 120px !important;
+    color: #333 !important;
+}
+
+.order-detail-address {
+    background-color: #eef2f5 !important;
+    border-left: 4px solid #007bff !important;
+    padding: 0.75rem !important;
+    border-radius: 6px !important;
+    margin-bottom: 1rem !important;
+    color: #444 !important;
+    font-size: 0.95rem !important;
+}
+
+.order-detail-notes {
+    background-color: #fefefe !important;
+    border-left: 4px solid #ffc107 !important;
+    padding: 0.75rem !important;
+    border-radius: 6px !important;
+    color: #333 !important;
+    font-size: 0.95rem !important;
+    margin-bottom: 1rem !important;
 }
