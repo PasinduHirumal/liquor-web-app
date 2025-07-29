@@ -92,32 +92,29 @@ const ManageCategory = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
+            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+            if (!validTypes.includes(file.type)) {
+                toast.error('Invalid file type. Please upload an image (JPEG, JPG, PNG, GIF, or WEBP)');
+                return;
+            }
+
+            if (file.size > 5 * 1024 * 1024) {
+                toast.error('File size too large. Maximum 5MB allowed');
+                return;
+            }
+
             setSelectedImage(file);
 
             const reader = new FileReader();
             reader.onloadend = () => {
-                setImagePreview(reader.result);
+                const base64String = reader.result;
+                setImagePreview(base64String);
+                setFormData(prev => ({
+                    ...prev,
+                    icon: base64String
+                }));
             };
             reader.readAsDataURL(file);
-        }
-    };
-
-    const uploadImage = async () => {
-        if (!selectedImage) return null;
-
-        setImageLoading(true);
-        try {
-            const formData = new FormData();
-            formData.append('image', selectedImage);
-
-            const response = await axiosInstance.post('/upload', formData);
-
-            return response.data.url;
-        } catch (error) {
-            toast.error('Failed to upload image');
-            return null;
-        } finally {
-            setImageLoading(false);
         }
     };
 
@@ -126,16 +123,8 @@ const ManageCategory = () => {
         setLoading(true);
 
         try {
-            // Upload image if selected
-            let iconUrl = formData.icon;
-            if (selectedImage) {
-                iconUrl = await uploadImage();
-                if (!iconUrl) return;
-            }
-
             const payload = {
                 ...formData,
-                icon: iconUrl
             };
 
             if (editMode) {
