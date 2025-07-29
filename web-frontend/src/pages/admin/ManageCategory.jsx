@@ -93,8 +93,7 @@ const ManageCategory = () => {
         const file = e.target.files[0];
         if (file) {
             setSelectedImage(file);
-            
-            // Create preview URL
+
             const reader = new FileReader();
             reader.onloadend = () => {
                 setImagePreview(reader.result);
@@ -105,18 +104,14 @@ const ManageCategory = () => {
 
     const uploadImage = async () => {
         if (!selectedImage) return null;
-        
+
         setImageLoading(true);
         try {
             const formData = new FormData();
             formData.append('image', selectedImage);
-            
-            const response = await axiosInstance.post('/upload', formData, {
-                headers: {
-                    'Content-Type': 'multipart/form-data'
-                }
-            });
-            
+
+            const response = await axiosInstance.post('/upload', formData);
+
             return response.data.url;
         } catch (error) {
             toast.error('Failed to upload image');
@@ -324,8 +319,8 @@ const ManageCategory = () => {
                                         <TableRow key={category.category_id}>
                                             <TableCell>
                                                 {category.icon ? (
-                                                    <Avatar 
-                                                        src={category.icon} 
+                                                    <Avatar
+                                                        src={category.icon}
                                                         alt={category.name}
                                                         sx={{ width: 40, height: 40 }}
                                                     />
@@ -382,8 +377,8 @@ const ManageCategory = () => {
                             <Grid item xs={12}>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
                                     {imagePreview ? (
-                                        <Avatar 
-                                            src={imagePreview} 
+                                        <Avatar
+                                            src={imagePreview}
                                             sx={{ width: 100, height: 100, mb: 2 }}
                                         />
                                     ) : (
@@ -473,8 +468,8 @@ const ManageCategory = () => {
                             <Grid item xs={12}>
                                 <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
                                     {imagePreview ? (
-                                        <Avatar 
-                                            src={imagePreview} 
+                                        <Avatar
+                                            src={imagePreview}
                                             sx={{ width: 100, height: 100, mb: 2 }}
                                         />
                                     ) : (
