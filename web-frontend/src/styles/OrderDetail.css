@@ -38,6 +38,15 @@
     padding: 1.25rem !important;
 }
 
+.order-detail-summery-line {
+    display: flex !important;
+    font-size: 1rem !important;
+}
+
+.order-detail-summery-line.fw-bold {
+    font-weight: 700 !important;
+}
+
 .order-detail-price-line {
     display: flex !important;
     justify-content: space-between !important;
@@ -70,12 +79,12 @@
 }
 
 .order-detail-section p {
-    margin-bottom: 0.4rem !important;
+    margin-bottom: 1rem !important;
 }
 
 .order-detail-section strong {
     display: inline-block !important;
-    width: 120px !important;
+    width: auto !important;
     color: #333 !important;
 }
 

@@ -86,38 +86,34 @@ function OrderDetail() {
 
             <Row className="g-4">
                 {/* Order Summary */}
-                <Col xs={12} md={6} className="mb-4">
+                <Col xs={12} md={6}>
                     <Card className="order-detail-card h-100">
-                        <Card.Header>Order Summary</Card.Header>
+                        <Card.Header as="h5">Order Summary</Card.Header>
                         <Card.Body className="order-detail-section">
-                            <Row>
-                                <Col xs={12} className="mb-3">
-                                    <p className="mb-2">
-                                        <strong>Order Date:</strong><br />
-                                        <span className="text-muted">{formatDate(order.order_date)}</span>
-                                    </p>
-                                    <p className="mb-2">
-                                        <strong>Status:</strong>
-                                        {renderBadge(order.status)}
-                                    </p>
-                                    <p className="mb-2">
-                                        <strong>Payment Method:</strong><br />
-                                        <span className="text-muted">{order.payment_method || "N/A"}</span>
-                                    </p>
-                                    <p className="mb-0">
-                                        <strong>Payment Status:</strong>
-                                        {renderBadge(order.payment_status, "payment")}
-                                    </p>
-                                </Col>
-                            </Row>
+                            <p className="mb-3 order-detail-summery-line">
+                                <strong>Order Date:</strong>
+                                <span className="text-muted">{formatDate(order.order_date)}</span>
+                            </p>
+                            <p className="mb-3 order-detail-summery-line">
+                                <strong>Status:</strong>
+                                {renderBadge(order.status)}
+                            </p>
+                            <p className="mb-3 order-detail-summery-line">
+                                <strong>Payment Method:</strong>
+                                <span className="text-muted">{order.payment_method || "N/A"}</span>
+                            </p>
+                            <p className="mb-0 order-detail-summery-line">
+                                <strong>Payment Status:</strong>
+                                {renderBadge(order.payment_status, "payment")}
+                            </p>
                         </Card.Body>
                     </Card>
                 </Col>
 
                 {/* Price Details */}
-                <Col md={6}>
+                <Col xs={12} md={6}>
                     <Card className="order-detail-card h-100">
-                        <Card.Header>Price Details</Card.Header>
+                        <Card.Header as="h5">Price Details</Card.Header>
                         <Card.Body className="order-detail-section">
                             <div className="order-detail-price-line">
                                 <span>Subtotal:</span><span>${order.subtotal?.toFixed(2)}</span>
@@ -176,8 +172,8 @@ function OrderDetail() {
                 </Col>
 
                 {/* Customer Info */}
-                <Col md={6}>
-                    <Card className="order-detail-card">
+                <Col xs={12} md={6}>
+                    <Card className="order-detail-card h-100">
                         <Card.Header>Customer Information</Card.Header>
                         <Card.Body className="order-detail-section">
                             <p><strong>Name:</strong> {order.user_id?.username || "N/A"}</p>
@@ -188,8 +184,8 @@ function OrderDetail() {
                 </Col>
 
                 {/* Driver Info */}
-                <Col md={6}>
-                    <Card className="order-detail-card">
+                <Col xs={12} md={6}>
+                    <Card className="order-detail-card h-100">
                         <Card.Header>Driver Information</Card.Header>
                         <Card.Body className="order-detail-section">
                             <p><strong>Name:</strong> {order.assigned_driver_id?.username || "N/A"}</p>
@@ -200,30 +196,24 @@ function OrderDetail() {
                 </Col>
 
                 {/* Delivery Information */}
-                <Col md={6}>
-                    <Card className="order-detail-card">
+                <Col xs={12} md={6}>
+                    <Card className="order-detail-card h-100">
                         <Card.Header>Delivery Information</Card.Header>
                         <Card.Body className="order-detail-section">
                             <p><strong>Address:</strong></p>
                             <p className="order-detail-address">
                                 {order.delivery_address_id?.streetAddress || order.delivery_address_id?.savedAddress || "N/A"}
                             </p>
-                            <Row>
-                                <Col sm={6}>
-                                    <p><strong>Distance:</strong> {order.distance?.toFixed(2)} km</p>
-                                    <p><strong>Estimated:</strong> {formatDate(order.estimated_delivery)}</p>
-                                </Col>
-                                <Col sm={6}>
-                                    <p><strong>Delivered At:</strong> {formatDate(order.delivered_at)}</p>
-                                </Col>
-                            </Row>
+                            <p><strong>Distance:</strong> {order.distance?.toFixed(2)} km</p>
+                            <p><strong>Estimated:</strong> {formatDate(order.estimated_delivery)}</p>
+                            <p><strong>Delivered At:</strong> {formatDate(order.delivered_at)}</p>
                         </Card.Body>
                     </Card>
                 </Col>
 
                 {/* Notes + Timestamps */}
-                <Col md={6}>
-                    <Card className="order-detail-card">
+                <Col xs={12} md={6}>
+                    <Card className="order-detail-card h-100">
                         <Card.Header>Additional Info</Card.Header>
                         <Card.Body className="order-detail-section">
                             <p><strong>Notes:</strong></p>
