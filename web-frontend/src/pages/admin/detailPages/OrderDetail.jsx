@@ -5,12 +5,17 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import { Card, Container, Row, Col, Badge, Image } from "react-bootstrap";
 import "../../../styles/OrderDetail.css";
+import AssignDriverModal from "../../../components/admin/forms/AssignDriverModal";
+import EditStatusModal from "../../../components/admin/forms/EditStatusModal";
 
 function OrderDetail() {
     const { id } = useParams();
     const [order, setOrder] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
+
+    const [showAssignDriverModal, setShowAssignDriverModal] = useState(false);
+    const [showEditStatusModal, setShowEditStatusModal] = useState(false);
 
     useEffect(() => {
         const fetchOrderDetail = async () => {
@@ -62,9 +67,22 @@ function OrderDetail() {
 
     return (
         <Container className="order-detail-container py-4">
-            <h1 className="mb-4">
-                Order Details <small className="text-muted">#{order.order_number || order.order_id}</small>
-            </h1>
+            <Row className="justify-content-between align-items-center mb-4">
+                <Col>
+                    <h1>
+                        Order Details <small className="text-muted">#{order.order_number || order.order_id}</small>
+                    </h1>
+                </Col>
+                <Col className="text-end">
+                    <button className="btn btn-outline-primary me-2" onClick={() => setShowAssignDriverModal(true)}>
+                        Assign Driver
+                    </button>
+                    <button className="btn btn-outline-secondary" onClick={() => setShowEditStatusModal(true)}>
+                        Edit Status
+                    </button>
+                </Col>
+            </Row>
+
 
             <Row className="g-4">
                 {/* Order Summary */}
@@ -217,6 +235,18 @@ function OrderDetail() {
                     </Card>
                 </Col>
             </Row>
+            <AssignDriverModal
+                show={showAssignDriverModal}
+                handleClose={() => setShowAssignDriverModal(false)}
+                orderId={order.order_id}
+            />
+
+            <EditStatusModal
+                show={showEditStatusModal}
+                handleClose={() => setShowEditStatusModal(false)}
+                orderId={order.order_id}
+            />
+
         </Container>
     );
 }
