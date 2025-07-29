@@ -96,9 +96,11 @@ const updateOrder = async (req, res) => {
             return res.status(404).json({ success: false, message: "Order not found"});
         }
 
-        let assigned_driver;
-        let isAssigningDriver = false;
-        if (assigned_driver_id !== undefined) {
+        let driver_duty = null;
+        const isAssigningDriver = assigned_driver_id !== undefined;
+        const isUpdatingStatus = status !== undefined;
+
+        if (isAssigningDriver) {
             const driver = await driverService.findById(assigned_driver_id);
             if (!driver) {
                 return res.status(404).json({ success: false, message: "Driver not found"});
@@ -118,25 +120,14 @@ const updateOrder = async (req, res) => {
                 return res.status(400).json({ success: false, message: failedChecks });
             }
 
-            assigned_driver = driver;
-            isAssigningDriver = true;
-        }
-
-        let isUpdatingStatus = false;
-        if (status !== undefined) {
-            isUpdatingStatus = true;
-        }
-
-        // create driver duty
-        let driver_duty = null;
-        if (isAssigningDriver) {
+            // create driver duty
             try {
                 const driverDutyData = {
                     driver_id: assigned_driver_id,
                     order_id: order.order_id,
                     is_completed: false,
                     is_driver_accepted: false,
-                    is_re_assigning_driver: false
+                    is_re_assigning_driver: order.assigned_driver_id !== undefined
                 }
 
                 const driverDuty = await dutyService.create(driverDutyData);
@@ -161,9 +152,13 @@ const updateOrder = async (req, res) => {
         }
 
         let successMessage = "Order updated successfully";
-        if (isAssigningDriver) successMessage = "Driver assigned successfully";
-        if (isUpdatingStatus) successMessage = "Order status updated successfully";
-        if (isAssigningDriver && isUpdatingStatus) successMessage = "Order status updated and Driver assigned successfully";
+        if (isAssigningDriver && isUpdatingStatus) {
+            successMessage = "Order status updated and Driver assigned successfully";
+        } else if (isAssigningDriver) {
+            successMessage = "Driver assigned successfully";
+        } else if (isUpdatingStatus) {
+            successMessage = "Order status updated successfully";
+        }
 
         return res.status(200).json({ 
             success: true, 
