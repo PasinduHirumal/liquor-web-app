@@ -28,7 +28,7 @@ function AssignDriverModal({ show, handleClose, orderId }) {
     };
 
     return (
-        <Modal show={show} onHide={handleClose}>
+        <Modal show={show} onHide={handleClose} className="mt-5 pt-5">
             <Modal.Header closeButton>
                 <Modal.Title>Assign Driver</Modal.Title>
             </Modal.Header>
