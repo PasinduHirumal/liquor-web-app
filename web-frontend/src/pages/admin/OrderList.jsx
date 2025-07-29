@@ -9,6 +9,11 @@ function OrderList() {
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
 
+    const formatDate = (timestamp) => {
+        if (!timestamp || !timestamp._seconds) return "N/A";
+        return new Date(timestamp._seconds * 1000).toLocaleString();
+    };
+
     useEffect(() => {
         const fetchOrders = async () => {
             try {
@@ -45,30 +50,46 @@ function OrderList() {
             title: "Order #",
             dataIndex: "order_number",
             key: "order_number",
+            width: 120,
         },
         {
             title: "Date",
             dataIndex: "order_date",
             key: "order_date",
-            render: (date) => new Date(date).toLocaleString(),
+            render: (date) => formatDate(date),
+            width: 180,
         },
         {
             title: "Customer",
             dataIndex: "user_id",
             key: "user_id",
-            render: (user) => user?.name || "N/A",
+            render: (user) => user?.username || "N/A",
+            width: 180,
         },
         {
             title: "Total",
             dataIndex: "total_amount",
             key: "total_amount",
             render: (amount) => `Rs. ${Number(amount).toFixed(2)}`,
+            width: 120,
         },
         {
-            title: "Status",
+            title: "Driver Accepted",
             dataIndex: "status",
             key: "status",
             render: getStatusTag,
+            width: 140,
+        },
+        {
+            title: "Driver Accepted",
+            dataIndex: "is_driver_accepted",
+            key: "is_driver_accepted",
+            render: (accepted) => (
+                <Tag color={accepted ? "green" : "red"}>
+                    {accepted ? "Accepted" : "Not Accepted"}
+                </Tag>
+            ),
+            width: 140,
         },
         {
             title: "Payment",
@@ -79,10 +100,12 @@ function OrderList() {
                     {status?.toUpperCase() || "UNKNOWN"}
                 </Tag>
             ),
+            width: 100,
         },
         {
             title: "Action",
             key: "action",
+            width: 50,
             render: (_, record) => (
                 <Button
                     type="primary"
@@ -120,6 +143,7 @@ function OrderList() {
                 rowKey="order_id"
                 bordered
                 pagination={{ pageSize: 10 }}
+                scroll={{ x: "max-content" }}
             />
         </div>
     );
