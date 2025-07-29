@@ -66,8 +66,11 @@ const OtherProductList = () => {
         setFilters((prev) => ({ ...prev, [name]: value }));
     };
 
-    const clearCategoryFilter = () => {
-        setFilters((prev) => ({ ...prev, categoryId: "" }));
+    const handleCategoryClick = (categoryId) => {
+        setFilters(prev => ({
+            ...prev,
+            categoryId: prev.categoryId === categoryId ? "" : categoryId
+        }));
     };
 
     return (
@@ -86,7 +89,7 @@ const OtherProductList = () => {
             />
 
             <div className="bg-light p-3 rounded mb-4">
-                <Row className="align-items-center">
+                <Row className="align-items-center mb-3">
                     <Col md={3} className="mb-3">
                         <Form.Group controlId="is_active">
                             <Form.Label>Active Status</Form.Label>
@@ -107,34 +110,44 @@ const OtherProductList = () => {
                             </Form.Select>
                         </Form.Group>
                     </Col>
-                    <Col md={4} className="mb-3">
-                        <Form.Label>Category</Form.Label>
-                        <InputGroup>
-                            <Form.Select
-                                name="categoryId"
-                                value={filters.categoryId}
-                                onChange={handleFilterChange}
-                                aria-label="Category Filter"
-                            >
-                                <option value="">All Categories</option>
-                                {categories.map((category) => (
-                                    <option key={category.category_id} value={category.category_id}>
-                                        {category.name}
-                                    </option>
-                                ))}
-                            </Form.Select>
-                            {filters.categoryId && (
-                                <Button
-                                    variant="outline-secondary"
-                                    onClick={clearCategoryFilter}
-                                    aria-label="Clear category filter"
-                                >
-                                    Clear
-                                </Button>
-                            )}
-                        </InputGroup>
-                    </Col>
                 </Row>
+
+                <div className="mt-3">
+                    <div className="d-flex flex-wrap gap-2">
+                        <Button
+                            variant={!filters.categoryId ? "primary" : "outline-secondary"}
+                            size="sm"
+                            onClick={() => handleCategoryClick("")}
+                            className="d-flex align-items-center"
+                        >
+                            All
+                        </Button>
+
+                        {categories.map(category => (
+                            <Button
+                                key={category.category_id}
+                                variant={filters.categoryId === category.category_id ? "primary" : "outline-secondary"}
+                                size="sm"
+                                onClick={() => handleCategoryClick(category.category_id)}
+                                className="d-flex align-items-center gap-2"
+                            >
+                                {category.icon && (
+                                    <img
+                                        src={category.icon}
+                                        alt={category.name}
+                                        style={{
+                                            width: '20px',
+                                            height: '20px',
+                                            borderRadius: '50%',
+                                            objectFit: 'cover'
+                                        }}
+                                    />
+                                )}
+                                {category.name}
+                            </Button>
+                        ))}
+                    </div>
+                </div>
             </div>
 
             {loading ? (

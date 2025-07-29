@@ -60,13 +60,16 @@ const LiquorList = () => {
         }));
     };
 
+    const handleCategoryClick = (categoryId) => {
+        setFilters(prev => ({
+            ...prev,
+            categoryId: prev.categoryId === categoryId ? "" : categoryId
+        }));
+    };
+
     const handleCreateSuccess = (newProduct) => {
         setProducts((prev) => [newProduct, ...prev]);
         setShowCreateModal(false);
-    };
-
-    const clearCategoryFilter = () => {
-        setFilters((prev) => ({ ...prev, categoryId: "" }));
     };
 
     return (
@@ -85,9 +88,8 @@ const LiquorList = () => {
                     <h5 className="card-title mb-3">Filters</h5>
 
                     <Form>
-                        <Row className="align-items-center">
-                            {/* Active Checkbox */}
-                            <Col xs="auto" className="mb-3">
+                        <Row className="align-items-center mb-3">
+                            <Col xs="auto">
                                 <Form.Check
                                     type="checkbox"
                                     id="filterActive"
@@ -98,8 +100,7 @@ const LiquorList = () => {
                                 />
                             </Col>
 
-                            {/* In Stock Checkbox */}
-                            <Col xs="auto" className="mb-3">
+                            <Col xs="auto">
                                 <Form.Check
                                     type="checkbox"
                                     id="filterInStock"
@@ -109,35 +110,42 @@ const LiquorList = () => {
                                     onChange={handleFilterChange}
                                 />
                             </Col>
-
-                            {/* Category Select with Clear Button */}
-                            <Col xs={12} sm={4} md={3} className="mb-3">
-                                <InputGroup>
-                                    <Form.Select
-                                        name="categoryId"
-                                        value={filters.categoryId}
-                                        onChange={handleFilterChange}
-                                        aria-label="Category Filter"
-                                    >
-                                        <option value="">All Categories</option>
-                                        {categories.map((category) => (
-                                            <option key={category.category_id} value={category.category_id}>
-                                                {category.name}
-                                            </option>
-                                        ))}
-                                    </Form.Select>
-                                    {filters.categoryId && (
-                                        <Button
-                                            variant="outline-secondary"
-                                            onClick={clearCategoryFilter}
-                                            aria-label="Clear category filter"
-                                        >
-                                            Clear
-                                        </Button>
-                                    )}
-                                </InputGroup>
-                            </Col>
                         </Row>
+
+                        <div className="d-flex flex-wrap gap-2">
+                            <Button
+                                variant={!filters.categoryId ? "primary" : "outline-secondary"}
+                                size="sm"
+                                onClick={() => handleCategoryClick("")}
+                                className="d-flex align-items-center"
+                            >
+                                All
+                            </Button>
+
+                            {categories.map(category => (
+                                <Button
+                                    key={category.category_id}
+                                    variant={filters.categoryId === category.category_id ? "primary" : "outline-secondary"}
+                                    size="sm"
+                                    onClick={() => handleCategoryClick(category.category_id)}
+                                    className="d-flex align-items-center gap-1"
+                                >
+                                    {category.icon && (
+                                        <img
+                                            src={category.icon}
+                                            alt={category.name}
+                                            style={{
+                                                width: '20px',
+                                                height: '20px',
+                                                borderRadius: '50%',
+                                                objectFit: 'cover'
+                                            }}
+                                        />
+                                    )}
+                                    {category.name}
+                                </Button>
+                            ))}
+                        </div>
                     </Form>
                 </div>
             </div>
