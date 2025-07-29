@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
-import { Table, Spin, message, Tag, Button } from "antd";
+import { Table, Spin, message, Tag, Button, Tooltip } from "antd";
 import { useNavigate } from "react-router-dom";
 import { ArrowRightOutlined } from "@ant-design/icons";
 
@@ -8,6 +8,11 @@ function OrderList() {
     const [orders, setOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const navigate = useNavigate();
+
+    const formatDate = (timestamp) => {
+        if (!timestamp || !timestamp._seconds) return "N/A";
+        return new Date(timestamp._seconds * 1000).toLocaleString();
+    };
 
     useEffect(() => {
         const fetchOrders = async () => {
@@ -45,30 +50,46 @@ function OrderList() {
             title: "Order #",
             dataIndex: "order_number",
             key: "order_number",
+            width: 120,
         },
         {
             title: "Date",
             dataIndex: "order_date",
             key: "order_date",
-            render: (date) => new Date(date).toLocaleString(),
+            render: (date) => formatDate(date),
+            width: 180,
         },
         {
             title: "Customer",
             dataIndex: "user_id",
             key: "user_id",
-            render: (user) => user?.name || "N/A",
+            render: (user) => user?.username || "N/A",
+            width: 180,
         },
         {
             title: "Total",
             dataIndex: "total_amount",
             key: "total_amount",
             render: (amount) => `Rs. ${Number(amount).toFixed(2)}`,
+            width: 120,
+        },
+        {
+            title: "Driver Accepted",
+            dataIndex: "is_driver_accepted",
+            key: "is_driver_accepted",
+            render: (accepted) => (
+                <Tag color={accepted ? "green" : "red"}>
+                    {accepted ? "Accepted" : "Not Accepted"}
+                </Tag>
+            ),
+            width: 140,
         },
         {
             title: "Status",
             dataIndex: "status",
             key: "status",
             render: getStatusTag,
+            width: 100,
         },
         {
             title: "Payment",
@@ -79,17 +100,21 @@ function OrderList() {
                     {status?.toUpperCase() || "UNKNOWN"}
                 </Tag>
             ),
+            width: 100,
         },
         {
             title: "Action",
             key: "action",
+            width: 50,
             render: (_, record) => (
-                <Button
-                    type="primary"
-                    shape="circle"
-                    icon={<ArrowRightOutlined />}
-                    onClick={() => navigate(`/order-list/${record.order_id}`)}
-                />
+                <Tooltip title="View Order Details">
+                    <Button
+                        type="primary"
+                        shape="circle"
+                        icon={<ArrowRightOutlined />}
+                        onClick={() => navigate(`/order-list/${record.order_id}`)}
+                    />
+                </Tooltip>
             ),
         },
     ];
@@ -120,6 +145,7 @@ function OrderList() {
                 rowKey="order_id"
                 bordered
                 pagination={{ pageSize: 10 }}
+                scroll={{ x: "max-content" }}
             />
         </div>
     );
