@@ -287,7 +287,7 @@ const AdminNavbar = () => {
                                 <Collapse in={manageProductOpen} timeout="auto" unmountOnExit>
                                     <Box sx={{ pl: 2 }}>
                                         <StyledNavLink
-                                            to="/users-list"
+                                            to="/liquor-list"
                                             onClick={closeMobileMenu}
                                             sx={{ display: "block", mb: 1 }}
                                         >

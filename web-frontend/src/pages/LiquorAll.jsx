@@ -76,7 +76,10 @@ const LiquorAll = () => {
       <div className="mb-4">
         <h2 className="mb-3">Liquor Products</h2>
 
-        <div className="d-flex flex-wrap gap-3">
+        <div
+          className="d-flex flex-nowrap overflow-auto py-2 gap-3"
+          style={{ scrollbarWidth: 'thin' }}
+        >
           <div
             className={`category-pill ${!selectedCategory ? 'active' : ''}`}
             onClick={() => handleCategoryClick(null)}
@@ -86,16 +89,18 @@ const LiquorAll = () => {
               borderRadius: '20px',
               backgroundColor: !selectedCategory ? '#1976d2' : '#f0f0f0',
               color: !selectedCategory ? 'white' : 'inherit',
+              flex: '0 0 auto',
+              whiteSpace: 'nowrap',
               transition: 'all 0.2s',
               display: 'flex',
               alignItems: 'center',
-              gap: '8px'
+              gap: '8px',
             }}
           >
             <span>All</span>
           </div>
 
-          {categories.map(category => (
+          {categories.map((category) => (
             <div
               key={category.category_id}
               className={`category-pill ${selectedCategory === category.category_id ? 'active' : ''}`}
@@ -106,10 +111,12 @@ const LiquorAll = () => {
                 borderRadius: '20px',
                 backgroundColor: selectedCategory === category.category_id ? '#1976d2' : '#f0f0f0',
                 color: selectedCategory === category.category_id ? 'white' : 'inherit',
+                flex: '0 0 auto',
+                whiteSpace: 'nowrap',
                 transition: 'all 0.2s',
                 display: 'flex',
                 alignItems: 'center',
-                gap: '8px'
+                gap: '8px',
               }}
             >
               {category.icon && (
@@ -120,7 +127,7 @@ const LiquorAll = () => {
                     width: '24px',
                     height: '24px',
                     borderRadius: '50%',
-                    objectFit: 'cover'
+                    objectFit: 'cover',
                   }}
                 />
               )}

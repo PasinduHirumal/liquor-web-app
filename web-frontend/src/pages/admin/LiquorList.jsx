@@ -74,7 +74,6 @@ const LiquorList = () => {
 
     return (
         <div className="container-fluid py-4">
-            {/* Page Header */}
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2>Manage Liquors</h2>
                 <Button variant="primary" onClick={() => setShowCreateModal(true)}>
@@ -112,33 +111,34 @@ const LiquorList = () => {
                             </Col>
                         </Row>
 
-                        <div className="d-flex flex-wrap gap-2">
+                        <div className="overflow-auto d-flex flex-nowrap gap-2 py-2" style={{ whiteSpace: "nowrap" }}>
                             <Button
                                 variant={!filters.categoryId ? "primary" : "outline-secondary"}
-                                size="sm"
+                                size="md"
                                 onClick={() => handleCategoryClick("")}
                                 className="d-flex align-items-center"
                             >
                                 All
                             </Button>
 
-                            {categories.map(category => (
+                            {categories.map((category) => (
                                 <Button
                                     key={category.category_id}
                                     variant={filters.categoryId === category.category_id ? "primary" : "outline-secondary"}
-                                    size="sm"
+                                    size="md"
                                     onClick={() => handleCategoryClick(category.category_id)}
                                     className="d-flex align-items-center gap-1"
+                                    style={{ flex: "0 0 auto" }}
                                 >
                                     {category.icon && (
                                         <img
                                             src={category.icon}
                                             alt={category.name}
                                             style={{
-                                                width: '20px',
-                                                height: '20px',
-                                                borderRadius: '50%',
-                                                objectFit: 'cover'
+                                                width: "20px",
+                                                height: "20px",
+                                                borderRadius: "50%",
+                                                objectFit: "cover"
                                             }}
                                         />
                                     )}
@@ -167,7 +167,6 @@ const LiquorList = () => {
                 </div>
             )}
 
-            {/* Product Grid */}
             {!loading && !error && (
                 <div className="row g-4">
                     {products.length > 0 ? (

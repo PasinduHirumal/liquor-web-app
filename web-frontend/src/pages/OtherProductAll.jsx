@@ -81,57 +81,61 @@ const OtherProductList = () => {
             <div className="mb-4">
                 <h2 className="mb-3">Grocery Items</h2>
 
-                <div className="d-flex flex-wrap gap-3 align-items-center">
-                    <div
-                        className={`category-pill ${!selectedCategory ? 'active' : ''}`}
-                        onClick={() => handleCategoryClick(null)}
-                        style={{
-                            cursor: 'pointer',
-                            padding: '8px 16px',
-                            borderRadius: '20px',
-                            backgroundColor: !selectedCategory ? '#1976d2' : '#f0f0f0',
-                            color: !selectedCategory ? 'white' : 'inherit',
-                            transition: 'all 0.2s',
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: '8px'
-                        }}
-                    >
-                        <span>All</span>
-                    </div>
-
-                    {categories.map(category => (
+                {/* Horizontal Scrollable Category Pills */}
+                <div className="overflow-auto pb-2">
+                    <div className="d-flex flex-nowrap gap-3">
                         <div
-                            key={category.category_id}
-                            className={`category-pill ${selectedCategory === category.category_id ? 'active' : ''}`}
-                            onClick={() => handleCategoryClick(category.category_id)}
+                            className={`category-pill ${!selectedCategory ? 'active' : ''}`}
+                            onClick={() => handleCategoryClick(null)}
                             style={{
                                 cursor: 'pointer',
                                 padding: '8px 16px',
                                 borderRadius: '20px',
-                                backgroundColor: selectedCategory === category.category_id ? '#1976d2' : '#f0f0f0',
-                                color: selectedCategory === category.category_id ? 'white' : 'inherit',
+                                backgroundColor: !selectedCategory ? '#1976d2' : '#f0f0f0',
+                                color: !selectedCategory ? 'white' : 'inherit',
                                 transition: 'all 0.2s',
                                 display: 'flex',
                                 alignItems: 'center',
-                                gap: '8px'
+                                whiteSpace: 'nowrap'
                             }}
                         >
-                            {category.icon && (
-                                <img
-                                    src={category.icon}
-                                    alt={category.name}
-                                    style={{
-                                        width: '24px',
-                                        height: '24px',
-                                        borderRadius: '50%',
-                                        objectFit: 'cover'
-                                    }}
-                                />
-                            )}
-                            <span>{category.name}</span>
+                            <span>All</span>
                         </div>
-                    ))}
+
+                        {categories.map(category => (
+                            <div
+                                key={category.category_id}
+                                className={`category-pill ${selectedCategory === category.category_id ? 'active' : ''}`}
+                                onClick={() => handleCategoryClick(category.category_id)}
+                                style={{
+                                    cursor: 'pointer',
+                                    padding: '8px 16px',
+                                    borderRadius: '20px',
+                                    backgroundColor: selectedCategory === category.category_id ? '#1976d2' : '#f0f0f0',
+                                    color: selectedCategory === category.category_id ? 'white' : 'inherit',
+                                    transition: 'all 0.2s',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    whiteSpace: 'nowrap'
+                                }}
+                            >
+                                {category.icon && (
+                                    <img
+                                        src={category.icon}
+                                        alt={category.name}
+                                        style={{
+                                            width: '24px',
+                                            height: '24px',
+                                            borderRadius: '50%',
+                                            objectFit: 'cover',
+                                            marginRight: '8px'
+                                        }}
+                                    />
+                                )}
+                                <span>{category.name}</span>
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
 

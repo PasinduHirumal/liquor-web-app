@@ -113,10 +113,13 @@ const OtherProductList = () => {
                 </Row>
 
                 <div className="mt-3">
-                    <div className="d-flex flex-wrap gap-2">
+                    <div
+                        className="d-flex gap-2 overflow-auto pb-2"
+                        style={{ whiteSpace: "nowrap", scrollSnapType: "x mandatory" }}
+                    >
                         <Button
                             variant={!filters.categoryId ? "primary" : "outline-secondary"}
-                            size="sm"
+                            size="md"
                             onClick={() => handleCategoryClick("")}
                             className="d-flex align-items-center"
                         >
@@ -127,9 +130,9 @@ const OtherProductList = () => {
                             <Button
                                 key={category.category_id}
                                 variant={filters.categoryId === category.category_id ? "primary" : "outline-secondary"}
-                                size="sm"
+                                size="md"
                                 onClick={() => handleCategoryClick(category.category_id)}
-                                className="d-flex align-items-center gap-2"
+                                className="d-flex align-items-center gap-2 flex-shrink-0"
                             >
                                 {category.icon && (
                                     <img
