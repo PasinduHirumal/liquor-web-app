@@ -24,6 +24,7 @@ class Orders {
         this.notes = data.notes;
         this.status = data.status;
         this.assigned_driver_id = data.assigned_driver_id;
+        this.is_driver_accepted = data.is_driver_accepted;
 
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;
