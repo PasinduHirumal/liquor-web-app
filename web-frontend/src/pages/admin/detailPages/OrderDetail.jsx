@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { axiosInstance } from "../../../lib/axios";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { Card, Container, Row, Col, Badge } from "react-bootstrap";
+import { Card, Container, Row, Col, Badge, Image } from "react-bootstrap";
 import "../../../styles/OrderDetail.css";
 
 function OrderDetail() {
@@ -16,7 +16,8 @@ function OrderDetail() {
         const fetchOrderDetail = async () => {
             try {
                 const res = await axiosInstance.get(`/orders/getOrderById/${id}`);
-                setOrder(res.data.data);
+                const data = Array.isArray(res.data.data) ? res.data.data[0] : res.data.data;
+                setOrder(data);
             } catch (err) {
                 console.error("Error fetching order:", err);
                 setError(err.response?.data?.message || "Failed to fetch order");
@@ -28,55 +29,31 @@ function OrderDetail() {
         fetchOrderDetail();
     }, [id]);
 
+    const formatDate = (timestamp) => {
+        if (!timestamp || !timestamp._seconds) return "N/A";
+        return new Date(timestamp._seconds * 1000).toLocaleString();
+    };
+
     if (loading) return <Skeleton count={8} />;
     if (error) return <div className="alert alert-danger">Error: {error}</div>;
     if (!order) return <div className="alert alert-warning">No order found.</div>;
 
-    const renderStatusBadge = () => {
-        if (!order.status) return null;
-
+    const renderBadge = (value, type = "status") => {
+        if (!value) return null;
         let variant = "secondary";
-        switch (order.status.toLowerCase()) {
-            case "delivered":
-                variant = "success";
-                break;
-            case "pending":
-                variant = "warning";
-                break;
-            case "cancelled":
-                variant = "danger";
-                break;
-            case "processing":
-                variant = "info";
-                break;
-            case "out_for_delivery":
-                variant = "primary";
-                break;
-        }
-
-        return <Badge bg={variant} className="text-capitalize">{order.status}</Badge>;
-    };
-
-    const renderPaymentStatusBadge = () => {
-        if (!order.payment_status) return null;
-
-        let variant = "secondary";
-        switch (order.payment_status.toLowerCase()) {
-            case "paid":
-                variant = "success";
-                break;
-            case "pending":
-                variant = "warning";
-                break;
-            case "failed":
-                variant = "danger";
-                break;
-            case "refunded":
-                variant = "info";
-                break;
-        }
-
-        return <Badge bg={variant} className="text-capitalize">{order.payment_status}</Badge>;
+        const val = value.toLowerCase();
+        const map = {
+            delivered: "success",
+            pending: "warning",
+            cancelled: "danger",
+            processing: "info",
+            out_for_delivery: "primary",
+            paid: "success",
+            failed: "danger",
+            refunded: "info"
+        };
+        variant = map[val] || "secondary";
+        return <Badge bg={variant} className="text-capitalize">{value}</Badge>;
     };
 
     return (
@@ -86,170 +63,145 @@ function OrderDetail() {
             </h1>
 
             <Row className="g-4">
-                {/* Order Summary Card */}
-                <Col md={6}>
-                    <Card className="h-100">
+                {/* Order Summary */}
+                <Col xs={12} md={6} className="mb-4">
+                    <Card className="h-100 shadow-sm">
                         <Card.Header className="bg-primary text-white">
-                            <Card.Title>Order Summary</Card.Title>
+                            <h5 className="mb-0">Order Summary</h5>
                         </Card.Header>
                         <Card.Body>
                             <Row>
-                                <Col sm={6}>
-                                    <p><strong>Order Date:</strong></p>
-                                    <p><strong>Status:</strong></p>
-                                    <p><strong>Payment Method:</strong></p>
-                                    <p><strong>Payment Status:</strong></p>
-                                </Col>
-                                <Col sm={6}>
-                                    <p>{order.order_date ? new Date(order.order_date).toLocaleString() : "N/A"}</p>
-                                    <p>{renderStatusBadge()}</p>
-                                    <p>{order.payment_method || "N/A"}</p>
-                                    <p>{renderPaymentStatusBadge()}</p>
+                                <Col xs={12} className="mb-3">
+                                    <p className="mb-2">
+                                        <strong>Order Date:</strong>
+                                        <br />
+                                        <span className="text-muted">{formatDate(order.order_date)}</span>
+                                    </p>
+                                    <p className="mb-2">
+                                        <strong>Status:</strong>
+                                        {renderBadge(order.status)}
+                                    </p>
+                                    <p className="mb-2">
+                                        <strong>Payment Method:</strong>
+                                        <br />
+                                        <span className="text-muted">{order.payment_method || "N/A"}</span>
+                                    </p>
+                                    <p className="mb-0">
+                                        <strong>Payment Status:</strong>
+                                        {renderBadge(order.payment_status, "payment")}
+                                    </p>
                                 </Col>
                             </Row>
                         </Card.Body>
                     </Card>
                 </Col>
 
-                {/* Price Details Card */}
+                {/* Price Details */}
                 <Col md={6}>
                     <Card className="h-100">
-                        <Card.Header className="bg-primary text-white">
-                            <Card.Title>Price Details</Card.Title>
-                        </Card.Header>
+                        <Card.Header className="bg-primary text-white">Price Details</Card.Header>
                         <Card.Body>
-                            <div className="price-details">
-                                <div className="d-flex justify-content-between">
-                                    <span>Subtotal:</span>
-                                    <span>{order.subtotal != null ? `$${order.subtotal.toFixed(2)}` : "N/A"}</span>
-                                </div>
-                                <div className="d-flex justify-content-between">
-                                    <span>Delivery Fee:</span>
-                                    <span>{order.delivery_fee != null ? `$${order.delivery_fee.toFixed(2)}` : "N/A"}</span>
-                                </div>
-                                <div className="d-flex justify-content-between">
-                                    <span>Tax Amount:</span>
-                                    <span>{order.tax_amount != null ? `$${order.tax_amount.toFixed(2)}` : "N/A"}</span>
-                                </div>
-                                <hr />
-                                <div className="d-flex justify-content-between fw-bold">
-                                    <span>Total:</span>
-                                    <span>{order.total_amount != null ? `$${order.total_amount.toFixed(2)}` : "N/A"}</span>
-                                </div>
-                            </div>
+                            <div className="d-flex justify-content-between"><span>Subtotal:</span><span>${order.subtotal?.toFixed(2)}</span></div>
+                            <div className="d-flex justify-content-between"><span>Delivery Fee:</span><span>${order.delivery_fee?.toFixed(2)}</span></div>
+                            <div className="d-flex justify-content-between"><span>Tax Amount:</span><span>${order.tax_amount?.toFixed(2)}</span></div>
+                            <hr />
+                            <div className="d-flex justify-content-between fw-bold"><span>Total:</span><span>${order.total_amount?.toFixed(2)}</span></div>
                         </Card.Body>
                     </Card>
                 </Col>
 
-                {/* Order Items Card */}
+                {/* Items */}
                 <Col md={12}>
                     <Card>
-                        <Card.Header className="bg-primary text-white">
-                            <Card.Title>Order Items</Card.Title>
-                        </Card.Header>
+                        <Card.Header className="bg-primary text-white">Order Items</Card.Header>
                         <Card.Body>
-                            {order.items && order.items.length > 0 ? (
+                            {order.items?.length > 0 ? (
                                 <div className="table-responsive">
                                     <table className="table">
                                         <thead>
                                             <tr>
-                                                <th>Item</th>
-                                                <th>Quantity</th>
-                                                <th>Price</th>
+                                                <th>Product</th>
+                                                <th>Image</th>
+                                                <th>Qty</th>
+                                                <th>Unit Price</th>
+                                                <th>Total</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            {order.items.map((item, idx) => (
-                                                <tr key={idx}>
-                                                    <td>{item.product_name || item.name || "Unnamed Item"}</td>
-                                                    <td>{item.quantity || item.qty || 1}</td>
-                                                    <td>{item.price ? `$${item.price.toFixed(2)}` : "N/A"}</td>
+                                            {order.items.map((item, i) => (
+                                                <tr key={i}>
+                                                    <td>{item.product_name}</td>
+                                                    <td>
+                                                        <Image src={item.product_image} width="50" rounded />
+                                                    </td>
+                                                    <td>{item.quantity}</td>
+                                                    <td>${item.unit_price?.toFixed(2)}</td>
+                                                    <td>${item.total_price?.toFixed(2)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
                                     </table>
                                 </div>
                             ) : (
-                                <p className="text-muted">No items found</p>
+                                <p>No items found.</p>
                             )}
                         </Card.Body>
                     </Card>
                 </Col>
 
-                {/* Delivery Information Card */}
+                {/* Delivery Information */}
                 <Col md={6}>
                     <Card>
-                        <Card.Header className="bg-primary text-white">
-                            <Card.Title>Delivery Information</Card.Title>
-                        </Card.Header>
+                        <Card.Header className="bg-primary text-white">Delivery Information</Card.Header>
                         <Card.Body>
-                            <p><strong>Delivery Address:</strong></p>
-                            <p className="mb-3">{order.delivery_address?.full_address || order.delivery_address?.address || "N/A"}</p>
-
+                            <p><strong>Address:</strong></p>
+                            <p>{order.delivery_address_id?.streetAddress || order.delivery_address_id?.savedAddress || "N/A"}</p>
                             <Row>
                                 <Col sm={6}>
-                                    <p><strong>Distance:</strong></p>
-                                    <p><strong>Estimated Delivery:</strong></p>
-                                    <p><strong>Delivered At:</strong></p>
+                                    <p><strong>Distance:</strong> {order.distance?.toFixed(2)} km</p>
+                                    <p><strong>Estimated:</strong> {formatDate(order.estimated_delivery)}</p>
                                 </Col>
                                 <Col sm={6}>
-                                    <p>{order.distance ? `${order.distance} km` : "N/A"}</p>
-                                    <p>{order.estimated_delivery ? new Date(order.estimated_delivery).toLocaleString() : "N/A"}</p>
-                                    <p>{order.delivered_at ? new Date(order.delivered_at).toLocaleString() : "Not delivered yet"}</p>
+                                    <p><strong>Delivered At:</strong> {formatDate(order.delivered_at)}</p>
                                 </Col>
                             </Row>
                         </Card.Body>
                     </Card>
                 </Col>
 
-                {/* Customer Information Card */}
+                {/* Customer Info */}
                 <Col md={6}>
                     <Card>
-                        <Card.Header className="bg-primary text-white">
-                            <Card.Title>Customer Information</Card.Title>
-                        </Card.Header>
+                        <Card.Header className="bg-primary text-white">Customer Information</Card.Header>
                         <Card.Body>
-                            {order.user ? (
-                                <>
-                                    <p><strong>Name:</strong> {order.user.name || order.user.full_name || "N/A"}</p>
-                                    <p><strong>Email:</strong> {order.user.email || "N/A"}</p>
-                                    <p><strong>Phone:</strong> {order.user.phone || "N/A"}</p>
-                                    <p><strong>Customer ID:</strong> {order.user.id || order.user._id || "N/A"}</p>
-                                </>
-                            ) : (
-                                <p className="text-muted">No customer information available</p>
-                            )}
+                            <p><strong>Name:</strong> {order.user_id?.username || "N/A"}</p>
+                            <p><strong>Email:</strong> {order.user_id?.email || "N/A"}</p>
+                            <p><strong>User ID:</strong> {order.user_id?.id || "N/A"}</p>
                         </Card.Body>
                     </Card>
                 </Col>
 
-                {/* Driver Information Card */}
-                {order.assigned_driver && (
-                    <Col md={6}>
-                        <Card>
-                            <Card.Header className="bg-primary text-white">
-                                <Card.Title>Driver Information</Card.Title>
-                            </Card.Header>
-                            <Card.Body>
-                                <p><strong>Name:</strong> {order.assigned_driver.name || "N/A"}</p>
-                                <p><strong>Email:</strong> {order.assigned_driver.email || "N/A"}</p>
-                                <p><strong>Phone:</strong> {order.assigned_driver.phone || "N/A"}</p>
-                                <p><strong>Driver ID:</strong> {order.assigned_driver.id || order.assigned_driver._id || "N/A"}</p>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                )}
-
-                {/* Additional Information Card */}
-                <Col md={order.assigned_driver ? 6 : 12}>
+                {/* Driver Info */}
+                <Col md={6}>
                     <Card>
-                        <Card.Header className="bg-primary text-white">
-                            <Card.Title>Additional Information</Card.Title>
-                        </Card.Header>
+                        <Card.Header className="bg-primary text-white">Driver Information</Card.Header>
                         <Card.Body>
-                            <p><strong>Note:</strong></p>
-                            <p className="mb-3">{order.note || "No notes available"}</p>
-                            <p><strong>Created At:</strong> {order.created_at ? new Date(order.created_at).toLocaleString() : order.order_date ? new Date(order.order_date).toLocaleString() : "N/A"}</p>
+                            <p><strong>Name:</strong> {order.assigned_driver_id?.username || "N/A"}</p>
+                            <p><strong>Email:</strong> {order.assigned_driver_id?.email || "N/A"}</p>
+                            <p><strong>Driver ID:</strong> {order.assigned_driver_id?.id || "N/A"}</p>
+                        </Card.Body>
+                    </Card>
+                </Col>
+
+                {/* Notes + Timestamps */}
+                <Col md={6}>
+                    <Card>
+                        <Card.Header className="bg-primary text-white">Additional Info</Card.Header>
+                        <Card.Body>
+                            <p><strong>Notes:</strong> {order.notes || "No notes available"}</p>
+                            <p><strong>Created At:</strong> {formatDate(order.created_at)}</p>
+                            <p><strong>Updated At:</strong> {formatDate(order.updated_at)}</p>
+                            <p><strong>Driver Accepted:</strong> {order.is_driver_accepted ? "Yes" : "No"}</p>
                         </Card.Body>
                     </Card>
                 </Col>
