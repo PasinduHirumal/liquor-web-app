@@ -152,7 +152,7 @@ const updateOrder = async (req, res) => {
 
         const updateData = { ...req.body };
 
-        if (isAssigningDriver) updateData.status = ORDER_STATUS.OUT_FOR_DELIVERY;
+        if (isAssigningDriver) updateData.status = ORDER_STATUS.PROCESSING;
 
         const updatedOrder = await orderService.updateById(orderId, updateData);
         if (!updatedOrder) {
