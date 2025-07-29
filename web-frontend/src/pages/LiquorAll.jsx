@@ -8,10 +8,7 @@ const LiquorAll = () => {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({
-    category_id: "",
-    is_liquor: true,
-  });
+  const [selectedCategory, setSelectedCategory] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -42,8 +39,7 @@ const LiquorAll = () => {
 
       filtered = filtered.filter(product => {
         return (
-          (filters.is_liquor === undefined || product.is_liquor === filters.is_liquor) &&
-          (!filters.category_id || product.category_id?.id === filters.category_id)
+          (!selectedCategory || product.category_id?.id === selectedCategory)
         );
       });
 
@@ -51,14 +47,10 @@ const LiquorAll = () => {
     };
 
     applyFilters();
-  }, [products, filters]);
+  }, [products, selectedCategory]);
 
-  const handleFilterChange = (e) => {
-    const { name, value } = e.target;
-    setFilters(prev => ({
-      ...prev,
-      [name]: value,
-    }));
+  const handleCategoryClick = (categoryId) => {
+    setSelectedCategory(selectedCategory === categoryId ? null : categoryId);
   };
 
   if (loading) {
@@ -81,28 +73,60 @@ const LiquorAll = () => {
 
   return (
     <div className="container-fluid py-4">
-      <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap">
-        <h2 className="mb-0">Liquor Products</h2>
+      <div className="mb-4">
+        <h2 className="mb-3">Liquor Products</h2>
 
-        <div className="d-flex gap-3 align-items-center flex-wrap mt-2 mt-sm-0">
-          {/* Category Filter */}
-          <div className="form-group">
-            <select
-              name="category_id"
-              value={filters.category_id}
-              onChange={handleFilterChange}
-              className="form-select form-select-sm"
-            >
-              <option value="">All Categories</option>
-              {categories
-                .filter(c => c.is_active)
-                .map(category => (
-                  <option key={category.category_id} value={category.category_id}>
-                    {category.name}
-                  </option>
-                ))}
-            </select>
+        <div className="d-flex flex-wrap gap-3">
+          <div
+            className={`category-pill ${!selectedCategory ? 'active' : ''}`}
+            onClick={() => handleCategoryClick(null)}
+            style={{
+              cursor: 'pointer',
+              padding: '8px 16px',
+              borderRadius: '20px',
+              backgroundColor: !selectedCategory ? '#1976d2' : '#f0f0f0',
+              color: !selectedCategory ? 'white' : 'inherit',
+              transition: 'all 0.2s',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}
+          >
+            <span>All</span>
           </div>
+
+          {categories.map(category => (
+            <div
+              key={category.category_id}
+              className={`category-pill ${selectedCategory === category.category_id ? 'active' : ''}`}
+              onClick={() => handleCategoryClick(category.category_id)}
+              style={{
+                cursor: 'pointer',
+                padding: '8px 16px',
+                borderRadius: '20px',
+                backgroundColor: selectedCategory === category.category_id ? '#1976d2' : '#f0f0f0',
+                color: selectedCategory === category.category_id ? 'white' : 'inherit',
+                transition: 'all 0.2s',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px'
+              }}
+            >
+              {category.icon && (
+                <img
+                  src={category.icon}
+                  alt={category.name}
+                  style={{
+                    width: '24px',
+                    height: '24px',
+                    borderRadius: '50%',
+                    objectFit: 'cover'
+                  }}
+                />
+              )}
+              <span>{category.name}</span>
+            </div>
+          ))}
         </div>
       </div>
 
