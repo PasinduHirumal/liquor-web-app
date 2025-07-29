@@ -5,7 +5,7 @@ const driverService = new DriverService();
 const populateDriver = async (data) => {
     const populateOne = async (category) => {
         // Check for both userId and user_id field names
-        const userIdField = category.hasOwnProperty('assigned_driver_id') ? 'assigned_driver_id' : 'user_id';
+        const userIdField = category.hasOwnProperty('assigned_driver_id') ? 'assigned_driver_id' : 'driver_id';
         const userIdValue = category[userIdField];
         
         // Handle both string ID and object with ID

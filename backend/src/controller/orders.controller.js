@@ -135,7 +135,8 @@ const updateOrder = async (req, res) => {
                     driver_id: assigned_driver_id,
                     order_id: order.order_id,
                     is_completed: false,
-                    is_driver_accepted: false
+                    is_driver_accepted: false,
+                    is_re_assigning_driver: false
                 }
 
                 const driverDuty = await dutyService.create(driverDutyData);

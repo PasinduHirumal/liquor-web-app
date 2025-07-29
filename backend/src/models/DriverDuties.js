@@ -8,6 +8,7 @@ class DriverDuties {
 
         this.is_completed = data.is_completed;
         this.is_driver_accepted = data.is_driver_accepted;
+        this.is_re_assigning_driver = data.is_re_assigning_driver;
 
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;

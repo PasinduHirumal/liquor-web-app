@@ -16,7 +16,7 @@ import productRoutes from "./src/routes/product.routes.js";
 import otherProductRoutes from "./src/routes/otherProducts.routes.js";
 import stockHistoryRoutes from "./src/routes/stockHistory.routes.js";
 import ordersRoutes from "./src/routes/orders.routes.js";
-
+import driverDutyRoutes from "./src/routes/driverDuty.routes.js";
 
 dotenv.config();
 
@@ -45,6 +45,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/other-products", otherProductRoutes);
 app.use("/api/stockHistory", stockHistoryRoutes);
 app.use("/api/orders", ordersRoutes);
+app.use("/api/driverDuties", driverDutyRoutes);
 
 
 //  Route handler for the root path
