@@ -4,14 +4,14 @@ import toast from 'react-hot-toast';
 import {
     Container, Typography, Paper, Box, Grid, TextField, FormControlLabel, Checkbox, Button, Table, TableBody, TableCell,
     TableContainer, TableHead, TableRow, CircularProgress, Chip, Dialog, DialogTitle, DialogContent, DialogActions,
-    DialogContentText, IconButton, Tooltip, FormControl, InputLabel, Select, MenuItem
+    DialogContentText, IconButton, Tooltip, FormControl, InputLabel, Select, MenuItem, Avatar
 } from '@mui/material';
-
 import {
     Edit as EditIcon,
     Delete as DeleteIcon,
     Add as AddIcon,
-    Cancel as CancelIcon
+    Cancel as CancelIcon,
+    CloudUpload as CloudUploadIcon
 } from '@mui/icons-material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
@@ -29,6 +29,9 @@ const theme = createTheme({
 const ManageCategory = () => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [imageLoading, setImageLoading] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
 
     const [filters, setFilters] = useState({
         is_active: '',
@@ -39,8 +42,10 @@ const ManageCategory = () => {
         name: '',
         description: '',
         is_active: true,
-        is_liquor: false
+        is_liquor: false,
+        icon: null
     });
+
     const [editMode, setEditMode] = useState(false);
     const [currentCategoryId, setCurrentCategoryId] = useState(null);
     const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -84,16 +89,65 @@ const ManageCategory = () => {
         });
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedImage(file);
+            
+            // Create preview URL
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const uploadImage = async () => {
+        if (!selectedImage) return null;
+        
+        setImageLoading(true);
+        try {
+            const formData = new FormData();
+            formData.append('image', selectedImage);
+            
+            const response = await axiosInstance.post('/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+            
+            return response.data.url;
+        } catch (error) {
+            toast.error('Failed to upload image');
+            return null;
+        } finally {
+            setImageLoading(false);
+        }
+    };
+
     const handleSubmit = async (e) => {
         if (e) e.preventDefault();
         setLoading(true);
 
         try {
+            // Upload image if selected
+            let iconUrl = formData.icon;
+            if (selectedImage) {
+                iconUrl = await uploadImage();
+                if (!iconUrl) return;
+            }
+
+            const payload = {
+                ...formData,
+                icon: iconUrl
+            };
+
             if (editMode) {
-                await axiosInstance.patch(`/categories/update/${currentCategoryId}`, formData);
+                await axiosInstance.patch(`/categories/update/${currentCategoryId}`, payload);
                 toast.success('Category updated successfully');
             } else {
-                await axiosInstance.post('/categories/create', formData);
+                await axiosInstance.post('/categories/create', payload);
                 toast.success('Category created successfully');
             }
 
@@ -113,10 +167,13 @@ const ManageCategory = () => {
             name: category.name,
             description: category.description,
             is_active: category.is_active,
-            is_liquor: category.is_liquor
+            is_liquor: category.is_liquor,
+            icon: category.icon
         });
         setCurrentCategoryId(category.category_id);
         setEditMode(true);
+        setImagePreview(category.icon || null);
+        setSelectedImage(null);
         setOpenEditDialog(true);
     };
 
@@ -149,8 +206,11 @@ const ManageCategory = () => {
             name: '',
             description: '',
             is_active: true,
-            is_liquor: false
+            is_liquor: false,
+            icon: null
         });
+        setSelectedImage(null);
+        setImagePreview(null);
         setEditMode(false);
         setCurrentCategoryId(null);
     };
@@ -251,6 +311,7 @@ const ManageCategory = () => {
                             <Table stickyHeader>
                                 <TableHead>
                                     <TableRow>
+                                        <TableCell className='fw-bold'>Icon</TableCell>
                                         <TableCell className='fw-bold'>Name</TableCell>
                                         <TableCell className='fw-bold'>Description</TableCell>
                                         <TableCell className='fw-bold'>Status</TableCell>
@@ -261,6 +322,19 @@ const ManageCategory = () => {
                                 <TableBody>
                                     {categories.map((category) => (
                                         <TableRow key={category.category_id}>
+                                            <TableCell>
+                                                {category.icon ? (
+                                                    <Avatar 
+                                                        src={category.icon} 
+                                                        alt={category.name}
+                                                        sx={{ width: 40, height: 40 }}
+                                                    />
+                                                ) : (
+                                                    <Avatar sx={{ width: 40, height: 40 }}>
+                                                        {category.name.charAt(0).toUpperCase()}
+                                                    </Avatar>
+                                                )}
+                                            </TableCell>
                                             <TableCell>{category.name}</TableCell>
                                             <TableCell>{category.description || '-'}</TableCell>
                                             <TableCell>
@@ -306,6 +380,33 @@ const ManageCategory = () => {
                     <DialogContent>
                         <Grid container spacing={3} sx={{ mt: 1 }}>
                             <Grid item xs={12}>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
+                                    {imagePreview ? (
+                                        <Avatar 
+                                            src={imagePreview} 
+                                            sx={{ width: 100, height: 100, mb: 2 }}
+                                        />
+                                    ) : (
+                                        <Avatar sx={{ width: 100, height: 100, mb: 2 }}>
+                                            <CloudUploadIcon fontSize="large" />
+                                        </Avatar>
+                                    )}
+                                    <Button
+                                        variant="contained"
+                                        component="label"
+                                        startIcon={<CloudUploadIcon />}
+                                    >
+                                        Upload Icon
+                                        <input
+                                            type="file"
+                                            hidden
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                        />
+                                    </Button>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={12}>
                                 <TextField
                                     fullWidth
                                     label="Name *"
@@ -350,16 +451,16 @@ const ManageCategory = () => {
                         </Grid>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleCloseCreateDialog} startIcon={<CancelIcon />} disabled={loading}>
+                        <Button onClick={handleCloseCreateDialog} startIcon={<CancelIcon />} disabled={loading || imageLoading}>
                             Cancel
                         </Button>
                         <Button
                             onClick={handleSubmit}
                             startIcon={<AddIcon />}
                             variant="contained"
-                            disabled={loading}
+                            disabled={loading || imageLoading}
                         >
-                            {loading ? 'Creating...' : 'Create'}
+                            {loading || imageLoading ? 'Processing...' : 'Create'}
                         </Button>
                     </DialogActions>
                 </Dialog>
@@ -370,6 +471,33 @@ const ManageCategory = () => {
                     <DialogContent>
                         <Grid container spacing={3} sx={{ mt: 1 }}>
                             <Grid item xs={12}>
+                                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
+                                    {imagePreview ? (
+                                        <Avatar 
+                                            src={imagePreview} 
+                                            sx={{ width: 100, height: 100, mb: 2 }}
+                                        />
+                                    ) : (
+                                        <Avatar sx={{ width: 100, height: 100, mb: 2 }}>
+                                            <CloudUploadIcon fontSize="large" />
+                                        </Avatar>
+                                    )}
+                                    <Button
+                                        variant="contained"
+                                        component="label"
+                                        startIcon={<CloudUploadIcon />}
+                                    >
+                                        Change Icon
+                                        <input
+                                            type="file"
+                                            hidden
+                                            accept="image/*"
+                                            onChange={handleImageChange}
+                                        />
+                                    </Button>
+                                </Box>
+                            </Grid>
+                            <Grid item xs={12}>
                                 <TextField
                                     fullWidth
                                     label="Name *"
@@ -414,16 +542,16 @@ const ManageCategory = () => {
                         </Grid>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={handleCloseEditDialog} startIcon={<CancelIcon />} disabled={loading}>
+                        <Button onClick={handleCloseEditDialog} startIcon={<CancelIcon />} disabled={loading || imageLoading}>
                             Cancel
                         </Button>
                         <Button
                             onClick={handleSubmit}
                             startIcon={<EditIcon />}
                             variant="contained"
-                            disabled={loading}
+                            disabled={loading || imageLoading}
                         >
-                            {loading ? 'Updating...' : 'Update'}
+                            {loading || imageLoading ? 'Updating...' : 'Update'}
                         </Button>
                     </DialogActions>
                 </Dialog>
