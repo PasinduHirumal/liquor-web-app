@@ -111,8 +111,8 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
         try {
             const payload = {
                 ...values,
-                images: images,
                 main_image: mainImage,
+                images: images.filter((img) => img !== mainImage),
                 is_liquor: true,
                 add_quantity: 0,
                 withdraw_quantity: 0
