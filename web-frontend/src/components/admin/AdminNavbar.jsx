@@ -15,6 +15,8 @@ import {
     List,
     ListItemButton,
     ListItemText,
+    Typography,
+    ListSubheader
 } from "@mui/material";
 import { Menu as MenuIcon, Close as CloseIcon, Logout as LogoutIcon, ExpandMore, ExpandLess } from "@mui/icons-material";
 import useAdminAuthStore from "../../stores/adminAuthStore";
@@ -115,6 +117,11 @@ const AdminNavbar = () => {
                                         minWidth: 140,
                                     }}
                                 >
+                                    {/* Manage Products */}
+                                    <Typography variant="subtitle2" sx={{ px: 2, py: 0.5, color: "gray", fontSize: "16px" }}>
+                                        Manage Products
+                                    </Typography>
+
                                     <StyledNavLink
                                         to="/liquor-list"
                                         onClick={() => {
@@ -133,10 +140,14 @@ const AdminNavbar = () => {
                                         }}
                                         style={{ display: "block", padding: "8px 16px" }}
                                     >
-                                        Other Product
+                                        Groceries
                                     </StyledNavLink>
 
-                                    {/* ManageMembers */}
+                                    {/* Manage Members */}
+                                    <Typography variant="subtitle2" sx={{ px: 2, py: 0.5, color: "gray", fontSize: "16px" }}>
+                                        Manage Members
+                                    </Typography>
+
                                     <StyledNavLink
                                         to="/users-list"
                                         onClick={() => {
@@ -168,7 +179,11 @@ const AdminNavbar = () => {
                                         Admin Users
                                     </StyledNavLink>
 
-                                    {/* Manage Category & Order */}
+                                    {/* Manage Others */}
+                                    <Typography variant="subtitle2" sx={{ px: 2, py: 0.5, color: "gray", fontSize: "16px" }}>
+                                        Manage Others
+                                    </Typography>
+
                                     <StyledNavLink
                                         to="/category"
                                         onClick={() => {
@@ -264,6 +279,12 @@ const AdminNavbar = () => {
                                 </ListItemButton>
                                 <Collapse in={manageDropDownOpen} timeout="auto" unmountOnExit>
                                     <Box sx={{ pl: 2 }}>
+
+                                        {/* Manage Products */}
+                                        <ListSubheader disableSticky sx={{ color: "gray", bgcolor: "transparent", pl: 0 }}>
+                                            Manage Products
+                                        </ListSubheader>
+
                                         <StyledNavLink
                                             to="/liquor-list"
                                             onClick={closeMobileMenu}
@@ -279,7 +300,11 @@ const AdminNavbar = () => {
                                             Other Product
                                         </StyledNavLink>
 
-                                        {/* Mobile Manage Memberes */}
+                                        {/* Manage Members */}
+                                        <ListSubheader disableSticky sx={{ color: "gray", bgcolor: "transparent", pl: 0 }}>
+                                            Manage Members
+                                        </ListSubheader>
+
                                         <StyledNavLink
                                             to="/users-list"
                                             onClick={closeMobileMenu}
@@ -301,6 +326,11 @@ const AdminNavbar = () => {
                                         >
                                             Admin Users
                                         </StyledNavLink>
+
+                                        {/* Manage Others */}
+                                        <ListSubheader disableSticky sx={{ color: "gray", bgcolor: "transparent", pl: 0 }}>
+                                            Manage Others
+                                        </ListSubheader>
 
                                         <StyledNavLink
                                             to="/category"
