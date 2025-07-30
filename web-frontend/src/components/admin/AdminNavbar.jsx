@@ -284,6 +284,7 @@ const AdminNavbar = () => {
                                 p: 3,
                                 display: "flex",
                                 flexDirection: "column",
+                                overflowY: "auto",
                             }}
                         >
                             <StyledNavLink to="/admin" onClick={closeMobileMenu} sx={{ mb: 2 }}>
