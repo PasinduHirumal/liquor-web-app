@@ -111,6 +111,34 @@ function OrderDetail() {
 
             <Row className="g-4">
 
+                {/* Order Summary */}
+                <Col xs={12} md={6}>
+                    <Card className="order-detail-card h-100">
+                        <Card.Header as="h5">Order Summary</Card.Header>
+                        <Card.Body className="order-detail-section">
+                            <p><strong>Order Date:</strong> <span className="text-muted">{formatDate(order.order_date)}</span></p>
+                            <p><strong>Status:</strong> {renderBadge(order.status)}</p>
+                            <p><strong>Payment Method:</strong> <span className="text-muted">{order.payment_method || "N/A"}</span></p>
+                            <p><strong>Payment Status:</strong> {renderBadge(order.payment_status)}</p>
+                            <p><strong>Driver Accepted:</strong> {order.is_driver_accepted ? "Yes" : "No"}</p>
+                        </Card.Body>
+                    </Card>
+                </Col>
+
+                {/* Price Details */}
+                <Col xs={12} md={6}>
+                    <Card className="order-detail-card h-100">
+                        <Card.Header as="h5">Price Details</Card.Header>
+                        <Card.Body className="order-detail-section">
+                            <div className="order-detail-price-line"><span>Subtotal:</span><span>${order.subtotal?.toFixed(2)}</span></div>
+                            <div className="order-detail-price-line"><span>Delivery Fee:</span><span>${order.delivery_fee?.toFixed(2)}</span></div>
+                            <div className="order-detail-price-line"><span>Tax Amount:</span><span>${order.tax_amount?.toFixed(2)}</span></div>
+                            <hr />
+                            <div className="order-detail-price-line fw-bold"><span>Total:</span><span>${order.total_amount?.toFixed(2)}</span></div>
+                        </Card.Body>
+                    </Card>
+                </Col>
+
                 {/* Driver Duties Section */}
                 <Col md={12}>
                     <Card className="order-detail-card">
@@ -148,34 +176,6 @@ function OrderDetail() {
                                     </tbody>
                                 </Table>
                             )}
-                        </Card.Body>
-                    </Card>
-                </Col>
-
-                {/* Order Summary */}
-                <Col xs={12} md={6}>
-                    <Card className="order-detail-card h-100">
-                        <Card.Header as="h5">Order Summary</Card.Header>
-                        <Card.Body className="order-detail-section">
-                            <p><strong>Order Date:</strong> <span className="text-muted">{formatDate(order.order_date)}</span></p>
-                            <p><strong>Status:</strong> {renderBadge(order.status)}</p>
-                            <p><strong>Payment Method:</strong> <span className="text-muted">{order.payment_method || "N/A"}</span></p>
-                            <p><strong>Payment Status:</strong> {renderBadge(order.payment_status)}</p>
-                            <p><strong>Driver Accepted:</strong> {order.is_driver_accepted ? "Yes" : "No"}</p>
-                        </Card.Body>
-                    </Card>
-                </Col>
-
-                {/* Price Details */}
-                <Col xs={12} md={6}>
-                    <Card className="order-detail-card h-100">
-                        <Card.Header as="h5">Price Details</Card.Header>
-                        <Card.Body className="order-detail-section">
-                            <div className="order-detail-price-line"><span>Subtotal:</span><span>${order.subtotal?.toFixed(2)}</span></div>
-                            <div className="order-detail-price-line"><span>Delivery Fee:</span><span>${order.delivery_fee?.toFixed(2)}</span></div>
-                            <div className="order-detail-price-line"><span>Tax Amount:</span><span>${order.tax_amount?.toFixed(2)}</span></div>
-                            <hr />
-                            <div className="order-detail-price-line fw-bold"><span>Total:</span><span>${order.total_amount?.toFixed(2)}</span></div>
                         </Card.Body>
                     </Card>
                 </Col>
