@@ -245,7 +245,7 @@ function OrderDetail() {
                         <Card.Header>Delivery Information</Card.Header>
                         <Card.Body>
                             <p><strong>Address:</strong></p>
-                            <p>{order.delivery_address_id?.streetAddress || order.delivery_address_id?.savedAddress || "N/A"}</p>
+                            <p className="order-detail-address">{order.delivery_address_id?.streetAddress || order.delivery_address_id?.savedAddress || "N/A"}</p>
                             <p><strong>Distance:</strong> {order.distance?.toFixed(2)} km</p>
                             <p><strong>Estimated:</strong> {formatDate(order.estimated_delivery)}</p>
                             <p><strong>Delivered At:</strong> {formatDate(order.delivered_at)}</p>
@@ -258,7 +258,7 @@ function OrderDetail() {
                     <Card className="order-detail-card h-100">
                         <Card.Header>Additional Info</Card.Header>
                         <Card.Body>
-                            <p><strong>Notes:</strong> {order.notes || "No notes available"}</p>
+                            <p className="order-detail-notes"><strong>Notes:</strong> {order.notes || "No notes available"}</p>
                             <p><strong>Created At:</strong> {formatDate(order.created_at)}</p>
                             <p><strong>Updated At:</strong> {formatDate(order.updated_at)}</p>
                         </Card.Body>
