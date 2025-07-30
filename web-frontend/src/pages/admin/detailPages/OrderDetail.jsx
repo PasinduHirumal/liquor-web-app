@@ -106,6 +106,7 @@ function OrderDetail() {
                                 <strong>Payment Status:</strong>
                                 {renderBadge(order.payment_status, "payment")}
                             </p>
+                            <p><strong>Driver Accepted:</strong> {order.is_driver_accepted ? "Yes" : "No"}</p>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -220,7 +221,6 @@ function OrderDetail() {
                             <p className="order-detail-notes">{order.notes || "No notes available"}</p>
                             <p><strong>Created At:</strong> {formatDate(order.created_at)}</p>
                             <p><strong>Updated At:</strong> {formatDate(order.updated_at)}</p>
-                            <p><strong>Driver Accepted:</strong> {order.is_driver_accepted ? "Yes" : "No"}</p>
                         </Card.Body>
                     </Card>
                 </Col>
