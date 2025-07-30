@@ -29,6 +29,8 @@ const LiquorEditForm = () => {
 
     const [categories, setCategories] = useState([]);
     const [existingImages, setExistingImages] = useState([]);
+    const [existingMainImage, setExistingMainImage] = useState(null);
+    const [newMainImageBase64, setNewMainImageBase64] = useState(null);
     const [newImagesBase64, setNewImagesBase64] = useState([]);
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
@@ -68,6 +70,7 @@ const LiquorEditForm = () => {
                     is_liquor: product.is_liquor ?? true,
                 });
 
+                setExistingMainImage(product.main_image || null);
                 setExistingImages(product.images || []);
             } catch (err) {
                 toast.error("Failed to load product.");
@@ -160,6 +163,18 @@ const LiquorEditForm = () => {
             reader.onerror = (error) => reject(error);
         });
 
+    const handleMainImageChange = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        try {
+            const base64Image = await fileToBase64(file);
+            setNewMainImageBase64(base64Image);
+        } catch (error) {
+            toast.error("Failed to read main image file.");
+        }
+    };
+
     const handleNewImagesChange = async (e) => {
         const files = Array.from(e.target.files);
 
@@ -172,6 +187,14 @@ const LiquorEditForm = () => {
         }
     };
 
+    const removeExistingMainImage = () => {
+        setExistingMainImage(null);
+    };
+
+    const removeNewMainImage = () => {
+        setNewMainImageBase64(null);
+    };
+
     const removeExistingImage = (url) => {
         setExistingImages((prev) => prev.filter((img) => img !== url));
     };
@@ -179,7 +202,6 @@ const LiquorEditForm = () => {
     const removeNewImage = (index) => {
         setNewImagesBase64((prev) => prev.filter((_, i) => i !== index));
     };
-
 
     const handleInventoryUpdate = async (e) => {
         e.preventDefault();
@@ -219,8 +241,13 @@ const LiquorEditForm = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
 
+        if (!existingMainImage && !newMainImageBase64) {
+            toast.error("Please upload a main image before updating.");
+            return;
+        }
+
         if (existingImages.length + newImagesBase64.length === 0) {
-            toast.error("Please upload at least one image before updating.");
+            toast.error("Please upload at least one additional image before updating.");
             return;
         }
 
@@ -233,6 +260,7 @@ const LiquorEditForm = () => {
         try {
             const payload = {
                 ...formData,
+                main_image: newMainImageBase64 || existingMainImage,
                 images: [...existingImages, ...newImagesBase64],
                 marked_price: undefined,
                 discount_percentage: undefined,
@@ -531,16 +559,76 @@ const LiquorEditForm = () => {
                                     </Card.Body>
                                 </Card>
 
-                                {/* Images Section */}
+                                {/* Main Image Section */}
+                                <Card className="mb-4">
+                                    <Card.Header>
+                                        <h5 className="mb-0">Main Product Image</h5>
+                                    </Card.Header>
+                                    <Card.Body>
+                                        <div className="mb-3">
+                                            <Form.Label>Current Main Image</Form.Label>
+                                            {!existingMainImage && !newMainImageBase64 ? (
+                                                <Alert variant="info">No main image uploaded yet</Alert>
+                                            ) : (
+                                                <div className="d-flex justify-content-center">
+                                                    <div className="position-relative">
+                                                        <Image
+                                                            src={newMainImageBase64 || existingMainImage}
+                                                            alt="main-product"
+                                                            thumbnail
+                                                            style={{ width: '100%', maxHeight: '200px', objectFit: 'contain' }}
+                                                            onError={(e) => (e.target.src = "/placeholder-bottle.jpg")}
+                                                        />
+                                                        <Button
+                                                            variant="danger"
+                                                            size="sm"
+                                                            className="position-absolute top-0 end-0 p-0 rounded-circle"
+                                                            style={{ width: '20px', height: '20px', transform: 'translate(30%, -30%)' }}
+                                                            onClick={newMainImageBase64 ? removeNewMainImage : removeExistingMainImage}
+                                                            title="Remove image"
+                                                        >
+                                                            <XCircle size={16} />
+                                                        </Button>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        <div className="mb-3">
+                                            <Form.Label>Upload New Main Image</Form.Label>
+                                            <Form.Control
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleMainImageChange}
+                                                className="d-none"
+                                                id="mainImageUpload"
+                                            />
+                                            <Button
+                                                variant="outline-primary"
+                                                as="label"
+                                                htmlFor="mainImageUpload"
+                                                className="w-100 d-flex align-items-center justify-content-center gap-2"
+                                            >
+                                                <UploadCloud size={16} />
+                                                Upload Main Image
+                                            </Button>
+                                            <Form.Text className="text-muted">
+                                                Recommended ratio: 1:1 (square)
+                                            </Form.Text>
+                                        </div>
+                                    </Card.Body>
+                                </Card>
+
+                                {/* Additional Images Section */}
                                 <Card>
                                     <Card.Header>
-                                        <h5 className="mb-0">Product Images</h5>
+                                        <h5 className="mb-0">Additional Product Images</h5>
                                     </Card.Header>
                                     <Card.Body>
                                         <div className="mb-3">
                                             <Form.Label>Current Images</Form.Label>
                                             {existingImages.length === 0 ? (
-                                                <Alert variant="info">No images uploaded yet</Alert>
+                                                <Alert variant="info">No additional images uploaded yet</Alert>
                                             ) : (
                                                 <div className="d-flex flex-wrap gap-2">
                                                     {existingImages.map((url, idx) => (

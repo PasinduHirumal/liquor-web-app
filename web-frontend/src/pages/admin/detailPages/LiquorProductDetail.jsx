@@ -27,7 +27,7 @@ const LiquorProductDetail = () => {
                 if (!productData) throw new Error("Product not found");
 
                 setProduct(productData);
-                setActiveImage(productData.images?.[0] || null);
+                setActiveImage(productData.main_image || productData.images?.[0] || null);
             } catch (err) {
                 toast.error("Failed to load product details. Please try again later.");
                 navigate("/liquor-list");
@@ -118,23 +118,26 @@ const LiquorProductDetail = () => {
                                 )}
                             </div>
 
-                            {product.images?.length > 1 && (
+                            {/* Thumbnails */}
+                            {(product.main_image || product.images?.length) && (
                                 <div className="thumbnail-container">
-                                    {product.images.map((img, index) => (
-                                        <div
-                                            key={index}
-                                            className={`thumbnail ${activeImage === img ? "active" : ""}`}
-                                            onClick={() => setActiveImage(img)}
-                                        >
-                                            <img
-                                                src={img}
-                                                alt={`Thumbnail ${index + 1}`}
-                                                onError={(e) => {
-                                                    e.target.src = '/placeholder-bottle.jpg';
-                                                }}
-                                            />
-                                        </div>
-                                    ))}
+                                    {[product.main_image, ...(product.images || [])]
+                                        .filter((img, idx, arr) => img && arr.indexOf(img) === idx)
+                                        .map((img, index) => (
+                                            <div
+                                                key={index}
+                                                className={`thumbnail ${activeImage === img ? "active" : ""}`}
+                                                onClick={() => setActiveImage(img)}
+                                            >
+                                                <img
+                                                    src={img}
+                                                    alt={`Thumbnail ${index + 1}`}
+                                                    onError={(e) => {
+                                                        e.target.src = '/placeholder-bottle.jpg';
+                                                    }}
+                                                />
+                                            </div>
+                                        ))}
                                 </div>
                             )}
                         </div>
