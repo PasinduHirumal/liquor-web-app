@@ -160,8 +160,8 @@ const OtherProductCard = ({ product, showDetailButton = false }) => {
                         )}
                         <span
                             className={`badge ${product.is_in_stock
-                                    ? "bg-primary"
-                                    : "bg-warning text-dark"
+                                ? "bg-primary"
+                                : "bg-warning text-dark"
                                 }`}
                         >
                             {product.is_in_stock ? "Available" : "Unavailable"}

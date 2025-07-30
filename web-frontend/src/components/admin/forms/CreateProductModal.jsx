@@ -13,6 +13,7 @@ import {
 } from "react-bootstrap";
 import { axiosInstance } from "../../../lib/axios";
 import { FiUpload, FiX, FiImage } from "react-icons/fi";
+import toast from "react-hot-toast";
 
 const CreateProductModal = ({ show, onHide, onProductCreated }) => {
     const [formData, setFormData] = useState({
@@ -32,14 +33,16 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
     const [imagePreviews, setImagePreviews] = useState([]);
     const [categories, setCategories] = useState([]);
     const [categoriesLoading, setCategoriesLoading] = useState(false);
-    const [categoriesError, setCategoriesError] = useState(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const [error, setError] = useState(null);
 
-    // Handle main image upload and preview
     const handleMainImageChange = (e) => {
         const file = e.target.files[0];
         if (!file) return;
+
+        if (!file.type.match('image.*')) {
+            toast.error("Please upload an image file");
+            return;
+        }
 
         const reader = new FileReader();
         reader.onload = () => {
@@ -54,7 +57,6 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
         setMainImage(null);
     };
 
-    // Handle multiple images upload and previews
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
 
@@ -82,14 +84,13 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
 
         const fetchCategories = async () => {
             setCategoriesLoading(true);
-            setCategoriesError(null);
             try {
                 const res = await axiosInstance.get("/categories/getAll");
                 const activeCategories = (res.data.data || []).filter(cat => cat.is_active && !cat.is_liquor);
                 setCategories(activeCategories);
             } catch (err) {
-                setCategoriesError("Failed to fetch categories. Please try again.");
                 console.error("Category fetch error:", err);
+                toast.error("Failed to fetch categories. Please try again.");
             } finally {
                 setCategoriesLoading(false);
             }
@@ -106,26 +107,64 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
         }));
     };
 
+    const validateForm = () => {
+        if (!formData.name.trim()) {
+            toast.error("Product name is required");
+            return false;
+        }
+
+        if (!formData.description.trim()) {
+            toast.error("Description is required");
+            return false;
+        }
+
+        if (!formData.category_id) {
+            toast.error("Please select a category");
+            return false;
+        }
+
+        if (formData.cost_price <= 0) {
+            toast.error("Cost price must be greater than 0");
+            return false;
+        }
+
+        if (formData.marked_price <= 0) {
+            toast.error("Marked price must be greater than 0");
+            return false;
+        }
+
+        if (!mainImage) {
+            toast.error("Main product image is required");
+            return false;
+        }
+
+        return true;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validateForm()) return;
+
         setIsSubmitting(true);
-        setError(null);
 
         try {
             // Convert mainImage to base64 string
-            const mainImageBase64 = mainImage ? await new Promise((resolve) => {
+            const mainImageBase64 = await new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(mainImage.file);
                 reader.onload = () => resolve(reader.result);
-            }) : null;
+                reader.onerror = (error) => reject(error);
+            });
 
             // Convert all other images to base64 strings
             const base64Images = await Promise.all(
                 imagePreviews.map(img => {
-                    return new Promise((resolve) => {
+                    return new Promise((resolve, reject) => {
                         const reader = new FileReader();
                         reader.readAsDataURL(img.file);
                         reader.onload = () => resolve(reader.result);
+                        reader.onerror = (error) => reject(error);
                     });
                 })
             );
@@ -138,12 +177,16 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
 
             await axiosInstance.post("/other-products/create", payload);
 
+            toast.success("Product created successfully!");
             onProductCreated();
             handleReset();
             onHide();
         } catch (err) {
             console.error("Create product error:", err);
-            setError(err.response?.data?.message || "Failed to create product. Please check your inputs and try again.");
+            const errorMessage = err.response?.data?.message ||
+                err.response?.data?.error ||
+                "Failed to create product. Please try again.";
+            toast.error(errorMessage);
         } finally {
             setIsSubmitting(false);
         }
@@ -164,7 +207,6 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
         });
         setMainImage(null);
         setImagePreviews([]);
-        setError(null);
     };
 
     return (
@@ -185,12 +227,6 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
             </Modal.Header>
 
             <Modal.Body className="pt-1">
-                {error && (
-                    <Alert variant="danger" className="mb-4" onClose={() => setError(null)} dismissible>
-                        {error}
-                    </Alert>
-                )}
-
                 <Form onSubmit={handleSubmit}>
                     <Row className="g-3">
                         <Col md={6}>
@@ -228,15 +264,15 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                                         <Spinner animation="border" size="sm" className="me-2" />
                                         Loading categories...
                                     </div>
-                                ) : categoriesError ? (
-                                    <Alert variant="warning">{categoriesError}</Alert>
+                                ) : categories.length === 0 ? (
+                                    <Alert variant="warning">No active categories available</Alert>
                                 ) : (
                                     <Form.Select
                                         name="category_id"
                                         value={formData.category_id}
                                         onChange={handleInputChange}
                                         required
-                                        disabled={isSubmitting || categories.length === 0}
+                                        disabled={isSubmitting}
                                         className="py-3"
                                     >
                                         <option value="">-- Select Category --</option>
@@ -316,7 +352,6 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                                         onChange={handleImageChange}
                                         multiple
                                         accept="image/*"
-                                        disabled={isSubmitting}
                                         className="d-none"
                                     />
                                 </div>
@@ -365,7 +400,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                                                     value={formData.cost_price}
                                                     onChange={handleInputChange}
                                                     required
-                                                    min="0"
+                                                    min="0.01"
                                                     step="0.01"
                                                     disabled={isSubmitting}
                                                     placeholder="0.00"
@@ -380,7 +415,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                                                     value={formData.marked_price}
                                                     onChange={handleInputChange}
                                                     required
-                                                    min="0"
+                                                    min="0.01"
                                                     step="0.01"
                                                     disabled={isSubmitting}
                                                     placeholder="0.00"
