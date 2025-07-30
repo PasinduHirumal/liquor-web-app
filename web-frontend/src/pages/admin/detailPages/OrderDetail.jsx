@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { axiosInstance } from "../../../lib/axios";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { Card, Container, Row, Col, Badge, Image } from "react-bootstrap";
+import { Card, Container, Row, Col, Badge, Image, Table, Alert } from "react-bootstrap";
 import "../../../styles/OrderDetail.css";
 import AssignDriverModal from "../../../components/admin/forms/AssignDriverModal";
 import EditStatusModal from "../../../components/admin/forms/EditStatusModal";
@@ -14,24 +14,34 @@ function OrderDetail() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
 
+    const [driverDuties, setDriverDuties] = useState([]);
+    const [dutiesError, setDutiesError] = useState("");
+
     const [showAssignDriverModal, setShowAssignDriverModal] = useState(false);
     const [showEditStatusModal, setShowEditStatusModal] = useState(false);
 
     useEffect(() => {
-        const fetchOrderDetail = async () => {
+        const fetchData = async () => {
             try {
-                const res = await axiosInstance.get(`/orders/getOrderById/${id}`);
-                const data = Array.isArray(res.data.data) ? res.data.data[0] : res.data.data;
-                setOrder(data);
+                const [orderRes, dutiesRes] = await Promise.all([
+                    axiosInstance.get(`/orders/getOrderById/${id}`),
+                    axiosInstance.get(`/driverDuties/getAllForOrder/${id}`)
+                ]);
+
+                const orderData = Array.isArray(orderRes.data.data) ? orderRes.data.data[0] : orderRes.data.data;
+                setOrder(orderData);
+
+                setDriverDuties(dutiesRes.data?.data || []);
             } catch (err) {
-                console.error("Error fetching order:", err);
-                setError(err.response?.data?.message || "Failed to fetch order");
+                console.error("Error fetching data:", err);
+                setError(err?.response?.data?.message || "Failed to fetch order");
+                setDutiesError("Failed to fetch driver duties");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchOrderDetail();
+        fetchData();
     }, [id]);
 
     const formatDate = (timestamp) => {
@@ -39,11 +49,7 @@ function OrderDetail() {
         return new Date(timestamp._seconds * 1000).toLocaleString();
     };
 
-    if (loading) return <Skeleton count={8} />;
-    if (error) return <div className="alert alert-danger">Error: {error}</div>;
-    if (!order) return <div className="alert alert-warning">No order found.</div>;
-
-    const renderBadge = (value, type = "status") => {
+    const renderBadge = (value) => {
         if (!value) return null;
         let variant = "secondary";
         const val = value.toLowerCase();
@@ -55,7 +61,7 @@ function OrderDetail() {
             out_for_delivery: "primary",
             paid: "success",
             failed: "danger",
-            refunded: "info"
+            refunded: "info",
         };
         variant = map[val] || "secondary";
         return (
@@ -64,6 +70,10 @@ function OrderDetail() {
             </span>
         );
     };
+
+    if (loading) return <Skeleton count={10} />;
+    if (error) return <Alert variant="danger">Error: {error}</Alert>;
+    if (!order) return <Alert variant="warning">No order found.</Alert>;
 
     return (
         <Container className="order-detail-container py-4">
@@ -83,29 +93,58 @@ function OrderDetail() {
                 </Col>
             </Row>
 
-
             <Row className="g-4">
+
+                {/* Driver Duties Section */}
+                <Col md={12}>
+                    <Card className="order-detail-card">
+                        <Card.Header>Driver Duties</Card.Header>
+                        <Card.Body>
+                            {dutiesError ? (
+                                <Alert variant="danger">{dutiesError}</Alert>
+                            ) : driverDuties.length === 0 ? (
+                                <p>No driver duties found for this order.</p>
+                            ) : (
+                                <Table bordered responsive>
+                                    <thead>
+                                        <tr>
+                                            <th>Driver</th>
+                                            <th>Driver Email</th>
+                                            <th>Accepted</th>
+                                            <th>Completed</th>
+                                            <th>Reassigned</th>
+                                            <th>Created</th>
+                                            <th>Updated</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {driverDuties.map((duty, idx) => (
+                                            <tr key={idx}>
+                                                <td>{duty.driver_id?.username || "Unknown"}</td>
+                                                <td>{duty.driver_id?.email || "Unknown"}</td>
+                                                <td>{duty.is_driver_accepted ? "Yes" : "No"}</td>
+                                                <td>{duty.is_completed ? "Yes" : "No"}</td>
+                                                <td>{duty.is_re_assigning_driver ? "Yes" : "No"}</td>
+                                                <td>{formatDate(duty.created_at)}</td>
+                                                <td>{formatDate(duty.updated_at)}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </Table>
+                            )}
+                        </Card.Body>
+                    </Card>
+                </Col>
+
                 {/* Order Summary */}
                 <Col xs={12} md={6}>
                     <Card className="order-detail-card h-100">
                         <Card.Header as="h5">Order Summary</Card.Header>
                         <Card.Body className="order-detail-section">
-                            <p className="mb-3 order-detail-summery-line">
-                                <strong>Order Date:</strong>
-                                <span className="text-muted">{formatDate(order.order_date)}</span>
-                            </p>
-                            <p className="mb-3 order-detail-summery-line">
-                                <strong>Status:</strong>
-                                {renderBadge(order.status)}
-                            </p>
-                            <p className="mb-3 order-detail-summery-line">
-                                <strong>Payment Method:</strong>
-                                <span className="text-muted">{order.payment_method || "N/A"}</span>
-                            </p>
-                            <p className="mb-0 order-detail-summery-line">
-                                <strong>Payment Status:</strong>
-                                {renderBadge(order.payment_status, "payment")}
-                            </p>
+                            <p><strong>Order Date:</strong> <span className="text-muted">{formatDate(order.order_date)}</span></p>
+                            <p><strong>Status:</strong> {renderBadge(order.status)}</p>
+                            <p><strong>Payment Method:</strong> <span className="text-muted">{order.payment_method || "N/A"}</span></p>
+                            <p><strong>Payment Status:</strong> {renderBadge(order.payment_status)}</p>
                             <p><strong>Driver Accepted:</strong> {order.is_driver_accepted ? "Yes" : "No"}</p>
                         </Card.Body>
                     </Card>
@@ -116,31 +155,23 @@ function OrderDetail() {
                     <Card className="order-detail-card h-100">
                         <Card.Header as="h5">Price Details</Card.Header>
                         <Card.Body className="order-detail-section">
-                            <div className="order-detail-price-line">
-                                <span>Subtotal:</span><span>${order.subtotal?.toFixed(2)}</span>
-                            </div>
-                            <div className="order-detail-price-line">
-                                <span>Delivery Fee:</span><span>${order.delivery_fee?.toFixed(2)}</span>
-                            </div>
-                            <div className="order-detail-price-line">
-                                <span>Tax Amount:</span><span>${order.tax_amount?.toFixed(2)}</span>
-                            </div>
+                            <div className="order-detail-price-line"><span>Subtotal:</span><span>${order.subtotal?.toFixed(2)}</span></div>
+                            <div className="order-detail-price-line"><span>Delivery Fee:</span><span>${order.delivery_fee?.toFixed(2)}</span></div>
+                            <div className="order-detail-price-line"><span>Tax Amount:</span><span>${order.tax_amount?.toFixed(2)}</span></div>
                             <hr />
-                            <div className="order-detail-price-line fw-bold">
-                                <span>Total:</span><span>${order.total_amount?.toFixed(2)}</span>
-                            </div>
+                            <div className="order-detail-price-line fw-bold"><span>Total:</span><span>${order.total_amount?.toFixed(2)}</span></div>
                         </Card.Body>
                     </Card>
                 </Col>
 
-                {/* Items */}
+                {/* Order Items */}
                 <Col md={12}>
                     <Card className="order-detail-card">
                         <Card.Header>Order Items</Card.Header>
-                        <Card.Body className="order-detail-section">
+                        <Card.Body>
                             {order.items?.length > 0 ? (
                                 <div className="table-responsive">
-                                    <table className="table order-detail-table">
+                                    <Table striped bordered>
                                         <thead>
                                             <tr>
                                                 <th>Product</th>
@@ -154,20 +185,16 @@ function OrderDetail() {
                                             {order.items.map((item, i) => (
                                                 <tr key={i}>
                                                     <td>{item.product_name}</td>
-                                                    <td>
-                                                        <Image src={item.product_image} width="50" rounded />
-                                                    </td>
+                                                    <td><Image src={item.product_image} width="50" rounded /></td>
                                                     <td>{item.quantity}</td>
                                                     <td>${item.unit_price?.toFixed(2)}</td>
                                                     <td>${item.total_price?.toFixed(2)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
-                                    </table>
+                                    </Table>
                                 </div>
-                            ) : (
-                                <p>No items found.</p>
-                            )}
+                            ) : <p>No items found.</p>}
                         </Card.Body>
                     </Card>
                 </Col>
@@ -176,7 +203,7 @@ function OrderDetail() {
                 <Col xs={12} md={6}>
                     <Card className="order-detail-card h-100">
                         <Card.Header>Customer Information</Card.Header>
-                        <Card.Body className="order-detail-section">
+                        <Card.Body>
                             <p><strong>Name:</strong> {order.user_id?.username || "N/A"}</p>
                             <p><strong>Email:</strong> {order.user_id?.email || "N/A"}</p>
                             <p><strong>User ID:</strong> {order.user_id?.id || "N/A"}</p>
@@ -188,7 +215,7 @@ function OrderDetail() {
                 <Col xs={12} md={6}>
                     <Card className="order-detail-card h-100">
                         <Card.Header>Driver Information</Card.Header>
-                        <Card.Body className="order-detail-section">
+                        <Card.Body>
                             <p><strong>Name:</strong> {order.assigned_driver_id?.username || "N/A"}</p>
                             <p><strong>Email:</strong> {order.assigned_driver_id?.email || "N/A"}</p>
                             <p><strong>Driver ID:</strong> {order.assigned_driver_id?.id || "N/A"}</p>
@@ -196,15 +223,13 @@ function OrderDetail() {
                     </Card>
                 </Col>
 
-                {/* Delivery Information */}
+                {/* Delivery Info */}
                 <Col xs={12} md={6}>
                     <Card className="order-detail-card h-100">
                         <Card.Header>Delivery Information</Card.Header>
-                        <Card.Body className="order-detail-section">
+                        <Card.Body>
                             <p><strong>Address:</strong></p>
-                            <p className="order-detail-address">
-                                {order.delivery_address_id?.streetAddress || order.delivery_address_id?.savedAddress || "N/A"}
-                            </p>
+                            <p>{order.delivery_address_id?.streetAddress || order.delivery_address_id?.savedAddress || "N/A"}</p>
                             <p><strong>Distance:</strong> {order.distance?.toFixed(2)} km</p>
                             <p><strong>Estimated:</strong> {formatDate(order.estimated_delivery)}</p>
                             <p><strong>Delivered At:</strong> {formatDate(order.delivered_at)}</p>
@@ -212,19 +237,19 @@ function OrderDetail() {
                     </Card>
                 </Col>
 
-                {/* Notes + Timestamps */}
+                {/* Notes & Timestamps */}
                 <Col xs={12} md={6}>
                     <Card className="order-detail-card h-100">
                         <Card.Header>Additional Info</Card.Header>
-                        <Card.Body className="order-detail-section">
-                            <p><strong>Notes:</strong></p>
-                            <p className="order-detail-notes">{order.notes || "No notes available"}</p>
+                        <Card.Body>
+                            <p><strong>Notes:</strong> {order.notes || "No notes available"}</p>
                             <p><strong>Created At:</strong> {formatDate(order.created_at)}</p>
                             <p><strong>Updated At:</strong> {formatDate(order.updated_at)}</p>
                         </Card.Body>
                     </Card>
                 </Col>
             </Row>
+
             <AssignDriverModal
                 show={showAssignDriverModal}
                 handleClose={() => setShowAssignDriverModal(false)}
@@ -236,7 +261,6 @@ function OrderDetail() {
                 handleClose={() => setShowEditStatusModal(false)}
                 orderId={order.order_id}
             />
-
         </Container>
     );
 }
