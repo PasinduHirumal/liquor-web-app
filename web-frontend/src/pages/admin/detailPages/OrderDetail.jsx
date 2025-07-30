@@ -44,10 +44,27 @@ function OrderDetail() {
         fetchData();
     }, [id]);
 
-    const formatDate = (timestamp) => {
-        if (!timestamp || !timestamp._seconds) return "N/A";
-        return new Date(timestamp._seconds * 1000).toLocaleString();
+    const formatDate = (value) => {
+        if (!value) return "N/A";
+
+        // Handle Firebase Timestamp
+        if (value._seconds) {
+            return new Date(value._seconds * 1000).toLocaleString();
+        }
+
+        // Handle Firestore Timestamp with toDate()
+        if (value.toDate) {
+            return value.toDate().toLocaleString();
+        }
+
+        // Handle ISO strings or JS Date-compatible strings
+        try {
+            return new Date(value).toLocaleString();
+        } catch (err) {
+            return "Invalid date";
+        }
     };
+
 
     const renderBadge = (value) => {
         if (!value) return null;
