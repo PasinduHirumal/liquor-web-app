@@ -27,7 +27,7 @@ const createDefaultSuperAdmin = async () => {
             await adminService.create(superAdminData);
             console.log("✅ Default Account created.");
         } else {
-            console.log("ℹ️ Default Account already exists.");
+            console.log("✅ Default Account already exists.");
         }
     } catch (error) {
         console.error("❌ Error creating default Account:", error);

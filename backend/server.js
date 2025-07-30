@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import initializeFirebase from "./src/config/firebase.config.js";
 import { initializeDefaultSuperAdmin } from "./src/initialize/defaultSuperAdminAccount.js";
+import { initializeDefaultCompanyDetails } from "./src/initialize/defaultCompanyDetails.js";
 
 import authRoutes from "./src/routes/auth.routes.js";
 import verifyRoutes from "./src/routes/verify.routes.js";
@@ -17,15 +18,24 @@ import otherProductRoutes from "./src/routes/otherProducts.routes.js";
 import stockHistoryRoutes from "./src/routes/stockHistory.routes.js";
 import ordersRoutes from "./src/routes/orders.routes.js";
 import driverDutyRoutes from "./src/routes/driverDuty.routes.js";
+import companyDetailsRoutes from "./src/routes/companyDetails.routes.js";
 
 dotenv.config();
 
 // connect DB
 initializeFirebase();
 
-initializeDefaultSuperAdmin().then(() => {
-  console.log('✅ Server initialization completed.....\n');
-});
+const initializeDefaults = async () => {
+  try {
+    await initializeDefaultSuperAdmin();
+    await initializeDefaultCompanyDetails();
+    console.log('✅ Server initialization completed.....\n');
+  } catch (error) {
+    console.error('❌ Server initialization failed:', error);
+  }
+};
+
+initializeDefaults();
 
 const app = express();
 app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000", credentials: true }));
@@ -46,6 +56,7 @@ app.use("/api/other-products", otherProductRoutes);
 app.use("/api/stockHistory", stockHistoryRoutes);
 app.use("/api/orders", ordersRoutes);
 app.use("/api/driverDuties", driverDutyRoutes);
+app.use("/api/system", companyDetailsRoutes);
 
 
 //  Route handler for the root path
