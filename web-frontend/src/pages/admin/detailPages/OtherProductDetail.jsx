@@ -30,7 +30,7 @@ const OtherProductDetail = () => {
                     throw new Error("Product not found");
                 }
                 setProduct(data.data);
-                setActiveImage(data.data.images?.[0] || null);
+                setActiveImage(data.data.main_image || data.data.images?.[0] || null)
                 setError(null);
             } catch (err) {
                 console.error("Fetch product error:", err);
@@ -170,9 +170,26 @@ const OtherProductDetail = () => {
                                 )}
                             </div>
 
-                            {product.images?.length > 1 && (
+                            {(product.main_image || (product.images && product.images.length > 0)) && (
                                 <div className="thumbnail-gallery">
-                                    {product.images.map((img, index) => (
+                                    {/* Show main_image first if exists */}
+                                    {product.main_image && (
+                                        <div
+                                            className={`thumbnail-item ${activeImage === product.main_image ? 'active' : ''}`}
+                                            onClick={() => setActiveImage(product.main_image)}
+                                        >
+                                            <img
+                                                src={product.main_image}
+                                                alt="Main Image Thumbnail"
+                                                onError={(e) => {
+                                                    e.target.src = '/placeholder-bottle.jpg';
+                                                }}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {/* Show other images except main_image */}
+                                    {product.images?.filter(img => img !== product.main_image).map((img, index) => (
                                         <div
                                             key={index}
                                             className={`thumbnail-item ${activeImage === img ? 'active' : ''}`}

@@ -14,7 +14,7 @@ import {
     Image,
     FloatingLabel
 } from "react-bootstrap";
-import { XCircle, UploadCloud, CheckCircle } from "react-feather";
+import { XCircle, UploadCloud, CheckCircle, Image as ImageIcon } from "react-feather";
 
 const OtherProductEditForm = () => {
     const { id } = useParams();
@@ -33,6 +33,7 @@ const OtherProductEditForm = () => {
         is_active: true,
         is_in_stock: true,
         weight: 0,
+        main_image: "",
         images: []
     });
 
@@ -68,6 +69,7 @@ const OtherProductEditForm = () => {
                     is_active: product.is_active ?? true,
                     is_in_stock: product.is_in_stock ?? true,
                     weight: product.weight || 0,
+                    main_image: product.main_image || "",
                     images: product.images || []
                 });
             } catch (error) {
@@ -103,32 +105,47 @@ const OtherProductEditForm = () => {
         }
     };
 
-    const handleImageUpload = async (e) => {
-        const files = Array.from(e.target.files);
+    const handleImageUpload = async (e, isMainImage = false) => {
+        const file = e.target.files[0];
+        if (!file) return;
 
         try {
-            const base64Promises = files.map(file => {
-                return new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.readAsDataURL(file);
-                    reader.onload = () => resolve(reader.result);
-                });
+            const base64Image = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
             });
 
-            const newImages = await Promise.all(base64Promises);
-            setFormData(prev => ({
-                ...prev,
-                images: [...prev.images, ...newImages]
-            }));
+            if (isMainImage) {
+                setFormData(prev => ({ ...prev, main_image: base64Image }));
+            } else {
+                setFormData(prev => ({
+                    ...prev,
+                    images: [...prev.images, base64Image]
+                }));
+            }
         } catch (error) {
-            toast.error("Failed to process images");
+            toast.error("Failed to process image");
         }
     };
 
-    const removeImage = (index) => {
+    const removeImage = (index, isMainImage = false) => {
+        if (isMainImage) {
+            setFormData(prev => ({ ...prev, main_image: "" }));
+        } else {
+            setFormData(prev => ({
+                ...prev,
+                images: prev.images.filter((_, i) => i !== index)
+            }));
+        }
+    };
+
+    const setAsMainImage = (image) => {
+        // Remove from images array and set as main image
         setFormData(prev => ({
             ...prev,
-            images: prev.images.filter((_, i) => i !== index)
+            main_image: image,
+            images: prev.images.filter(img => img !== image)
         }));
     };
 
@@ -161,6 +178,7 @@ const OtherProductEditForm = () => {
                 is_active: formData.is_active,
                 is_in_stock: formData.is_in_stock,
                 weight: formData.weight,
+                main_image: formData.main_image,
                 images: formData.images
             });
 
@@ -410,14 +428,64 @@ const OtherProductEditForm = () => {
                                     </Card.Body>
                                 </Card>
 
-                                {/* Images */}
-                                <Card>
-                                    <Card.Header><h5>Product Images</h5></Card.Header>
+                                {/* Main Image */}
+                                <Card className="mb-4">
+                                    <Card.Header>
+                                        <h5>Main Image</h5>
+                                    </Card.Header>
                                     <Card.Body>
-                                        {errors.images && (
-                                            <Alert variant="danger" className="mb-3">{errors.images}</Alert>
+                                        {formData.main_image ? (
+                                            <div className="position-relative mb-3">
+                                                <Image
+                                                    src={formData.main_image}
+                                                    thumbnail
+                                                    fluid
+                                                    className="w-100"
+                                                    style={{ maxHeight: "200px", objectFit: "contain" }}
+                                                />
+                                                <Button
+                                                    variant="danger"
+                                                    size="sm"
+                                                    className="position-absolute top-0 end-0 m-1 rounded-circle"
+                                                    onClick={() => removeImage(null, true)}
+                                                >
+                                                    <XCircle size={16} />
+                                                </Button>
+                                            </div>
+                                        ) : (
+                                            <div className="text-center py-4 border rounded mb-3">
+                                                <ImageIcon size={48} className="text-muted mb-2" />
+                                                <p className="text-muted">No main image selected</p>
+                                            </div>
                                         )}
 
+                                        <Form.Group controlId="mainImageUpload">
+                                            <Form.Control
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={(e) => handleImageUpload(e, true)}
+                                                className="d-none"
+                                                id="mainImageUpload"
+                                            />
+                                            <Button
+                                                variant="outline-primary"
+                                                as="label"
+                                                htmlFor="mainImageUpload"
+                                                className="w-100"
+                                            >
+                                                <UploadCloud className="me-2" />
+                                                {formData.main_image ? "Change Main Image" : "Upload Main Image"}
+                                            </Button>
+                                        </Form.Group>
+                                    </Card.Body>
+                                </Card>
+
+                                {/* Gallery Images */}
+                                <Card>
+                                    <Card.Header>
+                                        <h5>Gallery Images</h5>
+                                    </Card.Header>
+                                    <Card.Body>
                                         {formData.images.length > 0 ? (
                                             <div className="d-flex flex-wrap gap-2 mb-3">
                                                 {formData.images.map((img, index) => (
@@ -426,7 +494,8 @@ const OtherProductEditForm = () => {
                                                             src={img}
                                                             thumbnail
                                                             style={{ width: 80, height: 80, objectFit: 'cover' }}
-                                                            onError={(e) => e.target.src = '/placeholder-image.png'}
+                                                            onClick={() => setAsMainImage(img)}
+                                                            className="cursor-pointer"
                                                         />
                                                         <Button
                                                             variant="danger"
@@ -441,28 +510,27 @@ const OtherProductEditForm = () => {
                                                 ))}
                                             </div>
                                         ) : (
-                                            <Alert variant="info" className="mb-3">No images uploaded</Alert>
+                                            <Alert variant="info" className="mb-3">No gallery images</Alert>
                                         )}
 
-                                        <Form.Group controlId="imageUpload" className="mb-3">
+                                        <Form.Group controlId="galleryImageUpload">
                                             <Form.Control
                                                 type="file"
                                                 multiple
                                                 accept="image/*"
                                                 onChange={handleImageUpload}
                                                 className="d-none"
-                                                id="productImageUpload"
+                                                id="galleryImageUpload"
                                             />
                                             <Button
-                                                variant="outline-primary"
+                                                variant="outline-secondary"
                                                 as="label"
-                                                htmlFor="productImageUpload"
+                                                htmlFor="galleryImageUpload"
                                                 className="w-100"
                                             >
                                                 <UploadCloud className="me-2" />
-                                                Select Images
+                                                Add Gallery Images
                                             </Button>
-                                            <Form.Text>{formData.images.length} image(s) selected</Form.Text>
                                         </Form.Group>
                                     </Card.Body>
                                 </Card>
@@ -470,7 +538,9 @@ const OtherProductEditForm = () => {
                         </Row>
 
                         <div className="d-flex justify-content-end gap-3 mt-4">
-                            <Button variant="outline-secondary" onClick={() => navigate(-1)} disabled={submitting}>Cancel</Button>
+                            <Button variant="outline-secondary" onClick={() => navigate(-1)} disabled={submitting}>
+                                Cancel
+                            </Button>
                             <Button variant="primary" type="submit" disabled={submitting}>
                                 {submitting ? (
                                     <>

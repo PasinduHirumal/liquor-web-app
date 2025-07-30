@@ -1,17 +1,41 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const OtherProductCard = ({ product, showDetailButton = false }) => {
-    const [activeImage, setActiveImage] = useState(product.images?.[0]);
+    // Combine main_image and images into one array for thumbnails
+    const combinedImages = React.useMemo(() => {
+        const imgs = product.images ? [...product.images] : [];
+        // Add main_image at front if defined and not already included
+        if (product.main_image && !imgs.includes(product.main_image)) {
+            imgs.unshift(product.main_image);
+        }
+        return imgs;
+    }, [product.images, product.main_image]);
+
+    // Initialize activeImage with main_image or first combined image or null
+    const [activeImage, setActiveImage] = useState(null);
+
     const navigate = useNavigate();
+
+    // Set initial activeImage on mount or product change
+    useEffect(() => {
+        if (product.main_image) {
+            setActiveImage(product.main_image);
+        } else if (combinedImages.length > 0) {
+            setActiveImage(combinedImages[0]);
+        } else {
+            setActiveImage(null);
+        }
+    }, [product.main_image, combinedImages]);
 
     const handleViewDetail = () => {
         navigate(`/other-products/${product.product_id}`);
     };
 
-    const displayPrice = product.discount_percentage > 0
-        ? product.selling_price
-        : product.marked_price;
+    const displayPrice =
+        product.discount_percentage > 0
+            ? product.selling_price
+            : product.marked_price;
 
     return (
         <div className="col-12 col-sm-6 col-md-4 col-lg-2 mb-4">
@@ -19,7 +43,9 @@ const OtherProductCard = ({ product, showDetailButton = false }) => {
                 className="card h-100 shadow-sm"
                 style={{
                     transition: "transform 0.2s ease-in-out",
-                    border: product.is_liquor ? "1px solid #dc3545" : "1px solid #dee2e6"
+                    border: product.is_liquor
+                        ? "1px solid #dc3545"
+                        : "1px solid #dee2e6",
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
                 onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
@@ -34,7 +60,7 @@ const OtherProductCard = ({ product, showDetailButton = false }) => {
                             height: "200px",
                             objectFit: "contain",
                             backgroundColor: "#f8f9fa",
-                            borderBottom: "1px solid #eee"
+                            borderBottom: "1px solid #eee",
                         }}
                     />
                 ) : (
@@ -42,7 +68,7 @@ const OtherProductCard = ({ product, showDetailButton = false }) => {
                         className="d-flex justify-content-center align-items-center bg-light"
                         style={{
                             height: "200px",
-                            borderBottom: "1px solid #eee"
+                            borderBottom: "1px solid #eee",
                         }}
                     >
                         <small className="text-muted">No Image Available</small>
@@ -50,9 +76,9 @@ const OtherProductCard = ({ product, showDetailButton = false }) => {
                 )}
 
                 {/* Thumbnail Previews */}
-                {product.images?.length > 1 && (
+                {combinedImages.length > 1 && (
                     <div className="d-flex justify-content-center gap-1 py-2 px-1 flex-wrap">
-                        {product.images.map((img, idx) => (
+                        {combinedImages.map((img, idx) => (
                             <img
                                 key={idx}
                                 src={img}
@@ -63,7 +89,10 @@ const OtherProductCard = ({ product, showDetailButton = false }) => {
                                     height: "30px",
                                     objectFit: "cover",
                                     cursor: "pointer",
-                                    border: img === activeImage ? "2px solid #007bff" : "1px solid #ddd",
+                                    border:
+                                        img === activeImage
+                                            ? "2px solid #007bff"
+                                            : "1px solid #ddd",
                                     borderRadius: "3px",
                                 }}
                             />
@@ -102,7 +131,11 @@ const OtherProductCard = ({ product, showDetailButton = false }) => {
 
                     {/* Stock Information */}
                     <div className="d-flex justify-content-between align-items-center mb-2">
-                        <small className={product.stock_quantity > 0 ? "text-success" : "text-danger"}>
+                        <small
+                            className={
+                                product.stock_quantity > 0 ? "text-success" : "text-danger"
+                            }
+                        >
                             <strong>
                                 {product.stock_quantity > 0
                                     ? `${product.stock_quantity} in stock`
@@ -116,15 +149,21 @@ const OtherProductCard = ({ product, showDetailButton = false }) => {
 
                     {/* Status Badges */}
                     <div className="mb-2">
-                        <span className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"}`}>
+                        <span
+                            className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"
+                                }`}
+                        >
                             {product.is_active ? "Active" : "Inactive"}
                         </span>
                         {product.is_liquor && (
-                            <span className="badge bg-danger me-1">
-                                Liquor
-                            </span>
+                            <span className="badge bg-danger me-1">Liquor</span>
                         )}
-                        <span className={`badge ${product.is_in_stock ? "bg-primary" : "bg-warning text-dark"}`}>
+                        <span
+                            className={`badge ${product.is_in_stock
+                                ? "bg-primary"
+                                : "bg-warning text-dark"
+                                }`}
+                        >
                             {product.is_in_stock ? "Available" : "Unavailable"}
                         </span>
                     </div>
