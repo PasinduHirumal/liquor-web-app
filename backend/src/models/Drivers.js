@@ -29,9 +29,9 @@ class Drivers {
         // Account & Status
         this.role = data.role;
         this.googleId = data.googleId;
-        this.isAvailable = data.isAvailable;
-        this.isActive = data.isActive;
-        this.isOnline = data.isOnline;
+        this.isAvailable = data.isAvailable; // available or busy (he is on delivery)
+        this.isActive = data.isActive; // active or inactive account
+        this.isOnline = data.isOnline; // driver logged in or logout
         this.isDocumentVerified = data.isDocumentVerified;
         this.backgroundCheckStatus = data.backgroundCheckStatus;
 
