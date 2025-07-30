@@ -28,6 +28,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
         is_in_stock: true,
     });
 
+    const [mainImage, setMainImage] = useState(null);
     const [imagePreviews, setImagePreviews] = useState([]);
     const [categories, setCategories] = useState([]);
     const [categoriesLoading, setCategoriesLoading] = useState(false);
@@ -35,7 +36,25 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState(null);
 
-    // Convert image File to base64 string and create preview
+    // Handle main image upload and preview
+    const handleMainImageChange = (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            if (reader.readyState === 2) {
+                setMainImage({ file, preview: reader.result });
+            }
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const removeMainImage = () => {
+        setMainImage(null);
+    };
+
+    // Handle multiple images upload and previews
     const handleImageChange = (e) => {
         const files = Array.from(e.target.files);
 
@@ -93,7 +112,14 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
         setError(null);
 
         try {
-            // Convert all images to base64
+            // Convert mainImage to base64 string
+            const mainImageBase64 = mainImage ? await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(mainImage.file);
+                reader.onload = () => resolve(reader.result);
+            }) : null;
+
+            // Convert all other images to base64 strings
             const base64Images = await Promise.all(
                 imagePreviews.map(img => {
                     return new Promise((resolve) => {
@@ -106,6 +132,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
 
             const payload = {
                 ...formData,
+                main_image: mainImageBase64,
                 images: base64Images,
             };
 
@@ -135,6 +162,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
             is_active: true,
             is_in_stock: true,
         });
+        setMainImage(null);
         setImagePreviews([]);
         setError(null);
     };
@@ -166,6 +194,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                 <Form onSubmit={handleSubmit}>
                     <Row className="g-3">
                         <Col md={6}>
+                            {/* Basic info */}
                             <FloatingLabel controlId="name" label="Product Name" className="mb-3">
                                 <Form.Control
                                     type="text"
@@ -191,6 +220,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                                 />
                             </FloatingLabel>
 
+                            {/* Category */}
                             <Form.Group className="mb-3">
                                 <Form.Label>Category</Form.Label>
                                 {categoriesLoading ? (
@@ -219,8 +249,56 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                                 )}
                             </Form.Group>
 
+                            {/* Main Image Upload */}
+                            <Form.Group controlId="main_image" className="mb-3">
+                                <Form.Label>Main Product Image</Form.Label>
+                                <div className="border rounded p-3 text-center mb-3">
+                                    {mainImage ? (
+                                        <div className="position-relative d-inline-block">
+                                            <Image
+                                                src={mainImage.preview}
+                                                alt="Main Image Preview"
+                                                thumbnail
+                                                style={{ maxHeight: '200px', maxWidth: '100%' }}
+                                            />
+                                            <Button
+                                                variant="danger"
+                                                size="sm"
+                                                className="position-absolute top-0 end-0 p-0 rounded-circle"
+                                                style={{ width: '24px', height: '24px' }}
+                                                onClick={removeMainImage}
+                                                disabled={isSubmitting}
+                                            >
+                                                <FiX size={16} />
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <>
+                                            <label
+                                                htmlFor="main-image-upload"
+                                                className="d-flex flex-column align-items-center justify-content-center"
+                                                style={{ cursor: 'pointer', minHeight: '100px' }}
+                                            >
+                                                <FiUpload size={24} className="mb-2" />
+                                                <span>Click to upload main image</span>
+                                                <small className="text-muted">(JPEG, PNG, etc.)</small>
+                                            </label>
+                                            <Form.Control
+                                                id="main-image-upload"
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleMainImageChange}
+                                                disabled={isSubmitting}
+                                                className="d-none"
+                                            />
+                                        </>
+                                    )}
+                                </div>
+                            </Form.Group>
+
+                            {/* Multiple Images Upload */}
                             <Form.Group controlId="images" className="mb-3">
-                                <Form.Label>Product Images</Form.Label>
+                                <Form.Label>Other Product Images</Form.Label>
                                 <div className="border rounded p-3 text-center mb-3">
                                     <label
                                         htmlFor="product-images-upload"
@@ -274,6 +352,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                         </Col>
 
                         <Col md={6}>
+                            {/* Pricing */}
                             <Card className="mb-3">
                                 <Card.Body>
                                     <h6 className="mb-3">Pricing Information</h6>
@@ -343,6 +422,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                                 </Card.Body>
                             </Card>
 
+                            {/* Additional Info */}
                             <Card className="mb-3">
                                 <Card.Body>
                                     <h6 className="mb-3">Additional Information</h6>
