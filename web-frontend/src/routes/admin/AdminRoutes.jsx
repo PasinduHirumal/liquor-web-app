@@ -100,7 +100,7 @@ export const adminRoutes = [
         element: <LiquorList />
     },
     {
-        path: "/admin/profile/:id",
+        path: "/profile/:id",
         element: <AdminProfile />
     },
     {

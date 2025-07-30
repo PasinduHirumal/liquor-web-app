@@ -215,13 +215,12 @@ const AdminNavbar = () => {
                         </StyledNavLink>
 
                         <StyledNavLink
-                            to={`/admin/profile/${user?._id || user?.id}`}
+                            to={`/profile/${user?._id || user?.id}`}
                             onClick={closeMobileMenu}
                             sx={{ mr: 2 }}
                         >
                             Profile
                         </StyledNavLink>
-
 
                         <Button variant="contained" color="error" startIcon={<LogoutIcon />} onClick={handleLogout}>
                             Logout
@@ -355,7 +354,7 @@ const AdminNavbar = () => {
                             </StyledNavLink>
 
                             <StyledNavLink
-                                to={`/admin/profile/${user?._id || user?.id}`}
+                                to={`/profile/${user?._id || user?.id}`}
                                 onClick={closeMobileMenu}
                                 sx={{ mb: 2 }}
                             >
