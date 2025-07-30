@@ -3,6 +3,7 @@ import { useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
 import { format } from "date-fns";
+import { FaUserCircle } from "react-icons/fa";
 
 const AdminProfile = () => {
     const { id } = useParams();
@@ -15,11 +16,11 @@ const AdminProfile = () => {
             setLoading(true);
             setError(null);
             const { data } = await axiosInstance.get(`/admin/getById/${id}`);
-            
+
             if (!data?.data) {
                 throw new Error("Admin data not found in response");
             }
-            
+
             setAdmin(data.data);
         } catch (error) {
             console.error("Error fetching admin:", error);
@@ -72,7 +73,7 @@ const AdminProfile = () => {
             <div className="container mt-5">
                 <div className="alert alert-danger text-center">
                     {error}
-                    <button 
+                    <button
                         className="btn btn-sm btn-outline-danger ms-3"
                         onClick={fetchAdminDetails}
                     >
@@ -94,7 +95,7 @@ const AdminProfile = () => {
     }
 
     return (
-        <div className="container py-4">
+        <div className="container-fluid py-4">
             <div className="row justify-content-center">
                 <div className="col-md-10 col-lg-8">
                     <div className="card shadow-sm border-0 rounded-3">
@@ -105,18 +106,7 @@ const AdminProfile = () => {
                             <div className="d-flex flex-column flex-md-row align-items-center mb-4">
                                 <div className="mb-3 mb-md-0 me-md-4">
                                     <div className="bg-light rounded-circle p-3 d-flex align-items-center justify-content-center" style={{ width: "100px", height: "100px" }}>
-                                        <svg
-                                            xmlns="http://www.w3.org/2000/svg"
-                                            width="60"
-                                            height="60"
-                                            fill="#0d6efd"
-                                            className="bi bi-person-circle"
-                                            viewBox="0 0 16 16"
-                                        >
-                                            <path d="M13.468 12.37C12.758 11.226 11.474 10.5 10 10.5c-1.474 0-2.758.726-3.468 1.87A6.987 6.987 0 0 1 8 15a6.987 6.987 0 0 1 5.468-2.63z" />
-                                            <path fillRule="evenodd" d="M8 9a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
-                                            <path fillRule="evenodd" d="M8 1a7 7 0 1 0 0 14A7 7 0 0 0 8 1z" />
-                                        </svg>
+                                        <FaUserCircle size={60} color="#0d6efd" />
                                     </div>
                                 </div>
                                 <div className="text-center text-md-start">
