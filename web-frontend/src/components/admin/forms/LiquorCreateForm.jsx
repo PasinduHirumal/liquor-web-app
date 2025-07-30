@@ -40,6 +40,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
     const [images, setImages] = useState([]);
+    const [mainImage, setMainImage] = useState(null);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -75,7 +76,13 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
 
         Promise.all(readers)
             .then((base64Images) => {
-                setImages(prev => [...prev, ...base64Images]);
+                setImages(prev => {
+                    const updated = [...prev, ...base64Images];
+                    if (!mainImage && updated.length > 0) {
+                        setMainImage(updated[0]);
+                    }
+                    return updated;
+                });
             })
             .catch((err) => {
                 toast.error(err.message || 'Failed to read image files');
@@ -84,7 +91,13 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
     };
 
     const removeImage = (index) => {
-        setImages(images.filter((_, i) => i !== index));
+        setImages((prev) => {
+            const updated = prev.filter((_, i) => i !== index);
+            if (prev[index] === mainImage) {
+                setMainImage(updated[0] || null);
+            }
+            return updated;
+        });
     };
 
     const handleSubmit = async (values) => {
@@ -99,6 +112,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
             const payload = {
                 ...values,
                 images: images,
+                main_image: mainImage,
                 is_liquor: true,
                 add_quantity: 0,
                 withdraw_quantity: 0
@@ -413,11 +427,20 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                                     <Form.Label>Image Preview</Form.Label>
                                     <div className="d-flex flex-wrap gap-3">
                                         {images.map((img, index) => (
-                                            <ImagePreview
-                                                key={index}
-                                                src={img}
-                                                onRemove={() => removeImage(index)}
-                                            />
+                                            <div key={index} className="position-relative">
+                                                <ImagePreview
+                                                    src={img}
+                                                    onRemove={() => removeImage(index)}
+                                                />
+                                                <Form.Check
+                                                    type="radio"
+                                                    name="mainImage"
+                                                    label="Main"
+                                                    checked={mainImage === img}
+                                                    onChange={() => setMainImage(img)}
+                                                    className="position-absolute top-0 start-0 m-2 bg-white px-2 rounded"
+                                                />
+                                            </div>
                                         ))}
                                     </div>
                                 </div>

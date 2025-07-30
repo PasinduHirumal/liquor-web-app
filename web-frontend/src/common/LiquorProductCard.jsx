@@ -1,9 +1,20 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const LiquorProductCard = ({ product, detailButton = false }) => {
-  const [activeImage, setActiveImage] = useState(product.images?.[0]);
   const navigate = useNavigate();
+
+  // Combine main_image + images[] without duplication
+  const combinedImages = [
+    ...(product.main_image ? [product.main_image] : []),
+    ...(product.images || []),
+  ].filter((value, index, self) => self.indexOf(value) === index); // Remove duplicates
+
+  const [activeImage, setActiveImage] = useState(combinedImages?.[0]);
+
+  useEffect(() => {
+    setActiveImage(combinedImages?.[0]);
+  }, [product]);
 
   const handleViewDetail = () => {
     navigate(`/products/${product.product_id || product.id}`);
@@ -18,13 +29,10 @@ const LiquorProductCard = ({ product, detailButton = false }) => {
     <div className="col-12 col-sm-6 col-md-4 col-lg-2 mb-4">
       <div
         className="card h-100 shadow-sm"
-        style={{
-          transition: "transform 0.2s ease-in-out"
-        }}
+        style={{ transition: "transform 0.2s ease-in-out" }}
         onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
         onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
       >
-        {/* Main Image */}
         {activeImage ? (
           <img
             src={activeImage}
@@ -40,19 +48,16 @@ const LiquorProductCard = ({ product, detailButton = false }) => {
         ) : (
           <div
             className="d-flex justify-content-center align-items-center bg-light"
-            style={{
-              height: "200px",
-              borderBottom: "1px solid #eee",
-            }}
+            style={{ height: "200px", borderBottom: "1px solid #eee" }}
           >
             <small className="text-muted">No Image Available</small>
           </div>
         )}
 
         {/* Thumbnails */}
-        {product.images?.length > 1 && (
+        {combinedImages.length > 1 && (
           <div className="d-flex justify-content-center gap-1 py-2 px-1 flex-wrap">
-            {product.images.map((img, idx) => (
+            {combinedImages.map((img, idx) => (
               <img
                 key={idx}
                 src={img}
@@ -63,10 +68,7 @@ const LiquorProductCard = ({ product, detailButton = false }) => {
                   height: "30px",
                   objectFit: "cover",
                   cursor: "pointer",
-                  border:
-                    img === activeImage
-                      ? "2px solid #007bff"
-                      : "1px solid #ccc",
+                  border: img === activeImage ? "2px solid #007bff" : "1px solid #ccc",
                   borderRadius: "3px",
                 }}
               />
@@ -74,7 +76,6 @@ const LiquorProductCard = ({ product, detailButton = false }) => {
           </div>
         )}
 
-        {/* Product Details */}
         <div className="card-body d-flex flex-column">
           <h6 className="card-title text-truncate mb-1">{product.name}</h6>
 
@@ -84,7 +85,7 @@ const LiquorProductCard = ({ product, detailButton = false }) => {
             </small>
           </p>
 
-          {/* Price Display */}
+          {/* Price */}
           <div className="mb-1">
             {product.discount_percentage > 0 ? (
               <>
@@ -99,18 +100,14 @@ const LiquorProductCard = ({ product, detailButton = false }) => {
                 </span>
               </>
             ) : (
-              <span className="fw-bold">
-                ${displayPrice?.toFixed(2) || "0.00"}
-              </span>
+              <span className="fw-bold">${displayPrice?.toFixed(2) || "0.00"}</span>
             )}
           </div>
 
-          {/* Stock Info */}
+          {/* Stock */}
           <div className="d-flex justify-content-between align-items-center mb-2">
             <small
-              className={
-                product.stock_quantity > 0 ? "text-success" : "text-danger"
-              }
+              className={product.stock_quantity > 0 ? "text-success" : "text-danger"}
             >
               <strong>
                 {product.stock_quantity > 0
@@ -123,7 +120,7 @@ const LiquorProductCard = ({ product, detailButton = false }) => {
             </small>
           </div>
 
-          {/* Status Badges */}
+          {/* Badges */}
           <div className="mb-2">
             <span
               className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"
@@ -139,7 +136,7 @@ const LiquorProductCard = ({ product, detailButton = false }) => {
             </span>
           </div>
 
-          {/* Detail Button */}
+          {/* Button */}
           {detailButton && (
             <div className="card-footer mt-auto text-center">
               <button
