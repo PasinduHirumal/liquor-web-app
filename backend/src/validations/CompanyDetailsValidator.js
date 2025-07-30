@@ -1,3 +1,5 @@
+import Joi from 'joi';
+
 // UPDATE VALIDATOR - NO defaults, all fields optional
 const validateCompanyDetailsUpdate = (req, res, next) => {
   const schema = Joi.object({
