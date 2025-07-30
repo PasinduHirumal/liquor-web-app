@@ -43,8 +43,7 @@ const AdminNavbar = () => {
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    const [manageMemberOpen, setManageMemberOpen] = useState(false);
-    const [manageProductOpen, setManageProductOpen] = useState(false);
+    const [manageDropDownOpen, setManageDropDownOpen] = useState(false);
 
     const handleLogout = async () => {
         await logout();
@@ -55,8 +54,7 @@ const AdminNavbar = () => {
     const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
     const closeMobileMenu = () => {
         setMobileMenuOpen(false);
-        setManageMemberOpen(false);
-        setManageProductOpen(false);
+        setManageDropDownOpen(false);
     };
 
     return (
@@ -89,22 +87,22 @@ const AdminNavbar = () => {
                         {/* ManageProduct Dropdown simulated */}
                         <Box sx={{ position: "relative" }}>
                             <Button
-                                onClick={() => setManageProductOpen((prev) => !prev)}
+                                onClick={() => setManageDropDownOpen((prev) => !prev)}
                                 sx={{
                                     color: "white",
                                     textTransform: "none",
-                                    fontWeight: manageProductOpen ? "bold" : "normal",
-                                    bgcolor: manageProductOpen ? "#333" : "transparent",
+                                    fontWeight: manageDropDownOpen ? "bold" : "normal",
+                                    bgcolor: manageDropDownOpen ? "#333" : "transparent",
                                     "&:hover": {
                                         bgcolor: "#444",
                                     },
                                 }}
-                                endIcon={manageProductOpen ? <ExpandLess /> : <ExpandMore />}
+                                endIcon={manageDropDownOpen ? <ExpandLess /> : <ExpandMore />}
                             >
-                                Manage Products
+                                Management Panels
                             </Button>
 
-                            {manageProductOpen && (
+                            {manageDropDownOpen && (
                                 <Box
                                     sx={{
                                         position: "absolute",
@@ -121,7 +119,7 @@ const AdminNavbar = () => {
                                         to="/liquor-list"
                                         onClick={() => {
                                             closeMobileMenu();
-                                            setManageProductOpen(false);
+                                            setManageDropDownOpen(false);
                                         }}
                                         style={{ display: "block", padding: "8px 16px" }}
                                     >
@@ -131,52 +129,19 @@ const AdminNavbar = () => {
                                         to="/other-product-list"
                                         onClick={() => {
                                             closeMobileMenu();
-                                            setManageProductOpen(false);
+                                            setManageDropDownOpen(false);
                                         }}
                                         style={{ display: "block", padding: "8px 16px" }}
                                     >
                                         Other Product
                                     </StyledNavLink>
-                                </Box>
-                            )}
-                        </Box>
 
-                        {/* ManageMembers Dropdown simulated */}
-                        <Box sx={{ position: "relative" }}>
-                            <Button
-                                onClick={() => setManageMemberOpen((prev) => !prev)}
-                                sx={{
-                                    color: "white",
-                                    textTransform: "none",
-                                    fontWeight: manageMemberOpen ? "bold" : "normal",
-                                    bgcolor: manageMemberOpen ? "#333" : "transparent",
-                                    "&:hover": {
-                                        bgcolor: "#444",
-                                    },
-                                }}
-                                endIcon={manageMemberOpen ? <ExpandLess /> : <ExpandMore />}
-                            >
-                                Manage Memberes
-                            </Button>
-
-                            {manageMemberOpen && (
-                                <Box
-                                    sx={{
-                                        position: "absolute",
-                                        top: "100%",
-                                        left: 0,
-                                        bgcolor: "#1e1e1e",
-                                        borderRadius: 1,
-                                        boxShadow: theme.shadows[5],
-                                        zIndex: theme.zIndex.tooltip,
-                                        minWidth: 140,
-                                    }}
-                                >
+                                    {/* ManageMembers */}
                                     <StyledNavLink
                                         to="/users-list"
                                         onClick={() => {
                                             closeMobileMenu();
-                                            setManageMemberOpen(false);
+                                            setManageDropDownOpen(false);
                                         }}
                                         style={{ display: "block", padding: "8px 16px" }}
                                     >
@@ -186,7 +151,7 @@ const AdminNavbar = () => {
                                         to="/driver-list"
                                         onClick={() => {
                                             closeMobileMenu();
-                                            setManageMemberOpen(false);
+                                            setManageDropDownOpen(false);
                                         }}
                                         style={{ display: "block", padding: "8px 16px" }}
                                     >
@@ -196,23 +161,37 @@ const AdminNavbar = () => {
                                         to="/admin-users-list"
                                         onClick={() => {
                                             closeMobileMenu();
-                                            setManageMemberOpen(false);
+                                            setManageDropDownOpen(false);
                                         }}
                                         style={{ display: "block", padding: "8px 16px" }}
                                     >
                                         Admin Users
                                     </StyledNavLink>
+
+                                    {/* Manage Category & Order */}
+                                    <StyledNavLink
+                                        to="/category"
+                                        onClick={() => {
+                                            closeMobileMenu();
+                                            setManageDropDownOpen(false);
+                                        }}
+                                        style={{ display: "block", padding: "8px 16px" }}
+                                    >
+                                        Category
+                                    </StyledNavLink>
+                                    <StyledNavLink
+                                        to="/order-list"
+                                        onClick={() => {
+                                            closeMobileMenu();
+                                            setManageDropDownOpen(false);
+                                        }}
+                                        style={{ display: "block", padding: "8px 16px" }}
+                                    >
+                                        Orders
+                                    </StyledNavLink>
                                 </Box>
                             )}
                         </Box>
-
-                        <StyledNavLink to="/category" onClick={closeMobileMenu}>
-                            Manage Category
-                        </StyledNavLink>
-
-                        <StyledNavLink to="/order-list" onClick={closeMobileMenu}>
-                            Manage Orders
-                        </StyledNavLink>
 
                         <StyledNavLink
                             to={`/profile/${user?._id || user?.id}`}
@@ -271,7 +250,7 @@ const AdminNavbar = () => {
                             {/* Mobile ManageProduct section */}
                             <List disablePadding sx={{ mb: 2, bgcolor: "transparent" }}>
                                 <ListItemButton
-                                    onClick={() => setManageProductOpen((prev) => !prev)}
+                                    onClick={() => setManageDropDownOpen((prev) => !prev)}
                                     sx={{
                                         color: "white",
                                         px: 0,
@@ -280,10 +259,10 @@ const AdminNavbar = () => {
                                         },
                                     }}
                                 >
-                                    <ListItemText primary="Manage Products" />
-                                    {manageProductOpen ? <ExpandLess sx={{ color: "white" }} /> : <ExpandMore sx={{ color: "white" }} />}
+                                    <ListItemText primary="Management panels" />
+                                    {manageDropDownOpen ? <ExpandLess sx={{ color: "white" }} /> : <ExpandMore sx={{ color: "white" }} />}
                                 </ListItemButton>
-                                <Collapse in={manageProductOpen} timeout="auto" unmountOnExit>
+                                <Collapse in={manageDropDownOpen} timeout="auto" unmountOnExit>
                                     <Box sx={{ pl: 2 }}>
                                         <StyledNavLink
                                             to="/liquor-list"
@@ -299,27 +278,8 @@ const AdminNavbar = () => {
                                         >
                                             Other Product
                                         </StyledNavLink>
-                                    </Box>
-                                </Collapse>
-                            </List>
 
-                            {/* Mobile ManageMemberes section */}
-                            <List disablePadding sx={{ mb: 2, bgcolor: "transparent" }}>
-                                <ListItemButton
-                                    onClick={() => setManageMemberOpen((prev) => !prev)}
-                                    sx={{
-                                        color: "white",
-                                        px: 0,
-                                        "&.Mui-expanded": {
-                                            fontWeight: "bold",
-                                        },
-                                    }}
-                                >
-                                    <ListItemText primary="Manage Memberes" />
-                                    {manageMemberOpen ? <ExpandLess sx={{ color: "white" }} /> : <ExpandMore sx={{ color: "white" }} />}
-                                </ListItemButton>
-                                <Collapse in={manageMemberOpen} timeout="auto" unmountOnExit>
-                                    <Box sx={{ pl: 2 }}>
+                                        {/* Mobile Manage Memberes */}
                                         <StyledNavLink
                                             to="/users-list"
                                             onClick={closeMobileMenu}
@@ -341,17 +301,24 @@ const AdminNavbar = () => {
                                         >
                                             Admin Users
                                         </StyledNavLink>
+
+                                        <StyledNavLink
+                                            to="/category"
+                                            onClick={closeMobileMenu}
+                                            sx={{ display: "block" }}
+                                        >
+                                            Category
+                                        </StyledNavLink>
+                                        <StyledNavLink
+                                            to="/order-list"
+                                            onClick={closeMobileMenu}
+                                            sx={{ display: "block" }}
+                                        >
+                                            Orders
+                                        </StyledNavLink>
                                     </Box>
                                 </Collapse>
                             </List>
-
-                            <StyledNavLink to="/category" onClick={closeMobileMenu} sx={{ mb: 2 }}>
-                                Manage Category
-                            </StyledNavLink>
-
-                            <StyledNavLink to="/order-list" onClick={closeMobileMenu} sx={{ mb: 2 }}>
-                                Manage Orders
-                            </StyledNavLink>
 
                             <StyledNavLink
                                 to={`/profile/${user?._id || user?.id}`}
