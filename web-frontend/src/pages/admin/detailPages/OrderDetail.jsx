@@ -65,7 +65,6 @@ function OrderDetail() {
         }
     };
 
-
     const renderBadge = (value) => {
         if (!value) return null;
         let variant = "secondary";
