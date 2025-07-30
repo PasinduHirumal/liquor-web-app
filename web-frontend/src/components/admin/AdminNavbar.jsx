@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
     AppBar,
@@ -47,6 +47,33 @@ const AdminNavbar = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [manageDropDownOpen, setManageDropDownOpen] = useState(false);
 
+    const dropdownRef = useRef(null);
+    const mobileMenuRef = useRef(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                dropdownRef.current &&
+                !dropdownRef.current.contains(event.target)
+            ) {
+                setManageDropDownOpen(false);
+            }
+
+            if (
+                mobileMenuRef.current &&
+                !mobileMenuRef.current.contains(event.target) &&
+                !event.target.closest('[aria-label="menu"]')
+            ) {
+                setMobileMenuOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, []);
+
     const handleLogout = async () => {
         await logout();
         navigate("/");
@@ -87,7 +114,7 @@ const AdminNavbar = () => {
                         </StyledNavLink>
 
                         {/* ManageProduct Dropdown simulated */}
-                        <Box sx={{ position: "relative" }}>
+                        <Box sx={{ position: "relative" }} ref={dropdownRef}>
                             <Button
                                 onClick={() => setManageDropDownOpen((prev) => !prev)}
                                 sx={{
@@ -244,6 +271,7 @@ const AdminNavbar = () => {
                 {isMobile && (
                     <Slide direction="left" in={mobileMenuOpen} mountOnEnter unmountOnExit>
                         <Box
+                            ref={mobileMenuRef}
                             sx={{
                                 position: "fixed",
                                 top: { xs: 56, sm: 64 },
