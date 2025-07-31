@@ -1,12 +1,22 @@
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
-import { Table, Spin, message, Tag, Button, Tooltip } from "antd";
+import { Table, Spin, message, Tag, Button, Tooltip, Select } from "antd";
 import { useNavigate } from "react-router-dom";
 import { ArrowRightOutlined } from "@ant-design/icons";
 
+const ORDER_STATUS = {
+    PENDING: "PENDING",
+    CONFIRMED: "CONFIRMED",
+    OUT_FOR_DELIVERY: "OUT_FOR_DELIVERY",
+    DELIVERED: "DELIVERED",
+    CANCELLED: "CANCELLED"
+};
+
 function OrderList() {
     const [orders, setOrders] = useState([]);
+    const [filteredOrders, setFilteredOrders] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [statusFilter, setStatusFilter] = useState(null);
     const navigate = useNavigate();
 
     const formatDate = (timestamp) => {
@@ -17,9 +27,14 @@ function OrderList() {
     useEffect(() => {
         const fetchOrders = async () => {
             try {
-                const response = await axiosInstance.get("/orders/getAllOrders");
+                const url = statusFilter
+                    ? `/orders/getAllOrders?status=${statusFilter.toLowerCase()}`
+                    : "/orders/getAllOrders";
+
+                const response = await axiosInstance.get(url);
                 if (response.data?.success) {
                     setOrders(response.data.data);
+                    setFilteredOrders(response.data.data);
                 } else {
                     message.error("Failed to load orders");
                 }
@@ -32,7 +47,11 @@ function OrderList() {
         };
 
         fetchOrders();
-    }, []);
+    }, [statusFilter]);
+
+    const handleStatusFilterChange = (value) => {
+        setStatusFilter(value);
+    };
 
     const getStatusTag = (status) => {
         const colorMap = {
@@ -136,12 +155,26 @@ function OrderList() {
 
     return (
         <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
-            <h1 style={{ fontSize: "24px", fontWeight: "bold", marginBottom: "20px" }}>
-                Order List
-            </h1>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+                <h1 style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>
+                    Order List
+                </h1>
+                <Select
+                    placeholder="Filter by status"
+                    style={{ width: 200 }}
+                    onChange={handleStatusFilterChange}
+                    allowClear
+                >
+                    <Select.Option value={ORDER_STATUS.PENDING}>Pending</Select.Option>
+                    <Select.Option value={ORDER_STATUS.CONFIRMED}>Confirmed</Select.Option>
+                    <Select.Option value={ORDER_STATUS.OUT_FOR_DELIVERY}>Out for Delivery</Select.Option>
+                    <Select.Option value={ORDER_STATUS.DELIVERED}>Delivered</Select.Option>
+                    <Select.Option value={ORDER_STATUS.CANCELLED}>Cancelled</Select.Option>
+                </Select>
+            </div>
             <Table
                 columns={columns}
-                dataSource={orders}
+                dataSource={filteredOrders}
                 rowKey="order_id"
                 bordered
                 pagination={{ pageSize: 10 }}
