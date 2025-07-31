@@ -1,25 +1,14 @@
 import React, { useState, useRef, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
-    AppBar,
-    Toolbar,
-    IconButton,
-    Button,
-    Box,
-    useMediaQuery,
-    useTheme,
-    styled,
-    Slide,
-    Fade,
-    Collapse,
-    List,
-    ListItemButton,
-    ListItemText,
-    Typography,
-    ListSubheader
+    AppBar, Toolbar, IconButton, Button, Box, useMediaQuery, useTheme, styled, Slide, Fade,
+    Collapse, List, ListItemButton, ListItemText, Typography, ListSubheader
 } from "@mui/material";
 import { Menu as MenuIcon, Close as CloseIcon, Logout as LogoutIcon, ExpandMore, ExpandLess } from "@mui/icons-material";
+import Badge from "@mui/material/Badge";
+import MailIcon from "@mui/icons-material/Mail";
 import useAdminAuthStore from "../../stores/adminAuthStore";
+import { getPendingOrdersCount } from "../../lib/orderApi";
 
 const StyledNavLink = styled(NavLink)(({ theme }) => ({
     color: theme.palette.common.white,
@@ -49,6 +38,25 @@ const AdminNavbar = () => {
 
     const dropdownRef = useRef(null);
     const mobileMenuRef = useRef(null);
+
+    const [pendingCount, setPendingCount] = useState(0);
+
+    useEffect(() => {
+        const fetchPendingCount = async () => {
+            try {
+                const count = await getPendingOrdersCount();
+                setPendingCount(count);
+            } catch (error) {
+                console.error("Failed to fetch pending orders count:", error);
+            }
+        };
+
+        fetchPendingCount();
+
+        // Optionally refresh every X seconds:
+        const interval = setInterval(fetchPendingCount, 60000); // every 60 seconds
+        return () => clearInterval(interval);
+    }, []);
 
     useEffect(() => {
         const handleClickOutside = (event) => {
@@ -225,13 +233,12 @@ const AdminNavbar = () => {
                             )}
                         </Box>
 
-                        <StyledNavLink
-                            to={`/order-list`}
-                            onClick={closeMobileMenu}
-                            sx={{ mr: 2 }}
-                        >
-                            Orders
+                        <StyledNavLink to={`/order-list`} onClick={closeMobileMenu} sx={{ mr: 2 }}>
+                            <Badge badgeContent={pendingCount} color="error">
+                                Orders
+                            </Badge>
                         </StyledNavLink>
+
                         <StyledNavLink
                             to={`/syetem-detail`}
                             onClick={closeMobileMenu}
@@ -239,6 +246,7 @@ const AdminNavbar = () => {
                         >
                             System Detail
                         </StyledNavLink>
+
                         <StyledNavLink
                             to={`/profile/${user?._id || user?.id}`}
                             onClick={closeMobileMenu}
@@ -376,13 +384,12 @@ const AdminNavbar = () => {
                                 </Collapse>
                             </List>
 
-                            <StyledNavLink
-                                to={`/order-list`}
-                                onClick={closeMobileMenu}
-                                sx={{ mb: 2 }}
-                            >
-                                Orders
+                            <StyledNavLink to={`/order-list`} onClick={closeMobileMenu}>
+                                <Badge badgeContent={pendingCount} color="error" sx={{ mb: 2 }}>
+                                    Orders
+                                </Badge>
                             </StyledNavLink>
+
                             <StyledNavLink
                                 to={`/syetem-detail`}
                                 onClick={closeMobileMenu}
@@ -390,6 +397,7 @@ const AdminNavbar = () => {
                             >
                                 System Detail
                             </StyledNavLink>
+
                             <StyledNavLink
                                 to={`/profile/${user?._id || user?.id}`}
                                 onClick={closeMobileMenu}
