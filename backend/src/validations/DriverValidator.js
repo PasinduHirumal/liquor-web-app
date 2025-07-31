@@ -2,6 +2,8 @@ import Joi from 'joi';
 import { defaultNullImageSchema, optionalImageSchema } from './imageValidationSchemas.js';
 import phoneValidator from './phoneNumberValidationSchema.js';
 import nicValidator from './nicValidationSchema.js';
+import BACKGROUND_STATUS from '../enums/driverBackgroundStatus.js';
+import DELIVERY_VEHICLES from '../enums/deliveryVehicles.js';
 
 // CREATE VALIDATOR - With defaults
 const validateDriver = (req, res, next) => {
@@ -25,7 +27,7 @@ const validateDriver = (req, res, next) => {
     emergencyContact: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).allow('').default(null),
 
     // Vehicle Information
-    vehicleType: Joi.string().valid('car', 'motorcycle', 'bicycle', 'van', 'truck').default(null),
+    vehicleType: Joi.string().valid(...Object.values(DELIVERY_VEHICLES)).default(null),
     vehicleModel: Joi.string().max(100).allow('').default(null),
     vehicleNumber: Joi.string().max(50).allow('').default(null),
     vehicleColor: Joi.string().max(50).allow('').default(null),
@@ -40,7 +42,7 @@ const validateDriver = (req, res, next) => {
     isActive: Joi.boolean().default(true),
     isOnline: Joi.boolean().default(false),
     isDocumentVerified: Joi.boolean().default(false),
-    backgroundCheckStatus: Joi.string().valid('pending', 'approved', 'rejected').default('pending'),
+    backgroundCheckStatus: Joi.string().valid(...Object.values(BACKGROUND_STATUS)).default(BACKGROUND_STATUS.PENDING),
 
     // Location & Delivery
     currentLocation: Joi.object({
@@ -202,7 +204,7 @@ const validateDriverUpdate = (req, res, next) => {
     isActive: Joi.boolean().optional(),
     isOnline: Joi.boolean().optional(),
     isDocumentVerified: Joi.boolean().optional(),
-    backgroundCheckStatus: Joi.string().valid('pending', 'approved', 'rejected').optional(),
+    backgroundCheckStatus: Joi.string().valid(...Object.values(BACKGROUND_STATUS)).optional(),
 
     // Verification & Security
     verifyOtp: Joi.string().allow('').optional(),
@@ -255,7 +257,7 @@ const validateDriverUpdate = (req, res, next) => {
 const validateVehicleInformationUpdate = (req, res, next) => {
   const schema = Joi.object({
     // Vehicle Information
-    vehicleType: Joi.string().valid('car', 'motorcycle', 'bicycle', 'van', 'truck').optional(),
+    vehicleType: Joi.string().valid(...Object.values(DELIVERY_VEHICLES)).optional(),
     vehicleModel: Joi.string().max(100).allow('').optional(),
     vehicleNumber: Joi.string().max(50).allow('').optional(),
     vehicleColor: Joi.string().max(50).allow('').optional(),

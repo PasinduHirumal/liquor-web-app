@@ -1,5 +1,6 @@
 import DriverService from "../services/driver.service.js";
 import ADMIN_ROLES from '../enums/adminRoles.js';
+import BACKGROUND_STATUS from "../enums/driverBackgroundStatus.js";
 import { uploadImages, uploadSingleImage } from '../utils/firebaseStorage.js';
 
 const driverService = new DriverService();
@@ -61,7 +62,11 @@ const createDriver = async (req, res) => {
 
 const getAllDrivers = async (req, res) => {
 	try {
-        const { isActive, isAvailable, isOnline, isDocumentVerified } = req.query;
+        const { isActive, isAvailable, isOnline, isDocumentVerified, backgroundCheckStatus } = req.query;
+
+        if (backgroundCheckStatus && !Object.values(BACKGROUND_STATUS).includes(backgroundCheckStatus)) {
+            return res.status(400).json({ success: false, message: "Invalid status value" });
+        }
 
         const drivers = await driverService.findAll();
         if (!drivers) {
@@ -90,6 +95,10 @@ const getAllDrivers = async (req, res) => {
             const isActiveBoolean = isDocumentVerified === 'true';
             filteredDrivers = filteredDrivers.filter(driver => driver.isDocumentVerified === isActiveBoolean);
             filterDescription.push(`isDocumentVerified: ${isDocumentVerified}`);
+        }
+        if (backgroundCheckStatus !== undefined) {
+            filteredDrivers = filteredDrivers.filter(driver => driver.backgroundCheckStatus === backgroundCheckStatus);
+            filterDescription.push(`backgroundCheckStatus: ${backgroundCheckStatus}`);
         }
 
         // Remove password field from each driver object
