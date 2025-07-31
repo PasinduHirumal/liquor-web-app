@@ -11,7 +11,7 @@ import {
     Form,
 } from "react-bootstrap";
 import { PencilSquare } from "react-bootstrap-icons";
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
 const SystemDetail = () => {
     const [companyDetail, setCompanyDetail] = useState(null);
@@ -38,9 +38,7 @@ const SystemDetail = () => {
                     service_charge: data.service_charge ?? "",
                 });
             } catch (err) {
-                toast.error(
-                    err.response?.data?.message || "Failed to fetch system details"
-                );
+                toast.error(err.response?.data?.message || "Failed to fetch system details");
             } finally {
                 setLoading(false);
             }
@@ -49,7 +47,7 @@ const SystemDetail = () => {
         fetchCompanyDetail();
     }, []);
 
-    // Handle form input change
+    // Input change handler
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         if (name === "lat" || name === "lng") {
@@ -68,9 +66,43 @@ const SystemDetail = () => {
         }
     };
 
-    // Handle form submit
+    // Validation before submit
+    const validateFormData = () => {
+        const lat = parseFloat(formData.where_house_location.lat);
+        const lng = parseFloat(formData.where_house_location.lng);
+
+        if (isNaN(lat) || lat < -90 || lat > 90) {
+            toast.error("Warehouse latitude must be between -90 and 90");
+            return false;
+        }
+
+        if (isNaN(lng) || lng < -180 || lng > 180) {
+            toast.error("Warehouse longitude must be between -180 and 180");
+            return false;
+        }
+
+        if (
+            formData.delivery_charge_for_1KM === "" ||
+            Number(formData.delivery_charge_for_1KM) < 0
+        ) {
+            toast.error("Delivery charge per 1KM must be a non-negative number");
+            return false;
+        }
+
+        if (formData.service_charge === "" || Number(formData.service_charge) < 0) {
+            toast.error("Service charge must be a non-negative number");
+            return false;
+        }
+
+        return true;
+    };
+
+    // Submit handler with validation
     const handleSubmit = async (e) => {
         e.preventDefault();
+
+        if (!validateFormData()) return;
+
         setModalLoading(true);
         try {
             await axiosInstance.patch(`/system/update/${companyDetail.id}`, formData);
@@ -79,9 +111,7 @@ const SystemDetail = () => {
             toast.success("System details updated successfully");
             setShowModal(false);
         } catch (err) {
-            toast.error(
-                err.response?.data?.message || "Failed to update system details"
-            );
+            toast.error(err.response?.data?.message || "Failed to update system details");
         } finally {
             setModalLoading(false);
         }
@@ -151,7 +181,7 @@ const SystemDetail = () => {
                                 {/* Edit Modal */}
                                 <Modal
                                     show={showModal}
-                                    onHide={() => setShowModal(false)}
+                                    onHide={() => !modalLoading && setShowModal(false)}
                                     backdrop="static"
                                     keyboard={!modalLoading}
                                 >
