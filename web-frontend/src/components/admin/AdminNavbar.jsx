@@ -233,16 +233,21 @@ const AdminNavbar = () => {
                             )}
                         </Box>
 
-                        <StyledNavLink to={`/order-list`} onClick={closeMobileMenu} sx={{ mr: 2 }}>
-                            <Badge badgeContent={pendingCount} color="error">
-                                Orders
+                        <StyledNavLink to={`/order-list`} onClick={closeMobileMenu} sx={{ px: 3 }}>
+                            <Badge
+                                badgeContent={pendingCount}
+                                color="error"
+                                sx={{ "& .MuiBadge-badge": { right: -10, top: 6 } }}
+                            >
+                                <Box component="span" sx={{ pr: 1 }}>
+                                    Orders
+                                </Box>
                             </Badge>
                         </StyledNavLink>
 
                         <StyledNavLink
                             to={`/syetem-detail`}
                             onClick={closeMobileMenu}
-                            sx={{ mr: 2 }}
                         >
                             System Detail
                         </StyledNavLink>
@@ -384,9 +389,15 @@ const AdminNavbar = () => {
                                 </Collapse>
                             </List>
 
-                            <StyledNavLink to={`/order-list`} onClick={closeMobileMenu}>
-                                <Badge badgeContent={pendingCount} color="error" sx={{ mb: 2 }}>
-                                    Orders
+                            <StyledNavLink to={`/order-list`} onClick={closeMobileMenu} sx={{ px: 3, mb: 2 }}>
+                                <Badge
+                                    badgeContent={pendingCount}
+                                    color="error"
+                                    sx={{ "& .MuiBadge-badge": { right: -10, top: 6 } }}
+                                >
+                                    <Box component="span" sx={{ pr: 1 }}>
+                                        Orders
+                                    </Box>
                                 </Badge>
                             </StyledNavLink>
 
