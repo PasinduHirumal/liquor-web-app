@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
+import { Container, Row, Col, Card, Spinner, Alert } from "react-bootstrap";
 
 const SystemDetail = () => {
     const [companyDetail, setCompanyDetail] = useState(null);
@@ -21,48 +22,63 @@ const SystemDetail = () => {
         fetchCompanyDetail();
     }, []);
 
-    if (loading) return <p>Loading system details...</p>;
-    if (error) return <p style={{ color: "red" }}>{error}</p>;
-
     return (
-        <div style={{ padding: "24px" }}>
-            <h1>System Details</h1>
-            <div
-                style={{
-                    border: "1px solid #ccc",
-                    padding: "20px",
-                    borderRadius: "10px",
-                    maxWidth: "600px",
-                    background: "#f9f9f9"
-                }}
-            >
-                <p>
-                    <strong>Warehouse Location:</strong><br />
-                    Latitude: {companyDetail?.where_house_location?.lat ?? "N/A"}<br />
-                    Longitude: {companyDetail?.where_house_location?.lng ?? "N/A"}
-                </p>
-                <p>
-                    <strong>Delivery Charge per 1KM:</strong>{" "}
-                    {companyDetail?.delivery_charge_for_1KM ?? "N/A"}
-                </p>
-                <p>
-                    <strong>Service Charge:</strong>{" "}
-                    {companyDetail?.service_charge ?? "N/A"}
-                </p>
-                <p>
-                    <strong>Created At:</strong>{" "}
-                    {companyDetail?.created_at
-                        ? new Date(companyDetail.created_at).toLocaleString()
-                        : "N/A"}
-                </p>
-                <p>
-                    <strong>Updated At:</strong>{" "}
-                    {companyDetail?.updated_at
-                        ? new Date(companyDetail.updated_at).toLocaleString()
-                        : "N/A"}
-                </p>
-            </div>
-        </div>
+        <Container className="py-5">
+            <Row className="justify-content-center">
+                <Col xs={12} md={8} lg={6}>
+                    <h2 className="text-center mb-4">System Details</h2>
+
+                    {loading ? (
+                        <div className="d-flex justify-content-center">
+                            <Spinner animation="border" variant="primary" role="status">
+                                <span className="visually-hidden">Loading...</span>
+                            </Spinner>
+                        </div>
+                    ) : error ? (
+                        <Alert variant="danger" className="text-center">
+                            {error}
+                        </Alert>
+                    ) : (
+                        <Card className="shadow-sm">
+                            <Card.Body>
+                                <Card.Text>
+                                    <strong>Warehouse Location:</strong><br />
+                                    Latitude: {companyDetail?.where_house_location?.lat ?? "N/A"}<br />
+                                    Longitude: {companyDetail?.where_house_location?.lng ?? "N/A"}
+                                </Card.Text>
+
+                                <Card.Text>
+                                    <strong>Delivery Charge per 1KM:</strong>{" "}
+                                    {companyDetail?.delivery_charge_for_1KM ?? "N/A"}
+                                </Card.Text>
+
+                                <Card.Text>
+                                    <strong>Service Charge:</strong>{" "}
+                                    {companyDetail?.service_charge ?? "N/A"}
+                                </Card.Text>
+
+                                {/* 
+                                <Card.Text>
+                                    <strong>Created At:</strong>{" "}
+                                    {companyDetail?.created_at
+                                        ? new Date(companyDetail.created_at).toLocaleString()
+                                        : "N/A"}
+                                </Card.Text>
+
+                                <Card.Text>
+                                    <strong>Updated At:</strong>{" "}
+                                    {companyDetail?.updated_at
+                                        ? new Date(companyDetail.updated_at).toLocaleString()
+                                        : "N/A"}
+                                </Card.Text>
+                                */}
+
+                            </Card.Body>
+                        </Card>
+                    )}
+                </Col>
+            </Row>
+        </Container>
     );
 };
 
