@@ -92,13 +92,26 @@ const updateOrder = async (req, res) => {
         const orderId = req.params.id;
         const { status, assigned_driver_id } = req.body;
 
-        const order = await orderService.findById(orderId);
+        let order = await orderService.findById(orderId);
         if (!order) {
             return res.status(404).json({ success: false, message: "Order not found"});
         }
 
-        const driver = await driverService.findById(order.assigned_driver_id);
+        if (order.is_driver_accepted === undefined){
+            const updateOrderData = {
+                is_driver_accepted: false
+            };
+
+            const updatedOrderWithIsDriverAccepted = await orderService.updateById(orderId, updateOrderData);
+            if (!updatedOrderWithIsDriverAccepted) {
+                return res.status(500).json({ success: true, message: "Failed to update is_driver_accepted in order"});
+            }
+
+            order = updatedOrderWithIsDriverAccepted;
+        }
+
         if (order.is_driver_accepted) {
+            const driver = await driverService.findById(order.assigned_driver_id);
             return res.status(400).json({ success: false, message: `Order is already accepted by driver: ${driver.firstName} ${driver.lastName}` });
         }
 
