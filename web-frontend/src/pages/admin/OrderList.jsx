@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
-import { Table, Spin, message, Tag, Button, Tooltip, Select } from "antd";
+import { Table, message, Tag, Button, Tooltip, Select } from "antd";
 import { useNavigate } from "react-router-dom";
 import { ArrowRightOutlined } from "@ant-design/icons";
 
 const ORDER_STATUS = {
     PENDING: "PENDING",
-    CONFIRMED: "CONFIRMED",
+    PROCESSING: "PROCESSING",
     OUT_FOR_DELIVERY: "OUT_FOR_DELIVERY",
     DELIVERED: "DELIVERED",
     CANCELLED: "CANCELLED"
@@ -26,6 +26,7 @@ function OrderList() {
 
     useEffect(() => {
         const fetchOrders = async () => {
+            setLoading(true);
             try {
                 const url = statusFilter
                     ? `/orders/getAllOrders?status=${statusFilter.toLowerCase()}`
@@ -50,7 +51,7 @@ function OrderList() {
     }, [statusFilter]);
 
     const handleStatusFilterChange = (value) => {
-        setStatusFilter(value);
+        setStatusFilter(value); // This alone triggers useEffect which sets loading
     };
 
     const getStatusTag = (status) => {
@@ -138,24 +139,14 @@ function OrderList() {
         },
     ];
 
-    if (loading) {
-        return (
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    alignItems: "center",
-                    height: "60vh",
-                }}
-            >
-                <Spin size="large" />
-            </div>
-        );
-    }
-
     return (
         <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "20px" }}>
+            <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "20px"
+            }}>
                 <h1 style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>
                     Order List
                 </h1>
@@ -166,17 +157,19 @@ function OrderList() {
                     allowClear
                 >
                     <Select.Option value={ORDER_STATUS.PENDING}>Pending</Select.Option>
-                    <Select.Option value={ORDER_STATUS.CONFIRMED}>Confirmed</Select.Option>
+                    <Select.Option value={ORDER_STATUS.PROCESSING}>Processing</Select.Option>
                     <Select.Option value={ORDER_STATUS.OUT_FOR_DELIVERY}>Out for Delivery</Select.Option>
                     <Select.Option value={ORDER_STATUS.DELIVERED}>Delivered</Select.Option>
                     <Select.Option value={ORDER_STATUS.CANCELLED}>Cancelled</Select.Option>
                 </Select>
             </div>
+
             <Table
                 columns={columns}
                 dataSource={filteredOrders}
                 rowKey="order_id"
                 bordered
+                loading={loading}
                 pagination={{ pageSize: 10 }}
                 scroll={{ x: "max-content" }}
             />
