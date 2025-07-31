@@ -221,20 +221,17 @@ const AdminNavbar = () => {
                                     >
                                         Category
                                     </StyledNavLink>
-                                    <StyledNavLink
-                                        to="/order-list"
-                                        onClick={() => {
-                                            closeMobileMenu();
-                                            setManageDropDownOpen(false);
-                                        }}
-                                        style={{ display: "block", padding: "8px 16px" }}
-                                    >
-                                        Orders
-                                    </StyledNavLink>
                                 </Box>
                             )}
                         </Box>
 
+                        <StyledNavLink
+                            to={`/order-list`}
+                            onClick={closeMobileMenu}
+                            sx={{ mr: 2 }}
+                        >
+                            Orders
+                        </StyledNavLink>
                         <StyledNavLink
                             to={`/syetem-detail`}
                             onClick={closeMobileMenu}
@@ -375,17 +372,17 @@ const AdminNavbar = () => {
                                         >
                                             Category
                                         </StyledNavLink>
-                                        <StyledNavLink
-                                            to="/order-list"
-                                            onClick={closeMobileMenu}
-                                            sx={{ display: "block" }}
-                                        >
-                                            Orders
-                                        </StyledNavLink>
                                     </Box>
                                 </Collapse>
                             </List>
 
+                            <StyledNavLink
+                                to={`/order-list`}
+                                onClick={closeMobileMenu}
+                                sx={{ mb: 2 }}
+                            >
+                                Orders
+                            </StyledNavLink>
                             <StyledNavLink
                                 to={`/syetem-detail`}
                                 onClick={closeMobileMenu}
