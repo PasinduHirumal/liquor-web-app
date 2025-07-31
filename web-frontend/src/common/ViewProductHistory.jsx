@@ -109,10 +109,10 @@ const ViewProductHistory = ({ productId, productName }) => {
                                                 <tr key={index}>
                                                     <td
                                                         className={`history-type ${history.type?.toLowerCase() === "add items"
-                                                                ? "text-success"
-                                                                : history.type?.toLowerCase() === "remove items"
-                                                                    ? "text-danger"
-                                                                    : ""
+                                                            ? "text-success"
+                                                            : history.type?.toLowerCase() === "remove items"
+                                                                ? "text-danger"
+                                                                : ""
                                                             }`}
                                                     >
                                                         {history.type?.toLowerCase() === "add items"
@@ -126,12 +126,16 @@ const ViewProductHistory = ({ productId, productName }) => {
                                                         className={
                                                             history.type?.toLowerCase() === "add items"
                                                                 ? "text-success"
-                                                                : "text-danger"
+                                                                : history.type?.toLowerCase() === "remove items"
+                                                                    ? "text-danger"
+                                                                    : ""
                                                         }
                                                     >
                                                         {history.type?.toLowerCase() === "add items"
                                                             ? `+${history.quantity}`
-                                                            : `-${history.quantity}`}
+                                                            : history.type?.toLowerCase() === "remove items"
+                                                                ? `-${history.quantity}`
+                                                                : history.quantity || "Unknown"}
                                                     </td>
 
                                                     <td>{history.userId?.username || "System"}</td>
