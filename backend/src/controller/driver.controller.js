@@ -64,10 +64,6 @@ const getAllDrivers = async (req, res) => {
 	try {
         const { isActive, isAvailable, isOnline, isDocumentVerified, backgroundCheckStatus } = req.query;
 
-        if (backgroundCheckStatus && !Object.values(BACKGROUND_STATUS).includes(backgroundCheckStatus)) {
-            return res.status(400).json({ success: false, message: "Invalid status value" });
-        }
-
         const drivers = await driverService.findAll();
         if (!drivers) {
             return res.status(400).json({ success: false, message: "Failed to get all drivers"});
@@ -97,6 +93,10 @@ const getAllDrivers = async (req, res) => {
             filterDescription.push(`isDocumentVerified: ${isDocumentVerified}`);
         }
         if (backgroundCheckStatus !== undefined) {
+            if (backgroundCheckStatus && !Object.values(BACKGROUND_STATUS).includes(backgroundCheckStatus)) {
+                return res.status(400).json({ success: false, message: "Invalid status value" });
+            }
+            
             filteredDrivers = filteredDrivers.filter(driver => driver.backgroundCheckStatus === backgroundCheckStatus);
             filterDescription.push(`backgroundCheckStatus: ${backgroundCheckStatus}`);
         }
