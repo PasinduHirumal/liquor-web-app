@@ -58,7 +58,7 @@ const CreateDriverModal = ({ visible, onClose, onSuccess }) => {
                     </Col>
                     <Col span={12}>
                         <Form.Item name="phone" label="Phone" rules={[{ required: true }]}>
-                            <Input placeholder="+6591234567" />
+                            <Input placeholder="+947********" />
                         </Form.Item>
                     </Col>
                 </Row>
