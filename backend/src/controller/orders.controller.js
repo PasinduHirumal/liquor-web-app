@@ -16,10 +16,6 @@ const getAllOrders = async (req, res) => {
 	try {
         const { status } = req.query;
 
-        if (status && !Object.values(ORDER_STATUS).includes(status)) {
-            return res.status(400).json({ success: false, message: "Invalid status value" });
-        }
-
         const orders = await orderService.findAll();
         if (!orders) {
             return res.status(400).json({ success: false, message: "Failed to fetch orders"});
@@ -29,6 +25,10 @@ const getAllOrders = async (req, res) => {
         let filterDescription = [];
 
         if (status !== undefined){
+            if (status && !Object.values(ORDER_STATUS).includes(status)) {
+                return res.status(400).json({ success: false, message: "Invalid status value" });
+            }
+            
             filteredOrders = filteredOrders.filter(order => order.status === status);
             filterDescription.push(`status: ${status}`);
         }
