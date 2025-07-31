@@ -74,6 +74,7 @@ const getOrderById = async (req, res) => {
         try {
             populatedOrders = await populateAddressWithUserIdInData(order);
             populatedOrders = await populateUser(populatedOrders);
+            populatedOrders = await populateDriver(populatedOrders);
         } catch (error) {
             console.error("Error populating orders:", error);
             return res.status(500).json({ success: false, message: "Failed to populate orders" });

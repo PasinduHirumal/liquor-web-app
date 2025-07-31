@@ -60,6 +60,7 @@ function OrderDetail() {
         // Handle ISO strings or JS Date-compatible strings
         try {
             return new Date(value).toLocaleString();
+        // eslint-disable-next-line no-unused-vars
         } catch (err) {
             return "Invalid date";
         }
