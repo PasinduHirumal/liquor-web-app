@@ -236,6 +236,13 @@ const AdminNavbar = () => {
                         </Box>
 
                         <StyledNavLink
+                            to={`/syetem-detail`}
+                            onClick={closeMobileMenu}
+                            sx={{ mr: 2 }}
+                        >
+                            System Detail
+                        </StyledNavLink>
+                        <StyledNavLink
                             to={`/profile/${user?._id || user?.id}`}
                             onClick={closeMobileMenu}
                             sx={{ mr: 2 }}
@@ -379,6 +386,13 @@ const AdminNavbar = () => {
                                 </Collapse>
                             </List>
 
+                            <StyledNavLink
+                                to={`/syetem-detail`}
+                                onClick={closeMobileMenu}
+                                sx={{ mb: 2 }}
+                            >
+                                System Detail
+                            </StyledNavLink>
                             <StyledNavLink
                                 to={`/profile/${user?._id || user?.id}`}
                                 onClick={closeMobileMenu}
