@@ -136,7 +136,7 @@ const updateOrder = async (req, res) => {
             }
 
             if (failedChecks.length > 0) {
-                return res.status(400).json({ success: false, message: failedChecks });
+                return res.status(400).json({ success: false, message: failedChecks.join('.\n') });
             }
 
             // create driver duty
