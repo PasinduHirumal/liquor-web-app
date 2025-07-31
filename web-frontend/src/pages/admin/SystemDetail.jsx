@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
 
-const CompanyDetail = () => {
+const SystemDetail = () => {
     const [companyDetail, setCompanyDetail] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("");
@@ -66,4 +66,4 @@ const CompanyDetail = () => {
     );
 };
 
-export default CompanyDetail;
+export default SystemDetail;

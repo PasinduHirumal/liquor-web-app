@@ -23,7 +23,7 @@ import DriverFinancialInfo from "../../components/admin/forms/DriverFinancialInf
 import DriverDocumentInfo from "../../components/admin/forms/DriverDocumentInfo";
 import OrderLIst from "../../pages/admin/OrderList";
 import OrderDetail from "../../pages/admin/detailPages/OrderDetail";
-import CompanyDetail from "../../pages/admin/CompanyDetail";
+import SystemDetail from "../../pages/admin/SystemDetail";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -93,6 +93,14 @@ export const adminRoutes = [
         ),
     },
     {
+        path: "/syetem-detail",
+        element: (
+            <AdminProtectedRoute>
+                <SystemDetail />
+            </AdminProtectedRoute>
+        ),
+    },
+    {
         path: "/order-list/:id",
         element: <OrderDetail />
     },
@@ -155,9 +163,5 @@ export const adminRoutes = [
     {
         path: "/driver-list/:id/edit-documents",
         element: <DriverDocumentInfo />
-    },
-    {
-        path: "/syetem-detail",
-        element: <CompanyDetail />
     },
 ];
