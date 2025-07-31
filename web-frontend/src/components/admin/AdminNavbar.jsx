@@ -6,7 +6,6 @@ import {
 } from "@mui/material";
 import { Menu as MenuIcon, Close as CloseIcon, Logout as LogoutIcon, ExpandMore, ExpandLess } from "@mui/icons-material";
 import Badge from "@mui/material/Badge";
-import MailIcon from "@mui/icons-material/Mail";
 import useAdminAuthStore from "../../stores/adminAuthStore";
 import { getPendingOrdersCount } from "../../lib/orderApi";
 
