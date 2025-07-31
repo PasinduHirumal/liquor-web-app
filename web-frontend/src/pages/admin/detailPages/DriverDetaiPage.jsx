@@ -449,13 +449,13 @@ const DriverDetailPage = () => {
                             <div className="driver-detail-grid-item">
                                 <span className="driver-detail-info-label">Total Earnings</span>
                                 <span className="driver-detail-info-value">
-                                    ${driver.totalEarnings?.toFixed(2) || '0.00'}
+                                    Rs: {driver.totalEarnings?.toFixed(2) || '0.00'}
                                 </span>
                             </div>
                             <div className="driver-detail-grid-item">
                                 <span className="driver-detail-info-label">Current Balance</span>
                                 <span className="driver-detail-info-value">
-                                    ${driver.currentBalance?.toFixed(2) || '0.00'}
+                                    Rs: {driver.currentBalance?.toFixed(2) || '0.00'}
                                 </span>
                             </div>
                         </div>

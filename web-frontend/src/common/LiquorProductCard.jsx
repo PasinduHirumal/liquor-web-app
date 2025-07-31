@@ -90,17 +90,17 @@ const LiquorProductCard = ({ product, detailButton = false }) => {
             {product.discount_percentage > 0 ? (
               <>
                 <span className="text-danger fw-bold me-2">
-                  ${product.selling_price?.toFixed(2)}
-                </span>
+                  Rs: {product.selling_price?.toFixed(2)}
+                </span> <br />
                 <span className="text-decoration-line-through text-muted small">
-                  ${product.marked_price?.toFixed(2)}
+                  Rs: {product.marked_price?.toFixed(2)}
                 </span>
                 <span className="badge bg-danger ms-2">
                   {product.discount_percentage}% OFF
                 </span>
               </>
             ) : (
-              <span className="fw-bold">${displayPrice?.toFixed(2) || "0.00"}</span>
+              <span className="fw-bold">Rs: {displayPrice?.toFixed(2) || "0.00"}</span>
             )}
           </div>
 

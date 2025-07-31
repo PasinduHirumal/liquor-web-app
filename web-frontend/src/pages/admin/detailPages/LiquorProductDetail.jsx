@@ -147,13 +147,13 @@ const LiquorProductDetail = () => {
                             {/* Price & Discount */}
                             <div className="price-section d-flex align-items-center gap-3 flex-wrap m-0">
                                 <span className="current-price text-success">
-                                    ${product.selling_price?.toFixed(2) || "N/A"}
+                                    Rs: {product.selling_price?.toFixed(2) || "N/A"}
                                 </span>
 
                                 {product.marked_price > product.selling_price && (
                                     <>
                                         <span className="original-price text-muted text-decoration-line-through">
-                                            ${product.marked_price?.toFixed(2)}
+                                            Rs: {product.marked_price?.toFixed(2)}
                                         </span>
 
                                         {discountPercentage && (

@@ -71,14 +71,14 @@ const OtherProductDetail = () => {
             <div className="product-price-section">
                 <div className="price-display">
                     <span className="current-price">
-                        ${product.selling_price?.toFixed(2) || "N/A"}
+                        Rs: {product.selling_price?.toFixed(2) || "N/A"}
                     </span>
                 </div>
 
                 {product.discount_percentage > 0 && (
                     <div className="discount-display">
                         <span className="original-price">
-                            ${product.marked_price?.toFixed(2)}
+                            Rs: {product.marked_price?.toFixed(2)}
                         </span>
                         <span className="discount-badge">
                             <FaTag className="me-1" />

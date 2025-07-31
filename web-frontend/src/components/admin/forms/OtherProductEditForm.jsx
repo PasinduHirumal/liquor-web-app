@@ -306,7 +306,7 @@ const OtherProductEditForm = () => {
                                     <Card.Body>
                                         <Row>
                                             <Col md={6}>
-                                                <FloatingLabel controlId="costPrice" label="Cost Price ($)" className="mb-3">
+                                                <FloatingLabel controlId="costPrice" label="Cost Price (Rs)" className="mb-3">
                                                     <Form.Control
                                                         type="number"
                                                         name="cost_price"
@@ -322,7 +322,7 @@ const OtherProductEditForm = () => {
                                                 </FloatingLabel>
                                             </Col>
                                             <Col md={6}>
-                                                <FloatingLabel controlId="markedPrice" label="Marked Price ($)" className="mb-3">
+                                                <FloatingLabel controlId="markedPrice" label="Marked Price (Rs)" className="mb-3">
                                                     <Form.Control
                                                         type="number"
                                                         name="marked_price"
