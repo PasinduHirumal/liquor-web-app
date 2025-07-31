@@ -131,11 +131,11 @@ function OrderDetail() {
                     <Card className="order-detail-card h-100">
                         <Card.Header as="h5">Price Details</Card.Header>
                         <Card.Body className="order-detail-section">
-                            <div className="order-detail-price-line"><span>Subtotal:</span><span>${order.subtotal?.toFixed(2)}</span></div>
-                            <div className="order-detail-price-line"><span>Delivery Fee:</span><span>${order.delivery_fee?.toFixed(2)}</span></div>
-                            <div className="order-detail-price-line"><span>Tax Amount:</span><span>${order.tax_amount?.toFixed(2)}</span></div>
+                            <div className="order-detail-price-line"><span>Subtotal:</span><span>Rs: {order.subtotal?.toFixed(2)}</span></div>
+                            <div className="order-detail-price-line"><span>Delivery Fee:</span><span>Rs: {order.delivery_fee?.toFixed(2)}</span></div>
+                            <div className="order-detail-price-line"><span>Tax Amount:</span><span>Rs: {order.tax_amount?.toFixed(2)}</span></div>
                             <hr />
-                            <div className="order-detail-price-line fw-bold"><span>Total:</span><span>${order.total_amount?.toFixed(2)}</span></div>
+                            <div className="order-detail-price-line fw-bold"><span>Total:</span><span>Rs: {order.total_amount?.toFixed(2)}</span></div>
                         </Card.Body>
                     </Card>
                 </Col>
@@ -204,8 +204,8 @@ function OrderDetail() {
                                                     <td>{item.product_name}</td>
                                                     <td><Image src={item.product_image} width="50" rounded /></td>
                                                     <td>{item.quantity}</td>
-                                                    <td>${item.unit_price?.toFixed(2)}</td>
-                                                    <td>${item.total_price?.toFixed(2)}</td>
+                                                    <td>Rs: {item.unit_price?.toFixed(2)}</td>
+                                                    <td>Rs: {item.total_price?.toFixed(2)}</td>
                                                 </tr>
                                             ))}
                                         </tbody>
