@@ -334,4 +334,49 @@ const deleteProduct = async (req, res) => {
     }
 };
 
-export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct };
+const updateActiveToggle = async (req, res) => {
+	try {
+        const { is_active } = req.body;
+
+        const products = await productService.findByFilter('is_liquor', '==', true);
+        if (!products || products.length === 0) {
+            return res.status(400).json({ success: false, message: "Failed to fetch liquor products"});
+        }
+
+        // Update each product's is_active status
+        const updatePromises = products.map(async (product) => {
+            const updateData = {
+                is_active: is_active,
+            };
+            
+            return await productService.updateById(product.product_id, updateData);
+        });
+        
+        // Wait for all updates to complete
+        const updateResults = await Promise.all(updatePromises);
+        
+        // Check if all updates were successful
+        const failedUpdates = updateResults.filter(result => !result);
+        if (failedUpdates.length > 0) {
+            return res.status(500).json({
+                success: false,
+                message: `Failed to update ${failedUpdates.length} products`
+            });
+        }
+
+        const updatedProducts = await productService.findByFilter('is_liquor', '==', true);
+        
+        return res.status(200).json({ 
+            success: true, 
+            message: `Successfully updated is_active to ${is_active} for all liquor products`, 
+            before_count: products.length,
+            updated_count: updatedProducts.length,
+            data: updatedProducts 
+        });
+    } catch (error) {
+        console.error("Update active toggle error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, updateActiveToggle};
