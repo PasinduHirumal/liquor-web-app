@@ -83,7 +83,7 @@ const LiquorProduct = () => {
         ) : (
           <div className="col-12">
             <div className="alert alert-info" role="alert">
-              No products available based on filters.
+              No products available.
             </div>
           </div>
         )}

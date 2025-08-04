@@ -145,7 +145,7 @@ const OtherProductList = () => {
                 ) : (
                     <div className="col-12">
                         <div className="alert alert-info" role="alert">
-                            No products match the current filters.
+                            No products available.
                         </div>
                     </div>
                 )}
