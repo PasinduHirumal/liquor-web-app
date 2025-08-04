@@ -18,6 +18,7 @@ const LiquorEditForm = () => {
         category_id: "",
         alcohol_content: 0,
         volume: 0,
+        product_from: "",
         cost_price: 0,
         marked_price: 0,
         discount_percentage: 0,
@@ -61,6 +62,7 @@ const LiquorEditForm = () => {
                     category_id: product.category_id?._id || product.category_id || "",
                     alcohol_content: product.alcohol_content || 0,
                     volume: product.volume || 0,
+                    product_from: product.product_from || "", // Fix: Get from product data
                     cost_price: product.cost_price || 0,
                     marked_price: product.marked_price || 0,
                     discount_percentage: product.discount_percentage || 0,
@@ -140,6 +142,7 @@ const LiquorEditForm = () => {
         setPriceUpdating(true);
         try {
             const priceData = {
+                product_from: formData.product_from,
                 cost_price: formData.cost_price,
                 marked_price: formData.marked_price,
                 discount_percentage: formData.discount_percentage
@@ -366,7 +369,7 @@ const LiquorEditForm = () => {
                                 {/* Pricing Section */}
                                 <Card className="mb-4">
                                     <Card.Header className="d-flex justify-content-between align-items-center">
-                                        <h5 className="mb-0">Pricing & Inventory</h5>
+                                        <h5 className="mb-0">Update Pricing</h5>
                                         <Button
                                             variant="outline-primary"
                                             size="sm"
@@ -381,6 +384,18 @@ const LiquorEditForm = () => {
                                         </Button>
                                     </Card.Header>
                                     <Card.Body>
+                                        <Row>
+                                            <Col md={12}>
+                                                <FloatingLabel controlId="product_from" label="Product Source (e.g., Keels, Food City)" className="mb-3">
+                                                    <Form.Control
+                                                        name="product_from"
+                                                        value={formData.product_from}
+                                                        onChange={handleChange}
+                                                        placeholder="Enter where product is from"
+                                                    />
+                                                </FloatingLabel>
+                                            </Col>
+                                        </Row>
                                         <Row>
                                             <Col md={6}>
                                                 <FloatingLabel controlId="cost_price" label="Cost Price (Rs)" className="mb-3">

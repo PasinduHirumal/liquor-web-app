@@ -24,6 +24,7 @@ const OtherProductEditForm = () => {
         name: "",
         description: "",
         category_id: "",
+        product_from: "",
         cost_price: 0,
         marked_price: 0,
         discount_percentage: 0,
@@ -60,6 +61,7 @@ const OtherProductEditForm = () => {
                     name: product.name || "",
                     description: product.description || "",
                     category_id: product.category_id?.id || product.category_id || "",
+                    product_from: product.product_from || "",
                     cost_price: product.cost_price || 0,
                     marked_price: product.marked_price || 0,
                     discount_percentage: product.discount_percentage || 0,
@@ -175,6 +177,7 @@ const OtherProductEditForm = () => {
                 name: formData.name,
                 description: formData.description,
                 category_id: formData.category_id,
+                product_from: formData.product_from,
                 is_active: formData.is_active,
                 is_in_stock: formData.is_in_stock,
                 weight: formData.weight,
@@ -184,6 +187,7 @@ const OtherProductEditForm = () => {
 
             // Price update - let backend handle calculations
             await axiosInstance.patch(`/other-products/update-price/${id}`, {
+                product_from: formData.product_from,
                 cost_price: formData.cost_price,
                 marked_price: formData.marked_price,
                 discount_percentage: formData.discount_percentage
@@ -305,6 +309,17 @@ const OtherProductEditForm = () => {
                                     <Card.Header><h5>Pricing</h5></Card.Header>
                                     <Card.Body>
                                         <Row>
+                                            <Col md={12}>
+                                                <FloatingLabel controlId="productFrom" label="Product Source (e.g., Keels, Food City)" className="mb-3">
+                                                    <Form.Control
+                                                        type="text"
+                                                        name="product_from"
+                                                        value={formData.product_from}
+                                                        onChange={handleChange}
+                                                        placeholder="Where the product is from"
+                                                    />
+                                                </FloatingLabel>
+                                            </Col>
                                             <Col md={6}>
                                                 <FloatingLabel controlId="costPrice" label="Cost Price (Rs)" className="mb-3">
                                                     <Form.Control

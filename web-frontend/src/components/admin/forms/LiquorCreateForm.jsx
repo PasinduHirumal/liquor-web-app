@@ -148,6 +148,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                         brand: '',
                         alcohol_content: '',
                         volume: '',
+                        product_from: '',
                         cost_price: '',
                         marked_price: '',
                         discount_percentage: '',
@@ -288,6 +289,24 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                             </Row>
 
                             <Row>
+                                <Col md={12}>
+                                    <Form.Group className="mb-3">
+                                        <Form.Label>Product Source (e.g., Keels, Food City) *</Form.Label>
+                                        <Form.Control
+                                            type="text"
+                                            name="product_from"
+                                            value={values.product_from}
+                                            onChange={handleChange}
+                                            onBlur={handleBlur}
+                                            isInvalid={touched.product_from && !!errors.product_from}
+                                            disabled={loading}
+                                            placeholder="Enter where the product is from"
+                                        />
+                                        <Form.Control.Feedback type="invalid">
+                                            {errors.product_from}
+                                        </Form.Control.Feedback>
+                                    </Form.Group>
+                                </Col>
                                 <Col md={4}>
                                     <Form.Group className="mb-3">
                                         <Form.Label>Cost Price *</Form.Label>
@@ -368,6 +387,8 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                                         </Form.Control.Feedback>
                                     </Form.Group>
                                 </Col>
+                            </Row>
+                            <Row>
                                 <Col md={6}>
                                     <Form.Group className="mb-3 d-flex align-items-end h-100">
                                         <div className="d-flex gap-4">
