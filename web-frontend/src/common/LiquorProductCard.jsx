@@ -160,16 +160,22 @@ const LiquorProductCard = ({ product, detailButton = false }) => {
           </div>
 
           {/* Button */}
-          {detailButton && (
-            <div className="card-footer mt-auto text-center">
+          <div className="card-footer mt-auto text-center">
+            {detailButton && (
               <button
-                className="btn btn-primary btn-sm w-100"
+                className="btn btn-primary btn-sm w-100 my-1"
                 onClick={handleViewDetail}
               >
                 View Details
               </button>
-            </div>
-          )}
+            )}
+            <button
+              className="btn btn-success btn-sm w-100"
+              onClick={() => { console.log("navigate to application") }}
+            >
+              Buy Now
+            </button>
+          </div>
         </div>
       </div>
     </div>
