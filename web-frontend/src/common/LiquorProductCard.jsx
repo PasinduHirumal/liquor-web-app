@@ -33,26 +33,49 @@ const LiquorProductCard = ({ product, detailButton = false }) => {
         onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
         onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
       >
-        {activeImage ? (
-          <img
-            src={activeImage}
-            alt={product.name}
-            className="card-img-top p-2"
-            style={{
-              height: "200px",
-              objectFit: "contain",
-              backgroundColor: "#f8f9fa",
-              borderBottom: "1px solid #eee",
-            }}
-          />
-        ) : (
-          <div
-            className="d-flex justify-content-center align-items-center bg-light"
-            style={{ height: "200px", borderBottom: "1px solid #eee" }}
-          >
-            <small className="text-muted">No Image Available</small>
-          </div>
-        )}
+        {/* Image Container with Origin Badge */}
+        <div style={{ position: "relative" }}>
+          {activeImage ? (
+            <img
+              src={activeImage}
+              alt={product.name}
+              className="card-img-top p-2"
+              style={{
+                height: "200px",
+                objectFit: "contain",
+                backgroundColor: "#f8f9fa",
+                borderBottom: "1px solid #eee",
+              }}
+            />
+          ) : (
+            <div
+              className="d-flex justify-content-center align-items-center bg-light"
+              style={{ height: "200px", borderBottom: "1px solid #eee" }}
+            >
+              <small className="text-muted">No Image Available</small>
+            </div>
+          )}
+
+          {/* Origin Badge - Only show if product_from exists */}
+          {product.product_from && (
+            <span
+              style={{
+                position: "absolute",
+                top: "10px",
+                right: "10px",
+                backgroundColor: "rgba(64, 207, 59, 0.89)",
+                color: "black",
+                padding: "2px 6px",
+                borderRadius: "4px",
+                fontSize: "0.8rem",
+                fontWeight: "bold",
+              }}
+            >
+              {product.product_from.charAt(0).toUpperCase() +
+                product.product_from.slice(1)}
+            </span>
+          )}
+        </div>
 
         {/* Thumbnails */}
         {combinedImages.length > 1 && (
