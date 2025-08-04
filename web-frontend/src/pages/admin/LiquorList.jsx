@@ -15,38 +15,49 @@ const LiquorList = () => {
         categoryId: "",
     });
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [toggleLoading, setToggleLoading] = useState(false);
+
+    // Helper to parse filter string to boolean or undefined
+    const parseBoolFilter = (val) => {
+        if (val === "true") return true;
+        if (val === "false") return false;
+        return undefined;
+    };
+
+    const fetchProducts = async () => {
+        try {
+            setLoading(true);
+
+            const categoriesResponse = await axiosInstance.get("/categories/getAll");
+            const activeCategories = (categoriesResponse.data.data || []).filter(
+                (cat) => cat.is_active && cat.is_liquor
+            );
+            setCategories(activeCategories);
+
+            // Prepare query params with booleans
+            const params = {};
+            const activeFilter = parseBoolFilter(filters.is_active);
+            if (activeFilter !== undefined) params.is_active = activeFilter;
+            const stockFilter = parseBoolFilter(filters.is_in_stock);
+            if (stockFilter !== undefined) params.is_in_stock = stockFilter;
+            if (filters.categoryId !== "") params.categoryId = filters.categoryId;
+
+            const productsResponse = await axiosInstance.get("/products/getAll", {
+                params,
+            });
+
+            setProducts(productsResponse.data.data || []);
+            setError(null);
+        } catch (err) {
+            setError(err.message || "Failed to fetch data");
+            console.error("Fetch data error:", err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchInitialData = async () => {
-            try {
-                setLoading(true);
-
-                const categoriesResponse = await axiosInstance.get("/categories/getAll");
-                const activeCategories = (categoriesResponse.data.data || []).filter(
-                    (cat) => cat.is_active && cat.is_liquor
-                );
-                setCategories(activeCategories);
-
-                const params = {};
-                if (filters.is_active !== "") params.is_active = filters.is_active;
-                if (filters.is_in_stock !== "") params.is_in_stock = filters.is_in_stock;
-                if (filters.categoryId !== "") params.categoryId = filters.categoryId;
-
-                const productsResponse = await axiosInstance.get("/products/getAll", {
-                    params,
-                });
-
-                setProducts(productsResponse.data.data || []);
-                setError(null);
-            } catch (err) {
-                setError(err.message || "Failed to fetch data");
-                console.error("Fetch data error:", err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchInitialData();
+        fetchProducts();
     }, [filters]);
 
     const handleFilterChange = (e) => {
@@ -64,6 +75,29 @@ const LiquorList = () => {
         }));
     };
 
+    // Toggle all liquors active/inactive using your endpoint
+    const handleToggleActive = async () => {
+        try {
+            setToggleLoading(true);
+            // Calculate new toggle value: if any product inactive => activate all, else deactivate all
+            const anyInactive = products.some((p) => !p.is_active);
+            const newActiveValue = anyInactive;
+
+            await axiosInstance.patch(
+                "/products/update-activeToggle",
+                { is_active: newActiveValue }
+            );
+
+            // Refresh products list
+            await fetchProducts();
+        } catch (err) {
+            console.error("Toggle active error:", err);
+            setError("Failed to toggle product active status.");
+        } finally {
+            setToggleLoading(false);
+        }
+    };
+
     const handleCreateSuccess = (newProduct) => {
         setProducts((prev) => [newProduct, ...prev]);
         setShowCreateModal(false);
@@ -71,11 +105,26 @@ const LiquorList = () => {
 
     return (
         <div className="container-fluid py-4">
-            <div className="d-flex justify-content-between align-items-center mb-4">
+            <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
                 <h2>Manage Liquors</h2>
-                <Button variant="primary" onClick={() => setShowCreateModal(true)}>
-                    Create Item
-                </Button>
+                <div>
+                    <Button
+                        variant="secondary"
+                        className="me-2"
+                        onClick={handleToggleActive}
+                        disabled={toggleLoading}
+                    >
+                        {toggleLoading
+                            ? "Processing..."
+                            : products.some((p) => !p.is_active)
+                                ? "Activate All Liquors"
+                                : "Deactivate All Liquors"}
+                    </Button>
+
+                    <Button variant="primary" onClick={() => setShowCreateModal(true)}>
+                        Create Item
+                    </Button>
+                </div>
             </div>
 
             {/* Filters */}
@@ -124,7 +173,11 @@ const LiquorList = () => {
                             {categories.map((category) => (
                                 <Button
                                     key={category.category_id}
-                                    variant={filters.categoryId === category.category_id ? "primary" : "outline-secondary"}
+                                    variant={
+                                        filters.categoryId === category.category_id
+                                            ? "primary"
+                                            : "outline-secondary"
+                                    }
                                     onClick={() => handleCategoryClick(category.category_id)}
                                     className="d-flex align-items-center gap-1"
                                     style={{ flex: "0 0 auto" }}
@@ -151,7 +204,10 @@ const LiquorList = () => {
 
             {/* Loading */}
             {loading && (
-                <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
+                <div
+                    className="d-flex justify-content-center align-items-center"
+                    style={{ minHeight: "60vh" }}
+                >
                     <div className="spinner-border" role="status" />
                 </div>
             )}
