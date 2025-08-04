@@ -15,7 +15,12 @@ const OtherProduct = () => {
         setLoading(true);
         const response = await axiosInstance.get("/other-products/getAll");
         const allProducts = response.data.data || [];
-        setProducts(allProducts.slice(0, 12));
+
+        const filteredProducts = allProducts.filter(
+          (product) => product.is_active === true && product.is_in_stock === true
+        );
+
+        setProducts(filteredProducts.slice(0, 12));
       } catch (err) {
         setError(err.message || "Failed to fetch products");
         console.error("Fetch products error:", err);
@@ -26,6 +31,7 @@ const OtherProduct = () => {
 
     fetchProducts();
   }, []);
+
 
   const handleViewAll = () => {
     navigate("/other-product-all");

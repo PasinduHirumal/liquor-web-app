@@ -39,14 +39,12 @@ const OtherProductList = () => {
 
     useEffect(() => {
         const applyFilters = () => {
-            let filtered = [...products];
-
-            filtered = filtered.filter((product) => {
-                return (
-                    !selectedCategory ||
-                    product.category_id?.id === selectedCategory
-                );
-            });
+            let filtered = products.filter(
+                (product) =>
+                    product.is_active === true &&
+                    product.is_in_stock === true &&
+                    (!selectedCategory || product.category_id?.id === selectedCategory)
+            );
 
             setFilteredProducts(filtered);
         };
