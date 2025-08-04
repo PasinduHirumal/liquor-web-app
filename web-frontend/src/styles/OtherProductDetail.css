@@ -354,3 +354,9 @@
 .not-found-icon {
     color: #dc3545;
 }
+
+/* MUI Chip overrides */
+.MuiChip-root {
+    font-family: inherit;
+    letter-spacing: 0.5px;
+}

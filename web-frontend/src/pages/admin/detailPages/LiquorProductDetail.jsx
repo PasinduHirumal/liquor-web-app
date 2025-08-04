@@ -11,6 +11,27 @@ import toast from "react-hot-toast";
 import { axiosInstance } from "../../../lib/axios";
 import DeleteLiquorButton from "../../../components/admin/buttons/DeleteLiquorButton";
 import ViewProductHistory from "../../../common/ViewProductHistory";
+import { Chip } from "@mui/material";
+import { styled } from "@mui/system";
+
+const OriginBadge = styled(Chip)(({ theme, origin }) => ({
+    position: "absolute",
+    top: "16px",
+    right: "16px",
+    zIndex: 2,
+    fontWeight: "bold",
+    fontSize: "0.9rem",
+    color: "black",
+    backgroundColor: "#1ceb23ff",
+    boxShadow: "0 2px 8px rgba(0,0,0,0.2)",
+    "& .MuiChip-label": {
+        padding: "0 10px",
+    },
+    "&:hover": {
+        transform: "scale(1.05)",
+    },
+    transition: "all 0.2s ease",
+}));
 
 const LiquorProductDetail = () => {
     const { id } = useParams();
@@ -101,6 +122,12 @@ const LiquorProductDetail = () => {
                         {/* Image Gallery */}
                         <div className="product-gallery">
                             <div className="main-image-container">
+                                {product.product_from && (
+                                        <OriginBadge
+                                            label={`From: ${product.product_from}`}
+                                            size="medium"
+                                        />
+                                )}
                                 {activeImage ? (
                                     <img
                                         src={activeImage}

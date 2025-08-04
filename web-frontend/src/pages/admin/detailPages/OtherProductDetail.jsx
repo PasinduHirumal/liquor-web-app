@@ -12,6 +12,22 @@ import { axiosInstance } from "../../../lib/axios";
 import "../../../styles/OtherProductDetail.css";
 import DeleteOtherProductButton from "../../../components/admin/buttons/DeleteOtherProductButton";
 import ViewProductHistory from "../../../common/ViewProductHistory";
+import { Chip } from "@mui/material";
+import { styled } from "@mui/system";
+
+const OriginBadge = styled(Chip)(({ theme, origin }) => ({
+    position: "absolute",
+    top: "16px",
+    right: "16px",
+    zIndex: 2,
+    fontWeight: "bold",
+    color: "black",
+    backgroundColor: "#1ceb23ff",
+    boxShadow: "0 2px 4px rgba(0,0,0,0.2)",
+    "& .MuiChip-label": {
+        padding: "0 8px",
+    },
+}));
 
 const OtherProductDetail = () => {
     const { id } = useParams();
@@ -148,6 +164,12 @@ const OtherProductDetail = () => {
                         {/* Image Gallery */}
                         <div className="product-gallery">
                             <div className="main-image-wrapper">
+                                {product.product_from && (
+                                    <OriginBadge
+                                        label={`From: ${product.product_from}`}
+                                        size="medium"
+                                    />
+                                )}
                                 {activeImage ? (
                                     <img
                                         src={activeImage}
