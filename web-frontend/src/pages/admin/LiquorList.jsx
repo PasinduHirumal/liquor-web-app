@@ -10,8 +10,8 @@ const LiquorList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [filters, setFilters] = useState({
-        is_active: "true",
-        is_in_stock: "true",
+        is_active: "",
+        is_in_stock: "",
         categoryId: "",
     });
     const [showCreateModal, setShowCreateModal] = useState(false);
