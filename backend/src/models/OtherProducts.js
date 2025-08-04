@@ -12,6 +12,7 @@ class OtherProducts {
         this.weight = data.weight;
 
         // Pricing
+        this.product_from = data.product_from;
         this.cost_price = data.cost_price;
         this.marked_price = data.marked_price;
         this.selling_price = data.selling_price; 

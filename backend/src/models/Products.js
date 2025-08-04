@@ -14,11 +14,12 @@ class Products {
         this.price = data.price;
 
         // Pricing
-        this.cost_price = data.cost_price;
-        this.marked_price = data.marked_price;
-        this.selling_price = data.selling_price; 
-        this.discount_percentage = data.discount_percentage;
-        this.discount_amount = data.discount_amount;
+        this.product_from = data.product_from; // keels, food city, where house
+        this.cost_price = data.cost_price; // ex: keels price
+        this.marked_price = data.marked_price; // product price to be sell
+        this.selling_price = data.selling_price; // calculated from backend
+        this.discount_percentage = data.discount_percentage; // if you give any discount
+        this.discount_amount = data.discount_amount; // calculated from backend
         
         this.add_quantity = data.add_quantity;
         this.withdraw_quantity = data.withdraw_quantity;

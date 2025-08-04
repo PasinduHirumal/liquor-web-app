@@ -6,7 +6,7 @@ const validateProduct = (req, res, next) => {
   if (!req.body || Object.keys(req.body).length === 0) {
     return res.status(400).json({ success: false, message: "Validation failed"});
   }
-  
+
   const schema = Joi.object({
     name: Joi.string().min(1).max(200).required(),
     description: Joi.string().min(1).max(1000).required(),
@@ -18,6 +18,7 @@ const validateProduct = (req, res, next) => {
     images: requiredImageSchema,
 
     // Pricing
+    product_from: Joi.string().min(1).max(200).default("Where House"),
     cost_price: Joi.number().positive().required(),
     marked_price: Joi.number().positive().required(),
     selling_price: Joi.number().positive().optional(),
@@ -156,6 +157,7 @@ const validatePriceOperation = (req, res, next) => {
 
   const schema = Joi.object({
     // Pricing
+    product_from: Joi.string().min(1).max(200).optional(),
     cost_price: Joi.number().positive().optional(),
     marked_price: Joi.number().positive().optional(),
     discount_percentage: Joi.number().min(0).max(100).optional(),
