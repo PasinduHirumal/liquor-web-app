@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, Form, Row, Col, InputGroup } from "react-bootstrap";
+import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import { axiosInstance } from "../../lib/axios";
 import LiquorProductCard from "../../common/LiquorProductCard";
 import LiquorCreateForm from "../../components/admin/forms/LiquorCreateForm";
@@ -10,8 +10,8 @@ const LiquorList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [filters, setFilters] = useState({
-        is_active: true,
-        is_in_stock: true,
+        is_active: "true",
+        is_in_stock: "true",
         categoryId: "",
     });
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -27,18 +27,16 @@ const LiquorList = () => {
                 );
                 setCategories(activeCategories);
 
-                const params = {
-                    is_active: filters.is_active,
-                    is_in_stock: filters.is_in_stock,
-                };
-                if (filters.categoryId) {
-                    params.categoryId = filters.categoryId;
-                }
+                const params = {};
+                if (filters.is_active !== "") params.is_active = filters.is_active;
+                if (filters.is_in_stock !== "") params.is_in_stock = filters.is_in_stock;
+                if (filters.categoryId !== "") params.categoryId = filters.categoryId;
 
                 const productsResponse = await axiosInstance.get("/products/getAll", {
                     params,
                 });
-                setProducts(productsResponse.data.data);
+
+                setProducts(productsResponse.data.data || []);
                 setError(null);
             } catch (err) {
                 setError(err.message || "Failed to fetch data");
@@ -52,18 +50,17 @@ const LiquorList = () => {
     }, [filters]);
 
     const handleFilterChange = (e) => {
-        const { name, value, type, checked } = e.target;
-
+        const { name, value } = e.target;
         setFilters((prev) => ({
             ...prev,
-            [name]: type === "checkbox" ? checked : value,
+            [name]: value,
         }));
     };
 
     const handleCategoryClick = (categoryId) => {
-        setFilters(prev => ({
+        setFilters((prev) => ({
             ...prev,
-            categoryId: prev.categoryId === categoryId ? "" : categoryId
+            categoryId: prev.categoryId === categoryId ? "" : categoryId,
         }));
     };
 
@@ -85,47 +82,49 @@ const LiquorList = () => {
             <div className="card mb-4">
                 <div className="card-body">
                     <h5 className="card-title mb-3">Filters</h5>
-
                     <Form>
-                        <Row className="align-items-center mb-3">
-                            <Col xs="auto">
-                                <Form.Check
-                                    type="checkbox"
-                                    id="filterActive"
-                                    label="Active"
-                                    name="is_active"
-                                    checked={filters.is_active}
-                                    onChange={handleFilterChange}
-                                />
+                        <Row className="g-3 mb-3">
+                            <Col md={4}>
+                                <Form.Group controlId="filterActive">
+                                    <Form.Label>Status</Form.Label>
+                                    <Form.Select
+                                        name="is_active"
+                                        value={filters.is_active}
+                                        onChange={handleFilterChange}
+                                    >
+                                        <option value="">All</option>
+                                        <option value="true">Active</option>
+                                        <option value="false">Inactive</option>
+                                    </Form.Select>
+                                </Form.Group>
                             </Col>
-
-                            <Col xs="auto">
-                                <Form.Check
-                                    type="checkbox"
-                                    id="filterInStock"
-                                    label="In Stock"
-                                    name="is_in_stock"
-                                    checked={filters.is_in_stock}
-                                    onChange={handleFilterChange}
-                                />
+                            <Col md={4}>
+                                <Form.Group controlId="filterStock">
+                                    <Form.Label>Stock</Form.Label>
+                                    <Form.Select
+                                        name="is_in_stock"
+                                        value={filters.is_in_stock}
+                                        onChange={handleFilterChange}
+                                    >
+                                        <option value="">All</option>
+                                        <option value="true">In Stock</option>
+                                        <option value="false">Out of Stock</option>
+                                    </Form.Select>
+                                </Form.Group>
                             </Col>
                         </Row>
 
-                        <div className="overflow-auto d-flex flex-nowrap gap-2 py-2" style={{ whiteSpace: "nowrap" }}>
+                        <div className="overflow-auto d-flex flex-nowrap gap-2 py-2">
                             <Button
                                 variant={!filters.categoryId ? "primary" : "outline-secondary"}
-                                size="md"
                                 onClick={() => handleCategoryClick("")}
-                                className="d-flex align-items-center"
                             >
                                 All
                             </Button>
-
                             {categories.map((category) => (
                                 <Button
                                     key={category.category_id}
                                     variant={filters.categoryId === category.category_id ? "primary" : "outline-secondary"}
-                                    size="md"
                                     onClick={() => handleCategoryClick(category.category_id)}
                                     className="d-flex align-items-center gap-1"
                                     style={{ flex: "0 0 auto" }}
@@ -138,7 +137,7 @@ const LiquorList = () => {
                                                 width: "20px",
                                                 height: "20px",
                                                 borderRadius: "50%",
-                                                objectFit: "cover"
+                                                objectFit: "contain",
                                             }}
                                         />
                                     )}
@@ -150,23 +149,21 @@ const LiquorList = () => {
                 </div>
             </div>
 
-            {/* Loading State */}
+            {/* Loading */}
             {loading && (
-                <div
-                    className="d-flex justify-content-center align-items-center"
-                    style={{ minHeight: "60vh" }}
-                >
+                <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
                     <div className="spinner-border" role="status" />
                 </div>
             )}
 
-            {/* Error State */}
+            {/* Error */}
             {!loading && error && (
                 <div className="alert alert-danger text-center" role="alert">
                     {error}
                 </div>
             )}
 
+            {/* Products */}
             {!loading && !error && (
                 <div className="row g-4">
                     {products.length > 0 ? (
