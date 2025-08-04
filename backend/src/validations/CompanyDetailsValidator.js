@@ -2,6 +2,10 @@ import Joi from 'joi';
 
 // UPDATE VALIDATOR - NO defaults, all fields optional
 const validateCompanyDetailsUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+  
   const schema = Joi.object({
     where_house_location: Joi.object({
         lat: Joi.number().min(-90).max(90).required(),

@@ -3,6 +3,10 @@ import phoneValidator from './phoneNumberValidationSchema.js';
 
 // CREATE VALIDATOR - With defaults
 const validateAdminUser = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+
   const schema = Joi.object({
     email: Joi.string().email().lowercase().required(),
     password: Joi.string().min(6).max(128).required(),
@@ -57,6 +61,10 @@ const validateAdminUser = (req, res, next) => {
 
 // UPDATE VALIDATOR - NO defaults, all fields optional
 const validateAdminUserUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+  
   const schema = Joi.object({
     email: Joi.string().email().lowercase().optional(),
     password: Joi.string().min(6).max(128).optional(),

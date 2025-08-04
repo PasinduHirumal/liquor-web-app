@@ -3,6 +3,10 @@ import { optionalImageSchema, requiredImageSchema } from './imageValidationSchem
 
 // CREATE VALIDATOR - With defaults
 const validateCategory = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+
   const schema = Joi.object({
     icon: requiredImageSchema,
     name: Joi.string().min(1).max(100).required(),
@@ -38,6 +42,10 @@ const validateCategory = (req, res, next) => {
 
 // UPDATE VALIDATOR - NO defaults, all fields optional
 const validateCategoryUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+  
   const schema = Joi.object({
     icon: optionalImageSchema,
     name: Joi.string().min(1).max(100).optional(),

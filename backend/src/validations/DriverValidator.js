@@ -7,6 +7,10 @@ import DELIVERY_VEHICLES from '../enums/deliveryVehicles.js';
 
 // CREATE VALIDATOR - With defaults
 const validateDriver = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+
   const schema = Joi.object({
     // Personal Information
     email: Joi.string().email().lowercase().required(),
@@ -178,6 +182,10 @@ const validateDriver = (req, res, next) => {
 
 // UPDATE VALIDATOR - NO defaults, all fields optional
 const validateDriverUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+
   const schema = Joi.object({
     // Personal Information
     email: Joi.string().email().lowercase().optional(),
@@ -255,6 +263,10 @@ const validateDriverUpdate = (req, res, next) => {
 
 // Additional validator for vehicle information updates
 const validateVehicleInformationUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+
   const schema = Joi.object({
     // Vehicle Information
     vehicleType: Joi.string().valid(...Object.values(DELIVERY_VEHICLES)).optional(),
@@ -292,6 +304,10 @@ const validateVehicleInformationUpdate = (req, res, next) => {
 
 // Additional validator for location and delivery updates
 const validateLocationAndDeliveryUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+
   const schema = Joi.object({
     // Location & Delivery
     currentLocation: Joi.object({
@@ -372,6 +388,10 @@ const validateLocationAndDeliveryUpdate = (req, res, next) => {
 
 // Additional validator for performance and rating updates
 const validatePerformanceAndRatingUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+
   const schema = Joi.object({
     // Performance & Ratings
     rating: Joi.number().min(0).max(5).optional(),
@@ -410,6 +430,10 @@ const validatePerformanceAndRatingUpdate = (req, res, next) => {
 
 // Additional validator for financial updates
 const validateFinancialUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+
   const schema = Joi.object({
     // Financial
     bankAccountNumber: Joi.string().min(5).max(50).allow('').optional(),
@@ -448,6 +472,10 @@ const validateFinancialUpdate = (req, res, next) => {
 
 // Additional validator for document updates
 const validateDocumentUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+
   const schema = Joi.object({
     // Documents
     documents: Joi.object({
@@ -485,6 +513,10 @@ const validateDocumentUpdate = (req, res, next) => {
 
 // Additional validator for driver qualifications updates
 const validateQualificationsUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+  
   const schema = Joi.object({
     // Qualifications
     isActive: Joi.boolean().optional(),

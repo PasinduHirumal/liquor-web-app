@@ -3,6 +3,10 @@ import { optionalImageSchema, requiredImageSchema } from './imageValidationSchem
 
 // CREATE VALIDATOR - With defaults
 const validateOtherProduct = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+
     const schema = Joi.object({
         name: Joi.string().min(1).max(200).required(),
         description: Joi.string().min(1).max(500).required(),
@@ -58,6 +62,10 @@ const validateOtherProduct = (req, res, next) => {
 
 // UPDATE VALIDATOR - NO defaults, all fields optional
 const validateOtherProductUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+
   const schema = Joi.object({
     name: Joi.string().min(1).max(200).optional(),
     description: Joi.string().min(1).max(500).optional(),
@@ -101,6 +109,10 @@ const validateOtherProductUpdate = (req, res, next) => {
 
 // Additional validator for quantity operations (if needed separately)
 const validateQuantityOperation = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+
   const schema = Joi.object({
     // Quantity management
     add_quantity: Joi.number().integer().min(0).optional(),
@@ -133,6 +145,10 @@ const validateQuantityOperation = (req, res, next) => {
 
 // Additional validator for quantity operations (if needed separately)
 const validatePriceOperation = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+  
   const schema = Joi.object({
     // Pricing
     cost_price: Joi.number().positive().optional(),

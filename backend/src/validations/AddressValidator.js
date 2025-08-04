@@ -2,6 +2,10 @@ import Joi from 'joi';
 
 // CREATE VALIDATOR - With defaults
 const validateAddress = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+
   const schema = Joi.object({
     city: Joi.string().min(1).max(100).required(),
     state: Joi.string().min(1).max(100).required(),
@@ -48,6 +52,10 @@ const validateAddress = (req, res, next) => {
 
 // UPDATE VALIDATOR - NO defaults, all fields optional
 const validateAddressUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+  
   const schema = Joi.object({
     city: Joi.string().min(1).max(100).optional(),
     state: Joi.string().min(1).max(100).optional(),

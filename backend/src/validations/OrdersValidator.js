@@ -3,6 +3,10 @@ import ORDER_STATUS from "../enums/orderStatus.js";
 
 // UPDATE VALIDATOR - NO defaults, all fields optional
 const validateOrderStatusUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+
   const schema = Joi.object({
     //status: Joi.string().valid(...Object.values(ORDER_STATUS)).optional(),
     status: Joi.string().valid(ORDER_STATUS.PENDING, ORDER_STATUS.PROCESSING).optional(),
@@ -36,6 +40,10 @@ const validateOrderStatusUpdate = (req, res, next) => {
 
 // UPDATE VALIDATOR - NO defaults, all fields optional
 const validateOrderAssignedDriverUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+  
   const schema = Joi.object({
     assigned_driver_id: Joi.string().min(1).max(100).optional(),
   })
