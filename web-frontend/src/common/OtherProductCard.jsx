@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const OtherProductCard = ({ product, showDetailButton = false }) => {
+const OtherProductCard = ({ product, showDetailButton = false, navigateButton = true }) => {
     // Combine main_image and images into one array for thumbnails
     const combinedImages = React.useMemo(() => {
         const imgs = product.images ? [...product.images] : [];
@@ -194,18 +194,20 @@ const OtherProductCard = ({ product, showDetailButton = false }) => {
                     <div className="card-footer mt-auto text-center">
                         {showDetailButton && (
                             <button
-                                className="btn btn-primary btn-sm w-100 my-1"
+                                className="btn btn-primary btn-sm w-100"
                                 onClick={handleViewDetail}
                             >
                                 View Details
                             </button>
                         )}
-                        <button
-                            className="btn btn-success btn-sm w-100"
-                            onClick={() => { console.log("navigate to application") }}
-                        >
-                            Buy Now
-                        </button>
+                        {navigateButton && (
+                            <button
+                                className="btn btn-success btn-sm w-100"
+                                onClick={() => { console.log("navigate to application") }}
+                            >
+                                Buy Now
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>

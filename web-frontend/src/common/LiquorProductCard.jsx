@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const LiquorProductCard = ({ product, detailButton = false }) => {
+const LiquorProductCard = ({ product, detailButton = false, navigateButton = true }) => {
   const navigate = useNavigate();
 
   // Combine main_image + images[] without duplication
@@ -159,22 +159,24 @@ const LiquorProductCard = ({ product, detailButton = false }) => {
             </span>
           </div>
 
-          {/* Button */}
+          {/* Buttons */}
           <div className="card-footer mt-auto text-center">
             {detailButton && (
               <button
-                className="btn btn-primary btn-sm w-100 my-1"
+                className="btn btn-primary btn-sm w-100"
                 onClick={handleViewDetail}
               >
                 View Details
               </button>
             )}
-            <button
-              className="btn btn-success btn-sm w-100"
-              onClick={() => { console.log("navigate to application") }}
-            >
-              Buy Now
-            </button>
+            {navigateButton && (
+              <button
+                className="btn btn-success btn-sm w-100"
+                onClick={() => { console.log("navigate to application") }}
+              >
+                Buy Now
+              </button>
+            )}
           </div>
         </div>
       </div>

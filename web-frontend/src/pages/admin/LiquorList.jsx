@@ -228,6 +228,7 @@ const LiquorList = () => {
                                 key={product.product_id}
                                 product={product}
                                 detailButton={true}
+                                navigateButton={false}
                             />
                         ))
                     ) : (

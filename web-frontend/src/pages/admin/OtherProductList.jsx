@@ -162,7 +162,12 @@ const OtherProductList = () => {
             ) : products.length > 0 ? (
                 <div className="row g-4">
                     {products.map((product) => (
-                        <OtherProductCard key={product.product_id} product={product} showDetailButton={true} />
+                        <OtherProductCard
+                            key={product.product_id}
+                            product={product}
+                            showDetailButton={true}
+                            navigateButton={false}
+                        />
                     ))}
                 </div>
             ) : (
