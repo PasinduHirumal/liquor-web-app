@@ -249,11 +249,6 @@ const LiquorEditForm = () => {
             return;
         }
 
-        if (existingImages.length + newImagesBase64.length === 0) {
-            toast.error("Please upload at least one additional image before updating.");
-            return;
-        }
-
         if (!validateForm()) {
             return;
         }
@@ -274,7 +269,7 @@ const LiquorEditForm = () => {
 
             await axiosInstance.patch(`/products/update/${id}`, payload);
             toast.success("Product updated successfully!");
-            navigate(`/products/${id}`);
+            navigate(-1);
         } catch (err) {
             console.error(err);
             toast.error(err.response?.data?.message || "Update failed.");
