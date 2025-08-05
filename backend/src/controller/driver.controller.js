@@ -69,7 +69,7 @@ const createDriver = async (req, res) => {
 
 const getAllDrivers = async (req, res) => {
 	try {
-        const { isActive, isAvailable, isOnline, isDocumentVerified, backgroundCheckStatus } = req.query;
+        const { isActive, isAvailable, isOnline, isDocumentVerified, backgroundCheckStatus, where_house_id } = req.query;
 
         const drivers = await driverService.findAll();
         if (!drivers) {
@@ -106,6 +106,15 @@ const getAllDrivers = async (req, res) => {
             
             filteredDrivers = filteredDrivers.filter(driver => driver.backgroundCheckStatus === backgroundCheckStatus);
             filterDescription.push(`backgroundCheckStatus: ${backgroundCheckStatus}`);
+        }
+        if (where_house_id !== undefined) {
+            const where_house = await companyService.findById(where_house_id);
+            if (!where_house) {
+                return res.status(400).json({ success: false, message: "Invalid where house id" });
+            }
+            
+            filteredDrivers = filteredDrivers.filter(driver => driver.where_house_id === where_house_id);
+            filterDescription.push(`where_house_id: ${where_house_id}`);
         }
 
         // Remove password field from each driver object
