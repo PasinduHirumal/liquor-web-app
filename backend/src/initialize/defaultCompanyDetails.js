@@ -4,19 +4,19 @@ const companyService = new CompanyService();
 
 const createDefaultCompanyDetails = async () => {
     try {
-        const defaultCode = "B-1";
+        const defaultCode = "B-000001";
         const main_where_house = await companyService.findByFilter('where_house_code', '==', defaultCode);
 
         if (!main_where_house) {
-            const code = 1;
+            const code = 1; // Fixed: Use decimal 1 instead of octal 000001
             const companyData = { 
-                where_house_code: `B-${code}`,
+                where_house_code: `B-${code.toString().padStart(6, '0')}`, // Pad with zeros to get "B-000001"
                 where_house_name: "where_house_0",
                 where_house_location: {
                     lat: null,
                     lng: null
                 },
-                delivery_charge_for_1KM: 0.00,
+                delivery_charge_for_1KM: 0.01,
                 service_charge: 0.00,
                 isActive: true
             };
