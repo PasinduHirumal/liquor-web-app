@@ -122,12 +122,9 @@ const DriverList = () => {
                         <Badge status="default" text="Offline" />
                     )}
                     {record.nic_number && <Text type="secondary">NIC: {record.nic_number}</Text>}
-                    {record.dateOfBirth && (
-                        <Text type="secondary">DOB: {new Date(record.dateOfBirth).toLocaleDateString()}</Text>
-                    )}
                 </Space>
             ),
-            width: 200,
+            width: 150,
             fixed: 'left',
         },
         {
@@ -140,7 +137,7 @@ const DriverList = () => {
                     <Text type="secondary">{record.city}</Text>
                 </Space>
             ),
-            width: 250,
+            width: 200,
         },
         {
             title: 'Vehicle',
@@ -151,6 +148,23 @@ const DriverList = () => {
                     {record.vehicleModel && <Text>{record.vehicleModel}</Text>}
                     {record.vehicleNumber && (
                         <Tag color="blue">{record.vehicleNumber}</Tag>
+                    )}
+                </Space>
+            ),
+            width: 150,
+        },
+        {
+            title: 'Warehouse',
+            key: 'warehouse',
+            render: (_, record) => (
+                <Space direction="vertical" size={0}>
+                    {record.where_house_id ? (
+                        <>
+                            <Text strong>{record.where_house_name || 'N/A'}</Text>
+                            <Text type="secondary">ID: {record.where_house_id}</Text>
+                        </>
+                    ) : (
+                        <Text type="secondary">Not assigned</Text>
                     )}
                 </Space>
             ),
@@ -172,7 +186,7 @@ const DriverList = () => {
                     </Tag>
                 </Space>
             ),
-            width: 150,
+            width: 120,
         },
         {
             title: 'Documents',
@@ -192,7 +206,7 @@ const DriverList = () => {
                     )}
                 </Space>
             ),
-            width: 150,
+            width: 120,
         },
         {
             title: 'Actions',
@@ -210,7 +224,7 @@ const DriverList = () => {
                     />
                 </Space>
             ),
-            width: 120,
+            width: 100,
             fixed: 'right',
         },
     ];
