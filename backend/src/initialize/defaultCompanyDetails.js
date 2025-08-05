@@ -25,7 +25,9 @@ const createDefaultCompanyDetails = async () => {
             console.log("✅ Default Company Details created.");
         } else if (main_where_house.length === 1) {
             console.log("✅ Default Company Details already exists.");
-        } 
+        } else {
+            console.error("❌ There are more than 1 company details records. Please fix it.");
+        }
     } catch (error) {
         console.error("❌ Error creating default Company Details:", error);
     }
