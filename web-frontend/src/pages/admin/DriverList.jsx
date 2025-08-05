@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import DeleteDriverButton from '../../components/admin/buttons/DeleteDriverButton';
 import {
     Table, Button, Space, Tag, Switch,
-    Card, Row, Col, Typography, Select, Badge, Input
+    Card, Row, Col, Typography, Select, Badge, Input, Tooltip
 } from 'antd';
 import {
     EditOutlined, PlusOutlined, ReloadOutlined, FilterOutlined, SearchOutlined, RightOutlined
@@ -17,6 +17,7 @@ const { Option } = Select;
 
 const DriverList = () => {
     const [drivers, setDrivers] = useState([]);
+    const [warehouses, setWarehouses] = useState([]);
     const [loading, setLoading] = useState(false);
     const [isModalVisible, setIsModalVisible] = useState(false);
     const [pagination, setPagination] = useState({
@@ -36,6 +37,16 @@ const DriverList = () => {
     });
 
     const navigate = useNavigate();
+
+    const fetchWarehouses = useCallback(async () => {
+        try {
+            const response = await axiosInstance.get('/system/details');
+            setWarehouses(response.data.data || []);
+        } catch (err) {
+            toast.error('Failed to load warehouse data');
+            console.error('Error fetching warehouses:', err);
+        }
+    }, []);
 
     const fetchDrivers = useCallback(async () => {
         setLoading(true);
@@ -60,7 +71,17 @@ const DriverList = () => {
 
             const response = await axiosInstance.get('/drivers/allDrivers', { params });
 
-            setDrivers(response.data.data || []);
+            // Enhance driver data with warehouse names
+            const enhancedDrivers = response.data.data.map(driver => {
+                const warehouse = warehouses.find(w => w.id === driver.where_house_id);
+                return {
+                    ...driver,
+                    warehouseName: warehouse?.where_house_name || 'Unassigned',
+                    warehouseCode: warehouse?.where_house_code || ''
+                };
+            });
+
+            setDrivers(enhancedDrivers || []);
             setPagination(prev => ({
                 ...prev,
                 total: response.data.count || 0,
@@ -71,7 +92,11 @@ const DriverList = () => {
         } finally {
             setLoading(false);
         }
-    }, [filters, pagination.current, pagination.pageSize]);
+    }, [filters, pagination.current, pagination.pageSize, warehouses]);
+
+    useEffect(() => {
+        fetchWarehouses();
+    }, [fetchWarehouses]);
 
     useEffect(() => {
         fetchDrivers();
@@ -157,18 +182,24 @@ const DriverList = () => {
             title: 'Warehouse',
             key: 'warehouse',
             render: (_, record) => (
-                <Space direction="vertical" size={0}>
-                    {record.where_house_id ? (
-                        <>
-                            <Text strong>{record.where_house_name || 'N/A'}</Text>
+                <Tooltip
+                    title={`Code: ${record.warehouseCode}`}
+                    placement="topLeft"
+                >
+                    <Space direction="vertical" size={0}>
+                        <Text strong>{record.warehouseName}</Text>
+                        {record.where_house_id && (
                             <Text type="secondary">ID: {record.where_house_id}</Text>
-                        </>
-                    ) : (
-                        <Text type="secondary">Not assigned</Text>
-                    )}
-                </Space>
+                        )}
+                    </Space>
+                </Tooltip>
             ),
             width: 200,
+            filters: warehouses.map(w => ({
+                text: w.where_house_name,
+                value: w.id,
+            })),
+            onFilter: (value, record) => record.where_house_id === value,
         },
         {
             title: 'Status',
