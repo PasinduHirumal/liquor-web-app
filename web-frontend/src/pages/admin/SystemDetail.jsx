@@ -14,17 +14,17 @@ import CreateSystemModal from "../../components/admin/forms/CreateSystemModal";
 const { Title, Text } = Typography;
 
 const SystemDetail = () => {
-    const [companyDetail, setCompanyDetail] = useState(null);
+    const [companyDetails, setCompanyDetails] = useState([]); // ← treat as array
     const [loading, setLoading] = useState(true);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [editingId, setEditingId] = useState(null);
 
-    const fetchCompanyDetail = async () => {
+    const fetchCompanyDetails = async () => {
         setLoading(true);
         try {
             const res = await axiosInstance.get("/system/details");
-            setCompanyDetail(res.data.data);
+            setCompanyDetails(res.data.data); // ← array of warehouses
         } catch (err) {
             toast.error(err.response?.data?.message || "Failed to fetch system details");
         } finally {
@@ -33,10 +33,16 @@ const SystemDetail = () => {
     };
 
     useEffect(() => {
-        fetchCompanyDetail();
+        fetchCompanyDetails();
     }, []);
 
     const columns = [
+        {
+            title: 'Warehouse Code',
+            dataIndex: 'where_house_code',
+            key: 'where_house_code',
+            render: (text) => text || 'N/A',
+        },
         {
             title: 'Warehouse Name',
             dataIndex: 'where_house_name',
@@ -80,24 +86,18 @@ const SystemDetail = () => {
         {
             title: 'Action',
             key: 'action',
-            render: () => (
+            render: (_, record) => (
                 <Button
                     type="text"
                     icon={<EditOutlined />}
                     onClick={() => {
-                        if (companyDetail?.id) {
-                            setEditingId(companyDetail.id);
-                            setShowEditModal(true);
-                        } else {
-                            toast.error("No company detail to edit");
-                        }
+                        setEditingId(record.id); // ← use the row's ID
+                        setShowEditModal(true);
                     }}
                 />
             ),
         }
     ];
-
-    const dataSource = companyDetail ? [companyDetail] : [];
 
     return (
         <div className="container-fluid mt-3">
@@ -106,7 +106,7 @@ const SystemDetail = () => {
                     <Row justify="space-between" align="middle">
                         <Col>
                             <Title level={4} style={{ margin: 0 }}>System Configuration</Title>
-                            <Text type="secondary">Current system settings</Text>
+                            <Text type="secondary">All warehouse system settings</Text>
                         </Col>
                         <Col>
                             <Space>
@@ -119,7 +119,7 @@ const SystemDetail = () => {
                                 </Button>
                                 <Button
                                     icon={<ReloadOutlined />}
-                                    onClick={fetchCompanyDetail}
+                                    onClick={fetchCompanyDetails}
                                     loading={loading}
                                 >
                                     Refresh
@@ -131,14 +131,14 @@ const SystemDetail = () => {
             >
                 <Table
                     columns={columns}
-                    dataSource={dataSource}
+                    dataSource={companyDetails}
                     loading={loading}
-                    pagination={false}
+                    pagination={{ pageSize: 10 }}
                     bordered
                     size="middle"
-                    rowKey={() => 'system-settings'}
-                    style={{ marginTop: 16 }}
+                    rowKey="id"
                     scroll={{ x: 'max-content' }}
+                    style={{ marginTop: 16 }}
                 />
             </Card>
 
@@ -147,7 +147,9 @@ const SystemDetail = () => {
                 onHide={() => setShowEditModal(false)}
                 companyDetailId={editingId}
                 onUpdateSuccess={(updatedData) => {
-                    setCompanyDetail(updatedData);
+                    setCompanyDetails(prev =>
+                        prev.map(item => item.id === updatedData.id ? updatedData : item)
+                    );
                     setShowEditModal(false);
                 }}
             />
@@ -156,7 +158,7 @@ const SystemDetail = () => {
                 show={showCreateModal}
                 onHide={() => setShowCreateModal(false)}
                 onCreateSuccess={(newData) => {
-                    setCompanyDetail(newData);
+                    setCompanyDetails(prev => [...prev, newData]);
                     setShowCreateModal(false);
                     toast.success("System configuration created successfully");
                 }}
