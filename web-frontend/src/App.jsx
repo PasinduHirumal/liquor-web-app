@@ -23,6 +23,7 @@ import { userRoutes } from "./routes/user/UserRoutes";
 import MainLayout from "./layout/Mainlayout";
 import LiquorAll from "./pages/LiquorAll";
 import OtherProductAll from "./pages/OtherProductAll";
+import ScrollToTop from "./common/ScrollToTop";
 
 function App() {
   const adminCheckAuth = useAdminAuthStore((state) => state.checkAuth);
@@ -38,10 +39,11 @@ function App() {
   return (
     <Router>
       <ToastProvider />
+      <ScrollToTop />
 
       <Routes>
         <Route path="/" element={<MainLayout />}>
-        
+
           <Route
             index
             element={
@@ -60,7 +62,7 @@ function App() {
             element={
               adminAuth || userAuth ? <Navigate to="/" replace /> : <Login />
             }
-          /> 
+          />
 
           <Route
             path="register"
@@ -70,7 +72,7 @@ function App() {
           />
 
           <Route path="verify-otp" element={<VerifyOtpPage />} />
-          
+
           <Route path="/liquor-all" element={<LiquorAll />} />
           <Route path="/other-product-all" element={<OtherProductAll />} />
 
