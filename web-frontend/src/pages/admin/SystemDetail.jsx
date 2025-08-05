@@ -1,108 +1,147 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
 import {
-    Container,
-    Row,
-    Col,
-    Card,
-    Spinner,
-    Button,
-} from "react-bootstrap";
-import { PencilSquare } from "react-bootstrap-icons";
+    Table, Card, Row, Col, Typography,
+    Button, Space, Tag
+} from "antd";
+import {
+    EditOutlined, ReloadOutlined
+} from '@ant-design/icons';
 import toast from "react-hot-toast";
 import EditSystemModal from "../../components/admin/forms/EditSystemModal";
+
+const { Title, Text } = Typography;
 
 const SystemDetail = () => {
     const [companyDetail, setCompanyDetail] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [editingId, setEditingId] = useState(null);
+
+    const fetchCompanyDetail = async () => {
+        setLoading(true);
+        try {
+            const res = await axiosInstance.get("/system/details");
+            // Your backend returns one company detail object (earliest created)
+            setCompanyDetail(res.data.data);
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to fetch system details");
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchCompanyDetail = async () => {
-            setLoading(true);
-            try {
-                const res = await axiosInstance.get("/system/details");
-                setCompanyDetail(res.data.data);
-            } catch (err) {
-                toast.error(err.response?.data?.message || "Failed to fetch system details");
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchCompanyDetail();
     }, []);
 
+    const columns = [
+        {
+            title: 'Warehouse Name',
+            dataIndex: 'where_house_name',
+            key: 'where_house_name',
+            render: (text) => text || 'N/A',
+        },
+        {
+            title: 'Warehouse Location',
+            dataIndex: 'where_house_location',
+            key: 'where_house_location',
+            render: (location) =>
+                location ? (
+                    <Space direction="vertical" size={0}>
+                        <Text>Lat: {location.lat ?? 'N/A'}</Text>
+                        <Text>Lng: {location.lng ?? 'N/A'}</Text>
+                    </Space>
+                ) : 'N/A',
+        },
+        {
+            title: 'Delivery Charge (per 1KM)',
+            dataIndex: 'delivery_charge_for_1KM',
+            key: 'delivery_charge_for_1KM',
+            render: (value) => value ?? 'N/A',
+        },
+        {
+            title: 'Service Charge',
+            dataIndex: 'service_charge',
+            key: 'service_charge',
+            render: (value) => value ?? 'N/A',
+        },
+        {
+            title: 'System Status',
+            dataIndex: 'isActive',
+            key: 'isActive',
+            render: (isActive) => (
+                <Tag color={isActive ? 'green' : 'red'}>
+                    {isActive ? 'Active' : 'Inactive'}
+                </Tag>
+            ),
+        },
+        {
+            title: 'Action',
+            key: 'action',
+            render: () => (
+                <Button
+                    type="text"
+                    icon={<EditOutlined />}
+                    onClick={() => {
+                        if (companyDetail?.id) {
+                            setEditingId(companyDetail.id);
+                            setShowModal(true);
+                        } else {
+                            toast.error("No company detail to edit");
+                        }
+                    }}
+                />
+            ),
+        }
+    ];
+
+    const dataSource = companyDetail ? [companyDetail] : [];
+
     return (
-        <Container className="py-5">
-            <Row className="justify-content-center">
-                <Col xs={12} md={8} lg={6}>
-                    <h2 className="text-center mb-4">System Details</h2>
-                    {loading ? (
-                        <div className="d-flex justify-content-center">
-                            <Spinner animation="border" variant="primary" role="status">
-                                <span className="visually-hidden">Loading...</span>
-                            </Spinner>
-                        </div>
-                    ) : (
-                        <>
-                            <Card className="shadow-sm">
-                                <Card.Header className="d-flex justify-content-between align-items-center">
-                                    <span>System Information</span>
-                                    <Button
-                                        variant="link"
-                                        onClick={() => setShowModal(true)}
-                                        aria-label="Edit"
-                                    >
-                                        <PencilSquare size={20} />
-                                    </Button>
-                                </Card.Header>
-                                <Card.Body>
-                                    <Card.Text>
-                                        <strong>Warehouse Location:</strong>
-                                        <br />
-                                        Latitude: {companyDetail?.where_house_location?.lat ?? "N/A"}
-                                        <br />
-                                        Longitude: {companyDetail?.where_house_location?.lng ?? "N/A"}
-                                    </Card.Text>
+        <div className="container-fluid mt-3">
+            <Card
+                title={
+                    <Row justify="space-between" align="middle">
+                        <Col>
+                            <Title level={4} style={{ margin: 0 }}>System Configuration</Title>
+                            <Text type="secondary">Current system settings</Text>
+                        </Col>
+                        <Col>
+                            <Button
+                                icon={<ReloadOutlined />}
+                                onClick={fetchCompanyDetail}
+                                loading={loading}
+                            >
+                                Refresh
+                            </Button>
+                        </Col>
+                    </Row>
+                }
+            >
+                <Table
+                    columns={columns}
+                    dataSource={dataSource}
+                    loading={loading}
+                    pagination={false}
+                    bordered
+                    size="middle"
+                    rowKey={() => 'system-settings'}
+                    style={{ marginTop: 16 }}
+                    scroll={{ x: 'max-content' }}
+                />
+            </Card>
 
-                                    <Card.Text>
-                                        <strong>Delivery Charge per 1KM:</strong>{" "}
-                                        {companyDetail?.delivery_charge_for_1KM ?? "N/A"}
-                                    </Card.Text>
-
-                                    <Card.Text>
-                                        <strong>Service Charge:</strong>{" "}
-                                        {companyDetail?.service_charge ?? "N/A"}
-                                    </Card.Text>
-
-                                    <Card.Text>
-                                        <strong>Created At:</strong>{" "}
-                                        {companyDetail?.created_at
-                                            ? new Date(companyDetail.created_at).toLocaleString()
-                                            : "N/A"}
-                                    </Card.Text>
-
-                                    <Card.Text>
-                                        <strong>Updated At:</strong>{" "}
-                                        {companyDetail?.updated_at
-                                            ? new Date(companyDetail.updated_at).toLocaleString()
-                                            : "N/A"}
-                                    </Card.Text>
-                                </Card.Body>
-                            </Card>
-
-                            <EditSystemModal
-                                show={showModal}
-                                onHide={() => setShowModal(false)}
-                                companyDetail={companyDetail}
-                                onUpdateSuccess={(updatedData) => setCompanyDetail(updatedData)}
-                            />
-                        </>
-                    )}
-                </Col>
-            </Row>
-        </Container>
+            <EditSystemModal
+                show={showModal}
+                onHide={() => setShowModal(false)}
+                companyDetailId={editingId}
+                onUpdateSuccess={(updatedData) => {
+                    setCompanyDetail(updatedData);
+                    setShowModal(false);
+                }}
+            />
+        </div>
     );
 };
 
