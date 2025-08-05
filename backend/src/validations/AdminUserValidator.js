@@ -16,6 +16,7 @@ const validateAdminUser = (req, res, next) => {
     
     role: Joi.string().valid('pending', 'admin', 'super_admin').default('pending'),
     googleId: Joi.string().allow('').default(''),
+    where_house_id: Joi.string().required(),
     isActive: Joi.boolean().default(true),
     isAdminAccepted: Joi.boolean().default(false),
 
@@ -58,7 +59,6 @@ const validateAdminUser = (req, res, next) => {
   next();
 };
 
-
 // UPDATE VALIDATOR - NO defaults, all fields optional
 const validateAdminUserUpdate = (req, res, next) => {
   if (!req.body || Object.keys(req.body).length === 0) {
@@ -74,6 +74,7 @@ const validateAdminUserUpdate = (req, res, next) => {
     
     role: Joi.string().valid('pending', 'admin', 'super_admin').optional(),
     googleId: Joi.string().allow('').optional(),
+    where_house_id: Joi.string().optional(),
     isActive: Joi.boolean().optional(),
     isAdminAccepted: Joi.boolean().optional(),
     
@@ -117,8 +118,6 @@ const validateAdminUserUpdate = (req, res, next) => {
   req.body = value;
   next();
 };
-
-
 
 
 export { validateAdminUser, validateAdminUserUpdate };

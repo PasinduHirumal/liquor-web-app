@@ -1,4 +1,5 @@
 import dotenv from 'dotenv';
+import ADMIN_ROLES from '../enums/adminRoles.js';
 import AdminUserService from '../services/adminUsers.service.js';
 
 dotenv.config();
@@ -18,7 +19,10 @@ const createDefaultSuperAdmin = async () => {
                 lastName: process.env.SUPER_ADMIN_LAST_NAME,            
                 phone: process.env.SUPER_ADMIN_PHONE,
 
-                role: 'super_admin',
+                role: ADMIN_ROLES.SUPER_ADMIN,
+                googleId: '',
+                where_house_id: "N/A",
+
                 isAccountVerified: true,
                 isAdminAccepted: true,
                 isActive: true

@@ -171,6 +171,13 @@ const updateDriver = async (req, res) => {
             return res.status(404).json({ success: false, message: "Driver not found"});
         }
 
+        if (where_house_id !== undefined) {
+            const where_house = await companyService.findById(where_house_id);
+            if (!where_house) {
+                return res.status(400).json({ success: false, message: "Invalid where house id" });
+            }
+        }
+
         // Authorization logic
         const isSuperAdmin = req.user.role === ADMIN_ROLES.SUPER_ADMIN;
         const isAdmin = req.user.role === ADMIN_ROLES.ADMIN;
@@ -183,14 +190,7 @@ const updateDriver = async (req, res) => {
         // Only super admin can change these
         if (isActive || isDocumentVerified || isAccountVerified || where_house_id) {
             if (!isSuperAdmin) {
-                return res.status(403).json({ success: false, message: "Not authorized to change roles" });
-            }
-        }
-
-        if (where_house_id !== undefined) {
-            const where_house = await companyService.findById(where_house_id);
-            if (!where_house) {
-                return res.status(400).json({ success: false, message: "Invalid where house id" });
+                return res.status(403).json({ success: false, message: "Not authorized to update" });
             }
         }
 

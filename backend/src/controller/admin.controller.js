@@ -1,8 +1,10 @@
 import AdminUserService from '../services/adminUsers.service.js';
+import CompanyService from "../services/company.service.js";
 import generateToken from '../utils/createToken.js';
 import ADMIN_ROLES from '../enums/adminRoles.js';
 
 const adminService = new AdminUserService();
+const companyService = new CompanyService();
 
 const getAdminById = async (req, res) => {
     try {
@@ -85,11 +87,16 @@ const updateAdmin = async (req, res) => {
 	try {
         const adminIdToUpdate = req.params.id;
         const currentUserId = req.user.id;
-        const { email, phone, isActive, isAdminAccepted, isAccountVerified } = req.body;
+        const { email, phone, isActive, isAdminAccepted, isAccountVerified, where_house_id} = req.body;
 
         const admin = await adminService.findById(adminIdToUpdate);
         if (!admin) {
             return res.status(404).json({ success: false, message: "Admin not found"});
+        }
+
+        const where_house = await companyService.findById(where_house_id);
+        if (!where_house) {
+            return res.status(400).json({ success: false, message: "Invalid where house id" });
         }
 
         // Authorization logic
@@ -105,21 +112,16 @@ const updateAdmin = async (req, res) => {
         }
         
         // Role change restrictions
-        if (req.body.role || isAdminAccepted || isActive || isAccountVerified) {
+        if (req.body.role || isAdminAccepted || isActive || isAccountVerified || where_house_id) {
             // Only super admin can change roles
             if (!isSuperAdmin) {
-                return res.status(403).json({ success: false, message: "Not authorized to change roles" });
+                return res.status(403).json({ success: false, message: "Not authorized to update" });
             }
 
             // Validate role value
             if (req.body.role && !Object.values(ADMIN_ROLES).includes(req.body.role)) {
                 return res.status(400).json({ success: false, message: "Invalid role value" });
             }
-        }
-
-        let isUpdatingTokenValue = false;
-        if (req.body.role && isUpdatingSelf) {
-            isUpdatingTokenValue = true;
         }
 
         const updateData = { ...req.body };
@@ -140,12 +142,13 @@ const updateAdmin = async (req, res) => {
             return res.status(400).json({ success: false, message: "Failed to update admin"});
         }
         
-        if (isUpdatingTokenValue) {
+        if (req.body.role && isUpdatingSelf) {
             const payload = {
                 id: updatedAdmin.id,
                 email: updatedAdmin.email,
                 username: `${updatedAdmin.firstName} ${updatedAdmin.lastName}`,
                 role: updatedAdmin.role,
+                where_house: user.where_house_id || "N/A",
             };
 
             generateToken(payload, res);

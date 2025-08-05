@@ -11,6 +11,7 @@ class AdminUsers {
 
         this.role = data.role;
         this.googleId = data.googleId;
+        this.where_house_id = data.where_house_id;
         this.isActive = data.isActive;
         this.isAdminAccepted = data.isAdminAccepted;
 
