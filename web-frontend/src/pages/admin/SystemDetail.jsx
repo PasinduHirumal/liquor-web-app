@@ -14,7 +14,7 @@ import CreateSystemModal from "../../components/admin/forms/CreateSystemModal";
 const { Title, Text } = Typography;
 
 const SystemDetail = () => {
-    const [companyDetails, setCompanyDetails] = useState([]); // ← treat as array
+    const [companyDetails, setCompanyDetails] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showEditModal, setShowEditModal] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
@@ -24,7 +24,7 @@ const SystemDetail = () => {
         setLoading(true);
         try {
             const res = await axiosInstance.get("/system/details");
-            setCompanyDetails(res.data.data); // ← array of warehouses
+            setCompanyDetails(res.data.data);
         } catch (err) {
             toast.error(err.response?.data?.message || "Failed to fetch system details");
         } finally {
