@@ -1,16 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-    Modal,
-    Form,
-    Input,
-    InputNumber,
-    Switch,
-    Button,
-    Row,
-    Col,
-    Spin,
-    Typography,
-} from "antd";
+import { Modal, Form, Input, InputNumber, Switch, Button, Row, Col, Spin, Typography, } from "antd";
 import { axiosInstance } from "../../../lib/axios";
 import toast from "react-hot-toast";
 
