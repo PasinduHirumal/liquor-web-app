@@ -74,6 +74,17 @@ const SystemDetail = () => {
                 </Tag>
             ),
         },
+        {
+            title: 'Action',
+            key: 'action',
+            render: () => (
+                <Button
+                    type="text"
+                    icon={<EditOutlined />}
+                    onClick={() => setShowModal(true)}
+                />
+            ),
+        }
     ];
 
     const dataSource = companyDetail ? [companyDetail] : [];
@@ -88,21 +99,12 @@ const SystemDetail = () => {
                             <Text type="secondary">Current system settings</Text>
                         </Col>
                         <Col>
-                            <Space>
-                                <Button
-                                    icon={<ReloadOutlined />}
-                                    onClick={fetchCompanyDetail}
-                                >
-                                    Refresh
-                                </Button>
-                                <Button
-                                    type="primary"
-                                    icon={<EditOutlined />}
-                                    onClick={() => setShowModal(true)}
-                                >
-                                    Edit Settings
-                                </Button>
-                            </Space>
+                            <Button
+                                icon={<ReloadOutlined />}
+                                onClick={fetchCompanyDetail}
+                            >
+                                Refresh
+                            </Button>
                         </Col>
                     </Row>
                 }

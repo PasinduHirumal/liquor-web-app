@@ -79,7 +79,7 @@ const EditSystemModal = ({ show, onHide, companyDetail, onUpdateSuccess }) => {
     };
 
     return (
-        <Modal show={show} onHide={() => !modalLoading && onHide()} backdrop="static" keyboard={!modalLoading}>
+        <Modal className="mt-5 pt-2" show={show} onHide={() => !modalLoading && onHide()} backdrop="static" keyboard={!modalLoading}>
             <Modal.Header closeButton={!modalLoading}>
                 <Modal.Title>Edit System Details</Modal.Title>
             </Modal.Header>
