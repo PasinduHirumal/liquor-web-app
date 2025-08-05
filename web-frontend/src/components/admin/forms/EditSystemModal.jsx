@@ -34,7 +34,6 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                 });
             } catch (err) {
                 toast.error("Failed to load company details");
-                onHide();
             } finally {
                 setInitialLoading(false);
             }

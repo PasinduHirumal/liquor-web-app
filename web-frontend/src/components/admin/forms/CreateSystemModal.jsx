@@ -54,7 +54,13 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                         <Form.Item
                             name="where_house_name"
                             label="Warehouse Name"
-                            rules={[{ required: true, message: 'Please input warehouse name!' }]}
+                            rules={[
+                                { required: true, message: 'Please input warehouse name!' },
+                                {
+                                    pattern: /^where_house_\d+$/,
+                                    message: 'Must follow format "where_house_" followed by a number'
+                                }
+                            ]}
                         >
                             <Input placeholder="where_house_1" />
                         </Form.Item>
