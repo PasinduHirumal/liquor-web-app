@@ -5,15 +5,19 @@ const companyService = new CompanyService();
 const createDefaultCompanyDetails = async () => {
     try {
         const companyDetails = await companyService.findAll();
+        const code = 1;
 
         if (companyDetails.length === 0) {
             const companyData = { 
+                where_house_code: `B-${code}`,
+                where_house_name: "where_house_0",
                 where_house_location: {
                     lat: null,
                     lng: null
                 },
                 delivery_charge_for_1KM: 0.00,
-                service_charge: 0.00
+                service_charge: 0.00,
+                isActive: true
             };
 
             await companyService.create(companyData);

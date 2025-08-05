@@ -7,12 +7,15 @@ const validateCompanyDetailsUpdate = (req, res, next) => {
   }
   
   const schema = Joi.object({
+    //where_house_code: Joi.string().optional(),
+    where_house_name: Joi.string().pattern(/^where_house_\d+$/).optional(),
     where_house_location: Joi.object({
         lat: Joi.number().min(-90).max(90).required(),
         lng: Joi.number().min(-180).max(180).required(),
     }).allow(null).optional(),
     delivery_charge_for_1KM: Joi.number().positive().precision(2).optional(),
     service_charge: Joi.number().min(0).precision(2).optional(),
+    isActive: Joi.boolean().optional(),
   })
   .min(1) // Require at least one field to update
   .options({ stripUnknown: true });; 
