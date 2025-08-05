@@ -1,11 +1,33 @@
-import React, { useState } from 'react';
-import { Modal, Form, Input, DatePicker, Row, Col } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Modal, Form, Input, DatePicker, Row, Col, Select, Spin } from 'antd';
 import { axiosInstance } from '../../../lib/axios';
 import toast from 'react-hot-toast';
+
+const { Option } = Select;
 
 const CreateDriverModal = ({ visible, onClose, onSuccess }) => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
+    const [warehouses, setWarehouses] = useState([]);
+    const [warehouseLoading, setWarehouseLoading] = useState(false);
+
+    useEffect(() => {
+        if (visible) {
+            fetchWarehouses();
+        }
+    }, [visible]);
+
+    const fetchWarehouses = async () => {
+        setWarehouseLoading(true);
+        try {
+            const response = await axiosInstance.get('/system/details');
+            setWarehouses(response.data.data);
+        } catch (err) {
+            toast.error('Failed to load warehouses');
+        } finally {
+            setWarehouseLoading(false);
+        }
+    };
 
     const handleCreateDriver = async (values) => {
         setLoading(true);
@@ -80,6 +102,21 @@ const CreateDriverModal = ({ visible, onClose, onSuccess }) => {
                     <Col span={12}>
                         <Form.Item name="dateOfBirth" label="Date of Birth" rules={[{ required: true }]}>
                             <DatePicker style={{ width: '100%' }} />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item name="warehouseId" label="Assigned Warehouse" rules={[{ required: true }]}>
+                            {warehouseLoading ? (
+                                <Spin size="small" />
+                            ) : (
+                                <Select placeholder="Select warehouse">
+                                    {warehouses.map((wh) => (
+                                        <Option key={wh.id} value={wh.id}>
+                                            {wh.where_house_name}
+                                        </Option>
+                                    ))}
+                                </Select>
+                            )}
                         </Form.Item>
                     </Col>
                 </Row>
