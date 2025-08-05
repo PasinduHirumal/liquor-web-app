@@ -135,6 +135,10 @@ const DriverDetailPage = () => {
                             {driver.firstName} {driver.lastName}
                         </Typography>
 
+                        <Typography variant="h6" className="text-secondary border-0 m-0 p-0" style={{ fontSize: '14px' }}>
+                            {driver.where_house_id || "No Warehouse Assigned"}
+                        </Typography>
+
                         <div className="driver-detail-contact">
                             <Typography variant="h6" className="driver-detail-section-title">
                                 Contact Information
