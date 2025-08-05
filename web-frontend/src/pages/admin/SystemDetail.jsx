@@ -5,24 +5,25 @@ import {
     Button, Space, Tag
 } from "antd";
 import {
-    EditOutlined, ReloadOutlined
+    EditOutlined, ReloadOutlined, PlusOutlined
 } from '@ant-design/icons';
 import toast from "react-hot-toast";
 import EditSystemModal from "../../components/admin/forms/EditSystemModal";
+import CreateSystemModal from "../../components/admin/forms/CreateSystemModal";
 
 const { Title, Text } = Typography;
 
 const SystemDetail = () => {
     const [companyDetail, setCompanyDetail] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [showModal, setShowModal] = useState(false);
+    const [showEditModal, setShowEditModal] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
     const [editingId, setEditingId] = useState(null);
 
     const fetchCompanyDetail = async () => {
         setLoading(true);
         try {
             const res = await axiosInstance.get("/system/details");
-            // Your backend returns one company detail object (earliest created)
             setCompanyDetail(res.data.data);
         } catch (err) {
             toast.error(err.response?.data?.message || "Failed to fetch system details");
@@ -86,7 +87,7 @@ const SystemDetail = () => {
                     onClick={() => {
                         if (companyDetail?.id) {
                             setEditingId(companyDetail.id);
-                            setShowModal(true);
+                            setShowEditModal(true);
                         } else {
                             toast.error("No company detail to edit");
                         }
@@ -108,13 +109,22 @@ const SystemDetail = () => {
                             <Text type="secondary">Current system settings</Text>
                         </Col>
                         <Col>
-                            <Button
-                                icon={<ReloadOutlined />}
-                                onClick={fetchCompanyDetail}
-                                loading={loading}
-                            >
-                                Refresh
-                            </Button>
+                            <Space>
+                                <Button
+                                    type="primary"
+                                    icon={<PlusOutlined />}
+                                    onClick={() => setShowCreateModal(true)}
+                                >
+                                    Create New
+                                </Button>
+                                <Button
+                                    icon={<ReloadOutlined />}
+                                    onClick={fetchCompanyDetail}
+                                    loading={loading}
+                                >
+                                    Refresh
+                                </Button>
+                            </Space>
                         </Col>
                     </Row>
                 }
@@ -133,12 +143,22 @@ const SystemDetail = () => {
             </Card>
 
             <EditSystemModal
-                show={showModal}
-                onHide={() => setShowModal(false)}
+                show={showEditModal}
+                onHide={() => setShowEditModal(false)}
                 companyDetailId={editingId}
                 onUpdateSuccess={(updatedData) => {
                     setCompanyDetail(updatedData);
-                    setShowModal(false);
+                    setShowEditModal(false);
+                }}
+            />
+
+            <CreateSystemModal
+                show={showCreateModal}
+                onHide={() => setShowCreateModal(false)}
+                onCreateSuccess={(newData) => {
+                    setCompanyDetail(newData);
+                    setShowCreateModal(false);
+                    toast.success("System configuration created successfully");
                 }}
             />
         </div>
