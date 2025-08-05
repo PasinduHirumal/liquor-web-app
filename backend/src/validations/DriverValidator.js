@@ -29,6 +29,7 @@ const validateDriver = (req, res, next) => {
     address: Joi.string().max(350).allow('').default(null),
     city: Joi.string().max(100).allow('').default(null),
     emergencyContact: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).allow('').default(null),
+    where_house_id: Joi.string().required(),
 
     // Vehicle Information
     vehicleType: Joi.string().valid(...Object.values(DELIVERY_VEHICLES)).default(null),
@@ -204,6 +205,7 @@ const validateDriverUpdate = (req, res, next) => {
     address: Joi.string().max(350).allow('').optional(),
     city: Joi.string().max(100).allow('').optional(),
     emergencyContact: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).allow('').optional(),
+    where_house_id: Joi.string().optional(),
 
     // Account & Status
     role: Joi.string().valid('driver').optional(),

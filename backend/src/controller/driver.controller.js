@@ -1,19 +1,26 @@
 import DriverService from "../services/driver.service.js";
+import CompanyService from "../services/company.service.js";
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import BACKGROUND_STATUS from "../enums/driverBackgroundStatus.js";
 import { uploadImages, uploadSingleImage } from '../utils/firebaseStorage.js';
 
 const driverService = new DriverService();
+const companyService = new CompanyService();
 
 const createDriver = async (req, res) => {
 	try {
-        const { email, phone, profileImage } = req.body;
+        const { email, phone, profileImage, where_house_id } = req.body;
 
         const driverByEmail  = await driverService.findByEmail(email);
         const driverByPhone = await driverService.findByPhone(phone);
 
         if (driverByEmail || driverByPhone) {
             return res.status(400).json({ success: false, message: "Driver already exists" });
+        }
+
+        const where_house = await companyService.findById(where_house_id);
+        if (!where_house) {
+            return res.status(400).json({ success: false, message: "Invalid where house id" });
         }
         
         if (profileImage !== undefined) {
@@ -62,7 +69,7 @@ const createDriver = async (req, res) => {
 
 const getAllDrivers = async (req, res) => {
 	try {
-        const { isActive, isAvailable, isOnline, isDocumentVerified, backgroundCheckStatus } = req.query;
+        const { isActive, isAvailable, isOnline, isDocumentVerified, backgroundCheckStatus, where_house_id } = req.query;
 
         const drivers = await driverService.findAll();
         if (!drivers) {
@@ -99,6 +106,15 @@ const getAllDrivers = async (req, res) => {
             
             filteredDrivers = filteredDrivers.filter(driver => driver.backgroundCheckStatus === backgroundCheckStatus);
             filterDescription.push(`backgroundCheckStatus: ${backgroundCheckStatus}`);
+        }
+        if (where_house_id !== undefined) {
+            const where_house = await companyService.findById(where_house_id);
+            if (!where_house) {
+                return res.status(400).json({ success: false, message: "Invalid where house id" });
+            }
+            
+            filteredDrivers = filteredDrivers.filter(driver => driver.where_house_id === where_house_id);
+            filterDescription.push(`where_house_id: ${where_house_id}`);
         }
 
         // Remove password field from each driver object
@@ -148,7 +164,7 @@ const updateDriver = async (req, res) => {
 	try {
         const driverId = req.params.id;
         const currentUserId = req.user.id;
-        const { email, phone, profileImage, documents, isActive, isDocumentVerified, isAccountVerified } = req.body;
+        const { email, phone, profileImage, documents, isActive, isDocumentVerified, isAccountVerified, where_house_id } = req.body;
 
         const driver = await driverService.findById(driverId);
         if (!driver) {
@@ -165,9 +181,16 @@ const updateDriver = async (req, res) => {
         }
 
         // Only super admin can change these
-        if (isActive || isDocumentVerified || isAccountVerified) {
+        if (isActive || isDocumentVerified || isAccountVerified || where_house_id) {
             if (!isSuperAdmin) {
                 return res.status(403).json({ success: false, message: "Not authorized to change roles" });
+            }
+        }
+
+        if (where_house_id !== undefined) {
+            const where_house = await companyService.findById(where_house_id);
+            if (!where_house) {
+                return res.status(400).json({ success: false, message: "Invalid where house id" });
             }
         }
 
