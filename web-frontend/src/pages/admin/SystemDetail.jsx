@@ -16,11 +16,13 @@ const SystemDetail = () => {
     const [companyDetail, setCompanyDetail] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
+    const [editingId, setEditingId] = useState(null);
 
     const fetchCompanyDetail = async () => {
         setLoading(true);
         try {
             const res = await axiosInstance.get("/system/details");
+            // Your backend returns one company detail object (earliest created)
             setCompanyDetail(res.data.data);
         } catch (err) {
             toast.error(err.response?.data?.message || "Failed to fetch system details");
@@ -47,8 +49,8 @@ const SystemDetail = () => {
             render: (location) =>
                 location ? (
                     <Space direction="vertical" size={0}>
-                        <Text>Lat: {location.lat || 'N/A'}</Text>
-                        <Text>Lng: {location.lng || 'N/A'}</Text>
+                        <Text>Lat: {location.lat ?? 'N/A'}</Text>
+                        <Text>Lng: {location.lng ?? 'N/A'}</Text>
                     </Space>
                 ) : 'N/A',
         },
@@ -81,7 +83,14 @@ const SystemDetail = () => {
                 <Button
                     type="text"
                     icon={<EditOutlined />}
-                    onClick={() => setShowModal(true)}
+                    onClick={() => {
+                        if (companyDetail?.id) {
+                            setEditingId(companyDetail.id);
+                            setShowModal(true);
+                        } else {
+                            toast.error("No company detail to edit");
+                        }
+                    }}
                 />
             ),
         }
@@ -102,6 +111,7 @@ const SystemDetail = () => {
                             <Button
                                 icon={<ReloadOutlined />}
                                 onClick={fetchCompanyDetail}
+                                loading={loading}
                             >
                                 Refresh
                             </Button>
@@ -125,7 +135,7 @@ const SystemDetail = () => {
             <EditSystemModal
                 show={showModal}
                 onHide={() => setShowModal(false)}
-                companyDetail={companyDetail}
+                companyDetailId={editingId}
                 onUpdateSuccess={(updatedData) => {
                     setCompanyDetail(updatedData);
                     setShowModal(false);
