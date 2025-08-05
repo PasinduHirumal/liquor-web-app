@@ -27,6 +27,8 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
             title="Create System Configuration"
             visible={show}
             onCancel={onHide}
+            maskClosable={false}
+            afterClose={() => form.resetFields()}
             footer={[
                 <Button key="back" onClick={onHide}>
                     Cancel
