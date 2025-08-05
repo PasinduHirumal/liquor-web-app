@@ -118,6 +118,7 @@ const SystemDetail = () => {
                     size="middle"
                     rowKey={() => 'system-settings'}
                     style={{ marginTop: 16 }}
+                    scroll={{ x: 'max-content' }}
                 />
             </Card>
 
