@@ -106,12 +106,12 @@ const DriverProfileInfo = () => {
         <div className="container py-4">
             <Row className="align-items-center mb-4">
                 <Col xs="auto">
-                    <Button variant="outline-primary px-2 py-1" onClick={() => navigate(-1)} className="p-0">
+                    <Button variant="outline-dark px-2 py-1" onClick={() => navigate(-1)} className="p-0">
                         <ArrowLeft /> Back
                     </Button>
                 </Col>
                 <Col>
-                    <h2 className="text-primary mb-0 text-start">Driver Profile Management</h2>
+                    <h2 className="text-black fw-bold mb-0 text-start">Driver Profile Management</h2>
                 </Col>
             </Row>
 
