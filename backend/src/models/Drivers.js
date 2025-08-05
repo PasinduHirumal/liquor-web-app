@@ -16,6 +16,7 @@ class Drivers {
         this.address = data.address;
         this.city = data.city;
         this.emergencyContact = data.emergencyContact;
+        this.where_house_id = data.where_house_id;
 
         // Vehicle Information
         this.vehicleType = data.vehicleType;
@@ -83,43 +84,7 @@ class Drivers {
         this.deactivatedAt = data.deactivatedAt || null;
     };
 
-    // Helper methods
-    updateLocation(lat, lng) {
-        this.currentLocation = {
-            lat,
-            lng,
-            timestamp: new Date().toISOString()
-        };
-        this.lastActiveAt = new Date().toISOString();
-    }
-
-    calculateRating(newRating) {
-        this.rating = ((this.rating * this.totalRatings) + newRating) / (this.totalRatings + 1);
-        this.totalRatings += 1;
-    }
-
-    setAvailability(isAvailable) {
-        this.isAvailable = isAvailable;
-        this.updatedAt = new Date().toISOString();
-    }
-
-    addEarnings(amount) {
-        this.totalEarnings += amount;
-        this.currentBalance += amount;
-        this.updatedAt = new Date().toISOString();
-    }
-
-    isWithinDeliveryRadius(customerLat, customerLng) {
-        if (!this.currentLocation) return false;
-        
-        // Simple distance calculation (you'd want to use a proper geolocation library)
-        const distance = Math.sqrt(
-            Math.pow(this.currentLocation.lat - customerLat, 2) + 
-            Math.pow(this.currentLocation.lng - customerLng, 2)
-        ) * 111; // rough km conversion
-        
-        return distance <= this.maxDeliveryRadius;
-    }
+    
     
 };
 
