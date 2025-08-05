@@ -105,7 +105,7 @@ const CreateDriverModal = ({ visible, onClose, onSuccess }) => {
                         </Form.Item>
                     </Col>
                     <Col span={12}>
-                        <Form.Item name="warehouseId" label="Assigned Warehouse" rules={[{ required: true }]}>
+                        <Form.Item name="where_house_id" label="Assigned Warehouse" rules={[{ required: true }]}>
                             {warehouseLoading ? (
                                 <Spin size="small" />
                             ) : (
