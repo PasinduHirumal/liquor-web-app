@@ -3,7 +3,7 @@ import { Form, Button, Row, Col, Spinner, Alert } from "react-bootstrap";
 import { axiosInstance } from "../../../lib/axios";
 import toast from "react-hot-toast";
 
-const DriverAccountStatus = ({ driverId, onClose }) => {
+const DriverAccountStatus = ({ driverId, onClose, onUpdateSuccess }) => {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [error, setError] = useState(null);
@@ -59,9 +59,12 @@ const DriverAccountStatus = ({ driverId, onClose }) => {
 
             toast.success("Account & Status updated successfully");
 
+            if (onUpdateSuccess) {
+                onUpdateSuccess(formData);
+            }
+
             if (onClose) {
                 onClose();
-                window.location.reload();
             }
 
         } catch (err) {

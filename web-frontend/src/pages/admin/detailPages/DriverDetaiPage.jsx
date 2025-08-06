@@ -57,6 +57,17 @@ const DriverDetailPage = () => {
         fetchDriver();
     }, [id]);
 
+    const handleUpdateSuccess = (updatedData) => {
+        setDriver(prev => ({
+            ...prev,
+            isActive: updatedData.isActive,
+            isDocumentVerified: updatedData.isDocumentVerified,
+            isAvailable: updatedData.isAvailable,
+            isOnline: updatedData.isOnline,
+            backgroundCheckStatus: updatedData.backgroundCheckStatus
+        }));
+    };
+
     if (loading) {
         return (
             <div className="driver-detail-loading text-center mt-5 pt-5">
@@ -574,7 +585,11 @@ const DriverDetailPage = () => {
                     <Modal.Title>Edit Account & Status</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <DriverAccountStatus driverId={driver.id} onClose={handleClose} />
+                    <DriverAccountStatus
+                        driverId={driver.id}
+                        onClose={handleClose}
+                        onUpdateSuccess={handleUpdateSuccess}
+                    />
                 </Modal.Body>
             </Modal>
         </div>
