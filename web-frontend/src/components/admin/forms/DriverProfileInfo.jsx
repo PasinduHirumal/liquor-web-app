@@ -88,12 +88,6 @@ const DriverProfileInfo = () => {
     const handleUpdate = async () => {
         setUpdating(true);
         try {
-            if (formData.where_house_id && formData.where_house_id !== driver.where_house_id) {
-                const warehouseExists = warehouses.some(
-                    wh => wh.where_house_id === formData.where_house_id
-                );
-            }
-
             await axiosInstance.patch(`/drivers/update/${id}`, formData);
             toast.success("Driver profile updated successfully");
             navigate(-1);
