@@ -139,7 +139,7 @@ const AdminUserList = () => {
       title: 'Verified',
       dataIndex: 'isAccountVerified',
       render: (val) => <Tag color={val ? 'green' : 'red'}>{val ? 'Yes' : 'No'}</Tag>,
-      width: 80,
+      width: 85,
     },
     {
       title: 'Admin Accepted',
