@@ -37,7 +37,12 @@ const DriverProfileInfo = () => {
 
                 // Fetch warehouses list
                 const warehousesResponse = await axiosInstance.get('/system/details');
-                setWarehouses(warehousesResponse.data.data);
+                const warehousesData = warehousesResponse.data.data.map(wh => ({
+                    ...wh,
+                    id: wh.id
+                }));
+
+                setWarehouses(warehousesData);
 
                 setDriver(driverData);
                 setFormData({
@@ -83,6 +88,12 @@ const DriverProfileInfo = () => {
     const handleUpdate = async () => {
         setUpdating(true);
         try {
+            if (formData.where_house_id && formData.where_house_id !== driver.where_house_id) {
+                const warehouseExists = warehouses.some(
+                    wh => wh.where_house_id === formData.where_house_id
+                );
+            }
+
             await axiosInstance.patch(`/drivers/update/${id}`, formData);
             toast.success("Driver profile updated successfully");
             navigate(-1);
@@ -167,7 +178,7 @@ const DriverProfileInfo = () => {
                                 >
                                     <option value="">Select Warehouse</option>
                                     {warehouses.map((warehouse) => (
-                                        <option key={warehouse.where_house_id} value={warehouse.where_house_id}>
+                                        <option key={warehouse.id} value={warehouse.id}>
                                             {warehouse.where_house_name} ({warehouse.where_house_code})
                                         </option>
                                     ))}
