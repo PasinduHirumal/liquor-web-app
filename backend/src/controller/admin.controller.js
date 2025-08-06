@@ -2,6 +2,7 @@ import AdminUserService from '../services/adminUsers.service.js';
 import CompanyService from "../services/company.service.js";
 import generateToken from '../utils/createToken.js';
 import ADMIN_ROLES from '../enums/adminRoles.js';
+import populateWhereHouse from "../utils/populateWhere_House.js";
 
 const adminService = new AdminUserService();
 const companyService = new CompanyService();
@@ -78,12 +79,20 @@ const getAllAdmins = async (req, res) => {
             })
         : [];
 
+        let populatedAdmin = null;
+        try {
+            populatedAdmin = await populateWhereHouse(sortedUsers);
+        } catch (error) {
+            console.error("Error populating where house:", error);
+            return res.status(500).json({ success: false, message: "Failed to populate where house" });
+        }
+
         return res.status(200).json({ 
             success: true, 
             message: "All admins received successfully", 
             count: sortedUsers.length, 
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null,
-            data: sortedUsers
+            data: populatedAdmin
         });
     } catch (error) {
         console.error("Get all admins error:", error.message);

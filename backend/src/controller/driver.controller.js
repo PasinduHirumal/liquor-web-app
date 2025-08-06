@@ -2,6 +2,7 @@ import DriverService from "../services/driver.service.js";
 import CompanyService from "../services/company.service.js";
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import BACKGROUND_STATUS from "../enums/driverBackgroundStatus.js";
+import populateWhereHouse from "../utils/populateWhere_House.js";
 import { uploadImages, uploadSingleImage } from '../utils/firebaseStorage.js';
 
 const driverService = new DriverService();
@@ -148,9 +149,17 @@ const getDriverById = async (req, res) => {
         if (!driver) {
             return res.status(404).json({ success: false, message: "Driver not found"});
         }
+
+        let populatedDriver = null;
+        try {
+            populatedDriver = await populateWhereHouse(driver);
+        } catch (error) {
+            console.error("Error populating where house:", error);
+            return res.status(500).json({ success: false, message: "Failed to populate where house" });
+        }
         
         // Remove password before sending 
-        const { password, ...driverWithoutPassword } = driver;
+        const { password, ...driverWithoutPassword } = populatedDriver;
 
         return res.status(200).json({ success: true, message: "Driver fetched successfully", data: driverWithoutPassword });
     } catch (error) {
