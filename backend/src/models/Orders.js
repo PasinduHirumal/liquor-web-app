@@ -23,6 +23,7 @@ class Orders {
 
         this.notes = data.notes;
         this.status = data.status;
+        this.where_house_id = data.where_house_id;
         this.assigned_driver_id = data.assigned_driver_id;
         this.is_driver_accepted = data.is_driver_accepted;
 

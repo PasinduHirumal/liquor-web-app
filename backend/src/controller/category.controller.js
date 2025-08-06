@@ -58,25 +58,24 @@ const getCategoryById = async (req, res) => {
 const getAllCategories = async (req, res) => {
 	try {
         const { is_active, is_liquor } = req.query;
-
-        const categories = await categoryService.findAll();
-        if (!categories) {
-            return res.status(400).json({ success: false, message: "Failed to fetch categories"});
-        }
         
-        let filteredCategories = categories;
-        let filterDescription = [];
+        const filters = {};
+        const filterDescription = [];
 
         if (is_active !== undefined) {
-            const isActiveBoolean = is_active === 'true';
-            filteredCategories = filteredCategories.filter(category => category.is_active === isActiveBoolean);
-            filterDescription.push(`isActive: ${is_active}`);
-        }
+            const isBoolean = is_active === 'true';
+            filters.is_active = isBoolean;
+            filterDescription.push(`is_active: ${is_active}`);
+        } 
         if (is_liquor !== undefined) {
-            const isActiveBoolean = is_liquor === 'true';
-            filteredCategories = filteredCategories.filter(category => category.is_liquor === isActiveBoolean);
+            const isBoolean = is_liquor === 'true';
+            filters.is_liquor = isBoolean;
             filterDescription.push(`is_liquor: ${is_liquor}`);
         }
+
+        const filteredCategories = Object.keys(filters).length > 0 
+            ? await categoryService.findWithFilters(filters)
+            : await categoryService.findAll();
 
         return res.status(200).json({ 
             success: true, 

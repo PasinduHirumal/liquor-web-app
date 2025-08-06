@@ -1,5 +1,6 @@
 import OrdersService from '../services/orders.service.js';
 import DriverService from "../services/driver.service.js";
+import CompanyService from "../services/company.service.js";
 import DriverDutyService from '../services/driverDuty.service.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
 import populateUser from '../utils/populateUser.js';
@@ -10,32 +11,46 @@ import { populateAddressWithUserIdInData } from '../utils/populateAddress.js';
 const orderService = new OrdersService();
 const driverService = new DriverService();
 const dutyService = new DriverDutyService();
+const companyService = new CompanyService();
 
 
 const getAllOrders = async (req, res) => {
 	try {
-        const { status } = req.query;
+        const { status, is_driver_accepted, where_house_id } = req.query;
 
-        const orders = await orderService.findAll();
-        if (!orders) {
-            return res.status(400).json({ success: false, message: "Failed to fetch orders"});
-        }
-        
-        let filteredOrders = orders;
-        let filterDescription = [];
+        const filters = {};
+        const filterDescription = [];
 
         if (status !== undefined){
             if (status && !Object.values(ORDER_STATUS).includes(status)) {
                 return res.status(400).json({ success: false, message: "Invalid status value" });
             }
             
-            filteredOrders = filteredOrders.filter(order => order.status === status);
+            filters.status = status;
             filterDescription.push(`status: ${status}`);
         }
+        if (is_driver_accepted !== undefined) {
+            const isBoolean = is_driver_accepted === 'true';
+            filters.is_driver_accepted = isBoolean;
+            filterDescription.push(`is_driver_accepted: ${is_driver_accepted}`);
+        } 
+        if (where_house_id !== undefined) {
+            const where_house = await companyService.findById(where_house_id);
+            if (!where_house) {
+                return res.status(400).json({ success: false, message: "Invalid where house id" });
+            }
+            
+            filters.where_house_id = where_house_id;
+            filterDescription.push(`where_house_id: ${where_house_id}`);
+        }
 
-        let populatedOrders;
+        const filteredOrders = Object.keys(filters).length > 0 
+            ? await orderService.findWithFilters(filters)
+            : await orderService.findAll();
+
+        let populatedOrders = filteredOrders;
         try {
-            populatedOrders = await populateAddressWithUserIdInData(filteredOrders);
+            populatedOrders = await populateAddressWithUserIdInData(populatedOrders);
             populatedOrders = await populateUser(populatedOrders);
             populatedOrders = await populateDriver(populatedOrders);
         } catch (error) {
@@ -110,14 +125,14 @@ const updateOrder = async (req, res) => {
             order = updatedOrderWithIsDriverAccepted;
         }
 
-        if (order.is_driver_accepted) {
-            const driver = await driverService.findById(order.assigned_driver_id);
-            return res.status(400).json({ success: false, message: `Order is already accepted by driver: ${driver.firstName} ${driver.lastName}` });
-        }
-
         let driver_duty = null;
         const isAssigningDriver = assigned_driver_id !== undefined;
         const isUpdatingStatus = status !== undefined;
+
+        if (isAssigningDriver && order.is_driver_accepted) {
+            const driver = await driverService.findById(order.assigned_driver_id);
+            return res.status(400).json({ success: false, message: `Order is already accepted by driver: ${driver.firstName} ${driver.lastName}` });
+        }
 
         if (isAssigningDriver && !order.is_driver_accepted) {
             const driver = await driverService.findById(assigned_driver_id);

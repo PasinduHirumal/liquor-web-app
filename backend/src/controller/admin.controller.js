@@ -26,23 +26,18 @@ const getAdminById = async (req, res) => {
 const getAllAdmins = async (req, res) => {
 	try {
         const { isAdminAccepted, isActive, where_house_id } = req.query;
-        
-        const admins = await adminService.findAll();
-        if (!admins) {
-            return res.status(400).json({ success: false, message: "Failed to get all admins"});
-        }
 
-        let filteredAdmins = admins;
-        let filterDescription = [];
+        const filters = {};
+        const filterDescription = [];
 
         if (isActive !== undefined) {
-            const isActiveBoolean = isActive === 'true';
-            filteredAdmins = filteredAdmins.filter(admin => admin.isActive === isActiveBoolean);
+            const isBoolean = isActive === 'true';
+            filters.isActive = isBoolean;
             filterDescription.push(`isActive: ${isActive}`);
         } 
         if (isAdminAccepted !== undefined) {
-            const isActiveBoolean = isAdminAccepted === 'true';
-            filteredAdmins = filteredAdmins.filter(admin => admin.isAdminAccepted === isActiveBoolean);
+            const isBoolean = isAdminAccepted === 'true';
+            filters.isAdminAccepted = isBoolean;
             filterDescription.push(`isAdminAccepted: ${isAdminAccepted}`);
         }
         if (where_house_id !== undefined) {
@@ -51,9 +46,14 @@ const getAllAdmins = async (req, res) => {
                 return res.status(400).json({ success: false, message: "Invalid where house id" });
             }
             
-            filteredAdmins = filteredAdmins.filter(admin => admin.where_house_id === where_house_id);
+            filters.where_house_id = where_house_id;
             filterDescription.push(`where_house_id: ${where_house_id}`);
         }
+
+        // Use database filtering instead of in-memory filtering
+        const filteredAdmins = Object.keys(filters).length > 0 
+            ? await adminService.findWithFilters(filters)
+            : await adminService.findAll();
 
         const rolePriority = {
             [ADMIN_ROLES.SUPER_ADMIN]: 3,

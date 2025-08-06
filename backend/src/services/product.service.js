@@ -36,6 +36,29 @@ class ProductService {
         }
     }
 
+    async findWithFilters(filters = {}) {
+        try {
+            let query = this.collection;
+            
+            // Apply each filter to the query
+            Object.entries(filters).forEach(([field, value]) => {
+                if (value !== undefined && value !== null) {
+                    query = query.where(field, '==', value);
+                }
+            });
+
+            const usersRef = await query.get();
+
+            if (usersRef.empty) {
+                return [];
+            }
+
+            return usersRef.docs.map(doc => new Products(doc.id, doc.data()));
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async findByFilter(field, operator, value) {
         try {
             const usersRef = await this.collection.where(field, operator, value).get();

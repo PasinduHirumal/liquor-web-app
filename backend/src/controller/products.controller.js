@@ -115,41 +115,37 @@ const getAllProducts = async (req, res) => {
 	try {
         const { is_active, is_in_stock, is_liquor, categoryId } = req.query;
 
-        const products = await productService.findAll();
-        if (!products) {
-            return res.status(400).json({ success: false, message: "Failed to fetch products"});
-        }
-        
-        let filteredProducts = products;
-        let filterDescription = [];
+        const filters = {};
+        const filterDescription = [];
+
         if (is_active !== undefined) {
-            // Convert string to boolean since query params are strings
-            const isActiveBoolean = is_active === 'true';
-            filteredProducts = filteredProducts.filter(product => product.is_active === isActiveBoolean);
-            filterDescription.push(`isActive: ${is_active}`);
+            const isBoolean = is_active === 'true';
+            filters.is_active = isBoolean;
+            filterDescription.push(`is_active: ${is_active}`);
         } 
-        
-        if (is_in_stock !== undefined){
-            const isActiveBoolean = is_in_stock === 'true';
-            filteredProducts = filteredProducts.filter(product => product.is_in_stock === isActiveBoolean);
+        if (is_in_stock !== undefined) {
+            const isBoolean = is_in_stock === 'true';
+            filters.is_in_stock = isBoolean;
             filterDescription.push(`is_in_stock: ${is_in_stock}`);
         }
-
-        if (is_liquor !== undefined){
-            const isActiveBoolean = is_liquor === 'true';
-            filteredProducts = filteredProducts.filter(product => product.is_liquor === isActiveBoolean);
+        if (is_liquor !== undefined) {
+            const isBoolean = is_liquor === 'true';
+            filters.is_liquor = isBoolean;
             filterDescription.push(`is_liquor: ${is_liquor}`);
         }
-
         if (categoryId !== undefined){
             const category = await categoryService.findById(categoryId);
             if (!category) {
                 return res.status(404).json({ success: false, message: "Filter error. Category not found"});
             }
 
-            filteredProducts = filteredProducts.filter(product => product.category_id === categoryId);
+            filters.categoryId = categoryId;
             filterDescription.push(`category_id: ${categoryId}`);
         }
+
+        const filteredProducts = Object.keys(filters).length > 0 
+            ? await productService.findWithFilters(filters)
+            : await productService.findAll();
 
         const populatedProducts = await populateCategory(filteredProducts);
         if (!populatedProducts) {

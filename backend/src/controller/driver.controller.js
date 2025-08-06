@@ -71,32 +71,27 @@ const getAllDrivers = async (req, res) => {
 	try {
         const { isActive, isAvailable, isOnline, isDocumentVerified, backgroundCheckStatus, where_house_id } = req.query;
 
-        const drivers = await driverService.findAll();
-        if (!drivers) {
-            return res.status(400).json({ success: false, message: "Failed to get all drivers"});
-        }
-        
-        let filteredDrivers = drivers;
-        let filterDescription = [];
+        const filters = {};
+        const filterDescription = [];
 
         if (isActive !== undefined) {
-            const isActiveBoolean = isActive === 'true';
-            filteredDrivers = filteredDrivers.filter(driver => driver.isActive === isActiveBoolean);
+            const isBoolean = isActive === 'true';
+            filters.isActive = isBoolean;
             filterDescription.push(`isActive: ${isActive}`);
         } 
         if (isAvailable !== undefined) {
-            const isActiveBoolean = isAvailable === 'true';
-            filteredDrivers = filteredDrivers.filter(driver => driver.isAvailable === isActiveBoolean);
+            const isBoolean = isAvailable === 'true';
+            filters.isAvailable = isBoolean;
             filterDescription.push(`isAvailable: ${isAvailable}`);
         }
         if (isOnline !== undefined) {
-            const isActiveBoolean = isOnline === 'true';
-            filteredDrivers = filteredDrivers.filter(driver => driver.isOnline === isActiveBoolean);
+            const isBoolean = isOnline === 'true';
+            filters.isOnline = isBoolean;
             filterDescription.push(`isOnline: ${isOnline}`);
         }
         if (isDocumentVerified !== undefined) {
-            const isActiveBoolean = isDocumentVerified === 'true';
-            filteredDrivers = filteredDrivers.filter(driver => driver.isDocumentVerified === isActiveBoolean);
+            const isBoolean = isDocumentVerified === 'true';
+            filters.isDocumentVerified = isBoolean;
             filterDescription.push(`isDocumentVerified: ${isDocumentVerified}`);
         }
         if (backgroundCheckStatus !== undefined) {
@@ -104,7 +99,7 @@ const getAllDrivers = async (req, res) => {
                 return res.status(400).json({ success: false, message: "Invalid status value" });
             }
             
-            filteredDrivers = filteredDrivers.filter(driver => driver.backgroundCheckStatus === backgroundCheckStatus);
+            filters.backgroundCheckStatus = backgroundCheckStatus;
             filterDescription.push(`backgroundCheckStatus: ${backgroundCheckStatus}`);
         }
         if (where_house_id !== undefined) {
@@ -113,9 +108,13 @@ const getAllDrivers = async (req, res) => {
                 return res.status(400).json({ success: false, message: "Invalid where house id" });
             }
             
-            filteredDrivers = filteredDrivers.filter(driver => driver.where_house_id === where_house_id);
+            filters.where_house_id = where_house_id;
             filterDescription.push(`where_house_id: ${where_house_id}`);
         }
+
+        const filteredDrivers = Object.keys(filters).length > 0 
+            ? await driverService.findWithFilters(filters)
+            : await driverService.findAll();
 
         // Remove password field from each driver object
         const sanitizedDrivers = filteredDrivers.map(driver => {
