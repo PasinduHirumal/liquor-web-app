@@ -152,6 +152,9 @@ const updateOrder = async (req, res) => {
             if (driver.backgroundCheckStatus !== "approved") {
                 failedChecks.push(`Background check ${driver.backgroundCheckStatus} (must be approved)`);
             }
+            if (driver.where_house_id !== order.where_house_id) {
+                failedChecks.push("Can't get this order (driver & order must be same where house)");
+            }
 
             if (failedChecks.length > 0) {
                 return res.status(400).json({ success: false, message: failedChecks.join('.\n') });
