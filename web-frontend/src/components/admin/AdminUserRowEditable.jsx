@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Select, Switch } from 'antd';
 import toast from 'react-hot-toast';
 import { axiosInstance } from '../../lib/axios';
-import DeleteAdminButton from "./buttons/DeleteAdminButton";
+import DeleteAdminButton from './buttons/DeleteAdminButton';
 
 const ROLES = ['pending', 'admin', 'super_admin'];
 
@@ -10,33 +10,61 @@ const AdminUserRowEditable = ({ admin, onDeleteSuccess, onUpdateLocal, part }) =
     const [role, setRole] = useState(admin.role);
     const [isActive, setIsActive] = useState(admin.isActive);
     const [isAdminAccepted, setIsAdminAccepted] = useState(admin.isAdminAccepted);
+    const [whereHouseId, setWhereHouseId] = useState(admin.where_house_id?.id || '');
+    const [warehouses, setWarehouses] = useState([]);
     const [saving, setSaving] = useState(false);
+
+    const fetchWarehouses = async () => {
+        try {
+            const res = await axiosInstance.get('/system/details');
+            setWarehouses(res.data.data || []);
+        } catch (error) {
+            console.error('Failed to fetch warehouses:', error);
+            toast.error('Failed to load warehouse list');
+        }
+    };
+    
+    useEffect(() => {
+        if (part === 'where_house_id') {
+            fetchWarehouses();
+        }
+    }, []);
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (role !== admin.role || isActive !== admin.isActive) {
-                handleUpdate();
-            }
-            if (role !== admin.role || isAdminAccepted !== admin.isAdminAccepted) {
+            if (
+                role !== admin.role ||
+                isActive !== admin.isActive ||
+                isAdminAccepted !== admin.isAdminAccepted ||
+                whereHouseId !== admin.where_house_id?.id
+            ) {
                 handleUpdate();
             }
         }, 700);
         return () => clearTimeout(timer);
-    }, [role, isActive, isAdminAccepted]);
+    }, [role, isActive, isAdminAccepted, whereHouseId]);
 
     const handleUpdate = async () => {
         setSaving(true);
         try {
-            const updatedData = { role, isActive, isAdminAccepted };
-            const response = await axiosInstance.patch(`/admin/update/${admin.id}`, updatedData);
+            const updatedData = {
+                role,
+                isActive,
+                isAdminAccepted,
+                where_house_id: whereHouseId,
+            };
+
+            const res = await axiosInstance.patch(`/admin/update/${admin.id}`, updatedData);
             toast.success('Admin updated successfully');
-            onUpdateLocal(response.data.data);
+            onUpdateLocal(res.data.data);
         } catch (error) {
             console.error('Update failed:', error);
             toast.error(error?.response?.data?.message || 'Failed to update admin');
+            // Revert on failure
             setRole(admin.role);
             setIsActive(admin.isActive);
             setIsAdminAccepted(admin.isAdminAccepted);
+            setWhereHouseId(admin.where_house_id?.id || '');
         } finally {
             setSaving(false);
         }
@@ -81,6 +109,24 @@ const AdminUserRowEditable = ({ admin, onDeleteSuccess, onUpdateLocal, part }) =
                 checkedChildren="Yes"
                 unCheckedChildren="No"
             />
+        );
+    }
+
+    if (part === 'where_house_id') {
+        return (
+            <Select
+                value={whereHouseId}
+                onChange={setWhereHouseId}
+                size="small"
+                style={{ width: 160 }}
+                loading={warehouses.length === 0}
+            >
+                {warehouses.map((wh) => (
+                    <Select.Option key={wh.id} value={wh.id}>
+                        {wh.where_house_name}
+                    </Select.Option>
+                ))}
+            </Select>
         );
     }
 

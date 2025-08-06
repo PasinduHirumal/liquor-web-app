@@ -94,8 +94,15 @@ const AdminUserList = () => {
     {
       title: 'Warehouse',
       dataIndex: 'where_house_id',
-      render: (_, record) => `${record.where_house_id.name || '-'}`,
-      width: 140,
+      render: (_, admin) => (
+        <AdminUserRowEditable
+          admin={admin}
+          onDeleteSuccess={handleDeleteSuccess}
+          onUpdateLocal={handleUpdateLocal}
+          part="where_house_id"
+        />
+      ),
+      width: 200,
       filters: warehouses.map(wh => ({
         text: wh.where_house_name,
         value: wh.id,
