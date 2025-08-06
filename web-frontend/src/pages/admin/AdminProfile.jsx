@@ -180,12 +180,8 @@ const AdminProfile = () => {
                                                 </span>
                                             </li>
                                             <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                <strong>Created At:</strong>
-                                                <span>{formatDate(admin.createdAt)}</span>
-                                            </li>
-                                            <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                <strong>Last Updated:</strong>
-                                                <span>{formatDate(admin.updatedAt)}</span>
+                                                <strong>Warehouse:</strong>
+                                                <span>{admin.where_house_id}</span>
                                             </li>
                                         </ul>
                                     </div>
