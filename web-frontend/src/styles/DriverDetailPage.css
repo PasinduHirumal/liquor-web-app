@@ -20,25 +20,99 @@
     background-color: var(--background-color) !important;
 }
 
-/* Header Section */
+/* Driver Header Styles */
 .driver-detail-header {
     display: flex !important;
-    justify-content: space-between !important;
     align-items: center !important;
+    justify-content: space-between !important;
+    flex-wrap: wrap !important;
+    gap: 16px !important;
+    padding: 16px 24px !important;
     margin-bottom: 24px !important;
-    padding-bottom: 16px !important;
-    border-bottom: 1px solid var(--border-color) !important;
+    background: white !important;
+    border-radius: 10px !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08) !important;
+    position: relative !important;
+}
+
+.driver-detail-title-container {
+    display: flex !important;
+    align-items: center !important;
+    gap: 16px !important;
 }
 
 .driver-detail-title {
-    font-size: 1.8rem !important;
-    font-weight: 600 !important;
+    font-size: 1.75rem !important;
+    font-weight: 700 !important;
     color: var(--secondary-color) !important;
+    margin: 0 !important;
 }
 
-.driver-detail-status {
+.driver-detail-status-container {
     display: flex !important;
-    gap: 10px !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+
+.driver-detail-status-badge {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    padding: 6px 12px !important;
+    border-radius: 20px !important;
+    font-size: 0.85rem !important;
+    font-weight: 600 !important;
+}
+
+.driver-detail-status-badge.active {
+    background-color: rgba(76, 175, 80, 0.15) !important;
+    color: var(--success-color) !important;
+}
+
+.driver-detail-status-badge.inactive {
+    background-color: rgba(244, 67, 54, 0.15) !important;
+    color: var(--error-color) !important;
+}
+
+.driver-detail-status-badge.verified {
+    background-color: rgba(63, 81, 181, 0.15) !important;
+    color: var(--primary-color) !important;
+}
+
+.driver-detail-header-actions {
+    display: flex !important;
+    gap: 8px !important;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .driver-detail-header {
+        padding: 12px 16px !important;
+    }
+
+    .driver-detail-title {
+        font-size: 1.5rem !important;
+    }
+
+    .driver-detail-status-container {
+        order: 3 !important;
+        width: 100% !important;
+        margin-top: 8px !important;
+    }
+}
+
+@media (max-width: 576px) {
+    .driver-detail-title-container {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 8px !important;
+    }
+
+    .driver-detail-header-actions {
+        position: absolute !important;
+        top: 12px !important;
+        right: 12px !important;
+    }
 }
 
 /* Content Layout */
@@ -204,11 +278,11 @@
     .driver-detail-content {
         grid-template-columns: 1fr !important;
     }
-    
+
     .driver-detail-profile {
         position: static !important;
     }
-    
+
     .driver-detail-section-grid {
         grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)) !important;
     }
@@ -220,16 +294,16 @@
         align-items: flex-start !important;
         gap: 12px !important;
     }
-    
+
     .driver-detail-title {
         font-size: 1.5rem !important;
     }
-    
+
     .driver-detail-status {
         width: 100% !important;
         justify-content: flex-start !important;
     }
-    
+
     .driver-detail-section-grid {
         grid-template-columns: 1fr 1fr !important;
     }
@@ -239,21 +313,21 @@
     .driver-detail-container {
         padding: 15px !important;
     }
-    
+
     .driver-detail-avatar {
         width: 140px !important;
         height: 140px !important;
     }
-    
+
     .driver-detail-section-grid {
         grid-template-columns: 1fr !important;
     }
-    
+
     .driver-detail-info-item {
         flex-direction: column !important;
         gap: 4px !important;
     }
-    
+
     .driver-detail-info-value {
         max-width: 100% !important;
         text-align: left !important;

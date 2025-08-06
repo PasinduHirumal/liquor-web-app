@@ -83,29 +83,26 @@ const DriverDetailPage = () => {
 
     return (
         <div className="driver-detail-container">
-            <div className="driver-detail-header" style={{ position: "relative" }}>
-                <Typography variant="h4" className="driver-detail-title">
-                    Driver Profile
-                </Typography>
-
-                <div className="driver-detail-status">
-                    <Chip
-                        label={driver.isActive ? "Active" : "Inactive"}
-                        color={driver.isActive ? "success" : "error"}
-                        size="medium"
-                        style={{ marginRight: 8 }}
-                    />
-                    {driver.isDocumentVerified && (
-                        <Chip label="Verified" color="success" size="medium" />
-                    )}
+            <div className="driver-detail-header">
+                <div className="driver-detail-title-container">
+                    <Typography variant="h4" className="driver-detail-title">
+                        Driver Profile
+                    </Typography>
+                    <div className="driver-detail-status-container">
+                        <span className={`driver-detail-status-badge ${driver.isActive ? 'active' : 'inactive'}`}>
+                            {driver.isActive ? "Active" : "Inactive"}
+                        </span>
+                        {driver.isDocumentVerified && (
+                            <span className="driver-detail-status-badge verified">
+                                Verified
+                            </span>
+                        )}
+                    </div>
                 </div>
-                <div>
+
+                <div className="driver-detail-header-actions">
                     <Tooltip title="Edit Account & Status">
-                        <IconButton
-                            aria-label="edit profile"
-                            onClick={handleOpen}
-                            style={{ position: "absolute", top: 8, right: 8 }}
-                        >
+                        <IconButton onClick={handleOpen} aria-label="edit profile">
                             <Edit />
                         </IconButton>
                     </Tooltip>
