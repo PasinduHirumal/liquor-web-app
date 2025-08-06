@@ -3,14 +3,13 @@ import { Form, Button, Row, Col, Spinner, Alert } from "react-bootstrap";
 import { axiosInstance } from "../../../lib/axios";
 import toast from "react-hot-toast";
 
-const DriverAccountStatus = ({ driverId, onClose }) => {
+const DriverAccountStatus = ({ driverId, onClose, onUpdateSuccess }) => {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [error, setError] = useState(null);
 
     const [formData, setFormData] = useState({
         role: "driver",
-        googleId: "",
         isAvailable: false,
         isActive: false,
         isOnline: false,
@@ -29,7 +28,6 @@ const DriverAccountStatus = ({ driverId, onClose }) => {
 
                 setFormData({
                     role: data.role || "driver",
-                    googleId: data.googleId || "",
                     isAvailable: data.isAvailable || false,
                     isActive: data.isActive || false,
                     isOnline: data.isOnline || false,
@@ -61,10 +59,14 @@ const DriverAccountStatus = ({ driverId, onClose }) => {
 
             toast.success("Account & Status updated successfully");
 
+            if (onUpdateSuccess) {
+                onUpdateSuccess(formData);
+            }
+
             if (onClose) {
                 onClose();
             }
-            
+
         } catch (err) {
             const msg = err?.response?.data?.message || "Failed to update Account & Status";
             setError(msg);
@@ -94,7 +96,7 @@ const DriverAccountStatus = ({ driverId, onClose }) => {
         <div className="mb-4">
             <h5 className="mb-3 fw-bold">Account & Status</h5>
             <Row>
-                <Col md={4}>
+                <Col md={6}>
                     <Form.Group className="mb-3" controlId="formRole">
                         <Form.Label>Role</Form.Label>
                         <Form.Control
@@ -107,66 +109,6 @@ const DriverAccountStatus = ({ driverId, onClose }) => {
                             <option value="driver">Driver</option>
                             {/* Add more roles if your backend supports */}
                         </Form.Control>
-                    </Form.Group>
-                </Col>
-
-                <Col md={8}>
-                    <Form.Group className="mb-3" controlId="formGoogleId">
-                        <Form.Label>Google ID</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="googleId"
-                            value={formData.googleId}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                </Col>
-
-                <Col md={4}>
-                    <Form.Group className="mb-3" controlId="formIsAvailable">
-                        <Form.Label>Is Available</Form.Label>
-                        <Form.Check
-                            type="switch"
-                            name="isAvailable"
-                            checked={formData.isAvailable}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                </Col>
-
-                <Col md={4}>
-                    <Form.Group className="mb-3" controlId="formIsActive">
-                        <Form.Label>Is Active</Form.Label>
-                        <Form.Check
-                            type="switch"
-                            name="isActive"
-                            checked={formData.isActive}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                </Col>
-
-                <Col md={4}>
-                    <Form.Group className="mb-3" controlId="formIsOnline">
-                        <Form.Label>Is Online</Form.Label>
-                        <Form.Check
-                            type="switch"
-                            name="isOnline"
-                            checked={formData.isOnline}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                </Col>
-
-                <Col md={6}>
-                    <Form.Group className="mb-3" controlId="formIsDocumentVerified">
-                        <Form.Label>Document Verified</Form.Label>
-                        <Form.Check
-                            type="switch"
-                            name="isDocumentVerified"
-                            checked={formData.isDocumentVerified}
-                            onChange={handleChange}
-                        />
                     </Form.Group>
                 </Col>
 
@@ -185,9 +127,57 @@ const DriverAccountStatus = ({ driverId, onClose }) => {
                         </Form.Control>
                     </Form.Group>
                 </Col>
+
+                <Col md={3}>
+                    <Form.Group className="mb-3" controlId="formIsAvailable">
+                        <Form.Label>Is Available</Form.Label>
+                        <Form.Check
+                            type="switch"
+                            name="isAvailable"
+                            checked={formData.isAvailable}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                </Col>
+
+                <Col md={3}>
+                    <Form.Group className="mb-3" controlId="formIsActive">
+                        <Form.Label>Is Active</Form.Label>
+                        <Form.Check
+                            type="switch"
+                            name="isActive"
+                            checked={formData.isActive}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                </Col>
+
+                <Col md={3}>
+                    <Form.Group className="mb-3" controlId="formIsOnline">
+                        <Form.Label>Is Online</Form.Label>
+                        <Form.Check
+                            type="switch"
+                            name="isOnline"
+                            checked={formData.isOnline}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                </Col>
+
+                <Col md={3}>
+                    <Form.Group className="mb-3" controlId="formIsDocumentVerified">
+                        <Form.Label>Document Verified</Form.Label>
+                        <Form.Check
+                            type="switch"
+                            name="isDocumentVerified"
+                            checked={formData.isDocumentVerified}
+                            onChange={handleChange}
+                        />
+                    </Form.Group>
+                </Col>
             </Row>
 
-            <div className="d-flex justify-content-end">
+            <div className="d-flex justify-content-end mt-4">
                 <Button variant="primary" onClick={handleUpdate} disabled={updating}>
                     {updating ? "Updating..." : "Update Account & Status"}
                 </Button>

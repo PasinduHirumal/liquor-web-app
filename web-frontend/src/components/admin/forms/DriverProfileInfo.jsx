@@ -11,6 +11,7 @@ const DriverProfileInfo = () => {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [driver, setDriver] = useState(null);
+    const [warehouses, setWarehouses] = useState([]);
 
     const [formData, setFormData] = useState({
         email: "",
@@ -23,37 +24,49 @@ const DriverProfileInfo = () => {
         profileImage: "",
         address: "",
         city: "",
-        emergencyContact: ""
+        emergencyContact: "",
+        where_house_id: ""
     });
 
     useEffect(() => {
-        const fetchDriver = async () => {
+        const fetchData = async () => {
             try {
-                const response = await axiosInstance.get(`/drivers/getDriverById/${id}`);
-                const data = response.data.data;
+                // Fetch driver data
+                const driverResponse = await axiosInstance.get(`/drivers/getDriverById/${id}`);
+                const driverData = driverResponse.data.data;
 
-                setDriver(data);
+                // Fetch warehouses list
+                const warehousesResponse = await axiosInstance.get('/system/details');
+                const warehousesData = warehousesResponse.data.data.map(wh => ({
+                    ...wh,
+                    id: wh.id
+                }));
+
+                setWarehouses(warehousesData);
+
+                setDriver(driverData);
                 setFormData({
-                    email: data.email || "",
-                    firstName: data.firstName || "",
-                    lastName: data.lastName || "",
-                    phone: data.phone || "",
-                    nic_number: data.nic_number || "",
-                    license_number: data.license_number || "",
-                    dateOfBirth: data.dateOfBirth || "",
-                    profileImage: data.profileImage || "",
-                    address: data.address || "",
-                    city: data.city || "",
-                    emergencyContact: data.emergencyContact || ""
+                    email: driverData.email || "",
+                    firstName: driverData.firstName || "",
+                    lastName: driverData.lastName || "",
+                    phone: driverData.phone || "",
+                    nic_number: driverData.nic_number || "",
+                    license_number: driverData.license_number || "",
+                    dateOfBirth: driverData.dateOfBirth || "",
+                    profileImage: driverData.profileImage || "",
+                    address: driverData.address || "",
+                    city: driverData.city || "",
+                    emergencyContact: driverData.emergencyContact || "",
+                    where_house_id: driverData.where_house_id || ""
                 });
             } catch (error) {
-                toast.error("Failed to fetch driver data");
+                toast.error("Failed to fetch data");
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchDriver();
+        fetchData();
     }, [id]);
 
     const handleChange = (e) => {
@@ -149,6 +162,21 @@ const DriverProfileInfo = () => {
                                     value={formData.license_number}
                                     onChange={handleChange}
                                 />
+                            </Form.Group>
+                            <Form.Group className="mb-2">
+                                <Form.Label>Assigned Warehouse</Form.Label>
+                                <Form.Select
+                                    name="where_house_id"
+                                    value={formData.where_house_id}
+                                    onChange={handleChange}
+                                >
+                                    <option value="">Select Warehouse</option>
+                                    {warehouses.map((warehouse) => (
+                                        <option key={warehouse.id} value={warehouse.id}>
+                                            {warehouse.where_house_name} ({warehouse.where_house_code})
+                                        </option>
+                                    ))}
+                                </Form.Select>
                             </Form.Group>
                         </Card.Body>
                     </Card>
