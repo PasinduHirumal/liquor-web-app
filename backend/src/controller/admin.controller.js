@@ -25,26 +25,34 @@ const getAdminById = async (req, res) => {
 
 const getAllAdmins = async (req, res) => {
 	try {
-        const { isAdminAccepted, isActive } = req.query;
-        let admins;
-        let filterDescription = [];
-
-        if (isAdminAccepted !== undefined && isActive !== undefined) {
-            return res.status(400).json({ success: false, message: "Pass only one query parameter at a time"});
+        const { isAdminAccepted, isActive, where_house_id } = req.query;
+        
+        const admins = await adminService.findAll();
+        if (!admins) {
+            return res.status(400).json({ success: false, message: "Failed to get all admins"});
         }
 
-        if (isAdminAccepted !== undefined){
-            // Convert string to boolean (query params are always strings)
-            const status = isAdminAccepted === 'true';
-            admins = await adminService.findByFilter('isAdminAccepted', '==', status);
-            filterDescription.push(`isAdminAccepted: ${isAdminAccepted}`);
-        } else if (isActive !== undefined){
-            // Convert string to boolean (query params are always strings)
-            const status = isActive === 'true';
-            admins = await adminService.findByFilter('isActive', '==', status);
+        let filteredAdmins = admins;
+        let filterDescription = [];
+
+        if (isActive !== undefined) {
+            const isActiveBoolean = isActive === 'true';
+            filteredAdmins = filteredAdmins.filter(admin => admin.isActive === isActiveBoolean);
             filterDescription.push(`isActive: ${isActive}`);
-        } else {
-            admins = await adminService.findAll();
+        } 
+        if (isAdminAccepted !== undefined) {
+            const isActiveBoolean = isAdminAccepted === 'true';
+            filteredAdmins = filteredAdmins.filter(admin => admin.isAdminAccepted === isActiveBoolean);
+            filterDescription.push(`isAdminAccepted: ${isAdminAccepted}`);
+        }
+        if (where_house_id !== undefined) {
+            const where_house = await companyService.findById(where_house_id);
+            if (!where_house) {
+                return res.status(400).json({ success: false, message: "Invalid where house id" });
+            }
+            
+            filteredAdmins = filteredAdmins.filter(admin => admin.where_house_id === where_house_id);
+            filterDescription.push(`where_house_id: ${where_house_id}`);
         }
 
         const rolePriority = {
@@ -53,8 +61,8 @@ const getAllAdmins = async (req, res) => {
             [ADMIN_ROLES.PENDING]: 1
         };
 
-        const sortedUsers = admins.length > 0
-        ? admins.sort((a, b) => {
+        const sortedUsers = filteredAdmins.length > 0
+        ? filteredAdmins.sort((a, b) => {
             const priorityA = rolePriority[a.role] || 0;
             const priorityB = rolePriority[b.role] || 0;
 
