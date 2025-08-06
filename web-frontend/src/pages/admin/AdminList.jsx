@@ -94,7 +94,7 @@ const AdminUserList = () => {
     {
       title: 'Warehouse',
       dataIndex: 'where_house_id',
-      render: (_, record) => `${record.where_house_id || '-'}`,
+      render: (_, record) => `${record.where_house_id.name || '-'}`,
       width: 140,
       filters: warehouses.map(wh => ({
         text: wh.where_house_name,
