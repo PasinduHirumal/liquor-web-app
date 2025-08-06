@@ -3,6 +3,7 @@ import { axiosInstance } from "../../lib/axios";
 import { Table, message, Tag, Button, Tooltip, Select } from "antd";
 import { useNavigate } from "react-router-dom";
 import { ArrowRightOutlined } from "@ant-design/icons";
+import useAdminAuthStore from "../../stores/adminAuthStore";
 
 const ORDER_STATUS = {
     PENDING: "PENDING",
@@ -13,6 +14,7 @@ const ORDER_STATUS = {
 };
 
 function OrderList() {
+    const { user, isAuthenticated } = useAdminAuthStore();
     const [orders, setOrders] = useState([]);
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [loading, setLoading] = useState(true);
@@ -27,6 +29,8 @@ function OrderList() {
 
     useEffect(() => {
         const fetchOrders = async () => {
+            if (!isAuthenticated) return;
+
             setLoading(true);
             try {
                 const params = new URLSearchParams();
@@ -35,12 +39,27 @@ function OrderList() {
                     params.append("is_driver_accepted", driverAcceptedFilter);
                 }
 
+                // Add warehouse filter for non-super admins
+                if (user?.role !== 'super_admin' && user?.where_house) {
+                    params.append("where_house_id", user.where_house);
+                }
+
                 const url = `/orders/getAllOrders${params.toString() ? `?${params}` : ""}`;
 
                 const response = await axiosInstance.get(url);
                 if (response.data?.success) {
                     setOrders(response.data.data);
-                    setFilteredOrders(response.data.data);
+
+                    let filtered = response.data.data;
+
+                    // For non-super admins, ensure we only show their warehouse data
+                    if (user?.role !== 'super_admin' && user?.where_house) {
+                        filtered = filtered.filter(order =>
+                            order.where_house_id === user.where_house
+                        );
+                    }
+
+                    setFilteredOrders(filtered);
                 } else {
                     message.error("Failed to load orders");
                 }
@@ -53,8 +72,7 @@ function OrderList() {
         };
 
         fetchOrders();
-    }, [statusFilter, driverAcceptedFilter]);
-
+    }, [statusFilter, driverAcceptedFilter, isAuthenticated, user]);
 
     const handleStatusFilterChange = (value) => {
         setStatusFilter(value || null);
@@ -63,7 +81,6 @@ function OrderList() {
     const handleDriverAcceptedFilterChange = (value) => {
         setDriverAcceptedFilter(value || null);
     };
-
 
     const getStatusTag = (status) => {
         const colorMap = {
@@ -95,7 +112,14 @@ function OrderList() {
             dataIndex: "user_id",
             key: "user_id",
             render: (user) => user?.username || "N/A",
-            width: 180,
+            width: 150,
+        },
+        {
+            title: "Warehouse",
+            dataIndex: "where_house_id",
+            key: "where_house_id",
+            render: (id) => id || "N/A",
+            width: 150,
         },
         {
             title: "Total",
@@ -152,18 +176,21 @@ function OrderList() {
 
     return (
         <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
-            <div
-                style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                    marginBottom: "20px",
-                    gap: "16px",
-                    flexWrap: "wrap",
-                }}
-            >
+            <div style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+                marginBottom: "20px",
+                gap: "16px",
+                flexWrap: "wrap",
+            }}>
                 <h1 style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>
                     Order List
+                    {user?.role !== 'super_admin' && user?.where_house && (
+                        <span style={{ fontSize: "14px", marginLeft: "10px", color: "#666" }}>
+                            (Warehouse: {user.where_house})
+                        </span>
+                    )}
                 </h1>
                 <div style={{ display: "flex", gap: "12px" }}>
                     <Select

@@ -122,6 +122,7 @@ function OrderDetail() {
                             <p><strong>Payment Method:</strong> <span className="text-muted">{order.payment_method || "N/A"}</span></p>
                             <p><strong>Payment Status:</strong> {renderBadge(order.payment_status)}</p>
                             <p><strong>Driver Accepted:</strong> {order.is_driver_accepted ? "Yes" : "No"}</p>
+                            <p><strong>Driver Accepted:</strong> {order.where_house_id?.name || "N/A"}</p>
                         </Card.Body>
                     </Card>
                 </Col>
