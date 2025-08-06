@@ -14,8 +14,16 @@ const getAdminById = async (req, res) => {
             return res.status(404).json({ success: false, message: "Admin not found"});
         }
 
+        let populatedAdmin = null;
+        try {
+            populatedAdmin = await populateWhereHouse(admin);
+        } catch (error) {
+            console.error("Error populating where house:", error);
+            return res.status(500).json({ success: false, message: "Failed to populate where house" });
+        }
+
         // Remove password before sending user
-        const { password, ...adminWithoutPassword } = admin;
+        const { password, ...adminWithoutPassword } = populatedAdmin;
 
         return res.status(200).json({ success: true, message: "Admin found: ", data: adminWithoutPassword});
     } catch (error) {

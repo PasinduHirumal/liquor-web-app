@@ -5,6 +5,7 @@ import DriverDutyService from '../services/driverDuty.service.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
 import populateUser from '../utils/populateUser.js';
 import populateDriver from '../utils/populateDriver.js';
+import populateWhereHouse from "../utils/populateWhere_House.js";
 import { populateAddressWithUserIdInData } from '../utils/populateAddress.js';
 
 
@@ -53,6 +54,7 @@ const getAllOrders = async (req, res) => {
             populatedOrders = await populateAddressWithUserIdInData(populatedOrders);
             populatedOrders = await populateUser(populatedOrders);
             populatedOrders = await populateDriver(populatedOrders);
+            populatedOrders = await populateWhereHouse(populatedOrders);
         } catch (error) {
             console.error("Error populating orders:", error);
             return res.status(500).json({ success: false, message: "Failed to populate orders" });
@@ -90,6 +92,7 @@ const getOrderById = async (req, res) => {
             populatedOrders = await populateAddressWithUserIdInData(order);
             populatedOrders = await populateUser(populatedOrders);
             populatedOrders = await populateDriver(populatedOrders);
+            populatedOrders = await populateWhereHouse(populatedOrders);
         } catch (error) {
             console.error("Error populating orders:", error);
             return res.status(500).json({ success: false, message: "Failed to populate orders" });
