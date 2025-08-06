@@ -55,7 +55,6 @@ function OrderList() {
         fetchOrders();
     }, [statusFilter, driverAcceptedFilter]);
 
-
     const handleStatusFilterChange = (value) => {
         setStatusFilter(value || null);
     };
@@ -63,7 +62,6 @@ function OrderList() {
     const handleDriverAcceptedFilterChange = (value) => {
         setDriverAcceptedFilter(value || null);
     };
-
 
     const getStatusTag = (status) => {
         const colorMap = {
@@ -95,7 +93,14 @@ function OrderList() {
             dataIndex: "user_id",
             key: "user_id",
             render: (user) => user?.username || "N/A",
-            width: 180,
+            width: 150,
+        },
+        {
+            title: "Warehouse",
+            dataIndex: "where_house_id",
+            key: "where_house_id",
+            render: (id) => id || "N/A",
+            width: 150,
         },
         {
             title: "Total",
