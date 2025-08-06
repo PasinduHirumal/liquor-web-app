@@ -79,7 +79,7 @@ const AdminUserList = () => {
       title: 'Email',
       dataIndex: 'email',
       render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>,
-      width: 300,
+      width: 260,
     },
     {
       title: 'Full Name',
@@ -94,8 +94,15 @@ const AdminUserList = () => {
     {
       title: 'Warehouse',
       dataIndex: 'where_house_id',
-      render: (_, record) => `${record.where_house_id || '-'}`,
-      width: 140,
+      render: (_, admin) => (
+        <AdminUserRowEditable
+          admin={admin}
+          onDeleteSuccess={handleDeleteSuccess}
+          onUpdateLocal={handleUpdateLocal}
+          part="where_house_id"
+        />
+      ),
+      width: 200,
       filters: warehouses.map(wh => ({
         text: wh.where_house_name,
         value: wh.id,
@@ -113,7 +120,7 @@ const AdminUserList = () => {
           part="role"
         />
       ),
-      width: 140,
+      width: 150,
     },
     {
       title: 'Active',
@@ -132,7 +139,7 @@ const AdminUserList = () => {
       title: 'Verified',
       dataIndex: 'isAccountVerified',
       render: (val) => <Tag color={val ? 'green' : 'red'}>{val ? 'Yes' : 'No'}</Tag>,
-      width: 80,
+      width: 85,
     },
     {
       title: 'Admin Accepted',

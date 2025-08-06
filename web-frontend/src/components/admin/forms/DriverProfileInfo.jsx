@@ -57,7 +57,7 @@ const DriverProfileInfo = () => {
                     address: driverData.address || "",
                     city: driverData.city || "",
                     emergencyContact: driverData.emergencyContact || "",
-                    where_house_id: driverData.where_house_id || ""
+                    where_house_id: driverData.where_house_id?.id || ""
                 });
             } catch (error) {
                 toast.error("Failed to fetch data");

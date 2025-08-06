@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react"; // added useEffect
 import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../lib/axios";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
@@ -12,11 +12,27 @@ const AdminRegister = () => {
         password: "",
         firstName: "",
         lastName: "",
-        phone: ""
+        phone: "",
+        where_house_id: ""
     });
 
+    const [warehouses, setWarehouses] = useState([]);
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
+
+    // Fetch warehouses on mount
+    useEffect(() => {
+        const fetchWarehouses = async () => {
+            try {
+                const res = await axiosInstance.get("/system/details");
+                setWarehouses(res.data.data || []);
+            } catch (error) {
+                console.error("Failed to load warehouses", error);
+                toast.error("Failed to load warehouses");
+            }
+        };
+        fetchWarehouses();
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -33,7 +49,8 @@ const AdminRegister = () => {
                 password: formData.password,
                 firstName: formData.firstName.trim(),
                 lastName: formData.lastName.trim(),
-                phone: formData.phone.trim()
+                phone: formData.phone.trim(),
+                where_house_id: formData.where_house_id
             };
 
             const res = await axiosInstance.post("/auth/admin/register", payload);
@@ -147,6 +164,25 @@ const AdminRegister = () => {
                         title="Phone number must include country code, e.g. +947XXXXXXXX"
                         required
                     />
+                </div>
+
+                {/* Warehouse select dropdown */}
+                <div className="mb-3">
+                    <label className="form-label">Warehouse <span className="text-danger">*</span></label>
+                    <select
+                        name="where_house_id"
+                        className="form-select"
+                        value={formData.where_house_id}
+                        onChange={handleChange}
+                        required
+                    >
+                        <option value="" disabled>-- Select Warehouse --</option>
+                        {warehouses.map((wh) => (
+                            <option key={wh.id} value={wh.id}>
+                                {wh.name || wh.id}
+                            </option>
+                        ))}
+                    </select>
                 </div>
 
                 <button type="submit" className="btn btn-primary w-100" disabled={loading}>

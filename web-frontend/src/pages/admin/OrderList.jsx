@@ -17,6 +17,7 @@ function OrderList() {
     const [filteredOrders, setFilteredOrders] = useState([]);
     const [loading, setLoading] = useState(true);
     const [statusFilter, setStatusFilter] = useState(null);
+    const [driverAcceptedFilter, setDriverAcceptedFilter] = useState(null);
     const navigate = useNavigate();
 
     const formatDate = (timestamp) => {
@@ -28,9 +29,13 @@ function OrderList() {
         const fetchOrders = async () => {
             setLoading(true);
             try {
-                const url = statusFilter
-                    ? `/orders/getAllOrders?status=${statusFilter.toLowerCase()}`
-                    : "/orders/getAllOrders";
+                const params = new URLSearchParams();
+                if (statusFilter) params.append("status", statusFilter.toLowerCase());
+                if (driverAcceptedFilter !== null) {
+                    params.append("is_driver_accepted", driverAcceptedFilter);
+                }
+
+                const url = `/orders/getAllOrders${params.toString() ? `?${params}` : ""}`;
 
                 const response = await axiosInstance.get(url);
                 if (response.data?.success) {
@@ -48,16 +53,22 @@ function OrderList() {
         };
 
         fetchOrders();
-    }, [statusFilter]);
+    }, [statusFilter, driverAcceptedFilter]);
+
 
     const handleStatusFilterChange = (value) => {
-        setStatusFilter(value); // This alone triggers useEffect which sets loading
+        setStatusFilter(value || null);
     };
+
+    const handleDriverAcceptedFilterChange = (value) => {
+        setDriverAcceptedFilter(value || null);
+    };
+
 
     const getStatusTag = (status) => {
         const colorMap = {
             PENDING: "orange",
-            CONFIRMED: "blue",
+            PROCESSING: "blue",
             OUT_FOR_DELIVERY: "geekblue",
             DELIVERED: "green",
             CANCELLED: "red",
@@ -141,27 +152,45 @@ function OrderList() {
 
     return (
         <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
-            <div style={{
-                display: "flex",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: "20px"
-            }}>
+            <div
+                style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    marginBottom: "20px",
+                    gap: "16px",
+                    flexWrap: "wrap",
+                }}
+            >
                 <h1 style={{ fontSize: "24px", fontWeight: "bold", margin: 0 }}>
                     Order List
                 </h1>
-                <Select
-                    placeholder="Filter by status"
-                    style={{ width: 200 }}
-                    onChange={handleStatusFilterChange}
-                    allowClear
-                >
-                    <Select.Option value={ORDER_STATUS.PENDING}>Pending</Select.Option>
-                    <Select.Option value={ORDER_STATUS.PROCESSING}>Processing</Select.Option>
-                    <Select.Option value={ORDER_STATUS.OUT_FOR_DELIVERY}>Out for Delivery</Select.Option>
-                    <Select.Option value={ORDER_STATUS.DELIVERED}>Delivered</Select.Option>
-                    <Select.Option value={ORDER_STATUS.CANCELLED}>Cancelled</Select.Option>
-                </Select>
+                <div style={{ display: "flex", gap: "12px" }}>
+                    <Select
+                        placeholder="Filter by status"
+                        style={{ width: 200 }}
+                        onChange={handleStatusFilterChange}
+                        allowClear
+                        value={statusFilter}
+                    >
+                        {Object.values(ORDER_STATUS).map((status) => (
+                            <Select.Option key={status} value={status}>
+                                {status.replace(/_/g, " ")}
+                            </Select.Option>
+                        ))}
+                    </Select>
+
+                    <Select
+                        placeholder="Filter by driver acceptance"
+                        style={{ width: 200 }}
+                        onChange={handleDriverAcceptedFilterChange}
+                        allowClear
+                        value={driverAcceptedFilter}
+                    >
+                        <Select.Option value="true">Accepted</Select.Option>
+                        <Select.Option value="false">Not Accepted</Select.Option>
+                    </Select>
+                </div>
             </div>
 
             <Table
