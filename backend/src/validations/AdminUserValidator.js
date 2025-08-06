@@ -16,7 +16,7 @@ const validateAdminUser = (req, res, next) => {
     
     role: Joi.string().valid('pending', 'admin', 'super_admin').default('pending'),
     googleId: Joi.string().allow('').default(''),
-    where_house_id: Joi.string().required(),
+    where_house_id: Joi.string().default("N/A"),
     isActive: Joi.boolean().default(true),
     isAdminAccepted: Joi.boolean().default(false),
 

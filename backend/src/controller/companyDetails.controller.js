@@ -39,7 +39,7 @@ const createWhereHouse = async (req, res) => {
         
         return res.status(200).json({ success: true, message: "Where House created successfully", data: new_where_house });
     } catch (error) {
-        console.error("Method_name error:", error.message);
+        console.error("Create where house error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
