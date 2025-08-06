@@ -21,13 +21,14 @@ const useAdminAuthStore = create((set) => ({
       });
       toast.success(res.data.message);
     } catch (err) {
+      const errorMsg = err.response?.data?.message || 'Login failed';
       set({
         user: null,
         isAuthenticated: false,
         loading: false,
-        error: err.response?.data?.message || 'Login failed'
+        error: errorMsg
       });
-      toast.error(err.response?.data?.message || 'Login failed');
+      toast.error(errorMsg);
     }
   },
 
@@ -43,11 +44,12 @@ const useAdminAuthStore = create((set) => ({
       });
       toast.success('Logged out successfully');
     } catch (err) {
-      toast.error(err.response?.data?.message || 'Logout failed');
+      const errorMsg = err.response?.data?.message || 'Logout failed';
+      toast.error(errorMsg);
     }
   },
 
-  // CHECK AUTH on app load
+  // CHECK AUTH (Improved)
   checkAuth: async () => {
     set({ loading: true, error: null });
     try {
@@ -59,6 +61,8 @@ const useAdminAuthStore = create((set) => ({
         error: null
       });
     } catch (err) {
+      const errorMsg = err.response?.data?.message || 'Session expired';
+      console.warn('Auth check failed:', errorMsg);
       set({
         user: null,
         isAuthenticated: false,
@@ -68,7 +72,6 @@ const useAdminAuthStore = create((set) => ({
     }
   },
 
-  // RESET error manually (optional)
   resetError: () => set({ error: null })
 }));
 
