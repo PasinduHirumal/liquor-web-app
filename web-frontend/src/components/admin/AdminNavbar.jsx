@@ -28,6 +28,7 @@ const AdminNavbar = () => {
     const navigate = useNavigate();
     const logout = useAdminAuthStore((state) => state.logout);
     const user = useAdminAuthStore((state) => state.user);
+    const isSuperAdmin = user?.role === 'super_admin' || user?.roles?.includes('super_admin');
 
     const theme = useTheme();
     const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -182,16 +183,19 @@ const AdminNavbar = () => {
                                         Manage Members
                                     </Typography>
 
-                                    <StyledNavLink
-                                        to="/users-list"
-                                        onClick={() => {
-                                            closeMobileMenu();
-                                            setManageDropDownOpen(false);
-                                        }}
-                                        style={{ display: "block", padding: "8px 16px" }}
-                                    >
-                                        Users
-                                    </StyledNavLink>
+                                    {isSuperAdmin && (
+                                        <StyledNavLink
+                                            to="/users-list"
+                                            onClick={() => {
+                                                closeMobileMenu();
+                                                setManageDropDownOpen(false);
+                                            }}
+                                            style={{ display: "block", padding: "8px 16px" }}
+                                        >
+                                            Users
+                                        </StyledNavLink>
+                                    )}
+
                                     <StyledNavLink
                                         to="/driver-list"
                                         onClick={() => {
@@ -202,16 +206,19 @@ const AdminNavbar = () => {
                                     >
                                         Drivers
                                     </StyledNavLink>
-                                    <StyledNavLink
-                                        to="/admin-users-list"
-                                        onClick={() => {
-                                            closeMobileMenu();
-                                            setManageDropDownOpen(false);
-                                        }}
-                                        style={{ display: "block", padding: "8px 16px" }}
-                                    >
-                                        Admin Users
-                                    </StyledNavLink>
+
+                                    {isSuperAdmin && (
+                                        <StyledNavLink
+                                            to="/admin-users-list"
+                                            onClick={() => {
+                                                closeMobileMenu();
+                                                setManageDropDownOpen(false);
+                                            }}
+                                            style={{ display: "block", padding: "8px 16px" }}
+                                        >
+                                            Admin Users
+                                        </StyledNavLink>
+                                    )}
 
                                     {/* Manage Others */}
                                     <Typography variant="subtitle2" sx={{ px: 2, py: 0.5, color: "gray", fontSize: "16px" }}>
@@ -350,13 +357,16 @@ const AdminNavbar = () => {
                                             Manage Members
                                         </ListSubheader>
 
-                                        <StyledNavLink
-                                            to="/users-list"
-                                            onClick={closeMobileMenu}
-                                            sx={{ display: "block", mb: 1 }}
-                                        >
-                                            Users
-                                        </StyledNavLink>
+                                        {isSuperAdmin && (
+                                            <StyledNavLink
+                                                to="/users-list"
+                                                onClick={closeMobileMenu}
+                                                sx={{ display: "block", mb: 1 }}
+                                            >
+                                                Users
+                                            </StyledNavLink>
+                                        )}
+
                                         <StyledNavLink
                                             to="/driver-list"
                                             onClick={closeMobileMenu}
@@ -364,13 +374,16 @@ const AdminNavbar = () => {
                                         >
                                             Drivers
                                         </StyledNavLink>
-                                        <StyledNavLink
-                                            to="/admin-users-list"
-                                            onClick={closeMobileMenu}
-                                            sx={{ display: "block" }}
-                                        >
-                                            Admin Users
-                                        </StyledNavLink>
+
+                                        {isSuperAdmin && (
+                                            <StyledNavLink
+                                                to="/admin-users-list"
+                                                onClick={closeMobileMenu}
+                                                sx={{ display: "block", mb: 1 }}
+                                            >
+                                                Admin Users
+                                            </StyledNavLink>
+                                        )}
 
                                         {/* Manage Others */}
                                         <ListSubheader disableSticky sx={{ color: "gray", bgcolor: "transparent", pl: 0 }}>
