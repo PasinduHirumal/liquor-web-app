@@ -79,7 +79,7 @@ const AdminUserList = () => {
       title: 'Email',
       dataIndex: 'email',
       render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>,
-      width: 300,
+      width: 260,
     },
     {
       title: 'Full Name',
@@ -120,7 +120,7 @@ const AdminUserList = () => {
           part="role"
         />
       ),
-      width: 140,
+      width: 150,
     },
     {
       title: 'Active',
