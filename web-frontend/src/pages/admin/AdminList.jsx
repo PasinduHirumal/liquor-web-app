@@ -10,14 +10,20 @@ const { Option } = Select;
 const AdminUserList = () => {
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filter, setFilter] = useState({ isAdminAccepted: '', isActive: '' });
+  const [warehouses, setWarehouses] = useState([]);
+  const [filter, setFilter] = useState({
+    isAdminAccepted: '',
+    isActive: '',
+    where_house_id: ''
+  });
 
   const fetchAdmins = async () => {
     setLoading(true);
     try {
       const params = {};
       if (filter.isAdminAccepted !== '') params.isAdminAccepted = filter.isAdminAccepted;
-      else if (filter.isActive !== '') params.isActive = filter.isActive;
+      if (filter.isActive !== '') params.isActive = filter.isActive;
+      if (filter.where_house_id !== '') params.where_house_id = filter.where_house_id;
 
       const response = await axiosInstance.get('/admin/getAll', { params });
       setAdmins(response.data.data || []);
@@ -29,12 +35,21 @@ const AdminUserList = () => {
     }
   };
 
+  const fetchWarehouses = async () => {
+    try {
+      const response = await axiosInstance.get('/system/details');
+      setWarehouses(response.data.data || []);
+    } catch (error) {
+      console.error('Error fetching warehouses:', error);
+      toast.error('Failed to fetch warehouses');
+    }
+  };
+
   const handleFilterChange = (field, value) => {
-    setFilter((prev) =>
-      field === 'isAdminAccepted'
-        ? { isAdminAccepted: value, isActive: '' }
-        : { isAdminAccepted: '', isActive: value }
-    );
+    setFilter(prev => ({
+      ...prev,
+      [field]: value
+    }));
   };
 
   const handleDeleteSuccess = (deletedId) => {
@@ -48,6 +63,7 @@ const AdminUserList = () => {
   };
 
   useEffect(() => {
+    fetchWarehouses();
     fetchAdmins();
   }, [filter]);
 
@@ -74,6 +90,17 @@ const AdminUserList = () => {
       title: 'Phone',
       dataIndex: 'phone',
       width: 130,
+    },
+    {
+      title: 'Warehouse',
+      dataIndex: 'where_house_id',
+      render: (_, record) => `${record.where_house_id || '-'}`,
+      width: 140,
+      filters: warehouses.map(wh => ({
+        text: wh.where_house_name,
+        value: wh.id,
+      })),
+      onFilter: (value, record) => record.where_house_id === value,
     },
     {
       title: 'Role',
