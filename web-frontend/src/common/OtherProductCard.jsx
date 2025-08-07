@@ -170,25 +170,27 @@ const OtherProductCard = ({ product, showDetailButton = false, navigateButton = 
                     </div>
 
                     {/* Status Badges */}
-                    <div className="mb-2">
-                        <span
-                            className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"
-                                }`}
-                        >
-                            {product.is_active ? "Active" : "Inactive"}
-                        </span>
-                        {product.is_liquor && (
-                            <span className="badge bg-danger me-1">Liquor</span>
-                        )}
-                        <span
-                            className={`badge ${product.is_in_stock
-                                ? "bg-primary"
-                                : "bg-warning text-dark"
-                                }`}
-                        >
-                            {product.is_in_stock ? "Available" : "Unavailable"}
-                        </span>
-                    </div>
+                    {showDetailButton && (
+                        <div className="mb-2">
+                            <span
+                                className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"
+                                    }`}
+                            >
+                                {product.is_active ? "Active" : "Inactive"}
+                            </span>
+                            {product.is_liquor && (
+                                <span className="badge bg-danger me-1">Liquor</span>
+                            )}
+                            <span
+                                className={`badge ${product.is_in_stock
+                                    ? "bg-primary"
+                                    : "bg-warning text-dark"
+                                    }`}
+                            >
+                                {product.is_in_stock ? "Available" : "Unavailable"}
+                            </span>
+                        </div>
+                    )}
 
                     {/* Detail Button */}
                     <div className="card-footer mt-auto text-center">

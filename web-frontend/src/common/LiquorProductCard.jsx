@@ -144,20 +144,22 @@ const LiquorProductCard = ({ product, detailButton = false, navigateButton = tru
           </div>
 
           {/* Badges */}
-          <div className="mb-2">
-            <span
-              className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"
-                }`}
-            >
-              {product.is_active ? "Active" : "Inactive"}
-            </span>
-            <span
-              className={`badge ${product.is_in_stock ? "bg-primary" : "bg-warning text-dark"
-                }`}
-            >
-              {product.is_in_stock ? "Available" : "Unavailable"}
-            </span>
-          </div>
+          {detailButton && (
+            <div className="mb-2">
+              <span
+                className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"
+                  }`}
+              >
+                {product.is_active ? "Active" : "Inactive"}
+              </span>
+              <span
+                className={`badge ${product.is_in_stock ? "bg-primary" : "bg-warning text-dark"
+                  }`}
+              >
+                {product.is_in_stock ? "Available" : "Unavailable"}
+              </span>
+            </div>
+          )}
 
           {/* Buttons */}
           <div className="card-footer mt-auto text-center">
