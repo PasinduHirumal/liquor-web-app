@@ -5,8 +5,7 @@ import { Button, Form, Row, Col, InputGroup } from "react-bootstrap";
 import CreateProductModal from "../../components/admin/forms/CreateProductModal";
 
 const OtherProductList = () => {
-    const [allProducts, setAllProducts] = useState([]);
-    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -15,7 +14,7 @@ const OtherProductList = () => {
     const [filters, setFilters] = useState({
         is_active: "",
         is_in_stock: "",
-        categoryId: "",
+        category_id: "",
     });
 
     useEffect(() => {
@@ -24,22 +23,7 @@ const OtherProductList = () => {
 
     useEffect(() => {
         fetchProducts();
-    }, [filters.is_active, filters.is_in_stock]);
-
-    useEffect(() => {
-        const applyFilters = () => {
-            let filtered = allProducts.filter(product => {
-                // Apply category filter if selected
-                if (filters.categoryId && product.category_id?.id !== filters.categoryId) {
-                    return false;
-                }
-                return true;
-            });
-            setFilteredProducts(filtered);
-        };
-
-        applyFilters();
-    }, [allProducts, filters.categoryId]);
+    }, [filters]);
 
     const fetchCategories = async () => {
         try {
@@ -56,13 +40,18 @@ const OtherProductList = () => {
             setLoading(true);
             setError(null);
 
-            const queryParams = new URLSearchParams();
-            if (filters.is_active !== "") queryParams.append('is_active', filters.is_active);
-            if (filters.is_in_stock !== "") queryParams.append('is_in_stock', filters.is_in_stock);
+            const params = {};
 
-            const response = await axiosInstance.get(`/other-products/getAll?${queryParams.toString()}`);
-            const products = response.data.data || [];
-            setAllProducts(products);
+            if (filters.is_active !== "") params.is_active = filters.is_active;
+            if (filters.is_in_stock !== "") params.is_in_stock = filters.is_in_stock;
+            if (filters.category_id !== "") params.category_id = filters.category_id;
+
+            const response = await axiosInstance.get("/other-products/getAll", {
+                params: params
+            });
+
+            const allProducts = response.data.data || [];
+            setProducts(allProducts);
         } catch (err) {
             setError(err.message || "Failed to fetch products");
             console.error("Fetch products error:", err);
@@ -79,13 +68,6 @@ const OtherProductList = () => {
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         setFilters((prev) => ({ ...prev, [name]: value }));
-    };
-
-    const handleCategoryClick = (categoryId) => {
-        setFilters(prev => ({
-            ...prev,
-            categoryId: prev.categoryId === categoryId ? "" : categoryId
-        }));
     };
 
     return (
@@ -128,14 +110,11 @@ const OtherProductList = () => {
                 </Row>
 
                 <div className="mt-3">
-                    <div
-                        className="d-flex gap-2 overflow-auto pb-2"
-                        style={{ whiteSpace: "nowrap", scrollSnapType: "x mandatory" }}
-                    >
+                    <div className="d-flex gap-2 overflow-auto pb-2" style={{ whiteSpace: "nowrap", scrollSnapType: "x mandatory" }}>
                         <Button
-                            variant={!filters.categoryId ? "primary" : "outline-secondary"}
+                            variant={!filters.category_id ? "primary" : "outline-secondary"}
                             size="md"
-                            onClick={() => handleCategoryClick("")}
+                            onClick={() => setFilters(prev => ({ ...prev, category_id: "" }))}
                             className="d-flex align-items-center"
                         >
                             All
@@ -144,9 +123,9 @@ const OtherProductList = () => {
                         {categories.map(category => (
                             <Button
                                 key={category.category_id}
-                                variant={filters.categoryId === category.category_id ? "primary" : "outline-secondary"}
+                                variant={filters.category_id === category.category_id ? "primary" : "outline-secondary"}
                                 size="md"
-                                onClick={() => handleCategoryClick(category.category_id)}
+                                onClick={() => setFilters(prev => ({ ...prev, category_id: category.category_id }))}
                                 className="d-flex align-items-center gap-2 flex-shrink-0"
                             >
                                 {category.icon && (
@@ -174,9 +153,9 @@ const OtherProductList = () => {
                 </div>
             ) : error ? (
                 <div className="alert alert-danger">{error}</div>
-            ) : filteredProducts.length > 0 ? (
+            ) : products.length > 0 ? (
                 <div className="row g-4">
-                    {filteredProducts.map((product) => (
+                    {products.map((product) => (
                         <OtherProductCard
                             key={product.product_id}
                             product={product}

@@ -5,8 +5,7 @@ import LiquorProductCard from "../../common/LiquorProductCard";
 import LiquorCreateForm from "../../components/admin/forms/LiquorCreateForm";
 
 const LiquorList = () => {
-    const [allProducts, setAllProducts] = useState([]);
-    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -18,6 +17,7 @@ const LiquorList = () => {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [toggleLoading, setToggleLoading] = useState(false);
 
+    // Helper to parse filter string to boolean or undefined
     const parseBoolFilter = (val) => {
         if (val === "true") return true;
         if (val === "false") return false;
@@ -28,23 +28,34 @@ const LiquorList = () => {
         try {
             setLoading(true);
 
+            // Fetch categories first
             const categoriesResponse = await axiosInstance.get("/categories/getAll");
             const activeCategories = (categoriesResponse.data.data || []).filter(
                 (cat) => cat.is_active && cat.is_liquor
             );
             setCategories(activeCategories);
 
-            const params = {};
-            const activeFilter = parseBoolFilter(filters.is_active);
-            if (activeFilter !== undefined) params.is_active = activeFilter;
-            const stockFilter = parseBoolFilter(filters.is_in_stock);
-            if (stockFilter !== undefined) params.is_in_stock = stockFilter;
+            const params = {
+                is_liquor: true
+            };
+
+            if (filters.is_active !== "") {
+                params.is_active = filters.is_active === "true";
+            }
+
+            if (filters.is_in_stock !== "") {
+                params.is_in_stock = filters.is_in_stock === "true";
+            }
+
+            if (filters.categoryId) {
+                params.category_id = filters.categoryId;
+            }
 
             const productsResponse = await axiosInstance.get("/products/getAll", {
                 params,
             });
 
-            setAllProducts(productsResponse.data.data || []);
+            setProducts(productsResponse.data.data || []);
             setError(null);
         } catch (err) {
             setError(err.message || "Failed to fetch data");
@@ -56,21 +67,7 @@ const LiquorList = () => {
 
     useEffect(() => {
         fetchProducts();
-    }, [filters.is_active, filters.is_in_stock]);
-
-    useEffect(() => {
-        const applyFilters = () => {
-            let filtered = allProducts.filter(product => {
-                if (filters.categoryId && product.category_id?.id !== filters.categoryId) {
-                    return false;
-                }
-                return true;
-            });
-            setFilteredProducts(filtered);
-        };
-
-        applyFilters();
-    }, [allProducts, filters.categoryId]);
+    }, [filters]);
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -91,8 +88,7 @@ const LiquorList = () => {
     const handleToggleActive = async () => {
         try {
             setToggleLoading(true);
-            // Calculate new toggle value: if any product inactive => activate all, else deactivate all
-            const anyInactive = allProducts.some((p) => !p.is_active);
+            const anyInactive = products.some((p) => !p.is_active);
             const newActiveValue = anyInactive;
 
             await axiosInstance.patch(
@@ -100,7 +96,6 @@ const LiquorList = () => {
                 { is_active: newActiveValue }
             );
 
-            // Refresh products list
             await fetchProducts();
         } catch (err) {
             console.error("Toggle active error:", err);
@@ -111,7 +106,7 @@ const LiquorList = () => {
     };
 
     const handleCreateSuccess = (newProduct) => {
-        setAllProducts((prev) => [newProduct, ...prev]);
+        setProducts((prev) => [newProduct, ...prev]);
         setShowCreateModal(false);
     };
 
@@ -128,7 +123,7 @@ const LiquorList = () => {
                     >
                         {toggleLoading
                             ? "Processing..."
-                            : allProducts.some((p) => !p.is_active)
+                            : products.some((p) => !p.is_active)
                                 ? "Activate All Liquors"
                                 : "Deactivate All Liquors"}
                     </Button>
@@ -234,8 +229,8 @@ const LiquorList = () => {
             {/* Products */}
             {!loading && !error && (
                 <div className="row g-4">
-                    {filteredProducts.length > 0 ? (
-                        filteredProducts.map((product) => (
+                    {products.length > 0 ? (
+                        products.map((product) => (
                             <LiquorProductCard
                                 key={product.product_id}
                                 product={product}
