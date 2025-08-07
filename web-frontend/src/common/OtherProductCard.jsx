@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const OtherProductCard = ({ product, showDetailButton = false, navigateButton = true }) => {
+const OtherProductCard = ({ product, adminOnly = false, userOnly = true }) => {
     // Combine main_image and images into one array for thumbnails
     const combinedImages = React.useMemo(() => {
         const imgs = product.images ? [...product.images] : [];
@@ -170,29 +170,31 @@ const OtherProductCard = ({ product, showDetailButton = false, navigateButton = 
                     </div>
 
                     {/* Status Badges */}
-                    <div className="mb-2">
-                        <span
-                            className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"
-                                }`}
-                        >
-                            {product.is_active ? "Active" : "Inactive"}
-                        </span>
-                        {product.is_liquor && (
-                            <span className="badge bg-danger me-1">Liquor</span>
-                        )}
-                        <span
-                            className={`badge ${product.is_in_stock
-                                ? "bg-primary"
-                                : "bg-warning text-dark"
-                                }`}
-                        >
-                            {product.is_in_stock ? "Available" : "Unavailable"}
-                        </span>
-                    </div>
+                    {adminOnly && (
+                        <div className="mb-2">
+                            <span
+                                className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"
+                                    }`}
+                            >
+                                {product.is_active ? "Active" : "Inactive"}
+                            </span>
+                            {product.is_liquor && (
+                                <span className="badge bg-danger me-1">Liquor</span>
+                            )}
+                            <span
+                                className={`badge ${product.is_in_stock
+                                    ? "bg-primary"
+                                    : "bg-warning text-dark"
+                                    }`}
+                            >
+                                {product.is_in_stock ? "Available" : "Unavailable"}
+                            </span>
+                        </div>
+                    )}
 
                     {/* Detail Button */}
                     <div className="card-footer mt-auto text-center">
-                        {showDetailButton && (
+                        {adminOnly && (
                             <button
                                 className="btn btn-primary btn-sm w-100"
                                 onClick={handleViewDetail}
@@ -200,7 +202,7 @@ const OtherProductCard = ({ product, showDetailButton = false, navigateButton = 
                                 View Details
                             </button>
                         )}
-                        {navigateButton && (
+                        {userOnly && (
                             <button
                                 className="btn btn-success btn-sm w-100"
                                 onClick={() => { console.log("navigate to application") }}

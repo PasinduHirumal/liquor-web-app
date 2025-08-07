@@ -5,7 +5,8 @@ import { Button, Form, Row, Col, InputGroup } from "react-bootstrap";
 import CreateProductModal from "../../components/admin/forms/CreateProductModal";
 
 const OtherProductList = () => {
-    const [products, setProducts] = useState([]);
+    const [allProducts, setAllProducts] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -23,7 +24,22 @@ const OtherProductList = () => {
 
     useEffect(() => {
         fetchProducts();
-    }, [filters]);
+    }, [filters.is_active, filters.is_in_stock]);
+
+    useEffect(() => {
+        const applyFilters = () => {
+            let filtered = allProducts.filter(product => {
+                // Apply category filter if selected
+                if (filters.categoryId && product.category_id?.id !== filters.categoryId) {
+                    return false;
+                }
+                return true;
+            });
+            setFilteredProducts(filtered);
+        };
+
+        applyFilters();
+    }, [allProducts, filters.categoryId]);
 
     const fetchCategories = async () => {
         try {
@@ -41,13 +57,12 @@ const OtherProductList = () => {
             setError(null);
 
             const queryParams = new URLSearchParams();
-            Object.entries(filters).forEach(([key, value]) => {
-                if (value !== "") queryParams.append(key, value);
-            });
+            if (filters.is_active !== "") queryParams.append('is_active', filters.is_active);
+            if (filters.is_in_stock !== "") queryParams.append('is_in_stock', filters.is_in_stock);
 
             const response = await axiosInstance.get(`/other-products/getAll?${queryParams.toString()}`);
-            const allProducts = response.data.data || [];
-            setProducts(allProducts);
+            const products = response.data.data || [];
+            setAllProducts(products);
         } catch (err) {
             setError(err.message || "Failed to fetch products");
             console.error("Fetch products error:", err);
@@ -159,14 +174,14 @@ const OtherProductList = () => {
                 </div>
             ) : error ? (
                 <div className="alert alert-danger">{error}</div>
-            ) : products.length > 0 ? (
+            ) : filteredProducts.length > 0 ? (
                 <div className="row g-4">
-                    {products.map((product) => (
+                    {filteredProducts.map((product) => (
                         <OtherProductCard
                             key={product.product_id}
                             product={product}
-                            showDetailButton={true}
-                            navigateButton={false}
+                            adminOnly={true}
+                            userOnly={false}
                         />
                     ))}
                 </div>
