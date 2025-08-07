@@ -5,7 +5,8 @@ import LiquorProductCard from "../../common/LiquorProductCard";
 import LiquorCreateForm from "../../components/admin/forms/LiquorCreateForm";
 
 const LiquorList = () => {
-    const [products, setProducts] = useState([]);
+    const [allProducts, setAllProducts] = useState([]);
+    const [filteredProducts, setFilteredProducts] = useState([]);
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -17,7 +18,6 @@ const LiquorList = () => {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [toggleLoading, setToggleLoading] = useState(false);
 
-    // Helper to parse filter string to boolean or undefined
     const parseBoolFilter = (val) => {
         if (val === "true") return true;
         if (val === "false") return false;
@@ -34,19 +34,17 @@ const LiquorList = () => {
             );
             setCategories(activeCategories);
 
-            // Prepare query params with booleans
             const params = {};
             const activeFilter = parseBoolFilter(filters.is_active);
             if (activeFilter !== undefined) params.is_active = activeFilter;
             const stockFilter = parseBoolFilter(filters.is_in_stock);
             if (stockFilter !== undefined) params.is_in_stock = stockFilter;
-            if (filters.categoryId !== "") params.categoryId = filters.categoryId;
 
             const productsResponse = await axiosInstance.get("/products/getAll", {
                 params,
             });
 
-            setProducts(productsResponse.data.data || []);
+            setAllProducts(productsResponse.data.data || []);
             setError(null);
         } catch (err) {
             setError(err.message || "Failed to fetch data");
@@ -58,7 +56,21 @@ const LiquorList = () => {
 
     useEffect(() => {
         fetchProducts();
-    }, [filters]);
+    }, [filters.is_active, filters.is_in_stock]);
+
+    useEffect(() => {
+        const applyFilters = () => {
+            let filtered = allProducts.filter(product => {
+                if (filters.categoryId && product.category_id?.id !== filters.categoryId) {
+                    return false;
+                }
+                return true;
+            });
+            setFilteredProducts(filtered);
+        };
+
+        applyFilters();
+    }, [allProducts, filters.categoryId]);
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -80,7 +92,7 @@ const LiquorList = () => {
         try {
             setToggleLoading(true);
             // Calculate new toggle value: if any product inactive => activate all, else deactivate all
-            const anyInactive = products.some((p) => !p.is_active);
+            const anyInactive = allProducts.some((p) => !p.is_active);
             const newActiveValue = anyInactive;
 
             await axiosInstance.patch(
@@ -99,7 +111,7 @@ const LiquorList = () => {
     };
 
     const handleCreateSuccess = (newProduct) => {
-        setProducts((prev) => [newProduct, ...prev]);
+        setAllProducts((prev) => [newProduct, ...prev]);
         setShowCreateModal(false);
     };
 
@@ -116,7 +128,7 @@ const LiquorList = () => {
                     >
                         {toggleLoading
                             ? "Processing..."
-                            : products.some((p) => !p.is_active)
+                            : allProducts.some((p) => !p.is_active)
                                 ? "Activate All Liquors"
                                 : "Deactivate All Liquors"}
                     </Button>
@@ -222,8 +234,8 @@ const LiquorList = () => {
             {/* Products */}
             {!loading && !error && (
                 <div className="row g-4">
-                    {products.length > 0 ? (
-                        products.map((product) => (
+                    {filteredProducts.length > 0 ? (
+                        filteredProducts.map((product) => (
                             <LiquorProductCard
                                 key={product.product_id}
                                 product={product}
