@@ -12,10 +12,11 @@ const createDriver = async (req, res) => {
 	try {
         const { email, phone, profileImage, where_house_id } = req.body;
 
-        const driverByEmail  = await driverService.findByEmail(email);
-        const driverByPhone = await driverService.findByPhone(phone);
+        const existingDriver  = 
+            (email && await driverService.findByEmail(email)) || 
+            (phone && await driverService.findByPhone(phone));
 
-        if (driverByEmail || driverByPhone) {
+        if (existingDriver) {
             return res.status(400).json({ success: false, message: "Driver already exists" });
         }
 

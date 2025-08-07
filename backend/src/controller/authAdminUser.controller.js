@@ -9,10 +9,11 @@ const register = async (req, res) => {
     try {
         const { email, phone, where_house_id } = req.body;
 
-        const userByEmail  = await adminService.findByEmail(email);
-        const userByPhone = await adminService.findByPhone(phone);
+        const existingAdmin  = 
+            (email && await adminService.findByEmail(email)) || 
+            (phone && await adminService.findByPhone(phone));
 
-        if (userByEmail || userByPhone) {
+        if (existingAdmin) {
             return res.status(400).json({ success: false, message: "User already exists" });
         }
 
