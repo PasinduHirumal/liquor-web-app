@@ -76,44 +76,72 @@ const LiquorAll = () => {
 
         {/* Category Filter */}
         {!loadingCategories && (
-          <div
-            className="d-flex flex-nowrap overflow-auto py-2 gap-2"
-            style={{ scrollbarWidth: 'thin' }}
-          >
-            <Button
-              variant={!filters.categoryId ? "primary" : "outline-secondary"}
-              onClick={() => handleCategoryClick("")}
-              className="flex-shrink-0"
-            >
-              All
-            </Button>
+          <div className="overflow-auto pb-2">
+            <div className="d-flex flex-nowrap gap-3">
 
-            {categories.map((category) => (
-              <Button
-                key={category.category_id}
-                variant={
-                  filters.categoryId === category.category_id
-                    ? "primary"
-                    : "outline-secondary"
-                }
-                onClick={() => handleCategoryClick(category.category_id)}
-                className="d-flex align-items-center gap-2 flex-shrink-0"
+              {/* All button */}
+              <div
+                className={`category-pill ${!filters.categoryId ? "active" : ""}`}
+                onClick={() => handleCategoryClick("")}
+                style={{
+                  cursor: "pointer",
+                  padding: "8px 16px",
+                  borderRadius: "20px",
+                  backgroundColor: !filters.categoryId ? "#1976d2" : "#f0f0f0",
+                  color: !filters.categoryId ? "white" : "inherit",
+                  transition: "all 0.2s",
+                  display: "flex",
+                  alignItems: "center",
+                  whiteSpace: "nowrap",
+                  flexShrink: 0,
+                }}
               >
-                {category.icon && (
-                  <img
-                    src={category.icon}
-                    alt={category.name}
-                    style={{
-                      width: '20px',
-                      height: '20px',
-                      borderRadius: '50%',
-                      objectFit: 'cover',
-                    }}
-                  />
-                )}
-                {category.name}
-              </Button>
-            ))}
+                <span>All</span>
+              </div>
+
+              {/* Category buttons */}
+              {categories.map((category) => (
+                <div
+                  key={category.category_id}
+                  className={`category-pill ${filters.categoryId === category.category_id ? "active" : ""
+                    }`}
+                  onClick={() => handleCategoryClick(category.category_id)}
+                  style={{
+                    cursor: "pointer",
+                    padding: "8px 16px",
+                    borderRadius: "20px",
+                    backgroundColor:
+                      filters.categoryId === category.category_id
+                        ? "#1976d2"
+                        : "#f0f0f0",
+                    color:
+                      filters.categoryId === category.category_id
+                        ? "white"
+                        : "inherit",
+                    transition: "all 0.2s",
+                    display: "flex",
+                    alignItems: "center",
+                    whiteSpace: "nowrap",
+                    flexShrink: 0,
+                  }}
+                >
+                  {category.icon && (
+                    <img
+                      src={category.icon}
+                      alt={category.name}
+                      style={{
+                        width: "24px",
+                        height: "24px",
+                        borderRadius: "50%",
+                        objectFit: "cover",
+                        marginRight: "8px",
+                      }}
+                    />
+                  )}
+                  <span>{category.name}</span>
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>
