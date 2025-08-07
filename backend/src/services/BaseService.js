@@ -44,45 +44,17 @@ class BaseService {
         try {
             let query = this.collection;
             
-            // Handle date range filtering separately
+            // Handle date range filtering 
             if (filters.dateRange) {
                 const { start, end } = filters.dateRange;
                 
-                // Firestore Timestamp format (created_at)
-                const timestampQuery = this.collection
-                    .where('created_at', '>=', start)
-                    .where('created_at', '<=', end);
+                // Convert to Firestore Timestamps if they're Date objects
+                const startTimestamp = start instanceof Date ? start : start.toDate();
+                const endTimestamp = end instanceof Date ? end : end.toDate();
                 
-                // Then try with ISO string format (created_at)
-                const isoQuery = this.collection
-                    .where('created_at', '>=', start.toISOString())
-                    .where('created_at', '<=', end.toISOString());
-                
-                // Apply other filters to both queries
-                Object.entries(filters).forEach(([field, value]) => {
-                    if (field !== 'dateRange' && value !== undefined && value !== null) {
-                        timestampQuery = timestampQuery.where(field, '==', value);
-                        isoQuery = isoQuery.where(field, '==', value);
-                    }
-                });
-                
-                // Execute both queries
-                const [timestampResults, isoResults] = await Promise.all([
-                    timestampQuery.get().catch(() => ({ docs: [] })),
-                    isoQuery.get().catch(() => ({ docs: [] }))
-                ]);
-                
-                // Combine results and remove duplicates
-                const allDocs = [...timestampResults.docs, ...isoResults.docs];
-                const uniqueDocs = allDocs.filter((doc, index, self) => 
-                    index === self.findIndex(d => d.id === doc.id)
-                );
-
-                if (!uniqueDocs) {
-                    return [];
-                }
-                
-                return uniqueDocs.map(doc => new Orders(doc.id, doc.data()));
+                query = query
+                    .where(this.timestampFields.createdAt, '>=', startTimestamp)
+                    .where(this.timestampFields.createdAt, '<=', endTimestamp);
             }
 
             // Apply other filters

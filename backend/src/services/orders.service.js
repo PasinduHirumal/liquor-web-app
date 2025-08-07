@@ -117,8 +117,8 @@ class OrdersService {
     async create(data) {
         try {
             const userRef = await this.collection.add({...data,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
+                created_at: new Date().toISOString(),
+                updated_at: new Date().toISOString()
             });
 
             return new Orders(userRef.id, data);
@@ -135,7 +135,7 @@ class OrdersService {
                 return false;
             }
             
-            updateData.updatedAt = new Date().toISOString();
+            updateData.updated_at = new Date().toISOString();
         
             await this.collection.doc(id).update(updateData);
         
