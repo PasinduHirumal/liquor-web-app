@@ -110,38 +110,67 @@ const OtherProductList = () => {
                 </Row>
 
                 <div className="mt-3">
-                    <div className="d-flex gap-2 overflow-auto pb-2" style={{ whiteSpace: "nowrap", scrollSnapType: "x mandatory" }}>
-                        <Button
-                            variant={!filters.category_id ? "primary" : "outline-secondary"}
-                            size="md"
+                    <div
+                        className="d-flex gap-2 overflow-auto pb-2"
+                        style={{ whiteSpace: "nowrap", scrollSnapType: "x mandatory" }}
+                    >
+                        <div
+                            className={`border border-primary category-pill ${!filters.category_id ? "active" : ""}`}
                             onClick={() => setFilters(prev => ({ ...prev, category_id: "" }))}
-                            className="d-flex align-items-center"
+                            style={{
+                                cursor: "pointer",
+                                padding: "8px 16px",
+                                borderRadius: "20px",
+                                backgroundColor: !filters.category_id ? "#1976d2" : "#f0f0f0",
+                                color: !filters.category_id ? "white" : "inherit",
+                                transition: "all 0.2s",
+                                display: "flex",
+                                alignItems: "center",
+                                whiteSpace: "nowrap",
+                                flexShrink: 0,
+                            }}
                         >
                             All
-                        </Button>
+                        </div>
 
                         {categories.map(category => (
-                            <Button
+                            <div
                                 key={category.category_id}
-                                variant={filters.category_id === category.category_id ? "primary" : "outline-secondary"}
-                                size="md"
-                                onClick={() => setFilters(prev => ({ ...prev, category_id: category.category_id }))}
-                                className="d-flex align-items-center gap-2 flex-shrink-0"
+                                className={`border border-primary category-pill ${filters.category_id === category.category_id ? "active" : ""
+                                    }`}
+                                onClick={() =>
+                                    setFilters(prev => ({ ...prev, category_id: category.category_id }))
+                                }
+                                style={{
+                                    cursor: "pointer",
+                                    padding: "8px 16px",
+                                    borderRadius: "20px",
+                                    backgroundColor:
+                                        filters.category_id === category.category_id ? "#1976d2" : "#f0f0f0",
+                                    color:
+                                        filters.category_id === category.category_id ? "white" : "inherit",
+                                    transition: "all 0.2s",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    whiteSpace: "nowrap",
+                                    flexShrink: 0,
+                                }}
                             >
                                 {category.icon && (
                                     <img
                                         src={category.icon}
                                         alt={category.name}
                                         style={{
-                                            width: '20px',
-                                            height: '20px',
-                                            borderRadius: '50%',
-                                            objectFit: 'cover'
+                                            width: "20px",
+                                            height: "20px",
+                                            borderRadius: "50%",
+                                            objectFit: "cover",
+                                            marginRight: "8px",
                                         }}
                                     />
                                 )}
                                 {category.name}
-                            </Button>
+                            </div>
                         ))}
                     </div>
                 </div>

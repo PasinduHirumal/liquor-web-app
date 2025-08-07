@@ -81,7 +81,7 @@ const LiquorAll = () => {
 
               {/* All button */}
               <div
-                className={`category-pill ${!filters.categoryId ? "active" : ""}`}
+                className={`border border-primary category-pill ${!filters.categoryId ? "active" : ""}`}
                 onClick={() => handleCategoryClick("")}
                 style={{
                   cursor: "pointer",
@@ -103,7 +103,7 @@ const LiquorAll = () => {
               {categories.map((category) => (
                 <div
                   key={category.category_id}
-                  className={`category-pill ${filters.categoryId === category.category_id ? "active" : ""
+                  className={`border border-primary category-pill ${filters.categoryId === category.category_id ? "active" : ""
                     }`}
                   onClick={() => handleCategoryClick(category.category_id)}
                   style={{

@@ -79,7 +79,7 @@ const OtherProductAll = () => {
                     <div className="overflow-auto pb-2">
                         <div className="d-flex flex-nowrap gap-3">
                             <div
-                                className={`category-pill ${!filters.categoryId ? "active" : ""}`}
+                                className={`border border-primary category-pill ${!filters.categoryId ? "active" : ""}`}
                                 onClick={() => handleCategoryClick("")}
                                 style={{
                                     cursor: "pointer",
@@ -99,8 +99,7 @@ const OtherProductAll = () => {
                             {categories.map((category) => (
                                 <div
                                     key={category.category_id}
-                                    className={`category-pill ${filters.categoryId === category.category_id ? "active" : ""
-                                        }`}
+                                    className={`border border-primary category-pill ${filters.categoryId === category.category_id ? "active" : ""}`}
                                     onClick={() => handleCategoryClick(category.category_id)}
                                     style={{
                                         cursor: "pointer",
