@@ -115,7 +115,7 @@ const OtherProductList = () => {
                         style={{ whiteSpace: "nowrap", scrollSnapType: "x mandatory" }}
                     >
                         <div
-                            className={`border border-primary category-pill ${!filters.category_id ? "active" : ""}`}
+                            className={`border border-primary category-pill ${!filters.category_id ? "active" : "outline-secondary"}`}
                             onClick={() => setFilters(prev => ({ ...prev, category_id: "" }))}
                             style={{
                                 cursor: "pointer",
@@ -136,8 +136,7 @@ const OtherProductList = () => {
                         {categories.map(category => (
                             <div
                                 key={category.category_id}
-                                className={`border border-primary category-pill ${filters.category_id === category.category_id ? "active" : ""
-                                    }`}
+                                className={`border border-primary category-pill ${filters.category_id === category.category_id ? "active" : ""}`}
                                 onClick={() =>
                                     setFilters(prev => ({ ...prev, category_id: category.category_id }))
                                 }

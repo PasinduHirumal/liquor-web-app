@@ -170,24 +170,42 @@ const LiquorList = () => {
                             </Col>
                         </Row>
 
-                        <div className="overflow-auto d-flex flex-nowrap gap-2 py-2">
+                        <div
+                            className="overflow-auto d-flex flex-nowrap gap-2 py-2 px-1"
+                            style={{ scrollSnapType: "x mandatory", whiteSpace: "nowrap" }}
+                        >
                             <Button
-                                variant={!filters.categoryId ? "primary" : "outline-secondary"}
+                                variant={!filters.categoryId ? "primary" : "outline-primary"}
                                 onClick={() => handleCategoryClick("")}
+                                className="d-flex align-items-center justify-content-center px-3 py-2"
+                                style={{
+                                    flex: "0 0 auto",
+                                    borderRadius: "20px",
+                                    scrollSnapAlign: "start",
+                                    fontWeight: 500,
+                                    minWidth: "80px",
+                                }}
                             >
                                 All
                             </Button>
+
                             {categories.map((category) => (
                                 <Button
                                     key={category.category_id}
                                     variant={
                                         filters.categoryId === category.category_id
                                             ? "primary"
-                                            : "outline-secondary"
+                                            : "outline-primary"
                                     }
                                     onClick={() => handleCategoryClick(category.category_id)}
-                                    className="d-flex align-items-center gap-1"
-                                    style={{ flex: "0 0 auto" }}
+                                    className="d-flex align-items-center gap-2 px-3 py-2"
+                                    style={{
+                                        flex: "0 0 auto",
+                                        borderRadius: "20px",
+                                        scrollSnapAlign: "start",
+                                        fontWeight: 500,
+                                        minWidth: "100px",
+                                    }}
                                 >
                                     {category.icon && (
                                         <img
@@ -197,14 +215,15 @@ const LiquorList = () => {
                                                 width: "20px",
                                                 height: "20px",
                                                 borderRadius: "50%",
-                                                objectFit: "contain",
+                                                objectFit: "cover",
                                             }}
                                         />
                                     )}
-                                    {category.name}
+                                    <span style={{ whiteSpace: "nowrap" }}>{category.name}</span>
                                 </Button>
                             ))}
                         </div>
+
                     </Form>
                 </div>
             </div>
