@@ -1,55 +1,60 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../lib/axios";
 import LiquorProductCard from "../common/LiquorProductCard";
+import { Button } from "react-bootstrap";
 
 const LiquorAll = () => {
   const [products, setProducts] = useState([]);
-  const [filteredProducts, setFilteredProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [filters, setFilters] = useState({
+    is_active: "true",
+    is_in_stock: "true",
+    categoryId: "",
+  });
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [productsRes, categoriesRes] = await Promise.all([
-          axiosInstance.get("/products/getAll"),
-          axiosInstance.get("/categories/getAll"),
-        ]);
+  const fetchData = async () => {
+    try {
+      setLoading(true);
 
-        setProducts(productsRes.data.data || []);
-        const activeCategories = (categoriesRes.data.data || []).filter(cat => cat.is_active && cat.is_liquor);
-        setCategories(activeCategories);
-      } catch (err) {
-        setError(err.message || "Failed to fetch data");
-        console.error("Fetch error:", err);
-      } finally {
-        setLoading(false);
+      const params = {
+        is_liquor: true,
+        is_active: filters.is_active === "true",
+        is_in_stock: filters.is_in_stock === "true"
+      };
+
+      if (filters.categoryId) {
+        params.category_id = filters.categoryId;
       }
-    };
 
-    fetchData();
-  }, []);
+      const [productsRes, categoriesRes] = await Promise.all([
+        axiosInstance.get("/products/getAll", { params }),
+        axiosInstance.get("/categories/getAll"),
+      ]);
+
+      setProducts(productsRes.data.data || []);
+      const activeCategories = (categoriesRes.data.data || []).filter(
+        cat => cat.is_active && cat.is_liquor
+      );
+      setCategories(activeCategories);
+    } catch (err) {
+      setError(err.message || "Failed to fetch data");
+      console.error("Fetch error:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const applyFilters = () => {
-      let filtered = products.filter(
-        (product) =>
-          product.is_active === true &&
-          product.is_in_stock === true &&
-          (!selectedCategory || product.category_id?.id === selectedCategory)
-      );
-
-      setFilteredProducts(filtered);
-    };
-
-    applyFilters();
-  }, [products, selectedCategory]);
+    fetchData();
+  }, [filters]);
 
   const handleCategoryClick = (categoryId) => {
-    setSelectedCategory(selectedCategory === categoryId ? null : categoryId);
+    setFilters(prev => ({
+      ...prev,
+      categoryId: prev.categoryId === categoryId ? "" : categoryId,
+    }));
   };
 
   if (loading) {
@@ -75,70 +80,53 @@ const LiquorAll = () => {
       <div className="mb-4">
         <h2 className="mb-3">Liquor Products</h2>
 
+
+        {/* Category Filter */}
         <div
-          className="d-flex flex-nowrap overflow-auto py-2 gap-3"
+          className="d-flex flex-nowrap overflow-auto py-2 gap-2"
           style={{ scrollbarWidth: 'thin' }}
         >
-          <div
-            className={`category-pill ${!selectedCategory ? 'active' : ''}`}
-            onClick={() => handleCategoryClick(null)}
-            style={{
-              cursor: 'pointer',
-              padding: '8px 16px',
-              borderRadius: '20px',
-              backgroundColor: !selectedCategory ? '#1976d2' : '#f0f0f0',
-              color: !selectedCategory ? 'white' : 'inherit',
-              flex: '0 0 auto',
-              whiteSpace: 'nowrap',
-              transition: 'all 0.2s',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
+          <Button
+            variant={!filters.categoryId ? "primary" : "outline-secondary"}
+            onClick={() => handleCategoryClick("")}
+            className="flex-shrink-0"
           >
-            <span>All</span>
-          </div>
+            All
+          </Button>
 
           {categories.map((category) => (
-            <div
+            <Button
               key={category.category_id}
-              className={`category-pill ${selectedCategory === category.category_id ? 'active' : ''}`}
+              variant={
+                filters.categoryId === category.category_id
+                  ? "primary"
+                  : "outline-secondary"
+              }
               onClick={() => handleCategoryClick(category.category_id)}
-              style={{
-                cursor: 'pointer',
-                padding: '8px 16px',
-                borderRadius: '20px',
-                backgroundColor: selectedCategory === category.category_id ? '#1976d2' : '#f0f0f0',
-                color: selectedCategory === category.category_id ? 'white' : 'inherit',
-                flex: '0 0 auto',
-                whiteSpace: 'nowrap',
-                transition: 'all 0.2s',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px',
-              }}
+              className="d-flex align-items-center gap-2 flex-shrink-0"
             >
               {category.icon && (
                 <img
                   src={category.icon}
                   alt={category.name}
                   style={{
-                    width: '24px',
-                    height: '24px',
+                    width: '20px',
+                    height: '20px',
                     borderRadius: '50%',
                     objectFit: 'cover',
                   }}
                 />
               )}
-              <span>{category.name}</span>
-            </div>
+              {category.name}
+            </Button>
           ))}
         </div>
       </div>
 
+      {/* Products Grid */}
       <div className="row g-4">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
+        {products.length > 0 ? (
+          products.map((product) => (
             <LiquorProductCard
               key={product.product_id}
               product={product}
