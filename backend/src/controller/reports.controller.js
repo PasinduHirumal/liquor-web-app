@@ -8,7 +8,7 @@ const driverService = new DriverService();
 
 const getOrdersReport = async (req, res) => {
 	try {
-        const { status, is_driver_accepted, where_house_id, format } = req.query;
+        const { status, is_driver_accepted, where_house_id, format, start_date, end_date } = req.query;
 
         const filters = {};
         const filterDescription = [];
@@ -35,6 +35,38 @@ const getOrdersReport = async (req, res) => {
             filters.where_house_id = where_house_id;
             filterDescription.push(`where_house_id: ${where_house_id}`);
         }
+        if (start_date !== undefined || end_date !== undefined) {
+            if (start_date && end_date) {
+                const startDate = new Date(start_date);
+                const endDate = new Date(end_date);
+                
+                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: "Invalid date format. Use YYYY-MM-DD or MM/DD/YYYY" 
+                    });
+                }
+                
+                if (startDate > endDate) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: "Start date must be before or equal to end date" 
+                    });
+                }
+                
+                // Set time to beginning and end of day
+                startDate.setHours(0, 0, 0, 0);
+                endDate.setHours(23, 59, 59, 999);
+                
+                filters.dateRange = { start: startDate, end: endDate };
+                filterDescription.push(`date range: ${start_date} to ${end_date}`);
+            } else {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Both start_date and end_date are required for date filtering" 
+                });
+            }
+        }
         if (format !== undefined && format !== 'pdf') {
             return res.status(400).json({ success: false, message: "Invalid format"});
         }
@@ -43,9 +75,9 @@ const getOrdersReport = async (req, res) => {
             ? await orderService.findWithFilters(filters)
             : await orderService.findAll();
 
-        // Sort by created_at in descending order (newest first)
+        // Sort by created_at in ascending order (oldest first)
         const sortedOrders = filteredOrders.sort((a, b) => {
-            return new Date(b.created_at) - new Date(a.created_at);
+            return new Date(a.created_at) - new Date(b.created_at);
         });
 
         if (format === 'pdf') {

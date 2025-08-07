@@ -40,20 +40,61 @@ class OrdersService {
         try {
             let query = this.collection;
             
-            // Apply each filter to the query
+            // Handle date range filtering separately
+            if (filters.dateRange) {
+                const { start, end } = filters.dateRange;
+                
+                // Firestore Timestamp format (created_at)
+                const timestampQuery = this.collection
+                    .where('created_at', '>=', start)
+                    .where('created_at', '<=', end);
+                
+                // Then try with ISO string format (created_at)
+                const isoQuery = this.collection
+                    .where('created_at', '>=', start.toISOString())
+                    .where('created_at', '<=', end.toISOString());
+                
+                // Apply other filters to both queries
+                Object.entries(filters).forEach(([field, value]) => {
+                    if (field !== 'dateRange' && value !== undefined && value !== null) {
+                        timestampQuery = timestampQuery.where(field, '==', value);
+                        isoQuery = isoQuery.where(field, '==', value);
+                    }
+                });
+                
+                // Execute both queries
+                const [timestampResults, isoResults] = await Promise.all([
+                    timestampQuery.get().catch(() => ({ docs: [] })),
+                    isoQuery.get().catch(() => ({ docs: [] }))
+                ]);
+                
+                // Combine results and remove duplicates
+                const allDocs = [...timestampResults.docs, ...isoResults.docs];
+                const uniqueDocs = allDocs.filter((doc, index, self) => 
+                    index === self.findIndex(d => d.id === doc.id)
+                );
+
+                if (!uniqueDocs) {
+                    return [];
+                }
+                
+                return uniqueDocs.map(doc => new Orders(doc.id, doc.data()));
+            }
+
+            // Apply other filters
             Object.entries(filters).forEach(([field, value]) => {
                 if (value !== undefined && value !== null) {
                     query = query.where(field, '==', value);
                 }
             });
 
-            const usersRef = await query.get();
+            const ordersRef = await query.get();
 
-            if (usersRef.empty) {
+            if (ordersRef.empty) {
                 return [];
             }
 
-            return usersRef.docs.map(doc => new Orders(doc.id, doc.data()));
+            return ordersRef.docs.map(doc => new Orders(doc.id, doc.data()));
         } catch (error) {
             throw error;
         }
