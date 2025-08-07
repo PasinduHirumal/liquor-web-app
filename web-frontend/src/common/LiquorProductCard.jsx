@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
-const LiquorProductCard = ({ product, detailButton = false, navigateButton = true }) => {
+const LiquorProductCard = ({ product, adminOnly = false, userOnly = true }) => {
   const navigate = useNavigate();
 
   // Combine main_image + images[] without duplication
@@ -144,7 +144,7 @@ const LiquorProductCard = ({ product, detailButton = false, navigateButton = tru
           </div>
 
           {/* Badges */}
-          {detailButton && (
+          {adminOnly && (
             <div className="mb-2">
               <span
                 className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"
@@ -163,7 +163,7 @@ const LiquorProductCard = ({ product, detailButton = false, navigateButton = tru
 
           {/* Buttons */}
           <div className="card-footer mt-auto text-center">
-            {detailButton && (
+            {adminOnly && (
               <button
                 className="btn btn-primary btn-sm w-100"
                 onClick={handleViewDetail}
@@ -171,7 +171,7 @@ const LiquorProductCard = ({ product, detailButton = false, navigateButton = tru
                 View Details
               </button>
             )}
-            {navigateButton && (
+            {userOnly && (
               <button
                 className="btn btn-success btn-sm w-100"
                 onClick={() => { console.log("navigate to application") }}

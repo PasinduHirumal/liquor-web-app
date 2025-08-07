@@ -165,8 +165,8 @@ const OtherProductList = () => {
                         <OtherProductCard
                             key={product.product_id}
                             product={product}
-                            showDetailButton={true}
-                            navigateButton={false}
+                            adminOnly={true}
+                            userOnly={false}
                         />
                     ))}
                 </div>

@@ -227,8 +227,8 @@ const LiquorList = () => {
                             <LiquorProductCard
                                 key={product.product_id}
                                 product={product}
-                                detailButton={true}
-                                navigateButton={false}
+                                adminOnly={true}
+                                userOnly={false}
                             />
                         ))
                     ) : (
