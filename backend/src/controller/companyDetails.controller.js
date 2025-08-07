@@ -1,7 +1,9 @@
 import CompanyService from '../services/company.service.js';
+import SystemService from '../services/system.service.js';
 import ADMIN_ROLES from '../enums/adminRoles.js';
 
 const companyService = new CompanyService();
+const systemService = new SystemService();
 
 const createWhereHouse = async (req, res) => {
 	try {
@@ -46,15 +48,20 @@ const createWhereHouse = async (req, res) => {
 
 const getCompanyDetails = async (req, res) => {
 	try {
-        const allowedRoles = [ADMIN_ROLES.SUPER_ADMIN, ADMIN_ROLES.ADMIN];
-        if (!allowedRoles.includes(req.user.role)) {
-            return res.status(403).json({ success: false, message: "Access Forbidden" });
-        }
+        const { isActive } = req.query;
 
-        const details = await companyService.findAll();
-        if (!details) {
-            return res.status(400).json({ success: false, message: "Failed to fetch System details" });
-        }
+        const filters = {};
+        const filterDescription = [];
+
+        if (isActive !== undefined) {
+            const isBoolean = isActive === 'true';
+            filters.isActive = isBoolean;
+            filterDescription.push(`isActive: ${isActive}`);
+        } 
+
+        const details = Object.keys(filters).length > 0 
+            ? await systemService.findWithFilters(filters)
+            : await systemService.findAll();
         
         // Sort by created_at in ascending order (oldest first)
         const sortedDetails = details.sort((a, b) => {
@@ -65,6 +72,7 @@ const getCompanyDetails = async (req, res) => {
             success: true, 
             message: "System Details fetched successfully", 
             count: details.length, 
+            filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
             data: sortedDetails 
         });
     } catch (error) {
