@@ -113,7 +113,7 @@ const createProduct = async (req, res) => {
 
 const getAllProducts = async (req, res) => {
 	try {
-        const { is_active, is_in_stock, is_liquor, categoryId } = req.query;
+        const { is_active, is_in_stock, is_liquor, category_id } = req.query;
 
         const filters = {};
         const filterDescription = [];
@@ -133,14 +133,14 @@ const getAllProducts = async (req, res) => {
             filters.is_liquor = isBoolean;
             filterDescription.push(`is_liquor: ${is_liquor}`);
         }
-        if (categoryId !== undefined){
-            const category = await categoryService.findById(categoryId);
+        if (category_id !== undefined){
+            const category = await categoryService.findById(category_id);
             if (!category) {
                 return res.status(404).json({ success: false, message: "Filter error. Category not found"});
             }
 
-            filters.categoryId = categoryId;
-            filterDescription.push(`category_id: ${categoryId}`);
+            filters.category_id = category_id;
+            filterDescription.push(`category_id: ${category_id}-${category.name}`);
         }
 
         const filteredProducts = Object.keys(filters).length > 0 
