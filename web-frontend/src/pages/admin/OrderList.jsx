@@ -118,7 +118,7 @@ function OrderList() {
             title: "Warehouse",
             dataIndex: "where_house_id",
             key: "where_house_id",
-            render: (id) => id || "N/A",
+            render: (id) => id?.name || "N/A",
             width: 150,
         },
         {

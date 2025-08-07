@@ -181,7 +181,7 @@ const AdminProfile = () => {
                                             </li>
                                             <li className="list-group-item d-flex justify-content-between align-items-center">
                                                 <strong>Warehouse:</strong>
-                                                <span>{admin.where_house_id}</span>
+                                                <span>{admin.where_house_id?.name}</span>
                                             </li>
                                         </ul>
                                     </div>
