@@ -52,13 +52,6 @@ function OrderList() {
 
                     let filtered = response.data.data;
 
-                    // For non-super admins, ensure we only show their warehouse data
-                    if (user?.role !== 'super_admin' && user?.where_house) {
-                        filtered = filtered.filter(order =>
-                            order.where_house_id === user.where_house
-                        );
-                    }
-
                     setFilteredOrders(filtered);
                 } else {
                     message.error("Failed to load orders");
