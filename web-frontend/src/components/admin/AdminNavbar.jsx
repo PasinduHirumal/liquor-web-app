@@ -257,6 +257,15 @@ const AdminNavbar = () => {
                         >
                             System Detail
                         </StyledNavLink>
+                        
+                        {isSuperAdmin && (
+                            <StyledNavLink
+                                to={`/download-reports`}
+                                onClick={closeMobileMenu}
+                            >
+                                Download Report
+                            </StyledNavLink>
+                        )}
 
                         <StyledNavLink
                             to={`/profile/${user?._id || user?.id}`}
@@ -420,6 +429,15 @@ const AdminNavbar = () => {
                             >
                                 System Detail
                             </StyledNavLink>
+
+                            {isSuperAdmin && (
+                                <StyledNavLink
+                                    to={`/download-reports`}
+                                    onClick={closeMobileMenu}
+                                >
+                                    Download Report
+                                </StyledNavLink>
+                            )}
 
                             <StyledNavLink
                                 to={`/profile/${user?._id || user?.id}`}

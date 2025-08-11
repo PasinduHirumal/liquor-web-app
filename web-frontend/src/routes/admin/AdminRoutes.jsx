@@ -24,6 +24,7 @@ import DriverDocumentInfo from "../../components/admin/forms/DriverDocumentInfo"
 import OrderLIst from "../../pages/admin/OrderList";
 import OrderDetail from "../../pages/admin/detailPages/OrderDetail";
 import SystemDetail from "../../pages/admin/SystemDetail";
+import Report from "../../pages/admin/Report";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -97,6 +98,14 @@ export const adminRoutes = [
         element: (
             <AdminProtectedRoute>
                 <SystemDetail />
+            </AdminProtectedRoute>
+        ),
+    },
+    {
+        path: "/download-reports",
+        element: (
+            <AdminProtectedRoute>
+                <Report />
             </AdminProtectedRoute>
         ),
     },
