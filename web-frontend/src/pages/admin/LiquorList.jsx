@@ -35,9 +35,11 @@ const LiquorList = () => {
             );
             setCategories(activeCategories);
 
-            const params = {
-                is_liquor: true
-            };
+            const params = {};
+
+            if (filters.is_liquor !== "") {
+                params.is_liquor = filters.is_liquor === "true";
+            }
 
             if (filters.is_active !== "") {
                 params.is_active = filters.is_active === "true";
