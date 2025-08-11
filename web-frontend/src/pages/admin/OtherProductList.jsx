@@ -46,7 +46,7 @@ const OtherProductList = () => {
             if (filters.is_in_stock !== "") params.is_in_stock = filters.is_in_stock;
             if (filters.category_id !== "") params.category_id = filters.category_id;
 
-            const response = await axiosInstance.get("/other-products/getAll", {
+            const response = await axiosInstance.get("/other-products/getAll/dashboard", {
                 params: params
             });
 

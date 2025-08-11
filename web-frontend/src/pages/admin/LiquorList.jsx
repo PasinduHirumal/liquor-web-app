@@ -51,7 +51,7 @@ const LiquorList = () => {
                 params.category_id = filters.categoryId;
             }
 
-            const productsResponse = await axiosInstance.get("/products/getAll", {
+            const productsResponse = await axiosInstance.get("/products/getAll/dashboard", {
                 params,
             });
 
