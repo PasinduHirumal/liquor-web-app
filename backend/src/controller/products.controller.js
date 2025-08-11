@@ -114,6 +114,7 @@ const createProduct = async (req, res) => {
 const getAllProducts = async (req, res) => {
 	try {
         const { is_active, is_in_stock, is_liquor, category_id } = req.query;
+        const userRole = req.user? req.user.role : null;
 
         const filters = {};
         const filterDescription = [];
@@ -147,7 +148,7 @@ const getAllProducts = async (req, res) => {
             ? await productService.findWithFilters(filters)
             : await productService.findAll();
 
-        const populatedProducts = await populateCategory(filteredProducts);
+        const populatedProducts = await populateCategory(filteredProducts, userRole);
         if (!populatedProducts) {
             return res.status(400).json({ success: false, message: "Error in populate products"});
         }

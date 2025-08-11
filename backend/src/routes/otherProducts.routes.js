@@ -8,6 +8,7 @@ const router = express.Router();
 // http://localhost:5000/api/other-products
 
 router.get('/getAll', getAllProducts);
+router.get('/getAll/dashboard', authenticateUser, authorizeRoles("admin", "super_admin"), getAllProducts);
 router.get('/getOtherProductById/:id', authenticateUser, authorizeRoles("admin", "super_admin"), getProductById);
 router.post('/create', authenticateUser, authorizeRoles("admin", "super_admin"), validateOtherProduct, createProduct);
 router.patch('/update/:id', authenticateUser, authorizeRoles("admin", "super_admin"), validateOtherProductUpdate, updateProduct);
