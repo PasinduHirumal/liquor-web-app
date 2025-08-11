@@ -77,6 +77,11 @@ const SystemDetail = () => {
             title: 'System Status',
             dataIndex: 'isActive',
             key: 'isActive',
+            filters: [
+                { text: 'Active', value: true },
+                { text: 'Inactive', value: false }
+            ],
+            onFilter: (value, record) => record.isActive === value,
             render: (isActive) => (
                 <Tag color={isActive ? 'green' : 'red'}>
                     {isActive ? 'Active' : 'Inactive'}
