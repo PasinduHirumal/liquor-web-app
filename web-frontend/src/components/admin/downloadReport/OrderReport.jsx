@@ -1,0 +1,12 @@
+import React from 'react';
+
+const OrderReport = () => {
+    return (
+        <div className='container-fluid mt-1'>
+            <h2 >Order Report</h2>
+            <p>No orders to display.</p>
+        </div>
+    );
+};
+
+export default OrderReport;
