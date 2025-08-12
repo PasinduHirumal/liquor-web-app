@@ -1,5 +1,6 @@
 const USER_ROLES = {
-    USER: "user"
+    USER: "user",
+    DRIVER: "driver"
 };
 
 export default USER_ROLES;

@@ -1,5 +1,5 @@
-import BaseService from "./BaseService";
-import Banners from "../models/Banner";
+import BaseService from "./BaseService.js";
+import Banners from "../models/Banner.js";
 
 
 class BannerService extends BaseService {

@@ -1,4 +1,4 @@
-import BannerService from "../services/banner.service";
+import BannerService from "../services/banner.service.js";
 
 const bannerService = new BannerService();
 
