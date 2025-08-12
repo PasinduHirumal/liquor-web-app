@@ -20,6 +20,7 @@ import ordersRoutes from "./src/routes/orders.routes.js";
 import driverDutyRoutes from "./src/routes/driverDuty.routes.js";
 import companyDetailsRoutes from "./src/routes/companyDetails.routes.js";
 import reportsRoutes from "./src/routes/reports.routes.js";
+import bannerRoutes from "./src/routes/banner.routes.js";
 
 
 dotenv.config();
@@ -60,6 +61,7 @@ app.use("/api/orders", ordersRoutes);
 app.use("/api/driverDuties", driverDutyRoutes);
 app.use("/api/system", companyDetailsRoutes);
 app.use("/api/reports", reportsRoutes);
+app.use("/api/banners", bannerRoutes);
 
 
 //  Route handler for the root path
