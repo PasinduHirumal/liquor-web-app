@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import LiquorProduct from "../pages/LiquorProduct";
 import OtherProduct from "../pages/OtherProducts";
 import { axiosInstance } from "../lib/axios";
-import Banner from "../common/Banner";
+import Banner from "../components/Banner";
+import ShopByCategory from "../components/ShopByCategory";
 
 const PublicHome = () => {
   const [hasActiveLiquor, setHasActiveLiquor] = useState(true);
@@ -42,6 +43,7 @@ const PublicHome = () => {
   return (
     <>
       <Banner />
+      <ShopByCategory />
       {hasActiveLiquor && <LiquorProduct />}
       <OtherProduct />
     </>
