@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../lib/axios";
 import LiquorProductCard from "../common/LiquorProductCard";
-import { Button } from "react-bootstrap";
 
 const LiquorAll = () => {
   const [products, setProducts] = useState([]);
@@ -70,9 +69,9 @@ const LiquorAll = () => {
   };
 
   return (
-    <div className="container-fluid py-4">
+    <div className="container-fluid py-4" style={{ backgroundColor: "#010524ff" }}>
       <div className="mb-4">
-        <h2 className="mb-3">Liquor Products</h2>
+        <h2 className="mb-3 text-white">Liquor Products</h2>
 
         {/* Category Filter */}
         {!loadingCategories && (

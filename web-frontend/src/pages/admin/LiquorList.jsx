@@ -10,6 +10,7 @@ const LiquorList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [filters, setFilters] = useState({
+        is_liquor: "true", // ✅ always true for liquor list
         is_active: "",
         is_in_stock: "",
         categoryId: "",
@@ -17,18 +18,10 @@ const LiquorList = () => {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [toggleLoading, setToggleLoading] = useState(false);
 
-    // Helper to parse filter string to boolean or undefined
-    const parseBoolFilter = (val) => {
-        if (val === "true") return true;
-        if (val === "false") return false;
-        return undefined;
-    };
-
     const fetchProducts = async () => {
         try {
             setLoading(true);
 
-            // Fetch categories first
             const categoriesResponse = await axiosInstance.get("/categories/getAll");
             const activeCategories = (categoriesResponse.data.data || []).filter(
                 (cat) => cat.is_active && cat.is_liquor
@@ -40,22 +33,17 @@ const LiquorList = () => {
             if (filters.is_liquor !== "") {
                 params.is_liquor = filters.is_liquor === "true";
             }
-
             if (filters.is_active !== "") {
                 params.is_active = filters.is_active === "true";
             }
-
             if (filters.is_in_stock !== "") {
                 params.is_in_stock = filters.is_in_stock === "true";
             }
-
             if (filters.categoryId) {
                 params.category_id = filters.categoryId;
             }
 
-            const productsResponse = await axiosInstance.get("/products/getAll/dashboard", {
-                params,
-            });
+            const productsResponse = await axiosInstance.get("/products/getAll/dashboard", { params });
 
             setProducts(productsResponse.data.data || []);
             setError(null);
@@ -86,18 +74,13 @@ const LiquorList = () => {
         }));
     };
 
-    // Toggle all liquors active/inactive using your endpoint
     const handleToggleActive = async () => {
         try {
             setToggleLoading(true);
             const anyInactive = products.some((p) => !p.is_active);
             const newActiveValue = anyInactive;
 
-            await axiosInstance.patch(
-                "/products/update-activeToggle",
-                { is_active: newActiveValue }
-            );
-
+            await axiosInstance.patch("/products/update-activeToggle", { is_active: newActiveValue });
             await fetchProducts();
         } catch (err) {
             console.error("Toggle active error:", err);
@@ -172,21 +155,13 @@ const LiquorList = () => {
                             </Col>
                         </Row>
 
-                        <div
-                            className="overflow-auto d-flex flex-nowrap gap-2 py-2 px-1"
-                            style={{ scrollSnapType: "x mandatory", whiteSpace: "nowrap" }}
-                        >
+                        {/* Categories */}
+                        <div className="overflow-auto d-flex flex-nowrap gap-2 py-2 px-1">
                             <Button
                                 variant={!filters.categoryId ? "primary" : "outline-primary"}
                                 onClick={() => handleCategoryClick("")}
                                 className="d-flex align-items-center justify-content-center px-3 py-2"
-                                style={{
-                                    flex: "0 0 auto",
-                                    borderRadius: "20px",
-                                    scrollSnapAlign: "start",
-                                    fontWeight: 500,
-                                    minWidth: "80px",
-                                }}
+                                style={{ flex: "0 0 auto", borderRadius: "20px", fontWeight: 500, minWidth: "80px" }}
                             >
                                 All
                             </Button>
@@ -195,19 +170,11 @@ const LiquorList = () => {
                                 <Button
                                     key={category.category_id}
                                     variant={
-                                        filters.categoryId === category.category_id
-                                            ? "primary"
-                                            : "outline-primary"
+                                        filters.categoryId === category.category_id ? "primary" : "outline-primary"
                                     }
                                     onClick={() => handleCategoryClick(category.category_id)}
                                     className="d-flex align-items-center gap-2 px-3 py-2"
-                                    style={{
-                                        flex: "0 0 auto",
-                                        borderRadius: "20px",
-                                        scrollSnapAlign: "start",
-                                        fontWeight: 500,
-                                        minWidth: "100px",
-                                    }}
+                                    style={{ flex: "0 0 auto", borderRadius: "20px", fontWeight: 500, minWidth: "100px" }}
                                 >
                                     {category.icon && (
                                         <img
@@ -225,17 +192,13 @@ const LiquorList = () => {
                                 </Button>
                             ))}
                         </div>
-
                     </Form>
                 </div>
             </div>
 
             {/* Loading */}
             {loading && (
-                <div
-                    className="d-flex justify-content-center align-items-center"
-                    style={{ minHeight: "60vh" }}
-                >
+                <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
                     <div className="spinner-border" role="status" />
                 </div>
             )}
