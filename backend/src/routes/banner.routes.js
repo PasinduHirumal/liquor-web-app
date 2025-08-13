@@ -15,6 +15,6 @@ router.get('/getAll', getAllBanners);
 router.get('/getBanner/:id', authenticateUser, authorizeRoles(admin, super_admin), getBannerById);
 router.post('/create', authenticateUser, authorizeRoles(super_admin), validateBanner, createBanner);
 router.patch('/update/:id', authenticateUser, authorizeRoles(super_admin), validateBannerUpdate, updateBannerById);
-router.delete('/delete', authenticateUser, authorizeRoles(super_admin), deleteBannerById);
+router.delete('/delete/:id', authenticateUser, authorizeRoles(super_admin), deleteBannerById);
 
 export default router;
