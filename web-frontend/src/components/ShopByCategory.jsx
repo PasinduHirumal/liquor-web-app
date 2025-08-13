@@ -53,35 +53,33 @@ const ShopByCategory = () => {
                     categories.map((cat) => (
                         <div className="col-md-4" key={cat.category_id}>
                             <div
-                                className="category-card position-relative text-center rounded shadow-sm"
+                                className="category-card position-relative text-center rounded shadow-sm text-white"
                                 style={{
-                                    backgroundColor: "#f4f4f4",
+                                    backgroundImage: `url(${cat.icon})`,
+                                    backgroundSize: "cover",
+                                    backgroundPosition: "center",
                                     height: "200px",
                                     display: "flex",
-                                    flexDirection: "column",
                                     alignItems: "center",
                                     justifyContent: "center",
-                                    overflow: "hidden",
                                     borderRadius: "10px",
+                                    overflow: "hidden",
                                 }}
                             >
-                                <img
-                                    src={cat.icon || "/images/placeholder.jpg"}
-                                    alt={cat.name}
-                                    style={{
-                                        width: "150px",
-                                        height: "150px",
-                                        objectFit: "cover",
-                                        borderRadius: "8px",
-                                    }}
-                                />
+                                {/* Overlay */}
                                 <div
-                                    className="overlay position-absolute top-0 start-0 w-100 h-100 d-flex flex-column justify-content-center align-items-center"
                                     style={{
+                                        position: "absolute",
+                                        top: 0,
+                                        left: 0,
+                                        width: "100%",
+                                        height: "100%",
                                         background: "rgba(0, 0, 0, 0.5)",
-                                        opacity: 0,
-                                        transition: "opacity 0.3s ease",
-                                        color: "#fff",
+                                        display: "flex",
+                                        flexDirection: "column",
+                                        justifyContent: "center",
+                                        alignItems: "center",
+                                        padding: "10px",
                                     }}
                                 >
                                     <h5 className="mb-2">{cat.name}</h5>
@@ -99,15 +97,6 @@ const ShopByCategory = () => {
                     <p className="text-center">No categories found</p>
                 )}
             </div>
-
-            {/* Hover effect */}
-            <style>
-                {`
-                    .category-card:hover .overlay {
-                        opacity: 1;
-                    }
-                `}
-            </style>
         </section>
     );
 };
