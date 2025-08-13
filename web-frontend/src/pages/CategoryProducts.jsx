@@ -15,9 +15,13 @@ const CategoryProducts = () => {
 
     const [errorCategory, setErrorCategory] = useState(null);
     const [errorProducts, setErrorProducts] = useState(null);
+    
+    const filters = {
+        is_active: true,
+        is_in_stock: true,
+    };
 
     useEffect(() => {
-        // Fetch category details
         const fetchCategory = async () => {
             try {
                 setLoadingCategory(true);
@@ -43,7 +47,13 @@ const CategoryProducts = () => {
                     params: { category_id: id }
                 });
                 if (res.data?.success) {
-                    setProducts(res.data.data);
+                    const filtered = (res.data.data || []).filter(
+                        (p) => p.is_active === filters.is_active && p.is_in_stock === filters.is_in_stock
+                    );
+                    setProducts(filtered);
+                    if (filtered.length === 0) {
+                        setErrorProducts("No products found for this category.");
+                    }
                 } else {
                     setProducts([]);
                     setErrorProducts("No products found for this category.");
@@ -116,7 +126,7 @@ const CategoryProducts = () => {
             ) : (
                 <div className="row g-3">
                     {products.map((product) => (
-                        <div key={product.product_id || product.id}>
+                        <div key={product.product_id || product.id} className="col">
                             <LiquorProductCard
                                 product={product}
                                 adminOnly={false}

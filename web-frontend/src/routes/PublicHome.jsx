@@ -43,7 +43,7 @@ const PublicHome = () => {
   return (
     <>
       <Banner />
-      <ShopByCategory />
+      {hasActiveLiquor && <ShopByCategory />}
       {hasActiveLiquor && <LiquorProduct />}
       <OtherProduct />
     </>
