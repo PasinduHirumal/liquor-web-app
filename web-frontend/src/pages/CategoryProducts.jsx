@@ -6,56 +6,78 @@ import LiquorProductCard from "../common/LiquorProductCard";
 const CategoryProducts = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+
     const [products, setProducts] = useState([]);
-    const [loading, setLoading] = useState(true);
     const [category, setCategory] = useState(null);
-    const [error, setError] = useState(null);
+
+    const [loadingCategory, setLoadingCategory] = useState(true);
+    const [loadingProducts, setLoadingProducts] = useState(true);
+
+    const [errorCategory, setErrorCategory] = useState(null);
+    const [errorProducts, setErrorProducts] = useState(null);
 
     useEffect(() => {
-        const fetchData = async () => {
-            setLoading(true);
-            setError(null);
+        // Fetch category details
+        const fetchCategory = async () => {
             try {
-                // Fetch category details
-                const categoryRes = await axiosInstance.get(`/categories/${id}`);
-                if (categoryRes.data?.success) {
-                    setCategory(categoryRes.data.data);
-                }
-
-                // Fetch all products for this category
-                const productsRes = await axiosInstance.get(`/products/getAll?category_id=${id}`);
-                if (productsRes.data?.success) {
-                    setProducts(productsRes.data.data);
+                setLoadingCategory(true);
+                const res = await axiosInstance.get(`/categories/getCategoryById/${id}`);
+                if (res.data?.success) {
+                    setCategory(res.data.data);
                 } else {
-                    setProducts([]);
+                    setErrorCategory("Failed to load category details.");
                 }
             } catch (err) {
-                console.error("Error fetching category products:", err);
-                setError("Failed to load products. Please try again later.");
+                console.error("Error fetching category:", err);
+                setErrorCategory("Error loading category details.");
             } finally {
-                setLoading(false);
+                setLoadingCategory(false);
             }
         };
 
-        fetchData();
+        // Fetch products for this category
+        const fetchProducts = async () => {
+            try {
+                setLoadingProducts(true);
+                const res = await axiosInstance.get(`/products/getAll`, {
+                    params: { category_id: id }
+                });
+                if (res.data?.success) {
+                    setProducts(res.data.data);
+                } else {
+                    setProducts([]);
+                    setErrorProducts("No products found for this category.");
+                }
+            } catch (err) {
+                console.error("Error fetching products:", err);
+                setErrorProducts("Error loading products.");
+            } finally {
+                setLoadingProducts(false);
+            }
+        };
+
+        fetchCategory();
+        fetchProducts();
     }, [id]);
 
-    if (loading) {
+    // Show loading spinner until both category and products are loaded
+    if (loadingCategory || loadingProducts) {
         return (
-            <div className="container py-5 text-center">
-                <div className="spinner-border text-warning" role="status">
+            <div className="text-center" style={{ backgroundColor: "#010524ff", minHeight: "100vh", paddingTop: "20vh" }}>
+                <div className="spinner-border text-white" role="status">
                     <span className="visually-hidden">Loading...</span>
                 </div>
-                <p className="mt-2 text-light">Loading products...</p>
+                <p className="mt-2 text-light">Loading category and products...</p>
             </div>
         );
     }
 
-    if (error) {
+    // If category itself failed to load, show error
+    if (errorCategory) {
         return (
-            <div className="container py-5 text-center text-danger">
-                <p>{error}</p>
-                <button className="btn btn-warning" onClick={() => navigate('/products')}>
+            <div className="pt-5 text-center text-danger" style={{ backgroundColor: "#010524ff", minHeight: "100vh", paddingTop: "20vh" }}>
+                <p>{errorCategory}</p>
+                <button className="btn btn-warning" onClick={() => navigate("/")}>
                     Browse All Products
                 </button>
             </div>
@@ -63,50 +85,45 @@ const CategoryProducts = () => {
     }
 
     return (
-        <div className="container py-4" style={{ minHeight: "70vh" }}>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="text-light mb-0">
-                    {category?.name || "Category"} Products
-                    {category?.description && (
-                        <small className="d-block text-muted mt-1">{category.description}</small>
-                    )}
-                </h2>
-                <button 
+        <div className="container-fluid py-4" style={{ backgroundColor: "#010524ff", minHeight: "100vh" }}>
+            <div className="d-flex align-items-center mb-4 gap-4">
+                <button
                     className="btn btn-outline-light btn-sm"
                     onClick={() => navigate(-1)}
                 >
                     ← Back
                 </button>
+                <h2 className="text-light mb-0">
+                    {category?.name || "Category"} Products
+                </h2>
             </div>
 
-            {products.length > 0 ? (
+            {errorProducts ? (
+                <div className="text-center py-5">
+                    <div className="card bg-dark text-light border-secondary">
+                        <div className="card-body">
+                            <h5 className="card-title">No Products Found</h5>
+                            <p className="card-text">{errorProducts}</p>
+                            <button
+                                className="btn btn-warning"
+                                onClick={() => navigate("/")}
+                            >
+                                Browse All Products
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            ) : (
                 <div className="row g-3">
                     {products.map((product) => (
-                        <div key={product.product_id || product.id} className="col-md-4 col-lg-3">
-                            <LiquorProductCard 
+                        <div key={product.product_id || product.id}>
+                            <LiquorProductCard
                                 product={product}
                                 adminOnly={false}
                                 userOnly={true}
                             />
                         </div>
                     ))}
-                </div>
-            ) : (
-                <div className="text-center py-5">
-                    <div className="card bg-dark text-light border-secondary">
-                        <div className="card-body">
-                            <h5 className="card-title">No Products Found</h5>
-                            <p className="card-text">
-                                There are currently no products available in this category.
-                            </p>
-                            <button 
-                                className="btn btn-warning"
-                                onClick={() => navigate(-1)}
-                            >
-                                Browse All Products
-                            </button>
-                        </div>
-                    </div>
                 </div>
             )}
         </div>
