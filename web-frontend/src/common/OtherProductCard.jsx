@@ -2,22 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 const OtherProductCard = ({ product, adminOnly = false, userOnly = true }) => {
-    // Combine main_image and images into one array for thumbnails
     const combinedImages = React.useMemo(() => {
         const imgs = product.images ? [...product.images] : [];
-        // Add main_image at front if defined and not already included
         if (product.main_image && !imgs.includes(product.main_image)) {
             imgs.unshift(product.main_image);
         }
         return imgs;
     }, [product.images, product.main_image]);
 
-    // Initialize activeImage with main_image or first combined image or null
     const [activeImage, setActiveImage] = useState(null);
-
     const navigate = useNavigate();
 
-    // Set initial activeImage on mount or product change
     useEffect(() => {
         if (product.main_image) {
             setActiveImage(product.main_image);
@@ -43,14 +38,13 @@ const OtherProductCard = ({ product, adminOnly = false, userOnly = true }) => {
                 className="card h-100 shadow-sm"
                 style={{
                     transition: "transform 0.2s ease-in-out",
-                    border: product.is_liquor
-                        ? "1px solid #dc3545"
-                        : "1px solid #dee2e6",
+                    backgroundColor: "#0b0d17",
+                    color: "#fff",
+                    border: "1px solid #1c1f2b",
                 }}
                 onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
                 onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
             >
-                {/* Product Image with Origin Badge */}
                 <div style={{ position: "relative" }}>
                     {activeImage ? (
                         <img
@@ -60,31 +54,31 @@ const OtherProductCard = ({ product, adminOnly = false, userOnly = true }) => {
                             style={{
                                 height: "200px",
                                 objectFit: "contain",
-                                backgroundColor: "#f8f9fa",
-                                borderBottom: "1px solid #eee",
+                                backgroundColor: "#141722",
+                                borderBottom: "1px solid #1c1f2b",
                             }}
                         />
                     ) : (
                         <div
-                            className="d-flex justify-content-center align-items-center bg-light"
+                            className="d-flex justify-content-center align-items-center"
                             style={{
                                 height: "200px",
-                                borderBottom: "1px solid #eee",
+                                borderBottom: "1px solid #1c1f2b",
+                                backgroundColor: "#141722",
                             }}
                         >
                             <small className="text-muted">No Image Available</small>
                         </div>
                     )}
 
-                    {/* Origin Badge - Only show if product_from exists */}
                     {product.product_from && (
                         <span
                             style={{
                                 position: "absolute",
                                 top: "10px",
                                 right: "10px",
-                                backgroundColor: "rgba(64, 207, 59, 0.89)",
-                                color: "black",
+                                backgroundColor: "#ffb703",
+                                color: "#000",
                                 padding: "2px 6px",
                                 borderRadius: "4px",
                                 fontSize: "0.8rem",
@@ -97,7 +91,6 @@ const OtherProductCard = ({ product, adminOnly = false, userOnly = true }) => {
                     )}
                 </div>
 
-                {/* Thumbnail Previews */}
                 {combinedImages.length > 1 && (
                     <div className="d-flex justify-content-center gap-1 py-2 px-1 flex-wrap">
                         {combinedImages.map((img, idx) => (
@@ -113,8 +106,8 @@ const OtherProductCard = ({ product, adminOnly = false, userOnly = true }) => {
                                     cursor: "pointer",
                                     border:
                                         img === activeImage
-                                            ? "2px solid #007bff"
-                                            : "1px solid #ddd",
+                                            ? "2px solid #ffb703"
+                                            : "1px solid #555",
                                     borderRadius: "3px",
                                 }}
                             />
@@ -122,59 +115,71 @@ const OtherProductCard = ({ product, adminOnly = false, userOnly = true }) => {
                     </div>
                 )}
 
-                {/* Product Details */}
                 <div className="card-body d-flex flex-column">
-                    <h6 className="card-title text-truncate mb-1">{product.name}</h6>
+                    <h6 className="card-title text-truncate mb-1" style={{ color: "#fff" }}>
+                        {product.name}
+                    </h6>
 
                     <p className="card-text mb-1">
-                        <small className="text-muted">
+                        <small style={{ color: "#9ca3af" }}>
                             Category: {product.category_id?.name || "Uncategorized"}
                         </small>
                     </p>
 
-                    {/* Pricing Information */}
                     <div className="mb-1">
                         {product.discount_percentage > 0 ? (
                             <>
-                                <span className="text-danger fw-bold me-2">
+                                <span style={{ color: "#ef4444", fontWeight: "bold" }}>
                                     Rs: {displayPrice.toFixed(2)}
-                                </span> <br />
-                                <span className="text-decoration-line-through text-muted small">
+                                </span>
+                                <br />
+                                <span
+                                    className="text-decoration-line-through"
+                                    style={{ color: "#6b7280", fontSize: "0.85rem" }}
+                                >
                                     Rs: {product.marked_price.toFixed(2)}
                                 </span>
-                                <span className="badge bg-danger ms-2">
+                                <span
+                                    className="ms-2"
+                                    style={{
+                                        backgroundColor: "#ef4444",
+                                        color: "#fff",
+                                        padding: "2px 5px",
+                                        borderRadius: "3px",
+                                        fontSize: "0.75rem",
+                                    }}
+                                >
                                     {product.discount_percentage}% OFF
                                 </span>
                             </>
                         ) : (
-                            <span className="fw-bold">Rs: {displayPrice.toFixed(2)}</span>
+                            <span style={{ fontWeight: "bold", color: "#fff" }}>
+                                Rs: {displayPrice.toFixed(2)}
+                            </span>
                         )}
                     </div>
 
-                    {/* Stock Information */}
                     <div className="d-flex justify-content-between align-items-center mb-2">
                         <small
-                            className={
-                                product.stock_quantity > 0 ? "text-success" : "text-danger"
-                            }
+                            style={{
+                                color:
+                                    product.stock_quantity > 0 ? "#22c55e" : "#ef4444",
+                                fontWeight: "bold",
+                            }}
                         >
-                            <strong>
-                                {product.stock_quantity > 0
-                                    ? `${product.stock_quantity} in stock`
-                                    : "Out of stock"}
-                            </strong>
+                            {product.stock_quantity > 0
+                                ? `${product.stock_quantity} in stock`
+                                : "Out of stock"}
                         </small>
-                        <small className="text-muted">
+                        <small style={{ color: "#9ca3af" }}>
                             {product.weight ? `${product.weight}g` : ""}
                         </small>
                     </div>
 
-                    {/* Status Badges */}
                     {adminOnly && (
                         <div className="mb-2">
                             <span
-                                className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"
-                                    }`}
+                                className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"}`}
                             >
                                 {product.is_active ? "Active" : "Inactive"}
                             </span>
@@ -192,11 +197,10 @@ const OtherProductCard = ({ product, adminOnly = false, userOnly = true }) => {
                         </div>
                     )}
 
-                    {/* Detail Button */}
-                    <div className="card-footer mt-auto text-center">
+                    <div className="card-footer mt-auto text-center" style={{ background: "transparent", borderTop: "1px solid #1c1f2b" }}>
                         {adminOnly && (
                             <button
-                                className="btn btn-primary btn-sm w-100"
+                                className="btn btn-outline-light btn-sm w-100"
                                 onClick={handleViewDetail}
                             >
                                 View Details
@@ -204,7 +208,8 @@ const OtherProductCard = ({ product, adminOnly = false, userOnly = true }) => {
                         )}
                         {userOnly && (
                             <button
-                                className="btn btn-success btn-sm w-100"
+                                className="btn btn-warning btn-sm w-100"
+                                style={{ fontWeight: "bold", color: "#000" }}
                                 onClick={() => { console.log("navigate to application") }}
                             >
                                 Buy Now
