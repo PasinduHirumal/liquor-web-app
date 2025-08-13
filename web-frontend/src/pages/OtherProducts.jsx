@@ -39,7 +39,7 @@ const OtherProduct = () => {
 
   if (loading) {
     return (
-      <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "80vh" }}>
+      <div className="d-flex justify-content-center align-items-center text-white" style={{ minHeight: "80vh" }}>
         <div className="spinner-border" role="status" />
       </div>
     );

@@ -32,7 +32,7 @@ const ShopByCategory = () => {
 
     if (loading) {
         return (
-            <section className="container py-5 text-center">
+            <section className="container py-5 text-center text-white">
                 <p>Loading categories...</p>
             </section>
         );
