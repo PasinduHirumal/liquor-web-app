@@ -57,13 +57,17 @@ const getAllBanners = async (req, res) => {
             ? await bannerService.findWithFilters(filters)
             : await bannerService.findAll(); 
 
+        // Sort by createdAt in ascending order (oldest first)
+        const sortedBanners = filteredBanners.sort((a, b) => {
+            return new Date(a.createdAt) - new Date(b.createdAt);
+        });
         
         return res.status(200).json({ 
             success: true, 
             message: "Banners fetched successfully",
             count: filteredBanners.length,
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null,
-            data: filteredBanners
+            data: sortedBanners
         });
     } catch (error) {
         console.error("Get all banners error:", error.message);
