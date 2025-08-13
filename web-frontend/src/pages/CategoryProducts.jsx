@@ -15,7 +15,7 @@ const CategoryProducts = () => {
 
     const [errorCategory, setErrorCategory] = useState(null);
     const [errorProducts, setErrorProducts] = useState(null);
-    
+
     const filters = {
         is_active: true,
         is_in_stock: true,
@@ -124,16 +124,22 @@ const CategoryProducts = () => {
                     </div>
                 </div>
             ) : (
-                <div className="row g-3">
-                    {products.map((product) => (
-                        <div key={product.product_id || product.id} className="col">
+                <div className="row g-4">
+                    {products.length > 0 ? (
+                        products.map((product) => (
                             <LiquorProductCard
+                                key={product.product_id}
                                 product={product}
-                                adminOnly={false}
-                                userOnly={true}
+                                detailButton={false}
                             />
+                        ))
+                    ) : (
+                        <div className="col-12">
+                            <div className="alert alert-info" role="alert">
+                                No products match the current filters.
+                            </div>
                         </div>
-                    ))}
+                    )}
                 </div>
             )}
         </div>
