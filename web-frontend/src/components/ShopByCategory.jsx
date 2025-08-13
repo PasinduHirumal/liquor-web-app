@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { axiosInstance } from "../lib/axios";
 
 const ShopByCategory = () => {
@@ -102,12 +103,12 @@ const ShopByCategory = () => {
                                     }}
                                 >
                                     <h5 className="mb-2">{cat.name}</h5>
-                                    <a
-                                        href={`/category/${cat.category_id}`}
+                                    <Link
+                                        to={`/category/${cat.category_id}`}
                                         className="btn btn-light btn-sm"
                                     >
                                         Shop Now
-                                    </a>
+                                    </Link>
                                 </div>
                             </div>
                         </div>
