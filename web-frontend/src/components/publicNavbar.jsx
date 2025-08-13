@@ -27,11 +27,11 @@ const StyledNavLink = styled(NavLink)(({ theme }) => ({
   borderRadius: theme.shape.borderRadius,
   transition: "background-color 0.3s ease",
   "&.active": {
-    backgroundColor: "#333",
+    backgroundColor: "#490101ff",
     fontWeight: "bold",
   },
   "&:hover": {
-    backgroundColor: "#444",
+    backgroundColor: "#5f0404ff",
   },
 }));
 
@@ -52,7 +52,7 @@ const PublicNavbar = () => {
         position="fixed"
         elevation={4}
         sx={{
-          backgroundColor: "#121212",
+          backgroundColor: "#a30000ff",
         }}
       >
         <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2 } }}>
@@ -138,7 +138,7 @@ const PublicNavbar = () => {
                 right: 0,
                 width: "75vw",
                 maxWidth: 300,
-                bgcolor: "#1e1e1e",
+                bgcolor: "#7e0303ff",
                 zIndex: theme.zIndex.drawer + 1,
                 p: 3,
                 display: "flex",
@@ -156,7 +156,7 @@ const PublicNavbar = () => {
               <StyledNavLink to="/other-product-all" onClick={closeMobileMenu} sx={{ mb: 2 }}>
                 Grocery Items
               </StyledNavLink>
-              
+
               {/* 
               <Button
                 fullWidth
