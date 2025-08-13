@@ -89,7 +89,7 @@ const LiquorProductDetail = () => {
     const discountPercentage = product ? getDiscountPercentage() : null;
 
     return (
-        <div className="container-fluid px-4 pb-2 mt-3">
+        <div className="container-fluid px-4 pb-2 pt-3 bg-white">
             {loading ? (
                 <div className="product-detail-loading">
                     <div className="loading-left">

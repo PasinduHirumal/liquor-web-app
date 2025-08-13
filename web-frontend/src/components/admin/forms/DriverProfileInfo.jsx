@@ -101,7 +101,7 @@ const DriverProfileInfo = () => {
 
     if (loading) {
         return (
-            <div className="d-flex justify-content-center align-items-center vh-100">
+            <div className="d-flex justify-content-center align-items-center vh-100 bg-white">
                 <Spinner animation="border" variant="primary" />
             </div>
         );
@@ -109,14 +109,14 @@ const DriverProfileInfo = () => {
 
     if (!driver) {
         return (
-            <div className="d-flex justify-content-center align-items-center vh-100">
+            <div className="d-flex justify-content-center align-items-center vh-100 bg-white">
                 <Alert variant="danger">Driver not found</Alert>
             </div>
         );
     }
 
     return (
-        <div className="container py-4">
+        <div className="p-4 bg-white">
             <Row className="align-items-center mb-4">
                 <Col xs="auto">
                     <Button variant="outline-dark px-2 py-1" onClick={() => navigate(-1)} className="p-0">

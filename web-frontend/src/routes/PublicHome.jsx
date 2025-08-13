@@ -32,10 +32,14 @@ const PublicHome = () => {
   if (loading) {
     return (
       <div
-        className="d-flex justify-content-center align-items-center"
-        style={{ minHeight: "50vh" }}
+        className="d-flex justify-content-center"
+        style={{
+          minHeight: "100vh",
+          backgroundColor: "#010524ff",
+          paddingTop: "20vh",
+        }}
       >
-        <div className="spinner-border" role="status" />
+        <div className="spinner-border text-white" role="status" />
       </div>
     );
   }

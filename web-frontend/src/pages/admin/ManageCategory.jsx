@@ -216,7 +216,7 @@ const ManageCategory = () => {
 
     return (
         <ThemeProvider theme={theme}>
-            <Container maxWidth="lg" sx={{ mt: 4, mb: 4 }}>
+            <Container maxWidth="lg" sx={{ pt: 4, pb: 4,backgroundColor: 'white', p: 4, borderRadius: 2 }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
                     <Typography variant="h4" fontWeight="bold">
                         Manage Categories

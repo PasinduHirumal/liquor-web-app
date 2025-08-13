@@ -60,7 +60,7 @@ function OrderDetail() {
         // Handle ISO strings or JS Date-compatible strings
         try {
             return new Date(value).toLocaleString();
-        // eslint-disable-next-line no-unused-vars
+            // eslint-disable-next-line no-unused-vars
         } catch (err) {
             return "Invalid date";
         }
@@ -88,12 +88,25 @@ function OrderDetail() {
         );
     };
 
-    if (loading) return <Skeleton count={10} />;
+    if (loading) {
+        return (
+            <div
+                className="px-4 py-4"
+                style={{
+                    backgroundColor: "#fff",
+                    minHeight: "100vh"
+                }}
+            >
+                <Skeleton count={10} />
+            </div>
+        );
+    }
+
     if (error) return <Alert variant="danger">Error: {error}</Alert>;
     if (!order) return <Alert variant="warning">No order found.</Alert>;
 
     return (
-        <Container className="order-detail-container py-4">
+        <div className="order-detail-container px-4 py-4 bg-white">
             <Row className="justify-content-between align-items-center mb-4">
                 <Col>
                     <h1>
@@ -279,7 +292,7 @@ function OrderDetail() {
                 handleClose={() => setShowEditStatusModal(false)}
                 orderId={order.order_id}
             />
-        </Container>
+        </div>
     );
 }
 

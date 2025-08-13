@@ -127,11 +127,11 @@ function DriverPerformanceInfo() {
     };
 
 
-    if (loading) return <p className="mt-5 text-center">Loading...</p>;
+    if (loading) return <p className="pt-5 text-center bg-white">Loading...</p>;
 
     return (
-        <div className="container driver-performance-info mt-5">
-            <h2 className="mb-4 text-center text-primary">Driver Performance & Rating Info</h2>
+        <div className="container driver-performance-info py-3">
+            <h2 className="mb-4 text-center text-white">Driver Performance & Rating Info</h2>
             <form onSubmit={handleSubmit} className="driver-performance-form bg-light p-4 rounded shadow-sm">
                 <div className="row g-3">
                     <div className="col-md-6">

@@ -38,72 +38,74 @@ function App() {
   }, []);
 
   return (
-    <Router>
-      <ToastProvider />
-      <ScrollToTop />
+    <div style={{ backgroundColor: "#010524ff" }}>
+      <Router>
+        <ToastProvider />
+        <ScrollToTop />
 
-      <Routes>
-        <Route path="/" element={<MainLayout />}>
+        <Routes>
+          <Route path="/" element={<MainLayout />}>
 
-          <Route
-            index
-            element={
-              adminAuth ? (
-                <Navigate to="/admin" replace />
-              ) : userAuth ? (
-                <Navigate to="/user" replace />
-              ) : (
-                <PublicHome />
-              )
-            }
-          />
+            <Route
+              index
+              element={
+                adminAuth ? (
+                  <Navigate to="/admin" replace />
+                ) : userAuth ? (
+                  <Navigate to="/user" replace />
+                ) : (
+                  <PublicHome />
+                )
+              }
+            />
 
-          <Route
-            path="login"
-            element={
-              adminAuth || userAuth ? <Navigate to="/" replace /> : <Login />
-            }
-          />
+            <Route
+              path="login"
+              element={
+                adminAuth || userAuth ? <Navigate to="/" replace /> : <Login />
+              }
+            />
 
-          <Route
-            path="register"
-            element={
-              adminAuth || userAuth ? <Navigate to="/" replace /> : <Register />
-            }
-          />
+            <Route
+              path="register"
+              element={
+                adminAuth || userAuth ? <Navigate to="/" replace /> : <Register />
+              }
+            />
 
-          <Route path="verify-otp" element={<VerifyOtpPage />} />
+            <Route path="verify-otp" element={<VerifyOtpPage />} />
 
-          <Route path="/liquor-all" element={<LiquorAll />} />
-          <Route path="/other-product-all" element={<OtherProductAll />} />
-          <Route path="/category/:id" element={<CategoryProducts />} />
+            <Route path="/liquor-all" element={<LiquorAll />} />
+            <Route path="/other-product-all" element={<OtherProductAll />} />
+            <Route path="/category/:id" element={<CategoryProducts />} />
 
-          {/* Admin Routes */}
-          {adminRoutes.map(({ path, element }, i) => (
-            <Route key={`admin-${i}`} path={path} element={element} />
-          ))}
+            {/* Admin Routes */}
+            {adminRoutes.map(({ path, element }, i) => (
+              <Route key={`admin-${i}`} path={path} element={element} />
+            ))}
 
-          {/* User Routes */}
-          {userRoutes.map(({ path, element }, i) => (
-            <Route key={`user-${i}`} path={path} element={element} />
-          ))}
+            {/* User Routes */}
+            {userRoutes.map(({ path, element }, i) => (
+              <Route key={`user-${i}`} path={path} element={element} />
+            ))}
 
-          <Route
-            path="*"
-            element={
-              adminAuth ? (
-                <Navigate to="/admin" replace />
-              ) : userAuth ? (
-                <Navigate to="/user" replace />
-              ) : (
-                <Navigate to="/" replace />
-              )
-            }
-          />
+            <Route
+              path="*"
+              element={
+                adminAuth ? (
+                  <Navigate to="/admin" replace />
+                ) : userAuth ? (
+                  <Navigate to="/user" replace />
+                ) : (
+                  <Navigate to="/" replace />
+                )
+              }
+            />
 
-        </Route>
-      </Routes>
-    </Router>
+          </Route>
+        </Routes>
+      </Router>
+    </div>
   );
 }
 
