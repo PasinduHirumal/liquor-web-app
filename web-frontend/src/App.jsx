@@ -14,6 +14,7 @@ import Login from "./routes/Login";
 import Register from "./routes/Register";
 import VerifyOtpPage from "./components/admin/VerifyOtpPage";
 import PublicHome from "./routes/PublicHome";
+import CategoryProducts from "./pages/CategoryProducts";
 
 import useAdminAuthStore from "./stores/adminAuthStore";
 import useUserAuthStore from "./stores/userAuthStore";
@@ -75,6 +76,7 @@ function App() {
 
           <Route path="/liquor-all" element={<LiquorAll />} />
           <Route path="/other-product-all" element={<OtherProductAll />} />
+          <Route path="/category/:id" element={<CategoryProducts />} />
 
           {/* Admin Routes */}
           {adminRoutes.map(({ path, element }, i) => (
