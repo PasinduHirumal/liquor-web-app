@@ -1,3 +1,4 @@
+import bcrypt from "bcryptjs";
 import initializeFirebase from "../config/firebase.config.js";
 
 const { db } = initializeFirebase();
@@ -92,6 +93,12 @@ class BaseService {
 
     async create(data) {
         try {
+            // Hash password if it's being created
+            if (data.password) {
+                const salt = await bcrypt.genSalt(10);
+                data.password = await bcrypt.hash(data.password, salt);
+            }
+
             const timestamp = new Date().toISOString();
             const docRef = await this.collection.add({
                 ...data,
@@ -111,6 +118,12 @@ class BaseService {
 
             if (!doc.exists) {
                 return false;
+            }
+
+            // Hash password if it's being updated
+            if (updateData.password) {
+                const salt = await bcrypt.genSalt(10);
+                updateData.password = await bcrypt.hash(updateData.password, salt);
             }
             
             updateData[this.timestampFields.updatedAt] = new Date().toISOString();
