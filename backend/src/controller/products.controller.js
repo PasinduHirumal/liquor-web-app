@@ -179,13 +179,14 @@ const getAllProducts = async (req, res) => {
 const getProductById = async (req, res) => {
 	try {
         const productId = req.params.id;
+        const userRole = req.user? req.user.role : null;
 
         const product = await productService.findById(productId);
         if (!product) {
             return res.status(404).json({ success: false, message: "Product not found"});
         }
 
-        const populatedProduct = await populateCategory(product);
+        const populatedProduct = await populateCategory(product, userRole);
 
         return res.status(200).json({ success: true, message: "Product fetched successfully", data: populatedProduct });
     } catch (error) {
