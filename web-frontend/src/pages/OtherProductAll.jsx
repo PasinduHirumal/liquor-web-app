@@ -70,9 +70,9 @@ const OtherProductAll = () => {
     };
 
     return (
-        <div className="container-fluid py-4">
+        <div className="container-fluid py-4" style={{ backgroundColor: "#010524ff", minHeight: "100vh" }}>
             <div className="mb-4">
-                <h2 className="mb-3">Grocery Items</h2>
+                <h2 className="mb-3 text-white">Grocery Items</h2>
 
                 {/* Category Filter */}
                 {!loadingCategories && (
@@ -143,7 +143,7 @@ const OtherProductAll = () => {
             {/* Products Grid */}
             {loadingProducts ? (
                 <div
-                    className="d-flex justify-content-center align-items-center"
+                    className="d-flex justify-content-center align-items-center text-white"
                     style={{ minHeight: "50vh" }}
                 >
                     <div className="spinner-border" role="status" />

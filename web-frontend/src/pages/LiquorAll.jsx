@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../lib/axios";
 import LiquorProductCard from "../common/LiquorProductCard";
-import { Button } from "react-bootstrap";
 
 const LiquorAll = () => {
   const [products, setProducts] = useState([]);
@@ -70,9 +69,9 @@ const LiquorAll = () => {
   };
 
   return (
-    <div className="container-fluid py-4">
+    <div className="container-fluid py-2" style={{ backgroundColor: "#010524ff", minHeight: "100vh" }}>
       <div className="mb-4">
-        <h2 className="mb-3">Liquor Products</h2>
+        <h2 className="mb-3 text-white">Liquor Products</h2>
 
         {/* Category Filter */}
         {!loadingCategories && (
@@ -149,7 +148,7 @@ const LiquorAll = () => {
       {/* Products Grid */}
       {loadingProducts ? (
         <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "50vh" }}>
-          <div className="spinner-border" role="status" />
+          <div className="spinner-border text-white" role="status" />
         </div>
       ) : error ? (
         <div className="alert alert-danger" role="alert">
