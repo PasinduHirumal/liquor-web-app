@@ -51,14 +51,15 @@ const ShopByCategory = () => {
             <div className="row g-4">
                 {categories.length > 0 ? (
                     categories.map((cat) => (
-                        <div className="col-md-4" key={cat.category_id}>
+                        <div className="col-md-2" key={cat.category_id}>
                             <div
                                 className="category-card position-relative text-center rounded shadow-sm text-white"
                                 style={{
-                                    backgroundImage: `url(${cat.icon})`,
-                                    backgroundSize: "cover",
+                                    backgroundImage: `url(${cat.icon || "/images/placeholder.jpg"})`,
+                                    backgroundSize: "contain",
+                                    backgroundRepeat: "no-repeat",
                                     backgroundPosition: "center",
-                                    height: "200px",
+                                    height: "150px",
                                     display: "flex",
                                     alignItems: "center",
                                     justifyContent: "center",
