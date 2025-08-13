@@ -112,15 +112,22 @@ const deleteImages = async (imageUrls) => {
         const bucket = storage.bucket();
         const deletePromises = imageUrls.map(async (url) => {
             try {
+                // Check if it's a Firebase Storage URL
+                // Skip external URLs
+                if (!url.includes(`https://storage.googleapis.com/${bucket.name}/`)) {
+                    console.log(`Skipping external URL: ${url}`);
+                    return; 
+                }
+
                 // Extract file path from URL
                 const filePath = url.split(`https://storage.googleapis.com/${bucket.name}/`)[1];
                 if (filePath) {
                     const file = bucket.file(filePath);
                     await file.delete();
+                    console.log(`Deleted Firebase Storage file: ${filePath}`);
                 }
             } catch (err) {
                 console.error(`Failed to delete image: ${url}`, err);
-                // Continue with other deletions even if one fails
             }
         });
 

@@ -2,7 +2,7 @@ import ProductService from '../services/product.service.js';
 import StockHistoryService from '../services/stockHistory.service.js';
 import CategoryService from '../services/category.service.js';
 import populateCategory from '../utils/populateCategory.js';
-import { uploadImages, uploadSingleImage } from '../utils/firebaseStorage.js';
+import { deleteImages, uploadImages, uploadSingleImage } from '../utils/firebaseStorage.js';
 import { validateStockOperation } from '../utils/stockCalculator.js';
 import { validatePriceOperation } from '../utils/priceCalculator.js';
 import { createStockHistory } from './stockHistory.controller.js';
@@ -179,13 +179,14 @@ const getAllProducts = async (req, res) => {
 const getProductById = async (req, res) => {
 	try {
         const productId = req.params.id;
+        const userRole = req.user? req.user.role : null;
 
         const product = await productService.findById(productId);
         if (!product) {
             return res.status(404).json({ success: false, message: "Product not found"});
         }
 
-        const populatedProduct = await populateCategory(product);
+        const populatedProduct = await populateCategory(product, userRole);
 
         return res.status(200).json({ success: true, message: "Product fetched successfully", data: populatedProduct });
     } catch (error) {
@@ -322,6 +323,14 @@ const deleteProduct = async (req, res) => {
             return res.status(404).json({ success: false, message: "Product not found"});
         }
         
+        try {
+            await deleteImages(product.images);
+            await deleteImages(product.main_image);
+        } catch (imageError) {
+            console.error("Failed to delete banner images:", imageError.message);
+            return res.status(500).json({ success: false, message: "Server Error" });
+        }
+
         await productService.deleteById(productId);
 
         return res.status(200).json({ success: true, message: "Product deleted successfully"});
