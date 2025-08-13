@@ -35,7 +35,7 @@ const OtherProductCard = ({ product, adminOnly = false, userOnly = true }) => {
     return (
         <div className="col-12 col-sm-6 col-md-4 col-lg-2 mb-4">
             <div
-                className="card h-100 shadow-sm"
+                className="card h-100 shadow-sm border-secondary"
                 style={{
                     transition: "transform 0.2s ease-in-out",
                     backgroundColor: "#0b0d17",
