@@ -47,15 +47,33 @@ const ShopByCategory = () => {
 
     return (
         <section className="container-fluid py-4 bg-black">
-            <h2 className="text-center text-white fw-bold mb-4">SHOP BY CATEGORY</h2>
-            <div className="row g-4">
+            <h2 className="text-center text-white fw-bold mb-4">
+                SHOP BY CATEGORY
+            </h2>
+
+            <div
+                style={{
+                    display: "flex",
+                    overflowX: "auto",
+                    gap: "1rem",
+                    padding: "0 1rem",
+                    scrollbarWidth: "thin",
+                }}
+                className="category-scroll"
+            >
                 {categories.length > 0 ? (
                     categories.map((cat) => (
-                        <div className="col-md-2" key={cat.category_id}>
+                        <div
+                            key={cat.category_id}
+                            style={{
+                                flex: "0 0 auto",
+                                width: "150px",
+                            }}
+                        >
                             <div
                                 className="category-card position-relative text-center rounded shadow-sm text-white"
                                 style={{
-                                    backgroundImage: `url(${cat.icon || "/images/placeholder.jpg"})`,
+                                    backgroundImage: `url(${cat.icon})`,
                                     backgroundSize: "contain",
                                     backgroundRepeat: "no-repeat",
                                     backgroundPosition: "center",
@@ -95,9 +113,24 @@ const ShopByCategory = () => {
                         </div>
                     ))
                 ) : (
-                    <p className="text-center">No categories found</p>
+                    <p className="text-center text-white">
+                        No categories found
+                    </p>
                 )}
             </div>
+
+            {/* Optional: Hide scrollbar in webkit browsers */}
+            <style>
+                {`
+                .category-scroll::-webkit-scrollbar {
+                    height: 6px;
+                }
+                .category-scroll::-webkit-scrollbar-thumb {
+                    background: rgba(255,255,255,0.3);
+                    border-radius: 3px;
+                }
+                `}
+            </style>
         </section>
     );
 };
