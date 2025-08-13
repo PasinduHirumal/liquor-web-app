@@ -1,9 +1,26 @@
 import BannerService from "../services/banner.service.js";
+import { uploadSingleImage } from "../utils/firebaseStorage.js";
 
 const bannerService = new BannerService();
 
 const createBanner = async (req, res) => {
 	try {
+        const { image } = req.body;
+
+        if (image !== undefined) {
+            try {
+                const imageUrl = await uploadSingleImage(image, 'banner');
+                req.body.image = imageUrl;
+                console.log('✅ Image uploaded successfully:', imageUrl);
+            } catch (uploadError) {
+                console.error('Image upload failed:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload image" 
+                });
+            }
+        }
+
         const bannerData = { ...req.body };
 
         const banner = await bannerService.create(bannerData);
@@ -20,7 +37,7 @@ const createBanner = async (req, res) => {
 
 const getAllBanners = async (req, res) => {
 	try {
-        const { isActive } = req.query;
+        const { isActive, isLiquor } = req.query;
 
         const filters = {};
         const filterDescription = [];
@@ -29,6 +46,11 @@ const getAllBanners = async (req, res) => {
             const isBoolean = isActive === 'true';
             filters.isActive = isBoolean;
             filterDescription.push(`isActive: ${isActive}`);
+        }
+        if (isLiquor !== undefined) {
+            const isBoolean = isLiquor === 'true';
+            filters.isLiquor = isBoolean;
+            filterDescription.push(`isLiquor: ${isLiquor}`);
         }
 
         const filteredBanners = Object.keys(filters).length > 0 
@@ -68,10 +90,25 @@ const getBannerById = async (req, res) => {
 const updateBannerById = async (req, res) => {
 	try {
         const banner_id = req.params.id;
+        const { image } = req.body;
 
         const banner = await bannerService.findById(banner_id);
         if (!banner) {
             return res.status(404).json({ success: false, message: "Banner not found"});
+        }
+
+        if (image !== undefined) {
+            try {
+                const imageUrl = await uploadSingleImage(image, 'banner');
+                req.body.image = imageUrl;
+                console.log('✅ Image uploaded successfully:', imageUrl);
+            } catch (uploadError) {
+                console.error('Image upload failed:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload image" 
+                });
+            }
         }
 
         const updateData = { ...req.body };

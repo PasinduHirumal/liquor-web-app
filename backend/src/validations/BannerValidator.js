@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { optionalImageSchema, requiredImageSchema } from './imageValidationSchemas.js';
 
 // CREATE VALIDATOR - With defaults
 const validateBanner = (req, res, next) => {
@@ -7,10 +8,12 @@ const validateBanner = (req, res, next) => {
   }
 
   const schema = Joi.object({
-    name: Joi.string().min(1).max(100).required(),
-    description: Joi.string().min(1).max(200).required(),
+    title: Joi.string().min(1).max(200).required(),
+    image: requiredImageSchema,
+    description: Joi.string().min(1).max(400).required(),
     
     isActive: Joi.boolean().default(true),
+    isLiquor: Joi.boolean().default(true),
   });
 
   // THE KEY CHANGE: Use the validated value with defaults applied
@@ -44,10 +47,12 @@ const validateBannerUpdate = (req, res, next) => {
   }
   
   const schema = Joi.object({
-    name: Joi.string().min(1).max(100).optional(),
-    description: Joi.string().min(1).max(200).optional(),
+    title: Joi.string().min(1).max(200).optional(),
+    image: optionalImageSchema,
+    description: Joi.string().min(1).max(400).optional(),
     
     isActive: Joi.boolean().optional(),
+    isLiquor: Joi.boolean().optional(),
   })
   .min(1) // Require at least one field to update
   .options({ stripUnknown: true });; 
