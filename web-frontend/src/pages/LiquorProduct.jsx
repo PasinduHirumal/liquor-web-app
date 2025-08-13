@@ -65,11 +65,11 @@ const LiquorProduct = () => {
   }
 
   return (
-    <div className="container-fluid py-4">
+    <div className="container-fluid py-4" style={{ backgroundColor: "#00063aff" }}>
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-0">Liquor Products</h2>
+        <h2 className="mb-0 text-white">Liquor Products</h2>
         {filteredProducts.length > 6 && (
-          <button className="btn btn-outline-primary" onClick={() => navigate("/liquor-all")}>
+          <button className="btn btn-outline-light" onClick={() => navigate("/liquor-all")}>
             View All
           </button>
         )}

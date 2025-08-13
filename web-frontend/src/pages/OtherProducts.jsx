@@ -56,11 +56,11 @@ const OtherProduct = () => {
   }
 
   return (
-    <div className="container-fluid py-4">
+    <div className="container-fluid py-4 bg-black">
       <div className="d-flex justify-content-between align-items-center mb-3">
-        <h2 className="mb-0">Grocery Items</h2>
+        <h2 className="mb-0 text-white">Grocery Items</h2>
         {products.length > 6 && (
-          <button className="btn btn-outline-primary" onClick={handleViewAll}>
+          <button className="btn btn-outline-light" onClick={handleViewAll}>
             View All
           </button>
         )}
