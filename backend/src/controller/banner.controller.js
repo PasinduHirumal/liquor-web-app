@@ -1,5 +1,5 @@
 import BannerService from "../services/banner.service.js";
-import { uploadSingleImage } from "../utils/firebaseStorage.js";
+import { deleteImages, uploadSingleImage } from "../utils/firebaseStorage.js";
 
 const bannerService = new BannerService();
 
@@ -133,6 +133,13 @@ const deleteBannerById = async (req, res) => {
         const banner = await bannerService.findById(banner_id);
         if (!banner) {
             return res.status(404).json({ success: false, message: "Banner not found"});
+        }
+
+        try {
+            await deleteImages(banner.image);
+        } catch (imageError) {
+            console.error("Failed to delete banner images:", imageError.message);
+            return res.status(500).json({ success: false, message: "Server Error" });
         }
 
         const response = await bannerService.deleteById(banner_id);
