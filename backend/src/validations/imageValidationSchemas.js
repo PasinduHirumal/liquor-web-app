@@ -36,8 +36,10 @@ export const imageSchema = Joi.alternatives().try(
     ).max(10)
 );
 
+const default_icon = "https://icons.veryicon.com/png/o/miscellaneous/category-icon-set/category-56.png";
 
 export const defaultNullImageSchema = imageSchema.default(null);
+export const defaultIconSchema = imageSchema.default(default_icon);
 export const defaultArrayImageSchema = imageSchema.default([]);
 export const requiredImageSchema = imageSchema.required();
 export const optionalImageSchema = imageSchema.optional();

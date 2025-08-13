@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import { optionalImageSchema, requiredImageSchema } from './imageValidationSchemas.js';
+import { defaultIconSchema, optionalImageSchema } from './imageValidationSchemas.js';
 
 // CREATE VALIDATOR - With defaults
 const validateCategory = (req, res, next) => {
@@ -8,7 +8,7 @@ const validateCategory = (req, res, next) => {
   }
 
   const schema = Joi.object({
-    icon: requiredImageSchema,
+    icon: defaultIconSchema,
     name: Joi.string().min(1).max(100).required(),
     description: Joi.string().min(1).max(200).required(),
     
