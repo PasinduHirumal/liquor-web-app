@@ -21,7 +21,7 @@ const CategoryProducts = () => {
             try {
                 setLoadingCategory(true);
                 const res = await axiosInstance.get("/categories/getAll", {
-                    params: { is_active: true }
+                    params: { is_active: true, is_liquor: true }
                 });
 
                 if (res.data?.success) {
