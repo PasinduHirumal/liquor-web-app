@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { axiosInstance } from "../../../lib/axios";
+import toast from "react-hot-toast";
 
 function CreateBannerModal({ onClose, onCreated }) {
     const [title, setTitle] = useState("");
@@ -42,6 +43,9 @@ function CreateBannerModal({ onClose, onCreated }) {
                 isActive,
                 isLiquor
             });
+
+            toast.success("Banner created successfully");
+
             setTitle("");
             setDescription("");
             setImage("");
@@ -51,7 +55,7 @@ function CreateBannerModal({ onClose, onCreated }) {
             onCreated();
             onClose();
         } catch (err) {
-            alert(err.response?.data?.message || "Failed to create banner");
+            toast.error(err.response?.data?.message || "Failed to create banner");
             console.error("Error creating banner:", err);
         } finally {
             setLoading(false);
