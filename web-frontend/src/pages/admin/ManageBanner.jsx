@@ -1,33 +1,60 @@
 import React, { useState, useEffect } from "react";
 import { axiosInstance } from "../../lib/axios";
+import CreateBannerModal from "../../components/admin/forms/CreateBannerModal";
 
 export default function ManageBanner() {
     const [banners, setBanners] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+
+    const fetchBanners = async () => {
+        try {
+            const response = await axiosInstance.get("/banners/getAll");
+            setBanners(response.data.data);
+            setLoading(false);
+        } catch (err) {
+            setError(err.response?.data?.message || "Failed to fetch banners");
+            setLoading(false);
+            console.error("Error fetching banners:", err);
+        }
+    };
 
     useEffect(() => {
-        const fetchBanners = async () => {
-            try {
-                const response = await axiosInstance.get("/banners/getAll");
-                setBanners(response.data.data);
-                setLoading(false);
-            } catch (err) {
-                setError(err.response?.data?.message || "Failed to fetch banners");
-                setLoading(false);
-                console.error("Error fetching banners:", err);
-            }
-        };
-
         fetchBanners();
     }, []);
 
+    const handleSaveBanner = async (banner) => {
+        try {
+            await axiosInstance.post("/banners/create", banner);
+            setShowModal(false);
+            fetchBanners();
+        } catch (err) {
+            alert(err.response?.data?.message || "Failed to create banner");
+            console.error("Error creating banner:", err);
+        }
+    };
+
     return (
         <div className="bg-white" style={{ padding: 24 }}>
-            <h2>Manage Banners</h2>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <h2>Manage Banners</h2>
+                <button
+                    style={{
+                        padding: "8px 16px",
+                        backgroundColor: "#007bff",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 4,
+                        cursor: "pointer"
+                    }}
+                    onClick={() => setShowModal(true)}
+                >
+                    Create Banner
+                </button>
+            </div>
 
             {loading && <p>Loading banners...</p>}
-
             {error && <p style={{ color: "red" }}>Error: {error}</p>}
 
             {!loading && !error && (
@@ -37,7 +64,13 @@ export default function ManageBanner() {
                     ) : (
                         <div style={{ marginTop: 20 }}>
                             <h3>Banner List ({banners.length})</h3>
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
+                            <div
+                                style={{
+                                    display: "grid",
+                                    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
+                                    gap: 20
+                                }}
+                            >
                                 {banners.map((banner) => (
                                     <div
                                         key={banner.banner_id}
@@ -61,16 +94,20 @@ export default function ManageBanner() {
                                         <h4>{banner.title}</h4>
                                         <p>{banner.description}</p>
                                         <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
-                                            <span style={{
-                                                color: banner.isActive ? "green" : "red",
-                                                fontWeight: "bold"
-                                            }}>
+                                            <span
+                                                style={{
+                                                    color: banner.isActive ? "green" : "red",
+                                                    fontWeight: "bold"
+                                                }}
+                                            >
                                                 {banner.isActive ? "Active" : "Inactive"}
                                             </span>
-                                            <span style={{
-                                                color: banner.isLiquor ? "blue" : "gray",
-                                                fontWeight: "bold"
-                                            }}>
+                                            <span
+                                                style={{
+                                                    color: banner.isLiquor ? "blue" : "gray",
+                                                    fontWeight: "bold"
+                                                }}
+                                            >
                                                 {banner.isLiquor ? "Liquor" : "Regular"}
                                             </span>
                                         </div>
@@ -81,6 +118,9 @@ export default function ManageBanner() {
                     )}
                 </>
             )}
+
+            {/* Import modal here */}
+            {showModal && <CreateBannerModal onClose={() => setShowModal(false)} onSave={handleSaveBanner} />}
         </div>
     );
 }
