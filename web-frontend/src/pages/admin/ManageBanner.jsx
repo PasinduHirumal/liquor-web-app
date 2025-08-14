@@ -24,17 +24,6 @@ export default function ManageBanner() {
         fetchBanners();
     }, []);
 
-    const handleSaveBanner = async (banner) => {
-        try {
-            await axiosInstance.post("/banners/create", banner);
-            setShowModal(false);
-            fetchBanners();
-        } catch (err) {
-            alert(err.response?.data?.message || "Failed to create banner");
-            console.error("Error creating banner:", err);
-        }
-    };
-
     return (
         <div className="bg-white" style={{ padding: 24 }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -93,24 +82,6 @@ export default function ManageBanner() {
                                         />
                                         <h4>{banner.title}</h4>
                                         <p>{banner.description}</p>
-                                        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
-                                            <span
-                                                style={{
-                                                    color: banner.isActive ? "green" : "red",
-                                                    fontWeight: "bold"
-                                                }}
-                                            >
-                                                {banner.isActive ? "Active" : "Inactive"}
-                                            </span>
-                                            <span
-                                                style={{
-                                                    color: banner.isLiquor ? "blue" : "gray",
-                                                    fontWeight: "bold"
-                                                }}
-                                            >
-                                                {banner.isLiquor ? "Liquor" : "Regular"}
-                                            </span>
-                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -119,8 +90,12 @@ export default function ManageBanner() {
                 </>
             )}
 
-            {/* Import modal here */}
-            {showModal && <CreateBannerModal onClose={() => setShowModal(false)} onSave={handleSaveBanner} />}
+            {showModal && (
+                <CreateBannerModal
+                    onClose={() => setShowModal(false)}
+                    onCreated={fetchBanners}
+                />
+            )}
         </div>
     );
 }

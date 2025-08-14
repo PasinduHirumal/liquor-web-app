@@ -1,19 +1,32 @@
 import React, { useState } from "react";
+import { axiosInstance } from "../../lib/axios";
 
-export default function CreateBannerModal({ onClose, onSave }) {
+export default function CreateBannerModal({ onClose, onCreated }) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [image, setImage] = useState("");
+    const [loading, setLoading] = useState(false);
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!title || !description || !image) {
             alert("Please fill all fields");
             return;
         }
-        onSave({ title, description, image });
-        setTitle("");
-        setDescription("");
-        setImage("");
+
+        setLoading(true);
+        try {
+            await axiosInstance.post("/banners/create", { title, description, image });
+            setTitle("");
+            setDescription("");
+            setImage("");
+            setLoading(false);
+            onCreated(); // Notify parent to refresh the list
+            onClose();   // Close modal
+        } catch (err) {
+            alert(err.response?.data?.message || "Failed to create banner");
+            console.error("Error creating banner:", err);
+            setLoading(false);
+        }
     };
 
     return (
@@ -68,9 +81,16 @@ export default function CreateBannerModal({ onClose, onSave }) {
                     </button>
                     <button
                         onClick={handleSave}
-                        style={{ padding: "8px 16px", backgroundColor: "#007bff", color: "#fff", border: "none" }}
+                        style={{
+                            padding: "8px 16px",
+                            backgroundColor: "#007bff",
+                            color: "#fff",
+                            border: "none",
+                            cursor: "pointer"
+                        }}
+                        disabled={loading}
                     >
-                        Save
+                        {loading ? "Saving..." : "Save"}
                     </button>
                 </div>
             </div>
