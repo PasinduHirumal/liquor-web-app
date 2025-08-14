@@ -17,7 +17,6 @@ const CategoryProducts = () => {
     const [errorProducts, setErrorProducts] = useState(null);
 
     useEffect(() => {
-        // Fetch all categories and find the current one
         const fetchCategory = async () => {
             try {
                 setLoadingCategory(true);
@@ -27,11 +26,8 @@ const CategoryProducts = () => {
 
                 if (res.data?.success) {
                     const cat = res.data.data.find(c => c.category_id === id);
-                    if (cat) {
-                        setCategory(cat);
-                    } else {
-                        setErrorCategory("Category not found");
-                    }
+                    if (cat) setCategory(cat);
+                    else setErrorCategory("Category not found");
                 } else {
                     setErrorCategory("Failed to load category details.");
                 }
@@ -43,17 +39,21 @@ const CategoryProducts = () => {
             }
         };
 
-        // Fetch products for this category
         const fetchProducts = async () => {
             try {
                 setLoadingProducts(true);
                 const res = await axiosInstance.get(`/products/getAll`, {
                     params: { category_id: id }
                 });
+
                 if (res.data?.success && res.data.data) {
-                    setProducts(res.data.data);
-                    if (res.data.data.length === 0) {
-                        setErrorProducts("No products found for this category.");
+                    const filtered = res.data.data.filter(
+                        (p) => p.is_active === true && p.is_in_stock === true
+                    );
+                    setProducts(filtered);
+
+                    if (filtered.length === 0) {
+                        setErrorProducts("No active products in stock for this category.");
                     }
                 } else {
                     setProducts([]);
