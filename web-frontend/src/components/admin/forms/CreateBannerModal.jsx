@@ -33,12 +33,7 @@ function CreateBannerModal({ onClose, onCreated }) {
 
         setLoading(true);
         try {
-            const response = await axiosInstance.post("/banners/create", {
-                title,
-                description,
-                image,
-            });
-
+            await axiosInstance.post("/banners/create", { title, description, image });
             setTitle("");
             setDescription("");
             setImage("");
@@ -54,91 +49,77 @@ function CreateBannerModal({ onClose, onCreated }) {
     };
 
     return (
-        <div
-            style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                backgroundColor: "rgba(0,0,0,0.5)",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                zIndex: 1000,
-            }}
-            onClick={onClose}
-        >
+        <div className="modal show fade d-block mt-5" tabIndex="-1" onClick={onClose}>
             <div
-                style={{
-                    backgroundColor: "#fff",
-                    padding: 24,
-                    borderRadius: 8,
-                    width: 500,
-                    maxWidth: "90%",
-                    position: "relative",
-                }}
+                className="modal-dialog"
                 onClick={(e) => e.stopPropagation()}
             >
-                <h3 style={{ marginBottom: 16 }}>Create Banner</h3>
-                <div style={{ marginBottom: 12 }}>
-                    <input
-                        type="text"
-                        placeholder="Title"
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        style={{ width: "100%", padding: 8 }}
-                    />
-                    {errors.title && <p style={{ color: "red", fontSize: 12 }}>{errors.title}</p>}
-                </div>
-                <div style={{ marginBottom: 12 }}>
-                    <input
-                        type="text"
-                        placeholder="Description"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        style={{ width: "100%", padding: 8 }}
-                    />
-                    {errors.description && (
-                        <p style={{ color: "red", fontSize: 12 }}>{errors.description}</p>
-                    )}
-                </div>
-                <div style={{ marginBottom: 12 }}>
-                    <input type="file" accept="image/*" onChange={handleImageChange} />
-                    {errors.image && <p style={{ color: "red", fontSize: 12 }}>{errors.image}</p>}
-                    {image && (
-                        <img
-                            src={image}
-                            alt="Preview"
-                            style={{ marginTop: 8, maxWidth: "100%", maxHeight: 200 }}
-                        />
-                    )}
-                </div>
-                <div style={{ display: "flex", justifyContent: "flex-end", gap: 8 }}>
-                    <button
-                        onClick={onClose}
-                        style={{
-                            padding: "8px 16px",
-                            border: "1px solid #ccc",
-                            background: "#fff",
-                            cursor: "pointer",
-                        }}
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        onClick={handleSave}
-                        disabled={loading}
-                        style={{
-                            padding: "8px 16px",
-                            backgroundColor: "#007bff",
-                            color: "#fff",
-                            border: "none",
-                            cursor: loading ? "not-allowed" : "pointer",
-                        }}
-                    >
-                        {loading ? "Saving..." : "Save"}
-                    </button>
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title">Create Banner</h5>
+                        <button
+                            type="button"
+                            className="btn-close"
+                            onClick={onClose}
+                        ></button>
+                    </div>
+                    <div className="modal-body">
+                        <div className="mb-3">
+                            <label className="form-label">Title</label>
+                            <input
+                                type="text"
+                                className={`form-control ${errors.title ? "is-invalid" : ""}`}
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                            />
+                            {errors.title && <div className="invalid-feedback">{errors.title}</div>}
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Description</label>
+                            <input
+                                type="text"
+                                className={`form-control ${errors.description ? "is-invalid" : ""}`}
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                            />
+                            {errors.description && <div className="invalid-feedback">{errors.description}</div>}
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label">Image</label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                className={`form-control ${errors.image ? "is-invalid" : ""}`}
+                                onChange={handleImageChange}
+                            />
+                            {errors.image && <div className="invalid-feedback">{errors.image}</div>}
+                            {image && (
+                                <img
+                                    src={image}
+                                    alt="Preview"
+                                    className="img-fluid mt-2"
+                                    style={{ maxHeight: "200px" }}
+                                />
+                            )}
+                        </div>
+                    </div>
+                    <div className="modal-footer">
+                        <button
+                            type="button"
+                            className="btn btn-secondary"
+                            onClick={onClose}
+                        >
+                            Cancel
+                        </button>
+                        <button
+                            type="button"
+                            className="btn btn-primary"
+                            onClick={handleSave}
+                            disabled={loading}
+                        >
+                            {loading ? "Saving..." : "Save"}
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
