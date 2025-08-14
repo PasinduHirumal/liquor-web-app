@@ -5,6 +5,8 @@ function CreateBannerModal({ onClose, onCreated }) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [image, setImage] = useState("");
+    const [isActive, setIsActive] = useState(true);
+    const [isLiquor, setIsLiquor] = useState(true);
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -33,10 +35,18 @@ function CreateBannerModal({ onClose, onCreated }) {
 
         setLoading(true);
         try {
-            await axiosInstance.post("/banners/create", { title, description, image });
+            await axiosInstance.post("/banners/create", { 
+                title, 
+                description, 
+                image, 
+                isActive, 
+                isLiquor 
+            });
             setTitle("");
             setDescription("");
             setImage("");
+            setIsActive(true);
+            setIsLiquor(true);
             setErrors({});
             onCreated();
             onClose();
@@ -117,6 +127,32 @@ function CreateBannerModal({ onClose, onCreated }) {
                                     style={{ maxHeight: "200px" }}
                                 />
                             )}
+                        </div>
+
+                        {/* New toggles for isActive and isLiquor */}
+                        <div className="form-check form-switch mb-2">
+                            <input
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={isActive}
+                                onChange={() => setIsActive(!isActive)}
+                                id="isActiveSwitch"
+                            />
+                            <label className="form-check-label" htmlFor="isActiveSwitch">
+                                Active
+                            </label>
+                        </div>
+                        <div className="form-check form-switch mb-2">
+                            <input
+                                className="form-check-input"
+                                type="checkbox"
+                                checked={isLiquor}
+                                onChange={() => setIsLiquor(!isLiquor)}
+                                id="isLiquorSwitch"
+                            />
+                            <label className="form-check-label" htmlFor="isLiquorSwitch">
+                                Is Liquor
+                            </label>
                         </div>
                     </div>
                     <div className="modal-footer gap-2">
