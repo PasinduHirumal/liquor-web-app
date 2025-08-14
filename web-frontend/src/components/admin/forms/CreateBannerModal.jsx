@@ -35,12 +35,12 @@ function CreateBannerModal({ onClose, onCreated }) {
 
         setLoading(true);
         try {
-            await axiosInstance.post("/banners/create", { 
-                title, 
-                description, 
-                image, 
-                isActive, 
-                isLiquor 
+            await axiosInstance.post("/banners/create", {
+                title,
+                description,
+                image,
+                isActive,
+                isLiquor
             });
             setTitle("");
             setDescription("");
@@ -60,7 +60,7 @@ function CreateBannerModal({ onClose, onCreated }) {
 
     return (
         <div
-            className="modal-backdrop d-flex justify-content-center align-items-center"
+            className="modal-backdrop d-flex justify-content-center align-items-center my-4"
             style={{
                 position: "fixed",
                 top: 0,
@@ -74,22 +74,24 @@ function CreateBannerModal({ onClose, onCreated }) {
         >
             <div
                 className="modal-dialog"
-                style={{ maxWidth: "500px", width: "90%" }}
+                style={{ maxWidth: "500px", width: "90%", maxHeight: "90vh" }}
                 onClick={(e) => e.stopPropagation()}
             >
                 <div
                     className="modal-content"
-                    style={{ backgroundColor: "#fff", borderRadius: "8px" }}
+                    style={{
+                        backgroundColor: "#fff",
+                        borderRadius: "8px",
+                        display: "flex",
+                        flexDirection: "column",
+                        maxHeight: "85vh"
+                    }}
                 >
                     <div className="modal-header">
                         <h5 className="modal-title">Create Banner</h5>
-                        <button
-                            type="button"
-                            className="btn-close"
-                            onClick={onClose}
-                        ></button>
+                        <button type="button" className="btn-close" onClick={onClose}></button>
                     </div>
-                    <div className="modal-body">
+                    <div className="modal-body" style={{ overflowY: "auto" }}>
                         <div className="mb-3">
                             <label className="form-label">Title</label>
                             <input
@@ -110,6 +112,34 @@ function CreateBannerModal({ onClose, onCreated }) {
                             />
                             {errors.description && <div className="invalid-feedback">{errors.description}</div>}
                         </div>
+
+                        <div className="d-flex align-items-center mb-3 gap-4">
+                            <div className="form-check form-switch">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    checked={isActive}
+                                    onChange={() => setIsActive(!isActive)}
+                                    id="isActiveSwitch"
+                                />
+                                <label className="form-check-label" htmlFor="isActiveSwitch">
+                                    Active
+                                </label>
+                            </div>
+                            <div className="form-check form-switch">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    checked={isLiquor}
+                                    onChange={() => setIsLiquor(!isLiquor)}
+                                    id="isLiquorSwitch"
+                                />
+                                <label className="form-check-label" htmlFor="isLiquorSwitch">
+                                    Is Liquor
+                                </label>
+                            </div>
+                        </div>
+
                         <div className="mb-3">
                             <label className="form-label">Image</label>
                             <input
@@ -128,47 +158,12 @@ function CreateBannerModal({ onClose, onCreated }) {
                                 />
                             )}
                         </div>
-
-                        {/* New toggles for isActive and isLiquor */}
-                        <div className="form-check form-switch mb-2">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                checked={isActive}
-                                onChange={() => setIsActive(!isActive)}
-                                id="isActiveSwitch"
-                            />
-                            <label className="form-check-label" htmlFor="isActiveSwitch">
-                                Active
-                            </label>
-                        </div>
-                        <div className="form-check form-switch mb-2">
-                            <input
-                                className="form-check-input"
-                                type="checkbox"
-                                checked={isLiquor}
-                                onChange={() => setIsLiquor(!isLiquor)}
-                                id="isLiquorSwitch"
-                            />
-                            <label className="form-check-label" htmlFor="isLiquorSwitch">
-                                Is Liquor
-                            </label>
-                        </div>
                     </div>
                     <div className="modal-footer gap-2">
-                        <button
-                            type="button"
-                            className="btn btn-secondary"
-                            onClick={onClose}
-                        >
+                        <button type="button" className="btn btn-secondary" onClick={onClose}>
                             Cancel
                         </button>
-                        <button
-                            type="button"
-                            className="btn btn-primary"
-                            onClick={handleSave}
-                            disabled={loading}
-                        >
+                        <button type="button" className="btn btn-primary" onClick={handleSave} disabled={loading}>
                             {loading ? "Saving..." : "Save"}
                         </button>
                     </div>
