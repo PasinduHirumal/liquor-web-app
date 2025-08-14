@@ -244,6 +244,17 @@ const AdminNavbar = () => {
                                     >
                                         Category
                                     </StyledNavLink>
+
+                                    <StyledNavLink
+                                        to="/manage-banner"
+                                        onClick={() => {
+                                            closeMobileMenu();
+                                            setManageDropDownOpen(false);
+                                        }}
+                                        style={{ display: "block", padding: "8px 16px" }}
+                                    >
+                                        Banner
+                                    </StyledNavLink>
                                 </Box>
                             )}
                         </Box>
