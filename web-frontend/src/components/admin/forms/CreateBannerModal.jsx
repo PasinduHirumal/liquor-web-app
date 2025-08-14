@@ -4,7 +4,7 @@ import { axiosInstance } from "../../../lib/axios";
 function CreateBannerModal({ onClose, onCreated }) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
-    const [image, setImage] = useState(""); // Base64 string
+    const [image, setImage] = useState("");
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({});
 
@@ -23,7 +23,7 @@ function CreateBannerModal({ onClose, onCreated }) {
 
         const reader = new FileReader();
         reader.onloadend = () => {
-            setImage(reader.result); // Base64 string
+            setImage(reader.result);
         };
         reader.readAsDataURL(file);
     };
@@ -36,7 +36,7 @@ function CreateBannerModal({ onClose, onCreated }) {
             const response = await axiosInstance.post("/banners/create", {
                 title,
                 description,
-                image, // send Base64
+                image,
             });
 
             setTitle("");

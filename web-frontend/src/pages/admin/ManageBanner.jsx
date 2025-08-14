@@ -25,7 +25,7 @@ function ManageBanner() {
     }, []);
 
     return (
-        <div className="bg-white" style={{ padding: 24 }}>
+        <div className="bg-white py-4 px-md-5 px-3">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                 <h2>Manage Banners</h2>
                 <button
