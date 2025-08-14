@@ -16,11 +16,11 @@ const StyledNavLink = styled(NavLink)(({ theme }) => ({
     borderRadius: theme.shape.borderRadius,
     transition: "background-color 0.3s ease",
     "&.active": {
-        backgroundColor: "#333",
+        backgroundColor: "#490101ff",
         fontWeight: "bold",
     },
     "&:hover": {
-        backgroundColor: "#444",
+        backgroundColor: "#5f0404ff",
     },
 }));
 
@@ -96,7 +96,7 @@ const AdminNavbar = () => {
 
     return (
         <>
-            <AppBar position="fixed" elevation={4} sx={{ backgroundColor: "#121212" }}>
+            <AppBar position="fixed" elevation={4} sx={{ backgroundColor: "#a30000ff" }}>
                 <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2 } }}>
                     {/* Brand */}
                     <Box
@@ -129,9 +129,9 @@ const AdminNavbar = () => {
                                     color: "white",
                                     textTransform: "none",
                                     fontWeight: manageDropDownOpen ? "bold" : "normal",
-                                    bgcolor: manageDropDownOpen ? "#333" : "transparent",
+                                    bgcolor: manageDropDownOpen ? "#490101ff" : "transparent",
                                     "&:hover": {
-                                        bgcolor: "#444",
+                                        bgcolor: "#5f0404ff",
                                     },
                                 }}
                                 endIcon={manageDropDownOpen ? <ExpandLess /> : <ExpandMore />}
@@ -145,7 +145,7 @@ const AdminNavbar = () => {
                                         position: "absolute",
                                         top: "100%",
                                         left: 0,
-                                        bgcolor: "#1e1e1e",
+                                        bgcolor: "#8b0505ff",
                                         borderRadius: 1,
                                         boxShadow: theme.shadows[5],
                                         zIndex: theme.zIndex.tooltip,
@@ -257,7 +257,7 @@ const AdminNavbar = () => {
                         >
                             System Detail
                         </StyledNavLink>
-                        
+
                         {isSuperAdmin && (
                             <StyledNavLink
                                 to={`/download-reports`}
@@ -311,7 +311,7 @@ const AdminNavbar = () => {
                                 right: 0,
                                 width: "75vw",
                                 maxWidth: 300,
-                                bgcolor: "#1e1e1e",
+                                bgcolor: "#7e0303ff",
                                 zIndex: theme.zIndex.drawer + 1,
                                 p: 3,
                                 display: "flex",
