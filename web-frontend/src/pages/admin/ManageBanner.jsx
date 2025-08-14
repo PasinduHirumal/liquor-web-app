@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { axiosInstance } from "../../lib/axios";
 import CreateBannerModal from "../../components/admin/forms/CreateBannerModal";
+import DeleteBannerButton from "../../components/admin/buttons/DeleteBannerButton";
 
 function ManageBanner() {
     const [banners, setBanners] = useState([]);
@@ -9,6 +10,7 @@ function ManageBanner() {
     const [showModal, setShowModal] = useState(false);
 
     const fetchBanners = async () => {
+        setLoading(true);
         try {
             const response = await axiosInstance.get("/banners/getAll");
             setBanners(response.data.data);
@@ -67,35 +69,46 @@ function ManageBanner() {
                                             border: "1px solid #ddd",
                                             borderRadius: 8,
                                             padding: 16,
-                                            boxShadow: "0 2px 4px rgba(0,0,0,0.1)"
+                                            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
+                                            display: "flex",
+                                            flexDirection: "column",
+                                            justifyContent: "space-between"
                                         }}
                                     >
-                                        <img
-                                            src={banner.image}
-                                            alt={banner.title}
-                                            style={{
-                                                width: "100%",
-                                                height: "auto",
-                                                borderRadius: 4,
-                                                marginBottom: 12
-                                            }}
-                                        />
-                                        <h4>{banner.title}</h4>
-                                        <p>{banner.description}</p>
-                                        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
-                                            <span style={{
-                                                color: banner.isActive ? "green" : "red",
-                                                fontWeight: "bold"
-                                            }}>
-                                                {banner.isActive ? "Active" : "Inactive"}
-                                            </span>
-                                            <span style={{
-                                                color: banner.isLiquor ? "blue" : "gray",
-                                                fontWeight: "bold"
-                                            }}>
-                                                {banner.isLiquor ? "Liquor" : "Regular"}
-                                            </span>
+                                        <div>
+                                            <img
+                                                src={banner.image}
+                                                alt={banner.title}
+                                                style={{
+                                                    width: "100%",
+                                                    height: "auto",
+                                                    borderRadius: 4,
+                                                    marginBottom: 12
+                                                }}
+                                            />
+                                            <h4>{banner.title}</h4>
+                                            <p>{banner.description}</p>
+                                            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
+                                                <span style={{
+                                                    color: banner.isActive ? "green" : "red",
+                                                    fontWeight: "bold"
+                                                }}>
+                                                    {banner.isActive ? "Active" : "Inactive"}
+                                                </span>
+                                                <span style={{
+                                                    color: banner.isLiquor ? "blue" : "gray",
+                                                    fontWeight: "bold"
+                                                }}>
+                                                    {banner.isLiquor ? "Liquor" : "Regular"}
+                                                </span>
+                                            </div>
                                         </div>
+
+                                        {/* Use the DeleteBannerButton component */}
+                                        <DeleteBannerButton
+                                            bannerId={banner.banner_id}
+                                            onDeleted={fetchBanners}
+                                        />
                                     </div>
                                 ))}
                             </div>

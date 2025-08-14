@@ -2,13 +2,13 @@ import React, { useState } from "react";
 import { FaTrash } from "react-icons/fa";
 import { axiosInstance } from "../../../lib/axios";
 import toast from "react-hot-toast";
-import ConfirmDialog from "../../../common/ConfirmDialog";
+import ConfirmDeleteDialog from "../../../common/ConfirmDeleteDialog";
 
 const DeleteLiquorButton = ({ id, onSuccess }) => {
     const [isDeleting, setIsDeleting] = useState(false);
 
     const handleDelete = async () => {
-        const confirmed = await ConfirmDialog({
+        const confirmed = await ConfirmDeleteDialog({
             title: "Are you sure?",
             html: "You want to delete this product? This action cannot be undone.",
             icon: "warning",

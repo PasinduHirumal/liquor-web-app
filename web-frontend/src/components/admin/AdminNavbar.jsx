@@ -263,7 +263,7 @@ const AdminNavbar = () => {
                             <Badge
                                 badgeContent={pendingCount}
                                 color="error"
-                                sx={{ "& .MuiBadge-badge": { right: -10, top: 6 } }}
+                                sx={{ "& .MuiBadge-badge": { right: -10, top: 6, color: "#000000ff", bgcolor: "#fffb00ff" } }}
                             >
                                 <Box component="span" sx={{ pr: 1 }}>
                                     Orders

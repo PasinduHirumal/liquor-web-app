@@ -3,13 +3,13 @@ import { Button } from 'antd';
 import { DeleteOutlined } from '@ant-design/icons';
 import { axiosInstance } from '../../../lib/axios';
 import toast from 'react-hot-toast';
-import ConfirmDialog from '../../../common/ConfirmDialog';
+import ConfirmDeleteDialog from '../../../common/ConfirmDeleteDialog';
 
 const DeleteDriverButton = ({ driverId, onDeleted }) => {
     const [loading, setLoading] = useState(false);
 
     const handleDelete = async () => {
-        const confirmed = await ConfirmDialog({
+        const confirmed = await ConfirmDeleteDialog({
             title: 'Delete Driver?',
             html: 'This action cannot be undone.',
             icon: 'warning'
