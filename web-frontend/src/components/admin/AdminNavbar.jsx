@@ -32,7 +32,7 @@ const AdminNavbar = () => {
     const isSuperAdmin = user?.role === 'super_admin' || user?.roles?.includes('super_admin');
 
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+    const isMobile = useMediaQuery("(max-width:1150px)");
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [manageDropDownOpen, setManageDropDownOpen] = useState(false);
@@ -125,7 +125,7 @@ const AdminNavbar = () => {
                     </Box>
 
                     {/* Desktop Navigation */}
-                    <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+                    <Box sx={{ display: isMobile ? "none" : "flex", alignItems: "center" }}>
                         <StyledNavLink to="/admin" onClick={closeMobileMenu}>
                             Home
                         </StyledNavLink>
