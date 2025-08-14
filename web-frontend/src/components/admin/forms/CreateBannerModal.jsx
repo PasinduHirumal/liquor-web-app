@@ -49,12 +49,29 @@ function CreateBannerModal({ onClose, onCreated }) {
     };
 
     return (
-        <div className="modal show fade d-block mt-5" tabIndex="-1" onClick={onClose}>
+        <div
+            className="modal-backdrop d-flex justify-content-center align-items-center"
+            style={{
+                position: "fixed",
+                top: 0,
+                left: 0,
+                width: "100vw",
+                height: "100vh",
+                backgroundColor: "rgba(0,0,0,0.5)",
+                backdropFilter: "blur(5px)",
+                zIndex: 1050,
+            }}
+            onClick={onClose}
+        >
             <div
                 className="modal-dialog"
+                style={{ maxWidth: "500px", width: "90%" }}
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="modal-content">
+                <div
+                    className="modal-content"
+                    style={{ backgroundColor: "#fff", borderRadius: "8px" }}
+                >
                     <div className="modal-header">
                         <h5 className="modal-title">Create Banner</h5>
                         <button
@@ -103,7 +120,7 @@ function CreateBannerModal({ onClose, onCreated }) {
                             )}
                         </div>
                     </div>
-                    <div className="modal-footer">
+                    <div className="modal-footer gap-2">
                         <button
                             type="button"
                             className="btn btn-secondary"
