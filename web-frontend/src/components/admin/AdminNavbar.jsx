@@ -8,6 +8,7 @@ import { Menu as MenuIcon, Close as CloseIcon, Logout as LogoutIcon, ExpandMore,
 import Badge from "@mui/material/Badge";
 import useAdminAuthStore from "../../stores/adminAuthStore";
 import { getPendingOrdersCount } from "../../lib/orderApi";
+import ConfirmLogoutDialog from "../../common/ConfirmLogoutDialog";
 
 const StyledNavLink = styled(NavLink)(({ theme }) => ({
     color: theme.palette.common.white,
@@ -83,6 +84,14 @@ const AdminNavbar = () => {
     }, []);
 
     const handleLogout = async () => {
+        const confirmed = await ConfirmLogoutDialog({
+            title: "Confirm Logout",
+            html: "Are you sure you want to log out?",
+            icon: "warning"
+        });
+
+        if (!confirmed) return;
+
         await logout();
         navigate("/");
         setMobileMenuOpen(false);
