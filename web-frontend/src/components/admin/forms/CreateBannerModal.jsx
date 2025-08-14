@@ -61,7 +61,6 @@ function CreateBannerModal({ onClose, onCreated }) {
                 backdropFilter: "blur(5px)",
                 zIndex: 1050,
             }}
-            onClick={onClose}
         >
             <div
                 className="modal-dialog"
