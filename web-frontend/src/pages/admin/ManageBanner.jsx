@@ -82,6 +82,20 @@ function ManageBanner() {
                                         />
                                         <h4>{banner.title}</h4>
                                         <p>{banner.description}</p>
+                                        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
+                                            <span style={{
+                                                color: banner.isActive ? "green" : "red",
+                                                fontWeight: "bold"
+                                            }}>
+                                                {banner.isActive ? "Active" : "Inactive"}
+                                            </span>
+                                            <span style={{
+                                                color: banner.isLiquor ? "blue" : "gray",
+                                                fontWeight: "bold"
+                                            }}>
+                                                {banner.isLiquor ? "Liquor" : "Regular"}
+                                            </span>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
