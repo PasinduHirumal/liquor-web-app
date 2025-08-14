@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { axiosInstance } from "../../lib/axios";
 import CreateBannerModal from "../../components/admin/forms/CreateBannerModal";
 
-export default function ManageBanner() {
+function ManageBanner() {
     const [banners, setBanners] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -99,3 +99,5 @@ export default function ManageBanner() {
         </div>
     );
 }
+
+export default ManageBanner;
