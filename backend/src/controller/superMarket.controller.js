@@ -85,6 +85,27 @@ const getAllMarkets = async (req, res) => {
     }
 };
 
+const getAllMarketsList = async (req, res) => {
+	try {
+        const superMarkets = await marketService.findAll();
+
+        const sanitizedMarkets = superMarkets.map(market => ({
+            superMarket_id: market.id,
+            superMarket_name: `${market.superMarket_Name} - ${market.city}`
+        }));
+        
+        return res.status(200).json({ 
+            success: true, 
+            message: "Super Markets list fetched successfully", 
+            count: superMarkets.length, 
+            data: sanitizedMarkets 
+        });
+    } catch (error) {
+        console.error("Get all supermarkets list error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
 const updateMarketById = async (req, res) => {
 	try {
         const superMarketId = req.params.id;
@@ -115,4 +136,4 @@ const updateMarketById = async (req, res) => {
     }
 };
 
-export { createMarket, getMarketById, getAllMarkets, updateMarketById};
+export { createMarket, getMarketById, getAllMarkets, updateMarketById, getAllMarketsList };
