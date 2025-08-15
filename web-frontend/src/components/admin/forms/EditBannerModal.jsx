@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { axiosInstance } from "../../../lib/axios";
 import "bootstrap/dist/css/bootstrap.min.css";
+import toast from "react-hot-toast";
 
 function EditBannerModal({ banner, onClose, onUpdated }) {
     const [formData, setFormData] = useState({
@@ -12,7 +13,6 @@ function EditBannerModal({ banner, onClose, onUpdated }) {
     });
     const [previewImage, setPreviewImage] = useState("");
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(null);
 
     useEffect(() => {
         if (banner) {
@@ -53,21 +53,26 @@ function EditBannerModal({ banner, onClose, onUpdated }) {
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
-        setError(null);
 
         try {
             await axiosInstance.patch(`/banners/update/${banner.banner_id}`, formData);
+            toast.success("Banner updated successfully");
             onUpdated();
             onClose();
         } catch (err) {
-            setError(err.response?.data?.message || "Failed to update banner");
+            toast.error(err.response?.data?.message || "Failed to update banner");
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="modal show fade d-block pt-5" tabIndex="-1" role="dialog" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+        <div
+            className="modal show fade d-block pt-5"
+            tabIndex="-1"
+            role="dialog"
+            style={{ backgroundColor: "rgba(0,0,0,0.5)" }}
+        >
             <div className="modal-dialog modal-lg modal-dialog-centered" role="document">
                 <div className="modal-content">
                     <div className="modal-header">
@@ -76,8 +81,6 @@ function EditBannerModal({ banner, onClose, onUpdated }) {
                     </div>
                     <form onSubmit={handleSubmit}>
                         <div className="modal-body">
-                            {error && <div className="alert alert-danger">{error}</div>}
-
                             <div className="mb-3">
                                 <label className="form-label">Title</label>
                                 <input
@@ -109,7 +112,7 @@ function EditBannerModal({ banner, onClose, onUpdated }) {
                                     onChange={handleImageChange}
                                     className="form-control"
                                 />
-                                <label className="form-label">Current / New Image</label> <br />
+                                <label className="form-label mt-2">Current / New Image</label> <br />
                                 {previewImage && (
                                     <img
                                         src={previewImage}

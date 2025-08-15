@@ -11,22 +11,31 @@ function ManageBanner() {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [editBanner, setEditBanner] = useState(null);
 
+    // Filters
+    const [isActiveFilter, setIsActiveFilter] = useState("");
+    const [isLiquorFilter, setIsLiquorFilter] = useState("");
+
     const fetchBanners = async () => {
         setLoading(true);
         try {
-            const response = await axiosInstance.get("/banners/getAll");
-            setBanners(response.data.data);
-            setLoading(false);
+            const params = {};
+            if (isActiveFilter !== "") params.isActive = isActiveFilter;
+            if (isLiquorFilter !== "") params.isLiquor = isLiquorFilter;
+
+            const response = await axiosInstance.get("/banners/getAll", { params });
+            setBanners(response.data.data || []);
+            setError(null);
         } catch (err) {
             setError(err.response?.data?.message || "Failed to fetch banners");
-            setLoading(false);
             console.error("Error fetching banners:", err);
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
         fetchBanners();
-    }, []);
+    }, [isActiveFilter, isLiquorFilter]);
 
     return (
         <div className="bg-white py-4 px-md-5 px-3">
@@ -44,6 +53,46 @@ function ManageBanner() {
                     onClick={() => setShowCreateModal(true)}
                 >
                     Create Banner
+                </button>
+            </div>
+
+            {/* Filters */}
+            <div style={{ display: "flex", gap: "1rem", marginTop: 20, marginBottom: 20 }}>
+                <select
+                    value={isActiveFilter}
+                    onChange={(e) => setIsActiveFilter(e.target.value)}
+                    style={{ padding: "6px" }}
+                >
+                    <option value="">All Status</option>
+                    <option value="true">Active</option>
+                    <option value="false">Inactive</option>
+                </select>
+
+                <select
+                    value={isLiquorFilter}
+                    onChange={(e) => setIsLiquorFilter(e.target.value)}
+                    style={{ padding: "6px" }}
+                >
+                    <option value="">All Types</option>
+                    <option value="true">Liquor</option>
+                    <option value="false">Regular</option>
+                </select>
+
+                <button
+                    style={{
+                        padding: "6px 12px",
+                        backgroundColor: "#6c757d",
+                        color: "#fff",
+                        border: "none",
+                        borderRadius: 4,
+                        cursor: "pointer"
+                    }}
+                    onClick={() => {
+                        setIsActiveFilter("");
+                        setIsLiquorFilter("");
+                    }}
+                >
+                    Reset Filters
                 </button>
             </div>
 
@@ -106,7 +155,6 @@ function ManageBanner() {
                                             </div>
                                         </div>
 
-                                        {/* Buttons row */}
                                         <div className="gap-2 justify-content-end" style={{ display: "flex", marginTop: 12 }}>
                                             <button
                                                 style={{
