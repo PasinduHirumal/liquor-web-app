@@ -9,6 +9,7 @@ function EditBannerModal({ banner, onClose, onUpdated }) {
         isActive: false,
         isLiquor: false,
     });
+    const [previewImage, setPreviewImage] = useState("");   
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
@@ -22,6 +23,7 @@ function EditBannerModal({ banner, onClose, onUpdated }) {
                 isActive: banner.isActive || false,
                 isLiquor: banner.isLiquor || false,
             });
+            setPreviewImage(banner.image || "");
         }
     }, [banner]);
 
@@ -33,12 +35,29 @@ function EditBannerModal({ banner, onClose, onUpdated }) {
         }));
     };
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setFormData((prev) => ({
+                    ...prev,
+                    image: reader.result, // Base64 string
+                }));
+                setPreviewImage(reader.result); // Show preview
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
         setError(null);
+
         try {
             await axiosInstance.patch(`/banners/update/${banner.banner_id}`, formData);
+
             onUpdated();
             onClose();
         } catch (err) {
@@ -91,15 +110,25 @@ function EditBannerModal({ banner, onClose, onUpdated }) {
                         />
                     </div>
 
+                    {/* Image Preview */}
                     <div style={{ marginBottom: 10 }}>
-                        <label>Image URL</label>
+                        <label>Current / New Image</label>
+                        {previewImage && (
+                            <img
+                                src={previewImage}
+                                alt="Banner Preview"
+                                style={{
+                                    width: "100%",
+                                    borderRadius: 4,
+                                    marginBottom: 8,
+                                    border: "1px solid #ccc",
+                                }}
+                            />
+                        )}
                         <input
-                            type="text"
-                            name="image"
-                            value={formData.image}
-                            onChange={handleChange}
-                            style={{ width: "100%" }}
-                            required
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageChange}
                         />
                     </div>
 
