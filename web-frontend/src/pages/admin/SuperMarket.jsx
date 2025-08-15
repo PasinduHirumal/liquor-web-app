@@ -1,13 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { Table, Tag, Spin, message, Button } from "antd";
+import { Table, Tag, Spin, message, Button, Space, Tooltip } from "antd";
+import { EditOutlined } from "@ant-design/icons";
 import { axiosInstance } from "../../lib/axios";
 import CreateSuperMarketModal from "../../components/admin/forms/CreateSuperMarketModal";
+import EditSuperMarketModal from "../../components/admin/forms/EditSuperMarketModal";
 
 function SuperMarket() {
     const [markets, setMarkets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
+
+    const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedMarket, setSelectedMarket] = useState(null);
 
     const fetchMarkets = async () => {
         try {
@@ -32,6 +37,11 @@ function SuperMarket() {
         fetchMarkets();
     }, []);
 
+    const handleEditClick = (record) => {
+        setSelectedMarket(record);
+        setIsEditModalOpen(true);
+    };
+
     const columns = [
         { title: 'Name', dataIndex: 'superMarket_Name', key: 'name', width: 150 },
         { title: 'Street Address', dataIndex: 'streetAddress', key: 'streetAddress', width: 200 },
@@ -50,14 +60,31 @@ function SuperMarket() {
                 </Tag>
             ),
         },
-        { title: 'Orders Count', dataIndex: 'orders_count', key: 'orders_count', width: 120 }
+        { title: 'Orders Count', dataIndex: 'orders_count', key: 'orders_count', width: 120 },
+        {
+            title: 'Action',
+            key: 'action',
+            width: 80,
+            fixed: 'right',
+            render: (_, record) => (
+                <Space>
+                    <Tooltip title="Edit">
+                        <Button
+                            icon={<EditOutlined />}
+                            type="link"
+                            onClick={() => handleEditClick(record)}
+                        />
+                    </Tooltip>
+                </Space>
+            ),
+        },
     ];
 
     return (
         <div className="bg-white p-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 className="fw-bold mb-0">Super Market Management</h2>
-                <Button type="primary" onClick={() => setIsModalOpen(true)}>
+                <Button type="primary" onClick={() => setIsCreateModalOpen(true)}>
                     Create Supermarket
                 </Button>
             </div>
@@ -74,14 +101,21 @@ function SuperMarket() {
                     dataSource={markets}
                     rowKey="id"
                     bordered
-                    scroll={{ x: 1200 }}
+                    scroll={{ x: 1300 }}
                     locale={{ emptyText: 'No supermarkets found' }}
                 />
             )}
 
             <CreateSuperMarketModal
-                open={isModalOpen}
-                onClose={() => setIsModalOpen(false)}
+                open={isCreateModalOpen}
+                onClose={() => setIsCreateModalOpen(false)}
+                onSuccess={fetchMarkets}
+            />
+
+            <EditSuperMarketModal
+                open={isEditModalOpen}
+                onClose={() => setIsEditModalOpen(false)}
+                marketData={selectedMarket}
                 onSuccess={fetchMarkets}
             />
         </div>
