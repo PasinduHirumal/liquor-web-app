@@ -20,7 +20,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
         name: "",
         description: "",
         category_id: "",
-        product_from: "",
+        superMarket_id: "",
         cost_price: 0,
         marked_price: 0,
         discount_percentage: 0,
@@ -394,11 +394,11 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
                                     <h6 className="mb-3">Pricing & Inventory Information</h6>
                                     <Row className="g-2 mb-3">
                                         <Col>
-                                            <FloatingLabel controlId="product_from" label="Product Source (e.g., Keels, Food City)">
+                                            <FloatingLabel controlId="superMarket_id" label="Product Source (e.g., Keels, Food City)">
                                                 <Form.Control
                                                     type="text"
-                                                    name="product_from"
-                                                    value={formData.product_from}
+                                                    name="superMarket_id"
+                                                    value={formData.superMarket_id}
                                                     onChange={handleInputChange}
                                                     disabled={isSubmitting}
                                                     placeholder="Where the product is from"
