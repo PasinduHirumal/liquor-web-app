@@ -107,15 +107,16 @@ function ManageBanner() {
                                         </div>
 
                                         {/* Buttons row */}
-                                        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
+                                        <div className="gap-2 justify-content-end" style={{ display: "flex", marginTop: 12 }}>
                                             <button
                                                 style={{
+                                                    marginTop: 12,
                                                     padding: "6px 12px",
                                                     backgroundColor: "#ffc107",
                                                     color: "#000",
                                                     border: "none",
                                                     borderRadius: 4,
-                                                    cursor: "pointer"
+                                                    cursor: "pointer",
                                                 }}
                                                 onClick={() => setEditBanner(banner)}
                                             >
