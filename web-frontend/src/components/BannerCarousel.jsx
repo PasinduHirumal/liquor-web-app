@@ -40,8 +40,16 @@ const BannerCarousel = () => {
     return () => clearInterval(interval);
   }, [banners]);
 
-  if (loading) return <div>Loading banners...</div>;
+  if (loading) {
+    return (
+      <div className="d-flex justify-content-center align-items-center text-white" style={{ minHeight: "80vh" }}>
+        <div className="spinner-border" role="status" />
+      </div>
+    );
+  }
+
   if (error) return <div>{error}</div>;
+
   if (banners.length === 0) return <div>No banners available</div>;
 
   const currentBanner = banners[currentIndex];
