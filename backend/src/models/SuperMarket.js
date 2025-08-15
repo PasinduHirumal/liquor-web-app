@@ -6,7 +6,7 @@ class SuperMarket {
         this.superMarket_Name = data.superMarket_Name;
 
         // Location
-        this.city = data.name;
+        this.city = data.city;
         this.state = data.state
         this.postalCode = data.postalCode;
         this.country = data.country;
