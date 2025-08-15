@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Table, Tag, Spin, message, Button, Space, Tooltip } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { Table, Tag, Spin, message, Button, Space, Tooltip, Input } from "antd";
+import { EditOutlined, SearchOutlined } from "@ant-design/icons";
 import { axiosInstance } from "../../lib/axios";
 import CreateSuperMarketModal from "../../components/admin/forms/CreateSuperMarketModal";
 import EditSuperMarketModal from "../../components/admin/forms/EditSuperMarketModal";
@@ -14,12 +14,17 @@ function SuperMarket() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedMarket, setSelectedMarket] = useState(null);
 
+    // Search/filter state
+    const [searchText, setSearchText] = useState("");
+    const [filteredData, setFilteredData] = useState([]);
+
     const fetchMarkets = async () => {
         try {
             setLoading(true);
             const res = await axiosInstance.get("/superMarket/getAll");
             if (res.data?.success) {
                 setMarkets(res.data.data);
+                setFilteredData(res.data.data); // initialize filtered data
             } else {
                 setError("Failed to fetch supermarkets");
                 message.error("Failed to fetch supermarkets");
@@ -42,18 +47,70 @@ function SuperMarket() {
         setIsEditModalOpen(true);
     };
 
+    // Search handler
+    const handleSearch = (value) => {
+        setSearchText(value);
+        const filtered = markets.filter((item) =>
+            item.superMarket_Name?.toLowerCase().includes(value.toLowerCase()) ||
+            item.streetAddress?.toLowerCase().includes(value.toLowerCase())
+        );
+        setFilteredData(filtered);
+    };
+
+    const uniqueCities = [...new Set(markets.map((m) => m.city).filter(Boolean))];
+    const uniqueCountries = [...new Set(markets.map((m) => m.country).filter(Boolean))];
+
     const columns = [
-        { title: 'Name', dataIndex: 'superMarket_Name', key: 'name', width: 150 },
-        { title: 'Street Address', dataIndex: 'streetAddress', key: 'streetAddress', width: 200 },
-        { title: 'City', dataIndex: 'city', key: 'city', width: 120 },
-        { title: 'State', dataIndex: 'state', key: 'state', width: 120 },
-        { title: 'Postal Code', dataIndex: 'postalCode', key: 'postalCode', width: 120 },
-        { title: 'Country', dataIndex: 'country', key: 'country', width: 120 },
+        {
+            title: 'Name',
+            dataIndex: 'superMarket_Name',
+            key: 'name',
+            width: 150,
+        },
+        {
+            title: 'Street Address',
+            dataIndex: 'streetAddress',
+            key: 'streetAddress',
+            width: 200,
+        },
+        {
+            title: 'City',
+            dataIndex: 'city',
+            key: 'city',
+            width: 120,
+            filters: uniqueCities.map(city => ({ text: city, value: city })),
+            onFilter: (value, record) => record.city === value
+        },
+        {
+            title: 'State',
+            dataIndex: 'state',
+            key: 'state',
+            width: 120,
+        },
+        {
+            title: 'Postal Code',
+            dataIndex: 'postalCode',
+            key: 'postalCode',
+            width: 120,
+        },
+        {
+            title: 'Country',
+            dataIndex: 'country',
+            key: 'country',
+            width: 120,
+            filters: uniqueCountries.map(country => ({ text: country, value: country })),
+            onFilter: (value, record) => record.country === value
+        },
         {
             title: 'Active',
             dataIndex: 'isActive',
             key: 'isActive',
             width: 100,
+            filters: [
+                { text: 'Active', value: true },
+                { text: 'Inactive', value: false }
+            ],
+            onFilter: (value, record) => record.isActive === value,
             render: (isActive) => (
                 <Tag color={isActive ? 'green' : 'red'}>
                     {isActive ? 'Yes' : 'No'}
@@ -84,9 +141,19 @@ function SuperMarket() {
         <div className="bg-white p-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
                 <h2 className="fw-bold mb-0">Super Market Management</h2>
-                <Button type="primary" onClick={() => setIsCreateModalOpen(true)}>
-                    Create Supermarket
-                </Button>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                    <Input
+                        placeholder="Search by name or address"
+                        prefix={<SearchOutlined />}
+                        value={searchText}
+                        onChange={(e) => handleSearch(e.target.value)}
+                        style={{ width: 250 }}
+                        allowClear
+                    />
+                    <Button type="primary" onClick={() => setIsCreateModalOpen(true)}>
+                        Create Supermarket
+                    </Button>
+                </div>
             </div>
 
             {loading ? (
@@ -98,7 +165,7 @@ function SuperMarket() {
             ) : (
                 <Table
                     columns={columns}
-                    dataSource={markets}
+                    dataSource={filteredData}
                     rowKey="id"
                     bordered
                     scroll={{ x: 1300 }}
