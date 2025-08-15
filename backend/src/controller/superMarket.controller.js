@@ -97,25 +97,105 @@ const getAllMarkets = async (req, res) => {
     }
 };
 
-const getAllMarketsList = async (req, res) => {
-	try {
-        const superMarkets = await marketService.findAll();
+const searchMarketsAdvanced = async (req, res) => {
+    try {
+        const { 
+            q: searchTerm,
+            multiWord = 'false', // Enable multi-word search
+            city,
+            state,
+            country,
+            isActive,
+            limit,
+            offset
+        } = req.query;
+        
+        if (!searchTerm || searchTerm.trim() === '') {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Search term is required" 
+            });
+        }
+        
+        let results;
+        
+        if (multiWord === 'true') {
+            results = await marketService.searchMarketsMultiWord(searchTerm);
+        } else {
+            results = await marketService.searchMarkets(searchTerm);
+        }
+        
+        // Apply additional filters
+        const filters = {};
+        if (city) filters.city = city;
+        if (state) filters.state = state;
+        if (country) filters.country = country;
+        if (isActive !== undefined) filters.isActive = isActive === 'true';
+        
+        if (Object.keys(filters).length > 0) {
+            results = results.filter(market => {
+                return Object.entries(filters).every(([field, value]) => {
+                    if (value === undefined || value === null || value === '') {
+                        return true;
+                    }
+                    return market[field] === value;
+                });
+            });
+        }
+        
+        // Apply pagination
+        const totalCount = results.length;
+        let paginatedResults = results;
+        
+        if (limit) {
+            const limitNum = parseInt(limit);
+            const offsetNum = parseInt(offset) || 0;
+            paginatedResults = results.slice(offsetNum, offsetNum + limitNum);
+        }
 
-        const sanitizedMarkets = superMarkets.map(market => ({
+        const sanitizedResults = paginatedResults.map(market => ({
             superMarket_id: market.id,
             superMarket_name: `${market.superMarket_Name} - ${market.city}`,
             streetAddress: market.streetAddress
         }));
-        
-        return res.status(200).json({ 
-            success: true, 
-            message: "Super Markets list fetched successfully", 
-            count: superMarkets.length, 
-            data: sanitizedMarkets 
+
+        return res.status(200).json({
+            success: true,
+            message: "Search completed successfully",
+            searchTerm,
+            multiWord: multiWord === 'true',
+            total: totalCount,
+            count: sanitizedResults.length,
+            data: sanitizedResults,
+            pagination: limit ? {
+                limit: parseInt(limit),
+                offset: parseInt(offset) || 0,
+                hasMore: (parseInt(offset) || 0) + sanitizedResults.length < totalCount
+            } : null
         });
     } catch (error) {
-        console.error("Get all supermarkets list error:", error.message);
+        console.error("Advanced search error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+// Migration endpoint (call this once to update existing data)
+const migrateSearchTokens = async (req, res) => {
+    try {
+        const result = await marketService.addSearchTokensToExistingDocuments();
+        
+        return res.status(200).json({
+            success: true,
+            message: "Search tokens migration completed",
+            ...result
+        });
+    } catch (error) {
+        console.error("Migration error:", error.message);
+        return res.status(500).json({ 
+            success: false, 
+            message: "Migration failed",
+            error: error.message 
+        });
     }
 };
 
@@ -149,4 +229,4 @@ const updateMarketById = async (req, res) => {
     }
 };
 
-export { createMarket, getMarketById, getAllMarkets, updateMarketById, getAllMarketsList };
+export { createMarket, getMarketById, getAllMarkets, updateMarketById, searchMarketsAdvanced, migrateSearchTokens};

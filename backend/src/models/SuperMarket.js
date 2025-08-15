@@ -15,6 +15,7 @@ class SuperMarket {
         // For backend process
         this.isActive = data.isActive;
         this.orders_count = data.orders_count;
+        this.searchTokens = data.searchTokens;
 
         this.createdAt = data.createdAt;
         this.updatedAt = data.updatedAt;

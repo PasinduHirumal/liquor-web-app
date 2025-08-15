@@ -91,6 +91,23 @@ class BaseService {
         }
     }
 
+    // New method for multiple field searches (OR logic)
+    async findByMultipleFilters(filterGroups = []) {
+        try {
+            const results = new Map(); // Use Map to avoid duplicates
+            
+            // Execute each filter group and collect results
+            for (const filters of filterGroups) {
+                const docs = await this.findWithFilters(filters);
+                docs.forEach(doc => results.set(doc.id, doc));
+            }
+            
+            return Array.from(results.values());
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async create(data) {
         try {
             // Hash password if it's being created
@@ -106,7 +123,13 @@ class BaseService {
                 [this.timestampFields.updatedAt]: timestamp
             });
 
-            return new this.ModelClass(docRef.id, data);
+            const createdData = {
+                ...data,
+                [this.timestampFields.createdAt]: timestamp,
+                [this.timestampFields.updatedAt]: timestamp
+            };
+
+            return new this.ModelClass(docRef.id, createdData);
         } catch (error) {
             throw error;
         }
@@ -117,7 +140,7 @@ class BaseService {
             const doc = await this.collection.doc(id).get();
 
             if (!doc.exists) {
-                return false;
+                return null;
             }
 
             // Hash password if it's being updated
