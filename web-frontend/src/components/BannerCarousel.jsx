@@ -3,7 +3,7 @@ import { axiosInstance } from "../lib/axios";
 import Slider from "react-slick";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import "./BannerCarousel.css";
+import "../styles/BannerCarousel.css";
 
 const BannerCarousel = () => {
   const [banners, setBanners] = useState([]);
