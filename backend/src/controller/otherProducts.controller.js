@@ -1,5 +1,6 @@
 import OtherProductService from '../services/otherProduct.service.js';
 import StockHistoryService from '../services/stockHistory.service.js';
+import SuperMarketService from '../services/superMarket.service.js';
 import CategoryService from '../services/category.service.js';
 import populateCategory from '../utils/populateCategory.js';
 import { deleteImages, uploadImages, uploadSingleImage } from '../utils/firebaseStorage.js';
@@ -10,14 +11,30 @@ import { createStockHistory } from './stockHistory.controller.js';
 const categoryService = new CategoryService();
 const productService = new OtherProductService();
 const stockHistoryService = new StockHistoryService();
+const marketService = new SuperMarketService();
 
 const createProduct = async (req, res) => {
 	try {
-        const { marked_price, discount_percentage, category_id, images, main_image } = req.body;
+        const { marked_price, discount_percentage, category_id, images, main_image, superMarket_id } = req.body;
 
         const category = await categoryService.findById(category_id);
         if (!category) {
             return res.status(400).json({ success: false, message: "Invalid category"});
+        }
+
+        const productData = {};
+
+        if (superMarket_id !== undefined) {
+            const superMarket = await marketService.findById(superMarket_id);
+            if (!superMarket) {
+                return res.status(404).json({ success: false, message: "Super market not found"});
+            }
+
+            if (!superMarket.isActive) {
+                return res.status(400).json({ success: false, message: "Super market not in active"});
+            }
+            
+            productData.product_from = `${superMarket.superMarket_Name} - ${superMarket.city}`;
         }
 
         if (images !== undefined) {
@@ -54,7 +71,7 @@ const createProduct = async (req, res) => {
 
         const updatedPrices = validatePriceOperation(markedPrice, discountPercentage);
         if (!updatedPrices.isValid) {
-            return res.status(400).json({ success: false, message: stockValidation.error });
+            return res.status(400).json({ success: false, message: updatedPrices.error });
         }
 
         if (req.body.selling_price || req.body.discount_amount) {
@@ -62,11 +79,11 @@ const createProduct = async (req, res) => {
             if (req.body.discount_amount) delete req.body.discount_amount;
         }
 
-        const productData = { 
+        Object.assign(productData, {
             selling_price: updatedPrices.newPrice,
             discount_amount: updatedPrices.discount,
-            ...req.body,
-        };
+            ...req.body
+        });
 
         const product = await productService.create(productData);
         if (!product) {
@@ -78,7 +95,7 @@ const createProduct = async (req, res) => {
             quantity: product.stock_quantity,
             productId: product.product_id,
             userId: req.user.id
-        }
+        };
 
         const stockHistory = await stockHistoryService.create(stockHistoryData);
         if (!stockHistory) {
@@ -197,7 +214,7 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
 	try {
         const productId = req.params.id;
-        const { marked_price, discount_percentage, category_id, images, main_image, add_quantity, withdraw_quantity } = req.body;
+        const { marked_price, discount_percentage, category_id, images, main_image, add_quantity, withdraw_quantity, superMarket_id} = req.body;
 
         const product = await productService.findById(productId);
         if (!product) {
@@ -209,6 +226,21 @@ const updateProduct = async (req, res) => {
             if (!category) {
                 return res.status(400).json({ success: false, message: "Invalid category"});
             }
+        }
+
+        const updateData = {};
+
+        if (superMarket_id !== undefined) {
+            const superMarket = await marketService.findById(superMarket_id);
+            if (!superMarket) {
+                return res.status(404).json({ success: false, message: "Super market not found"});
+            }
+
+            if (!superMarket.isActive) {
+                return res.status(400).json({ success: false, message: "Super market not in active"});
+            }
+            
+            updateData.product_from = `${superMarket.superMarket_Name} - ${superMarket.city}`;
         }
 
         if (images !== undefined) {
@@ -280,12 +312,12 @@ const updateProduct = async (req, res) => {
             if (req.body.discount_amount) delete req.body.discount_amount;
         }
 
-        const updateData = { 
+        Object.assign(updateData, { 
             selling_price: updatedPrices.newPrice,
             discount_amount: updatedPrices.discount,
             stock_quantity: stockValidation.newStock,
             ...req.body
-        };
+        });
 
         if (updateData.stock_quantity <= 0) {
             updateData.is_in_stock = false;
