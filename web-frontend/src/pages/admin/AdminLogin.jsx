@@ -61,6 +61,7 @@ const AdminLogin = () => {
         };
 
         await login(dataToSend);
+        window.location.reload();
     };
 
     return (
