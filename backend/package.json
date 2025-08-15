@@ -25,6 +25,7 @@
     "jsonwebtoken": "^9.0.2",
     "libphonenumber-js": "^1.12.10",
     "nodemailer": "^7.0.5",
+    "postal-codes-js": "^2.5.2",
     "puppeteer": "^24.15.0",
     "uuid": "^11.1.0"
   }
