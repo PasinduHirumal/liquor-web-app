@@ -1,13 +1,15 @@
 import React, { useState, useEffect } from "react";
 import { axiosInstance } from "../../lib/axios";
 import CreateBannerModal from "../../components/admin/forms/CreateBannerModal";
+import EditBannerModal from "../../components/admin/forms/EditBannerModal";
 import DeleteBannerButton from "../../components/admin/buttons/DeleteBannerButton";
 
 function ManageBanner() {
     const [banners, setBanners] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [showModal, setShowModal] = useState(false);
+    const [showCreateModal, setShowCreateModal] = useState(false);
+    const [editBanner, setEditBanner] = useState(null);
 
     const fetchBanners = async () => {
         setLoading(true);
@@ -39,7 +41,7 @@ function ManageBanner() {
                         borderRadius: 4,
                         cursor: "pointer"
                     }}
-                    onClick={() => setShowModal(true)}
+                    onClick={() => setShowCreateModal(true)}
                 >
                     Create Banner
                 </button>
@@ -104,11 +106,26 @@ function ManageBanner() {
                                             </div>
                                         </div>
 
-                                        {/* Use the DeleteBannerButton component */}
-                                        <DeleteBannerButton
-                                            bannerId={banner.banner_id}
-                                            onDeleted={fetchBanners}
-                                        />
+                                        {/* Buttons row */}
+                                        <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
+                                            <button
+                                                style={{
+                                                    padding: "6px 12px",
+                                                    backgroundColor: "#ffc107",
+                                                    color: "#000",
+                                                    border: "none",
+                                                    borderRadius: 4,
+                                                    cursor: "pointer"
+                                                }}
+                                                onClick={() => setEditBanner(banner)}
+                                            >
+                                                Edit
+                                            </button>
+                                            <DeleteBannerButton
+                                                bannerId={banner.banner_id}
+                                                onDeleted={fetchBanners}
+                                            />
+                                        </div>
                                     </div>
                                 ))}
                             </div>
@@ -117,10 +134,18 @@ function ManageBanner() {
                 </>
             )}
 
-            {showModal && (
+            {showCreateModal && (
                 <CreateBannerModal
-                    onClose={() => setShowModal(false)}
+                    onClose={() => setShowCreateModal(false)}
                     onCreated={fetchBanners}
+                />
+            )}
+
+            {editBanner && (
+                <EditBannerModal
+                    banner={editBanner}
+                    onClose={() => setEditBanner(null)}
+                    onUpdated={fetchBanners}
                 />
             )}
         </div>
