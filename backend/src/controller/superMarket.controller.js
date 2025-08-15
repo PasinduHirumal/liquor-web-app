@@ -46,7 +46,7 @@ const getMarketById = async (req, res) => {
 
 const getAllMarkets = async (req, res) => {
 	try {
-        const { isActive } = req.query;
+        const { isActive, city, state, country } = req.query;
 
         const filters = {};
         const filterDescription = [];
@@ -56,7 +56,19 @@ const getAllMarkets = async (req, res) => {
             const isBoolean = isActive === 'true';
             filters.isActive = isBoolean;
             filterDescription.push(`isActive: ${isActive}`);
-        } 
+        }
+        if (city !== undefined) {
+            filters.city = city;
+            filterDescription.push(`city: ${city}`);
+        }
+        if (state !== undefined) {
+            filters.state = state;
+            filterDescription.push(`state: ${state}`);
+        }
+        if (country !== undefined) {
+            filters.country = country;
+            filterDescription.push(`country: ${country}`);
+        }
 
         const filteredMarkets = Object.keys(filters).length > 0 
             ? await marketService.findWithFilters(filters)
