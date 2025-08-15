@@ -1,17 +1,56 @@
-import React from "react";
-import bannerImage from "../assets/banner.jpg";
+import React, { useEffect, useState } from "react";
+import { axiosInstance } from "../lib/axios";
 
-const Banner = () => {
+const BannerCarousel = () => {
+  const [banners, setBanners] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const response = await axiosInstance.get("/banners/getAll", {
+          params: { isActive: true },
+        });
+
+        if (response.data.success && response.data.data.length > 0) {
+          setBanners(response.data.data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch banners:", err);
+        setError("Failed to load banners");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBanners();
+  }, []);
+
+  // Auto-slide every 5 seconds
+  useEffect(() => {
+    if (banners.length === 0) return;
+
+    const interval = setInterval(() => {
+      setCurrentIndex((prevIndex) => (prevIndex + 1) % banners.length);
+    }, 7000);
+
+    return () => clearInterval(interval);
+  }, [banners]);
+
+  if (loading) return <div>Loading banners...</div>;
+  if (error) return <div>{error}</div>;
+  if (banners.length === 0) return <div>No banners available</div>;
+
+  const currentBanner = banners[currentIndex];
+
   return (
     <div style={{ width: "100%", position: "relative", overflow: "hidden" }}>
       <img
-        src={bannerImage}
-        alt="Premium Spirits & Wine Collection"
-        style={{
-          width: "100%",
-          height: "auto",
-          objectFit: "cover",
-        }}
+        src={currentBanner.image}
+        alt={currentBanner.title}
+        style={{ width: "100%", height: "auto", objectFit: "cover" }}
       />
 
       {/* Overlay text */}
@@ -29,10 +68,10 @@ const Banner = () => {
         }}
       >
         <h1 style={{ fontSize: "2.5rem", fontWeight: "bold" }}>
-          Premium Spirits & Wine Collection
+          {currentBanner.title}
         </h1>
         <p style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>
-          Discover Our Curated Selection of Fine Beverages
+          {currentBanner.description}
         </p>
         <button
           style={{
@@ -49,8 +88,48 @@ const Banner = () => {
           Shop Now
         </button>
       </div>
+
+      {/* Navigation buttons */}
+      <button
+        onClick={() =>
+          setCurrentIndex(
+            (currentIndex - 1 + banners.length) % banners.length
+          )
+        }
+        style={{
+          position: "absolute",
+          top: "50%",
+          left: "10px",
+          transform: "translateY(-50%)",
+          backgroundColor: "rgba(0,0,0,0.5)",
+          color: "#fff",
+          border: "none",
+          padding: "0.5rem",
+          borderRadius: "50%",
+          cursor: "pointer",
+        }}
+      >
+        ◀
+      </button>
+      <button
+        onClick={() => setCurrentIndex((currentIndex + 1) % banners.length)}
+        style={{
+          position: "absolute",
+          top: "50%",
+          right: "10px",
+          transform: "translateY(-50%)",
+          backgroundColor: "rgba(0,0,0,0.5)",
+          color: "#fff",
+          border: "none",
+          padding: "0.5rem",
+          borderRadius: "50%",
+          cursor: "pointer",
+        }}
+      >
+        ▶
+      </button>
     </div>
   );
 };
 
-export default Banner;
+export default BannerCarousel;
