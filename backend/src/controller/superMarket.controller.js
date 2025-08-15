@@ -91,7 +91,8 @@ const getAllMarketsList = async (req, res) => {
 
         const sanitizedMarkets = superMarkets.map(market => ({
             superMarket_id: market.id,
-            superMarket_name: `${market.superMarket_Name} - ${market.city}`
+            superMarket_name: `${market.superMarket_Name} - ${market.city}`,
+            streetAddress: market.streetAddress
         }));
         
         return res.status(200).json({ 
