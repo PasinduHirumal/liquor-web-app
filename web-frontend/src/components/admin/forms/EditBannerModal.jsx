@@ -103,20 +103,21 @@ function EditBannerModal({ banner, onClose, onUpdated }) {
                             </div>
 
                             <div className="mb-3">
-                                <label className="form-label">Current / New Image</label>
-                                {previewImage && (
-                                    <img
-                                        src={previewImage}
-                                        alt="Banner Preview"
-                                        className="img-fluid rounded border mb-2"
-                                    />
-                                )}
                                 <input
                                     type="file"
                                     accept="image/*"
                                     onChange={handleImageChange}
                                     className="form-control"
                                 />
+                                <label className="form-label">Current / New Image</label> <br />
+                                {previewImage && (
+                                    <img
+                                        src={previewImage}
+                                        alt="Banner Preview"
+                                        className="img-fluid rounded border mb-2"
+                                        style={{ maxHeight: "200px", objectFit: "contain" }}
+                                    />
+                                )}
                             </div>
 
                             <div className="form-check form-check-inline">
