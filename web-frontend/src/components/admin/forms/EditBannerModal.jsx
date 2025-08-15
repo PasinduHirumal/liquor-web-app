@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { axiosInstance } from "../../../lib/axios";
+import "bootstrap/dist/css/bootstrap.min.css";
 
 function EditBannerModal({ banner, onClose, onUpdated }) {
     const [formData, setFormData] = useState({
@@ -9,11 +10,10 @@ function EditBannerModal({ banner, onClose, onUpdated }) {
         isActive: false,
         isLiquor: false,
     });
-    const [previewImage, setPreviewImage] = useState("");   
+    const [previewImage, setPreviewImage] = useState("");
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Prefill form with banner data
     useEffect(() => {
         if (banner) {
             setFormData({
@@ -42,9 +42,9 @@ function EditBannerModal({ banner, onClose, onUpdated }) {
             reader.onloadend = () => {
                 setFormData((prev) => ({
                     ...prev,
-                    image: reader.result, // Base64 string
+                    image: reader.result,
                 }));
-                setPreviewImage(reader.result); // Show preview
+                setPreviewImage(reader.result);
             };
             reader.readAsDataURL(file);
         }
@@ -57,7 +57,6 @@ function EditBannerModal({ banner, onClose, onUpdated }) {
 
         try {
             await axiosInstance.patch(`/banners/update/${banner.banner_id}`, formData);
-
             onUpdated();
             onClose();
         } catch (err) {
@@ -68,110 +67,97 @@ function EditBannerModal({ banner, onClose, onUpdated }) {
     };
 
     return (
-        <div
-            style={{
-                position: "fixed",
-                top: 0,
-                left: 0,
-                width: "100%",
-                height: "100%",
-                backgroundColor: "rgba(0,0,0,0.5)",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                zIndex: 9999,
-            }}
-        >
-            <div style={{ background: "#fff", padding: 20, borderRadius: 8, width: 400 }}>
-                <h3>Edit Banner</h3>
-                {error && <p style={{ color: "red" }}>{error}</p>}
-
-                <form onSubmit={handleSubmit}>
-                    <div style={{ marginBottom: 10 }}>
-                        <label>Title</label>
-                        <input
-                            type="text"
-                            name="title"
-                            value={formData.title}
-                            onChange={handleChange}
-                            style={{ width: "100%" }}
-                            required
-                        />
+        <div className="modal show fade d-block pt-5" tabIndex="-1" role="dialog" style={{ backgroundColor: "rgba(0,0,0,0.5)" }}>
+            <div className="modal-dialog modal-lg modal-dialog-centered" role="document">
+                <div className="modal-content">
+                    <div className="modal-header">
+                        <h5 className="modal-title">Edit Banner</h5>
+                        <button type="button" className="btn-close" aria-label="Close" onClick={onClose}></button>
                     </div>
+                    <form onSubmit={handleSubmit}>
+                        <div className="modal-body">
+                            {error && <div className="alert alert-danger">{error}</div>}
 
-                    <div style={{ marginBottom: 10 }}>
-                        <label>Description</label>
-                        <textarea
-                            name="description"
-                            value={formData.description}
-                            onChange={handleChange}
-                            style={{ width: "100%" }}
-                            required
-                        />
-                    </div>
+                            <div className="mb-3">
+                                <label className="form-label">Title</label>
+                                <input
+                                    type="text"
+                                    name="title"
+                                    value={formData.title}
+                                    onChange={handleChange}
+                                    className="form-control"
+                                    required
+                                />
+                            </div>
 
-                    {/* Image Preview */}
-                    <div style={{ marginBottom: 10 }}>
-                        <label>Current / New Image</label>
-                        {previewImage && (
-                            <img
-                                src={previewImage}
-                                alt="Banner Preview"
-                                style={{
-                                    width: "100%",
-                                    borderRadius: 4,
-                                    marginBottom: 8,
-                                    border: "1px solid #ccc",
-                                }}
-                            />
-                        )}
-                        <input
-                            type="file"
-                            accept="image/*"
-                            onChange={handleImageChange}
-                        />
-                    </div>
+                            <div className="mb-3">
+                                <label className="form-label">Description</label>
+                                <textarea
+                                    name="description"
+                                    value={formData.description}
+                                    onChange={handleChange}
+                                    className="form-control"
+                                    rows="3"
+                                    required
+                                ></textarea>
+                            </div>
 
-                    <div style={{ display: "flex", gap: "1rem", marginBottom: 10 }}>
-                        <label>
-                            <input
-                                type="checkbox"
-                                name="isActive"
-                                checked={formData.isActive}
-                                onChange={handleChange}
-                            />
-                            Active
-                        </label>
-                        <label>
-                            <input
-                                type="checkbox"
-                                name="isLiquor"
-                                checked={formData.isLiquor}
-                                onChange={handleChange}
-                            />
-                            Liquor
-                        </label>
-                    </div>
+                            <div className="mb-3">
+                                <label className="form-label">Current / New Image</label>
+                                {previewImage && (
+                                    <img
+                                        src={previewImage}
+                                        alt="Banner Preview"
+                                        className="img-fluid rounded border mb-2"
+                                    />
+                                )}
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    onChange={handleImageChange}
+                                    className="form-control"
+                                />
+                            </div>
 
-                    <div style={{ display: "flex", justifyContent: "flex-end", gap: 10 }}>
-                        <button type="button" onClick={onClose} style={{ padding: "6px 12px" }}>
-                            Cancel
-                        </button>
-                        <button
-                            type="submit"
-                            disabled={loading}
-                            style={{
-                                padding: "6px 12px",
-                                backgroundColor: "#28a745",
-                                color: "#fff",
-                                border: "none",
-                                borderRadius: 4,
-                            }}
-                        >
-                            {loading ? "Updating..." : "Update"}
-                        </button>
-                    </div>
-                </form>
+                            <div className="form-check form-check-inline">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    name="isActive"
+                                    checked={formData.isActive}
+                                    onChange={handleChange}
+                                    id="activeCheck"
+                                />
+                                <label className="form-check-label" htmlFor="activeCheck">
+                                    Active
+                                </label>
+                            </div>
+
+                            <div className="form-check form-check-inline">
+                                <input
+                                    className="form-check-input"
+                                    type="checkbox"
+                                    name="isLiquor"
+                                    checked={formData.isLiquor}
+                                    onChange={handleChange}
+                                    id="liquorCheck"
+                                />
+                                <label className="form-check-label" htmlFor="liquorCheck">
+                                    Liquor
+                                </label>
+                            </div>
+                        </div>
+
+                        <div className="modal-footer">
+                            <button type="button" className="btn btn-secondary" onClick={onClose}>
+                                Cancel
+                            </button>
+                            <button type="submit" className="btn btn-success" disabled={loading}>
+                                {loading ? "Updating..." : "Update"}
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     );
