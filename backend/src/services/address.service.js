@@ -1,27 +1,39 @@
 import initializeFirebase from "../config/firebase.config.js";
+import BaseService from "./BaseService.js";
 import Addresses from "../models/Addresses.js";
 
 const { db } = initializeFirebase();
 
-class AddressService {
+class AddressService extends BaseService {
     constructor() {
+        // Initialize BaseService with a dummy collection name since we'll override collection handling
+        super('addresses', Addresses, {
+            createdAtField: 'created_at',
+            updatedAtField: 'updated_at'
+        })
         this.usersCollection = db.collection('users');
     }
 
-    // Get addresses sub-collection for a specific user
-    getAddressesCollection(userId) {
+    // Override collection getter to work with sub-collections
+    getCollection(userId) {
+        if (!userId) {
+            throw new Error('UserId is required for address operations');
+        }
         return this.usersCollection.doc(userId).collection('addresses');
     }
 
+    // Override BaseService methods to work with sub-collections
     async findById(userId, addressId) {
         try {
-            const addressDoc = await this.getAddressesCollection(userId).doc(addressId).get();
-            if (!addressDoc.exists) {
+            const collection = this.getCollection(userId);
+            const doc = await collection.doc(addressId).get();
+            
+            if (!doc.exists) {
                 return null;
             }
         
-            const addressData = addressDoc.data();
-            return new Addresses(addressDoc.id, addressData);
+            const data = doc.data();
+            return new this.ModelClass(doc.id, data);
         } catch (error) {
             throw error;
         }
@@ -29,13 +41,14 @@ class AddressService {
 
     async findAllByUserId(userId) {
         try {
-            const addressesRef = await this.getAddressesCollection(userId).get();
+            const collection = this.getCollection(userId);
+            const docsRef = await collection.get();
 
-            if (addressesRef.empty) {
+            if (docsRef.empty) {
                 return [];
             }
 
-            return addressesRef.docs.map(doc => new Addresses(doc.id, doc.data()));
+            return docsRef.docs.map(doc => new this.ModelClass(doc.id, doc.data()));
         } catch (error) {
             throw error;
         }
@@ -43,15 +56,50 @@ class AddressService {
 
     async findByFilter(userId, field, operator, value) {
         try {
-            const addressesRef = await this.getAddressesCollection(userId)
-                .where(field, operator, value)
-                .get();
+            const collection = this.getCollection(userId);
+            const docsRef = await collection.where(field, operator, value).get();
 
-            if (addressesRef.empty) {
+            if (docsRef.empty) {
                 return [];
             }
 
-            return addressesRef.docs.map(doc => new Addresses(doc.id, doc.data()));
+            return docsRef.docs.map(doc => new this.ModelClass(doc.id, doc.data()));
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async findWithFilters(userId, filters = {}) {
+        try {
+            let query = this.getCollection(userId);
+            
+            // Handle date range filtering 
+            if (filters.dateRange) {
+                const { start, end } = filters.dateRange;
+                
+                // Convert to Firestore Timestamps if they're Date objects
+                const startTimestamp = start instanceof Date ? start : start.toDate();
+                const endTimestamp = end instanceof Date ? end : end.toDate();
+                
+                query = query
+                    .where(this.timestampFields.createdAt, '>=', startTimestamp)
+                    .where(this.timestampFields.createdAt, '<=', endTimestamp);
+            }
+
+            // Apply other filters (excluding dateRange and userId)
+            Object.entries(filters).forEach(([field, value]) => {
+                if (value !== undefined && value !== null && field !== 'dateRange') {
+                    query = query.where(field, '==', value);
+                }
+            });
+
+            const docsRef = await query.get();
+
+            if (docsRef.empty) {
+                return [];
+            }
+
+            return docsRef.docs.map(doc => new this.ModelClass(doc.id, doc.data()));
         } catch (error) {
             throw error;
         }
@@ -59,13 +107,16 @@ class AddressService {
 
     async create(userId, data) {
         try {
-            const addressRef = await this.getAddressesCollection(userId).add({
+            const collection = this.getCollection(userId);
+            const timestamp = new Date().toISOString();
+            
+            const docRef = await collection.add({
                 ...data,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString()
+                [this.timestampFields.createdAt]: timestamp,
+                [this.timestampFields.updatedAt]: timestamp
             });
 
-            return new Addresses(addressRef.id, data);
+            return new this.ModelClass(docRef.id, data);
         } catch (error) {
             throw error;
         }
@@ -73,15 +124,16 @@ class AddressService {
 
     async updateById(userId, addressId, updateData) {
         try {
-            const addressDoc = await this.getAddressesCollection(userId).doc(addressId).get();
+            const collection = this.getCollection(userId);
+            const doc = await collection.doc(addressId).get();
 
-            if (!addressDoc.exists) {
+            if (!doc.exists) {
                 return false;
             }
             
-            updateData.updatedAt = new Date().toISOString();
+            updateData[this.timestampFields.updatedAt] = new Date().toISOString();
         
-            await this.getAddressesCollection(userId).doc(addressId).update(updateData);
+            await collection.doc(addressId).update(updateData);
         
             const updatedData = await this.findById(userId, addressId);
             return updatedData;
@@ -92,18 +144,20 @@ class AddressService {
 
     async deleteById(userId, addressId) {
         try {
-            const addressDoc = await this.getAddressesCollection(userId).doc(addressId).get();
+            const collection = this.getCollection(userId);
+            const doc = await collection.doc(addressId).get();
 
-            if (!addressDoc.exists) {
+            if (!doc.exists) {
                 return false;
             }
 
-            await this.getAddressesCollection(userId).doc(addressId).delete();
+            await collection.doc(addressId).delete();
             return true;
         } catch (error) {
             throw error;
         }
     }
+
 
     // Additional method to get all addresses across all users (if needed)
     async findAllAddressesGlobally() {
@@ -114,7 +168,7 @@ class AddressService {
             for (const userDoc of usersSnapshot.docs) {
                 const addressesSnapshot = await userDoc.ref.collection('addresses').get();
                 const userAddresses = addressesSnapshot.docs.map(doc => ({
-                    ...new Addresses(doc.id, doc.data()),
+                    ...new this.ModelClass(doc.id, doc.data()),
                     userId: userDoc.id // Include userId for reference
                 }));
                 allAddresses.push(...userAddresses);
