@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../lib/axios";
+import { AiOutlineLeft, AiOutlineRight } from "react-icons/ai";
 
 const BannerCarousel = () => {
   const [banners, setBanners] = useState([]);
@@ -101,7 +102,7 @@ const BannerCarousel = () => {
         </button>
       </div>
 
-      {/* Navigation buttons */}
+      {/* Navigation buttons with icons */}
       <button
         onClick={() =>
           setCurrentIndex((currentIndex - 1 + banners.length) % banners.length)
@@ -117,9 +118,12 @@ const BannerCarousel = () => {
           padding: "0.5rem",
           borderRadius: "50%",
           cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        ◀
+        <AiOutlineLeft size={24} />
       </button>
       <button
         onClick={() => setCurrentIndex((currentIndex + 1) % banners.length)}
@@ -134,9 +138,12 @@ const BannerCarousel = () => {
           padding: "0.5rem",
           borderRadius: "50%",
           cursor: "pointer",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
         }}
       >
-        ▶
+        <AiOutlineRight size={24} />
       </button>
     </div>
   );
