@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Table, Tag, Space, Spin, message } from "antd";
+import { Table, Tag, Spin, message } from "antd";
 import { axiosInstance } from "../../lib/axios";
 
 function SuperMarket() {
@@ -36,36 +36,43 @@ function SuperMarket() {
             title: 'Name',
             dataIndex: 'superMarket_Name',
             key: 'name',
+            width: 150, // set width for scroll
         },
         {
             title: 'Street Address',
             dataIndex: 'streetAddress',
             key: 'streetAddress',
+            width: 200,
         },
         {
             title: 'City',
             dataIndex: 'city',
             key: 'city',
+            width: 120,
         },
         {
             title: 'State',
             dataIndex: 'state',
             key: 'state',
+            width: 120,
         },
         {
             title: 'Postal Code',
             dataIndex: 'postalCode',
             key: 'postalCode',
+            width: 120,
         },
         {
             title: 'Country',
             dataIndex: 'country',
             key: 'country',
+            width: 120,
         },
         {
             title: 'Active',
             dataIndex: 'isActive',
             key: 'isActive',
+            width: 100,
             render: (isActive) => (
                 <Tag color={isActive ? 'green' : 'red'}>
                     {isActive ? 'Yes' : 'No'}
@@ -76,13 +83,8 @@ function SuperMarket() {
             title: 'Orders Count',
             dataIndex: 'orders_count',
             key: 'orders_count',
-        },
-        {
-            title: 'Created At',
-            dataIndex: 'createdAt',
-            key: 'createdAt',
-            render: (date) => new Date(date).toLocaleString(),
-        },
+            width: 120,
+        }
     ];
 
     return (
@@ -101,6 +103,7 @@ function SuperMarket() {
                     dataSource={markets}
                     rowKey="id"
                     bordered
+                    scroll={{ x: 1200 }}
                     locale={{
                         emptyText: 'No supermarkets found'
                     }}
