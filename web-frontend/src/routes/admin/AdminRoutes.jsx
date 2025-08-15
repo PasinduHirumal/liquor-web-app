@@ -64,51 +64,27 @@ export const adminRoutes = [
     },
     {
         path: "/admin-users-list",
-        element: (
-            <AdminProtectedRoute>
-                <AdminUserList />
-            </AdminProtectedRoute>
-        ),
+        element: <AdminUserList />
     },
     {
         path: "/users-list",
-        element: (
-            <AdminProtectedRoute>
-                <UserList />
-            </AdminProtectedRoute>
-        ),
+        element: <UserList />
     },
     {
         path: "/driver-list",
-        element: (
-            <AdminProtectedRoute>
-                <DriverList />
-            </AdminProtectedRoute>
-        ),
+        element: <DriverList />
     },
     {
         path: "/order-list",
-        element: (
-            <AdminProtectedRoute>
-                <OrderLIst />
-            </AdminProtectedRoute>
-        ),
+        element: <OrderLIst />
     },
     {
         path: "/syetem-detail",
-        element: (
-            <AdminProtectedRoute>
-                <SystemDetail />
-            </AdminProtectedRoute>
-        ),
+        element: <SystemDetail />
     },
     {
         path: "/download-reports",
-        element: (
-            <AdminProtectedRoute>
-                <Report />
-            </AdminProtectedRoute>
-        ),
+        element: <Report />
     },
     {
         path: "/order-list/:id",
