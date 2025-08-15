@@ -25,6 +25,7 @@ import OrderLIst from "../../pages/admin/OrderList";
 import OrderDetail from "../../pages/admin/detailPages/OrderDetail";
 import SystemDetail from "../../pages/admin/SystemDetail";
 import Report from "../../pages/admin/Report";
+import ManageBanner from "../../pages/admin/ManageBanner";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -172,5 +173,9 @@ export const adminRoutes = [
     {
         path: "/driver-list/:id/edit-documents",
         element: <DriverDocumentInfo />
+    },
+    {
+        path: "/manage-banner",
+        element: <ManageBanner />
     },
 ];

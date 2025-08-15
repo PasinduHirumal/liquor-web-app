@@ -19,7 +19,7 @@ const Login = () => {
 
     return (
         <>
-            <div className="d-flex flex-column align-items-center justify-content-center">
+            <div className="d-flex flex-column align-items-center justify-content-center bg-white">
                 <h3 className="mt-3 m-0 p-0 text-center fw-semibold" style={{ letterSpacing: '0.05em' }}>
                     Sign In
                 </h3>

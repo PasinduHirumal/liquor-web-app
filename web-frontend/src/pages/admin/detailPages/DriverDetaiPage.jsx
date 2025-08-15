@@ -70,7 +70,7 @@ const DriverDetailPage = () => {
 
     if (loading) {
         return (
-            <div className="driver-detail-loading text-center mt-5 pt-5">
+            <div className="driver-detail-loading text-center bg-white" style={{paddingTop:"20vh"}}>
                 <CircularProgress />
             </div>
         );

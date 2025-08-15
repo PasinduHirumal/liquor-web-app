@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { axiosInstance } from '../../../lib/axios';
-import ConfirmDialog from '../../../common/ConfirmDialog';
+import ConfirmDeleteDialog from '../../../common/ConfirmDeleteDialog';
 import useAdminAuthStore from '../../../stores/adminAuthStore';
 
 const DeleteUserButton = ({ userId, onSuccess }) => {
@@ -9,7 +9,7 @@ const DeleteUserButton = ({ userId, onSuccess }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const handleDelete = async () => {
-        const confirmed = await ConfirmDialog({
+        const confirmed = await ConfirmDeleteDialog({
             title: 'Delete User?',
             html: 'This action cannot be undone.',
             icon: 'warning',

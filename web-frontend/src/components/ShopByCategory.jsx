@@ -12,7 +12,7 @@ const ShopByCategory = () => {
             try {
                 setLoading(true);
                 const res = await axiosInstance.get("/categories/getAll", {
-                    params: { is_active: true },
+                    params: { is_active: true, is_liquor: true },
                 });
                 if (res.data?.success) {
                     setCategories(res.data.data);
@@ -32,7 +32,7 @@ const ShopByCategory = () => {
 
     if (loading) {
         return (
-            <section className="container py-5 text-center">
+            <section className="container py-5 text-center text-white">
                 <p>Loading categories...</p>
             </section>
         );

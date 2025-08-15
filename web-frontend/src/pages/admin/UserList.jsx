@@ -131,7 +131,7 @@ const UserList = () => {
     ];
 
     return (
-        <div className="d-flex justify-content-center mt-3">
+        <div className="d-flex justify-content-center pt-3 bg-white">
             <div className="container" style={{ maxWidth: 1000 }}>
                 <div className="mb-4 text-center">
                     <Title level={2}>User List</Title>

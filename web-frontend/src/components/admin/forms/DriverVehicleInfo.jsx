@@ -67,14 +67,14 @@ function DriverVehicleInfo() {
 
     if (loading) {
         return (
-            <div className="text-center my-5">
+            <div className="text-center py-5 bg-white">
                 <Spinner animation="border" />
             </div>
         );
     }
 
     return (
-        <Container className="my-4">
+        <div className="p-4 px-5 bg-white">
             <Row className="align-items-center mb-4">
                 <Col xs="auto">
                     <Button variant="outline-secondary" onClick={() => navigate(-1)}>
@@ -220,7 +220,7 @@ function DriverVehicleInfo() {
                     </Button>
                 </div>
             </Form>
-        </Container>
+        </div>
     );
 }
 

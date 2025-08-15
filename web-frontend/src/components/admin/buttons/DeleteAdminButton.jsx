@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { axiosInstance } from '../../../lib/axios';
-import ConfirmDialog from '../../../common/ConfirmDialog';
+import ConfirmDeleteDialog from '../../../common/ConfirmDeleteDialog';
 
 const DeleteAdminButton = ({ adminId, onSuccess }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const handleDelete = async () => {
-        const confirmed = await ConfirmDialog({
+        const confirmed = await ConfirmDeleteDialog({
             title: 'Confirm Deletion',
             html: 'This admin will be permanently removed. You cannot undo this action!',
         });

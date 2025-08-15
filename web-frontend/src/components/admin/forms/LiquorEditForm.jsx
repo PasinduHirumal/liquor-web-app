@@ -280,16 +280,16 @@ const LiquorEditForm = () => {
 
     if (loading) {
         return (
-            <Container className="d-flex justify-content-center align-items-center" style={{ height: "50vh" }}>
+            <div className="d-flex justify-content-center align-items-center bg-white" style={{ height: "50vh" }}>
                 <Spinner animation="border" variant="primary" role="status">
                     <span className="visually-hidden">Loading...</span>
                 </Spinner>
-            </Container>
+            </div>
         );
     }
 
     return (
-        <Container className="py-4">
+        <div className="py-5 bg-white px-md-5 px-4" style={{ paddingLeft: "40px", paddingRight: "40px" }}>
             <Card className="shadow-sm">
                 <Card.Header className="bg-primary text-white">
                     <h2 className="mb-0">Edit Liquor Product</h2>
@@ -751,7 +751,7 @@ const LiquorEditForm = () => {
                     </Form>
                 </Card.Body>
             </Card>
-        </Container>
+        </div>
     );
 };
 

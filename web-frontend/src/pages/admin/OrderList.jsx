@@ -168,7 +168,7 @@ function OrderList() {
     ];
 
     return (
-        <div style={{ padding: "24px", maxWidth: "1200px", margin: "0 auto" }}>
+        <div className="bg-white p-5">
             <div style={{
                 display: "flex",
                 justifyContent: "space-between",

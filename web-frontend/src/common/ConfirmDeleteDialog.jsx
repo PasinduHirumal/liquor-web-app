@@ -4,7 +4,7 @@ import '../styles/confirmDialog.css';
 
 const MySwal = withReactContent(Swal);
 
-const ConfirmDialog = async ({ title, html, icon = 'warning' }) => {
+const ConfirmDeleteDialog = async ({ title, html, icon = 'warning' }) => {
     const result = await MySwal.fire({
         title: `<strong>${title}</strong>`,
         html: `<small>${html}</small>`,
@@ -25,4 +25,4 @@ const ConfirmDialog = async ({ title, html, icon = 'warning' }) => {
     return result.isConfirmed;
 };
 
-export default ConfirmDialog;
+export default ConfirmDeleteDialog;

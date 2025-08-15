@@ -81,10 +81,11 @@ function DriverFinancialInfo() {
         }
     };
 
-    if (loading) return <p className="text-center mt-4">Loading...</p>;
+    if (loading) return <p className="text-center pt-4 bg-white">Loading...</p>;
 
     return (
-        <div className="container mt-5 driver-financial-container shadow-sm p-4 rounded bg-white">
+        <div className="container py-5 ">
+        <div className="driver-financial-container shadow-sm p-4 rounded bg-white">
             <h2 className="mb-4 text-center text-primary">Driver Financial Information</h2>
 
             {errors.length > 0 && (
@@ -160,6 +161,7 @@ function DriverFinancialInfo() {
                     </button>
                 </div>
             </form>
+        </div>
         </div>
     );
 }

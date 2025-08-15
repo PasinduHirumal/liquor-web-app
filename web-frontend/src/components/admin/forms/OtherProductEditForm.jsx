@@ -213,14 +213,14 @@ const OtherProductEditForm = () => {
 
     if (loading) {
         return (
-            <Container className="d-flex justify-content-center align-items-center" style={{ height: "50vh" }}>
+            <div className="d-flex justify-content-center align-items-center bg-white" style={{ height: "50vh" }}>
                 <Spinner animation="border" variant="primary" />
-            </Container>
+            </div>
         );
     }
 
     return (
-        <Container className="py-4">
+        <div className="py-4 px-md-5 px-3 bg-white">
             <Card className="shadow-sm">
                 <Card.Header className="bg-primary text-white">
                     <h2 className="mb-0">Edit Product</h2>
@@ -573,7 +573,7 @@ const OtherProductEditForm = () => {
                     </Form>
                 </Card.Body>
             </Card>
-        </Container>
+        </div>
     );
 };
 

@@ -71,9 +71,9 @@ const OtherProductList = () => {
     };
 
     return (
-        <div className="container-fluid py-4">
+        <div className="container-fluid py-4" style={{ backgroundColor: "#010524ff" }}>
             <div className="d-flex justify-content-between align-items-center mb-3">
-                <h2 className="mb-0">Manage Grocery Items</h2>
+                <h2 className="mb-0 text-white">Manage Grocery Items</h2>
                 <Button variant="primary" onClick={() => setShowCreateModal(true)}>
                     Create Product
                 </Button>
@@ -85,8 +85,8 @@ const OtherProductList = () => {
                 onProductCreated={handleProductCreated}
             />
 
-            <div className="bg-light p-3 rounded mb-4">
-                <Row className="align-items-center mb-3">
+            <div className="p-3 rounded mb-4 border" style={{ backgroundColor: "#010524ff" }}>
+                <Row className="align-items-center mb-3 text-white">
                     <Col md={3} className="mb-3">
                         <Form.Group controlId="is_active">
                             <Form.Label>Active Status</Form.Label>
@@ -176,7 +176,7 @@ const OtherProductList = () => {
             </div>
 
             {loading ? (
-                <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
+                <div className="d-flex justify-content-center align-items-center text-white" style={{ minHeight: "60vh" }}>
                     <div className="spinner-border" role="status" />
                 </div>
             ) : error ? (

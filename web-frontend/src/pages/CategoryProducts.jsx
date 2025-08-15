@@ -16,18 +16,18 @@ const CategoryProducts = () => {
     const [errorCategory, setErrorCategory] = useState(null);
     const [errorProducts, setErrorProducts] = useState(null);
 
-    const filters = {
-        is_active: true,
-        is_in_stock: true,
-    };
-
     useEffect(() => {
         const fetchCategory = async () => {
             try {
                 setLoadingCategory(true);
-                const res = await axiosInstance.get(`/categories/getCategoryById/${id}`);
+                const res = await axiosInstance.get("/categories/getAll", {
+                    params: { is_active: true, is_liquor: true }
+                });
+
                 if (res.data?.success) {
-                    setCategory(res.data.data);
+                    const cat = res.data.data.find(c => c.category_id === id);
+                    if (cat) setCategory(cat);
+                    else setErrorCategory("Category not found");
                 } else {
                     setErrorCategory("Failed to load category details.");
                 }
@@ -39,20 +39,21 @@ const CategoryProducts = () => {
             }
         };
 
-        // Fetch products for this category
         const fetchProducts = async () => {
             try {
                 setLoadingProducts(true);
                 const res = await axiosInstance.get(`/products/getAll`, {
                     params: { category_id: id }
                 });
-                if (res.data?.success) {
-                    const filtered = (res.data.data || []).filter(
-                        (p) => p.is_active === filters.is_active && p.is_in_stock === filters.is_in_stock
+
+                if (res.data?.success && res.data.data) {
+                    const filtered = res.data.data.filter(
+                        (p) => p.is_active === true && p.is_in_stock === true
                     );
                     setProducts(filtered);
+
                     if (filtered.length === 0) {
-                        setErrorProducts("No products found for this category.");
+                        setErrorProducts("No active products in stock for this category.");
                     }
                 } else {
                     setProducts([]);
@@ -70,7 +71,7 @@ const CategoryProducts = () => {
         fetchProducts();
     }, [id]);
 
-    // Show loading spinner until both category and products are loaded
+    // Loading state
     if (loadingCategory || loadingProducts) {
         return (
             <div className="text-center" style={{ backgroundColor: "#010524ff", minHeight: "100vh", paddingTop: "20vh" }}>
@@ -82,7 +83,7 @@ const CategoryProducts = () => {
         );
     }
 
-    // If category itself failed to load, show error
+    // Category fetch error
     if (errorCategory) {
         return (
             <div className="pt-5 text-center text-danger" style={{ backgroundColor: "#010524ff", minHeight: "100vh", paddingTop: "20vh" }}>
@@ -136,7 +137,7 @@ const CategoryProducts = () => {
                     ) : (
                         <div className="col-12">
                             <div className="alert alert-info" role="alert">
-                                No products match the current filters.
+                                No products found for this category.
                             </div>
                         </div>
                     )}

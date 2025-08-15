@@ -8,6 +8,7 @@ import { Menu as MenuIcon, Close as CloseIcon, Logout as LogoutIcon, ExpandMore,
 import Badge from "@mui/material/Badge";
 import useAdminAuthStore from "../../stores/adminAuthStore";
 import { getPendingOrdersCount } from "../../lib/orderApi";
+import ConfirmLogoutDialog from "../../common/ConfirmLogoutDialog";
 
 const StyledNavLink = styled(NavLink)(({ theme }) => ({
     color: theme.palette.common.white,
@@ -16,11 +17,11 @@ const StyledNavLink = styled(NavLink)(({ theme }) => ({
     borderRadius: theme.shape.borderRadius,
     transition: "background-color 0.3s ease",
     "&.active": {
-        backgroundColor: "#333",
+        backgroundColor: "#490101ff",
         fontWeight: "bold",
     },
     "&:hover": {
-        backgroundColor: "#444",
+        backgroundColor: "#5f0404ff",
     },
 }));
 
@@ -31,7 +32,7 @@ const AdminNavbar = () => {
     const isSuperAdmin = user?.role === 'super_admin' || user?.roles?.includes('super_admin');
 
     const theme = useTheme();
-    const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+    const isMobile = useMediaQuery("(max-width:1150px)");
 
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [manageDropDownOpen, setManageDropDownOpen] = useState(false);
@@ -83,6 +84,14 @@ const AdminNavbar = () => {
     }, []);
 
     const handleLogout = async () => {
+        const confirmed = await ConfirmLogoutDialog({
+            title: "Confirm Logout",
+            html: "Are you sure you want to log out?",
+            icon: "warning"
+        });
+
+        if (!confirmed) return;
+
         await logout();
         navigate("/");
         setMobileMenuOpen(false);
@@ -96,7 +105,7 @@ const AdminNavbar = () => {
 
     return (
         <>
-            <AppBar position="fixed" elevation={4} sx={{ backgroundColor: "#121212" }}>
+            <AppBar position="fixed" elevation={4} sx={{ backgroundColor: "#a30000ff" }}>
                 <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2 } }}>
                     {/* Brand */}
                     <Box
@@ -116,7 +125,7 @@ const AdminNavbar = () => {
                     </Box>
 
                     {/* Desktop Navigation */}
-                    <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
+                    <Box sx={{ display: isMobile ? "none" : "flex", alignItems: "center" }}>
                         <StyledNavLink to="/admin" onClick={closeMobileMenu}>
                             Home
                         </StyledNavLink>
@@ -129,9 +138,9 @@ const AdminNavbar = () => {
                                     color: "white",
                                     textTransform: "none",
                                     fontWeight: manageDropDownOpen ? "bold" : "normal",
-                                    bgcolor: manageDropDownOpen ? "#333" : "transparent",
+                                    bgcolor: manageDropDownOpen ? "#490101ff" : "transparent",
                                     "&:hover": {
-                                        bgcolor: "#444",
+                                        bgcolor: "#5f0404ff",
                                     },
                                 }}
                                 endIcon={manageDropDownOpen ? <ExpandLess /> : <ExpandMore />}
@@ -145,7 +154,7 @@ const AdminNavbar = () => {
                                         position: "absolute",
                                         top: "100%",
                                         left: 0,
-                                        bgcolor: "#1e1e1e",
+                                        bgcolor: "#8b0505ff",
                                         borderRadius: 1,
                                         boxShadow: theme.shadows[5],
                                         zIndex: theme.zIndex.tooltip,
@@ -235,6 +244,17 @@ const AdminNavbar = () => {
                                     >
                                         Category
                                     </StyledNavLink>
+
+                                    <StyledNavLink
+                                        to="/manage-banner"
+                                        onClick={() => {
+                                            closeMobileMenu();
+                                            setManageDropDownOpen(false);
+                                        }}
+                                        style={{ display: "block", padding: "8px 16px" }}
+                                    >
+                                        Banner
+                                    </StyledNavLink>
                                 </Box>
                             )}
                         </Box>
@@ -243,7 +263,7 @@ const AdminNavbar = () => {
                             <Badge
                                 badgeContent={pendingCount}
                                 color="error"
-                                sx={{ "& .MuiBadge-badge": { right: -10, top: 6 } }}
+                                sx={{ "& .MuiBadge-badge": { right: -10, top: 6, color: "#000000ff", bgcolor: "#fffb00ff" } }}
                             >
                                 <Box component="span" sx={{ pr: 1 }}>
                                     Orders
@@ -257,7 +277,7 @@ const AdminNavbar = () => {
                         >
                             System Detail
                         </StyledNavLink>
-                        
+
                         {isSuperAdmin && (
                             <StyledNavLink
                                 to={`/download-reports`}
@@ -311,7 +331,7 @@ const AdminNavbar = () => {
                                 right: 0,
                                 width: "75vw",
                                 maxWidth: 300,
-                                bgcolor: "#1e1e1e",
+                                bgcolor: "#7e0303ff",
                                 zIndex: theme.zIndex.drawer + 1,
                                 p: 3,
                                 display: "flex",

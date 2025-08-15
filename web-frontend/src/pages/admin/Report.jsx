@@ -21,7 +21,7 @@ const Report = () => {
 
     return (
         <>
-            <div className="d-flex flex-column align-items-center justify-content-center">
+            <div className="d-flex flex-column align-items-center justify-content-center bg-white">
                 <div className="card border-0 p-4" style={{ minWidth: '350px', width: '100%' }}>
                     <div className="btn-group w-100 gap-1 mb-4" role="group" aria-label="Login Toggle">
                         <button

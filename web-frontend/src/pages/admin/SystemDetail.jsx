@@ -105,7 +105,7 @@ const SystemDetail = () => {
     ];
 
     return (
-        <div className="container-fluid mt-3">
+        <div className="container-fluid pt-3 bg-white">
             <Card
                 title={
                     <Row justify="space-between" align="middle">

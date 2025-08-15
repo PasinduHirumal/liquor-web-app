@@ -59,7 +59,7 @@ const AdminProfile = () => {
 
     if (loading) {
         return (
-            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
+            <div className="d-flex justify-content-center align-items-center bg-white" style={{ minHeight: "60vh" }}>
                 <div className="spinner-border text-primary" role="status">
                     <span className="visually-hidden">Loading...</span>
                 </div>
@@ -70,7 +70,7 @@ const AdminProfile = () => {
 
     if (error) {
         return (
-            <div className="container mt-5">
+            <div className="container pt-5 bg-white">
                 <div className="alert alert-danger text-center">
                     {error}
                     <button
@@ -86,7 +86,7 @@ const AdminProfile = () => {
 
     if (!admin) {
         return (
-            <div className="container mt-5">
+            <div className="container pt-5 bg-white">
                 <div className="alert alert-warning text-center">
                     Admin not found
                 </div>
@@ -95,10 +95,10 @@ const AdminProfile = () => {
     }
 
     return (
-        <div className="container-fluid py-4">
+        <div className="container-fluid py-4 bg-white">
             <div className="row justify-content-center">
                 <div className="col-md-10 col-lg-8">
-                    <div className="card shadow-sm border-0 rounded-3">
+                    <div className="card shadow-sm border rounded-3">
                         <div className="card-header bg-dark text-white rounded-top-3 py-3">
                             <h3 className="mb-0 text-center">Admin Profile</h3>
                         </div>

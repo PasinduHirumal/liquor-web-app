@@ -164,11 +164,11 @@ function DriverLocationInfo() {
 
 
     if (loading) {
-        return <div className="text-center py-8 mt-5">Loading driver data...</div>;
+        return <div className="text-center py-5 bg-white">Loading driver data...</div>;
     }
 
     return (
-        <div className="driver-location-delivery-form">
+        <div className="driver-location-delivery-form ">
             <h1 className="section-title">Driver Location & Delivery Information</h1>
 
             <form onSubmit={handleSubmit} className="driver-form">

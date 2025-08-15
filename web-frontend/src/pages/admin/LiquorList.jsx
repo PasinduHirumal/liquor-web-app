@@ -96,9 +96,9 @@ const LiquorList = () => {
     };
 
     return (
-        <div className="container-fluid py-4">
+        <div className="container-fluid py-4" style={{ backgroundColor: "#010524ff" }}>
             <div className="d-flex justify-content-between align-items-center mb-4 flex-wrap gap-2">
-                <h2>Manage Liquors</h2>
+                <h2 className="text-white">Manage Liquors</h2>
                 <div>
                     <Button
                         variant="secondary"
@@ -120,7 +120,7 @@ const LiquorList = () => {
             </div>
 
             {/* Filters */}
-            <div className="card mb-4">
+            <div className="card mb-4 border-secondary text-white" style={{ backgroundColor: "#010524ff" }}>
                 <div className="card-body">
                     <h5 className="card-title mb-3">Filters</h5>
                     <Form>
@@ -198,7 +198,7 @@ const LiquorList = () => {
 
             {/* Loading */}
             {loading && (
-                <div className="d-flex justify-content-center align-items-center" style={{ minHeight: "60vh" }}>
+                <div className="d-flex justify-content-center align-items-center text-white" style={{ minHeight: "60vh" }}>
                     <div className="spinner-border" role="status" />
                 </div>
             )}
