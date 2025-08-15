@@ -104,7 +104,7 @@ export const adminRoutes = [
         ),
     },
     {
-        path: "/super-market",
+        path: "/supermarket",
         element: (
             <AdminProtectedRoute>
                 <SuperMarket />

@@ -319,13 +319,13 @@ const AdminNavbar = () => {
                                     Warehouse
                                 </DesktopDropdownLink>
                                 <DesktopDropdownLink
-                                    to="/super-market"
+                                    to="/supermarket"
                                     onClick={() => {
                                         closeMobileMenu();
                                         setStoreDropDownOpen(false);
                                     }}
                                 >
-                                    Super Market
+                                    Supermarket
                                 </DesktopDropdownLink>
                             </DesktopDropdownMenu>
                         </Box>
@@ -508,11 +508,11 @@ const AdminNavbar = () => {
                                             Warehouse
                                         </StyledNavLink>
                                         <StyledNavLink
-                                            to="/super-market"
+                                            to="/supermarket"
                                             onClick={closeMobileMenu}
                                             sx={{ display: "block", mb: 1 }}
                                         >
-                                            Super Market
+                                            Supermarket
                                         </StyledNavLink>
                                     </Box>
                                 </Collapse>
