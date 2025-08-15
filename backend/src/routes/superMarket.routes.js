@@ -1,8 +1,8 @@
 import express from 'express';
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import { authenticateUser, authorizeRoles } from '../middleware/authMiddleware.js';
-import { createMarket, getAllMarkets, getMarketById } from '../controller/superMarket.controller.js';
-import { validateSuperMarket } from '../validations/SuperMarketValidator.js';
+import { createMarket, getAllMarkets, getMarketById, updateMarketById } from '../controller/superMarket.controller.js';
+import { validateSuperMarket, validateSuperMarketUpdate } from '../validations/SuperMarketValidator.js';
 
 const router = express.Router();
 
@@ -11,8 +11,9 @@ const super_admin = ADMIN_ROLES.SUPER_ADMIN;
 
 // http://localhost:5000/api/superMarket
 
-router.post('/create', authenticateUser, authorizeRoles(super_admin), validateSuperMarket, createMarket);
+router.post('/create', authenticateUser, authorizeRoles(admin, super_admin), validateSuperMarket, createMarket);
 router.get('/getAll', authenticateUser, authorizeRoles(admin, super_admin), getAllMarkets);
 router.get('/getById/:id', authenticateUser, authorizeRoles(admin, super_admin), getMarketById);
+router.patch('/update/:id', authenticateUser, authorizeRoles(admin, super_admin), validateSuperMarketUpdate, updateMarketById);
 
 export default router;

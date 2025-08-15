@@ -1,4 +1,5 @@
 import SuperMarketService from "../services/superMarket.service.js";
+import ADMIN_ROLES from "../enums/adminRoles.js";
 
 const marketService = new SuperMarketService();
 
@@ -79,19 +80,39 @@ const getAllMarkets = async (req, res) => {
             data: sortedMarkets 
         });
     } catch (error) {
-        console.error("Method_name error:", error.message);
+        console.error("Get all supermarkets error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
 
 const updateMarketById = async (req, res) => {
 	try {
-        return res.status(400).json({ success: false, message: ""});
-        return res.status(200).json({ success: true, message: ""});
+        const superMarketId = req.params.id;
+        const { isActive } = req.body;
+        const user_role = req.user? req.user.role : null;
+
+        const superMarket = await marketService.findById(superMarketId);
+        if (!superMarket) {
+            return res.status(404).json({ success: false, message: "Super Market not found"});
+        }
+
+        const is_SuperAdmin = ADMIN_ROLES.SUPER_ADMIN;
+        if (isActive !== undefined && user_role !== is_SuperAdmin) {
+            return res.status(403).json({ message: "Access Forbidden" });
+        }
+
+        const updateData = { ...req.body };
+
+        const updatedMarket = await marketService.updateById(superMarketId, updateData);
+        if (!updatedMarket) {
+            return res.status(500).json({ success: false, message: "Server Error" });
+        }
+        
+        return res.status(200).json({ success: true, message: "Super market updated successfully", data: updatedMarket });
     } catch (error) {
         console.error("Method_name error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
 
-export { createMarket, getMarketById, getAllMarkets};
+export { createMarket, getMarketById, getAllMarkets, updateMarketById};
