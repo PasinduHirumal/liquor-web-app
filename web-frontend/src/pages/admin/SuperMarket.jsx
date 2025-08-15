@@ -140,7 +140,7 @@ function SuperMarket() {
     return (
         <div className="bg-white p-4">
             <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="fw-bold mb-0">Super Market Management</h2>
+                <h2 className="fw-bold mb-0">Supermarket Management</h2>
                 <div style={{ display: 'flex', gap: '10px' }}>
                     <Input
                         placeholder="Search by name or address"
