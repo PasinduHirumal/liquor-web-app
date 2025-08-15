@@ -1,8 +1,5 @@
 import { EMAIL_VERIFY_TEMPLATE, PASSWORD_RESET_TEMPLATE } from '../templates/emailTemplates.js';
 import transporter from '../config/nodemailer.js';
-import dotenv from 'dotenv';
-
-dotenv.config();
 
 const sendOtp = async (mailData, mailAction) => {
     const mailOptions = {};

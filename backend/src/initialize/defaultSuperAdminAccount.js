@@ -1,8 +1,6 @@
-import dotenv from 'dotenv';
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import AdminUserService from '../services/adminUsers.service.js';
 
-dotenv.config();
 const adminService = new AdminUserService();
 
 const createDefaultSuperAdmin = async () => {
