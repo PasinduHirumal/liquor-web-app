@@ -1,8 +1,26 @@
 import admin from 'firebase-admin';
 import dotenv from 'dotenv';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
+dotenv.config({ path: path.join(__dirname, '../../.env') });
+
+const requiredVars = [
+  'FIREBASE_PROJECT_ID',
+  'FIREBASE_CLIENT_EMAIL',
+  'FIREBASE_PRIVATE_KEY',
+  //'FIREBASE_DATABASE_URL',
+  'FIREBASE_STORAGE_BUCKET'
+];
+
+for (const key of requiredVars) {
+  if (!process.env[key]) {
+    throw new Error(`Missing environment variable: ${key}`);
+  }
+}
 
 const initializeFirebase = () => {
   try {
