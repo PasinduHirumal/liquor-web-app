@@ -1,6 +1,5 @@
-// components/admin/forms/EditSuperMarketModal.jsx
 import React, { useEffect, useState } from "react";
-import { Modal, Form, Input, Switch, Button, message } from "antd";
+import { Modal, Form, Input, Switch, Button, message, Space } from "antd";
 import { axiosInstance } from "../../../lib/axios";
 
 function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
@@ -47,6 +46,7 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
             onCancel={onClose}
             footer={null}
             destroyOnClose
+            maskClosable={false}
         >
             <Form layout="vertical" form={form} onFinish={handleUpdate}>
                 <Form.Item
@@ -99,9 +99,14 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
                     <Switch />
                 </Form.Item>
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" loading={updating}>
-                        Update
-                    </Button>
+                    <Space>
+                        <Button type="primary" htmlType="submit" loading={updating}>
+                            Update
+                        </Button>
+                        <Button onClick={onClose}>
+                            Cancel
+                        </Button>
+                    </Space>
                 </Form.Item>
             </Form>
         </Modal>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Form, Input, Switch, Button, message } from "antd";
+import { Modal, Form, Input, Switch, Button, message, Space } from "antd";
 import { axiosInstance } from "../../../lib/axios";
 
 function CreateSuperMarketModal({ open, onClose, onSuccess }) {
@@ -94,9 +94,14 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
                     <Switch defaultChecked />
                 </Form.Item>
                 <Form.Item>
-                    <Button type="primary" htmlType="submit" loading={creating}>
-                        Create
-                    </Button>
+                    <Space>
+                        <Button type="primary" htmlType="submit" loading={creating}>
+                            Create
+                        </Button>
+                        <Button onClick={handleCancel}>
+                            Cancel
+                        </Button>
+                    </Space>
                 </Form.Item>
             </Form>
         </Modal>
