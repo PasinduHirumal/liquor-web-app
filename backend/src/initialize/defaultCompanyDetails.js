@@ -11,7 +11,7 @@ const createDefaultCompanyDetails = async () => {
             const code = 1; // Fixed: Use decimal 1 instead of octal 000001
             const companyData = { 
                 where_house_code: `B-${code.toString().padStart(6, '0')}`, // Pad with zeros to get "B-000001"
-                where_house_name: "where_house_0",
+                where_house_name: "Main Warehouse",
                 where_house_location: {
                     lat: null,
                     lng: null
