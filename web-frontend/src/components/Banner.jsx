@@ -28,7 +28,7 @@ const BannerCarousel = () => {
     fetchBanners();
   }, []);
 
-  // Auto-slide every 5 seconds
+  // Auto-slide every 7 seconds
   useEffect(() => {
     if (banners.length === 0) return;
 
@@ -46,11 +46,22 @@ const BannerCarousel = () => {
   const currentBanner = banners[currentIndex];
 
   return (
-    <div style={{ width: "100%", position: "relative", overflow: "hidden" }}>
+    <div
+      style={{
+        width: "100%",
+        height: "450px",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
       <img
         src={currentBanner.image}
         alt={currentBanner.title}
-        style={{ width: "100%", height: "auto", objectFit: "cover" }}
+        style={{
+          width: "100%",
+          height: "100%",
+          objectFit: "cover",
+        }}
       />
 
       {/* Overlay text */}
@@ -65,18 +76,19 @@ const BannerCarousel = () => {
           backgroundColor: "rgba(0,0,0,0.4)",
           padding: "1rem 2rem",
           borderRadius: "8px",
+          maxWidth: "80%",
         }}
       >
-        <h1 style={{ fontSize: "2.5rem", fontWeight: "bold" }}>
+        <h1 style={{ fontSize: "2rem", fontWeight: "bold" }}>
           {currentBanner.title}
         </h1>
-        <p style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>
+        <p style={{ fontSize: "1rem", marginBottom: "1rem" }}>
           {currentBanner.description}
         </p>
         <button
           style={{
-            padding: "0.7rem 1.5rem",
-            fontSize: "1rem",
+            padding: "0.5rem 1rem",
+            fontSize: "0.9rem",
             backgroundColor: "#fff",
             color: "#000",
             border: "none",
@@ -92,9 +104,7 @@ const BannerCarousel = () => {
       {/* Navigation buttons */}
       <button
         onClick={() =>
-          setCurrentIndex(
-            (currentIndex - 1 + banners.length) % banners.length
-          )
+          setCurrentIndex((currentIndex - 1 + banners.length) % banners.length)
         }
         style={{
           position: "absolute",
