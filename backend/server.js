@@ -17,6 +17,7 @@ import cookieParser from "cookie-parser";
 import initializeFirebase from "./src/config/firebase.config.js";
 import { initializeDefaultSuperAdmin } from "./src/initialize/defaultSuperAdminAccount.js";
 import { initializeDefaultCompanyDetails } from "./src/initialize/defaultCompanyDetails.js";
+import { initializeDefaultAppInfo } from "./src/initialize/defaultAppInfo.js";
 
 import authRoutes from "./src/routes/auth.routes.js";
 import verifyRoutes from "./src/routes/verify.routes.js";
@@ -36,6 +37,7 @@ import bannerRoutes from "./src/routes/banner.routes.js";
 import superMarketRoutes from "./src/routes/superMarket.routes.js";
 
 
+
 // connect DB
 initializeFirebase();
 
@@ -43,6 +45,7 @@ const initializeDefaults = async () => {
   try {
     await initializeDefaultSuperAdmin();
     await initializeDefaultCompanyDetails();
+    await initializeDefaultAppInfo();
     console.log('✅ Server initialization completed.....\n');
   } catch (error) {
     console.error('❌ Server initialization failed:', error);
