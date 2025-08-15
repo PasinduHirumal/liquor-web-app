@@ -4,6 +4,7 @@ import { axiosInstance } from "../../../lib/axios";
 
 function CreateSuperMarketModal({ open, onClose, onSuccess }) {
     const [creating, setCreating] = useState(false);
+    const [form] = Form.useForm();
 
     const handleCreate = async (values) => {
         try {
@@ -11,6 +12,7 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
             const res = await axiosInstance.post("/superMarket/create", values);
             if (res.data?.success) {
                 message.success("Supermarket created successfully");
+                form.resetFields();
                 onClose();
                 onSuccess();
             } else {
@@ -24,14 +26,24 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
         }
     };
 
+    const handleCancel = () => {
+        form.resetFields();
+        onClose();
+    };
+
     return (
         <Modal
             title="Create Supermarket"
             open={open}
-            onCancel={onClose}
+            onCancel={handleCancel}
             footer={null}
+            maskClosable={false}
         >
-            <Form layout="vertical" onFinish={handleCreate}>
+            <Form
+                layout="vertical"
+                form={form}
+                onFinish={handleCreate}
+            >
                 <Form.Item
                     label="Name"
                     name="superMarket_Name"
