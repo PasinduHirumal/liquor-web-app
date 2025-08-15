@@ -310,7 +310,7 @@ const AdminNavbar = () => {
 
                             <DesktopDropdownMenu open={storeDropDownOpen}>
                                 <DesktopDropdownLink
-                                    to="/syetem-detail"
+                                    to="/wharehouse"
                                     onClick={() => {
                                         closeMobileMenu();
                                         setStoreDropDownOpen(false);
@@ -319,7 +319,7 @@ const AdminNavbar = () => {
                                     Warehouse
                                 </DesktopDropdownLink>
                                 <DesktopDropdownLink
-                                    to="/syetem-detail"
+                                    to="/super-market"
                                     onClick={() => {
                                         closeMobileMenu();
                                         setStoreDropDownOpen(false);
@@ -501,14 +501,14 @@ const AdminNavbar = () => {
                                 <Collapse in={storeDropDownOpen} timeout="auto" unmountOnExit>
                                     <Box sx={{ pl: 2 }}>
                                         <StyledNavLink
-                                            to="/syetem-detail"
+                                            to="/wharehouse"
                                             onClick={closeMobileMenu}
                                             sx={{ display: "block", mb: 1 }}
                                         >
                                             Warehouse
                                         </StyledNavLink>
                                         <StyledNavLink
-                                            to="/syetem-detail"
+                                            to="/super-market"
                                             onClick={closeMobileMenu}
                                             sx={{ display: "block", mb: 1 }}
                                         >

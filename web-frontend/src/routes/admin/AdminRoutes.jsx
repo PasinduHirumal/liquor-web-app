@@ -26,6 +26,7 @@ import OrderDetail from "../../pages/admin/detailPages/OrderDetail";
 import SystemDetail from "../../pages/admin/SystemDetail";
 import Report from "../../pages/admin/Report";
 import ManageBanner from "../../pages/admin/ManageBanner";
+import SuperMarket from "../../pages/admin/SuperMarket";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -95,10 +96,18 @@ export const adminRoutes = [
         ),
     },
     {
-        path: "/syetem-detail",
+        path: "/wharehouse",
         element: (
             <AdminProtectedRoute>
                 <SystemDetail />
+            </AdminProtectedRoute>
+        ),
+    },
+    {
+        path: "/super-market",
+        element: (
+            <AdminProtectedRoute>
+                <SuperMarket />
             </AdminProtectedRoute>
         ),
     },
