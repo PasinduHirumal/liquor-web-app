@@ -132,13 +132,6 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                             <Form.Item
                                 name="where_house_name"
                                 label="Warehouse Name"
-                                rules={[
-                                    { required: true, message: "Please input warehouse name!" },
-                                    {
-                                        pattern: /^where_house_\d+$/,
-                                        message: "Format must be 'where_house_' followed by a number"
-                                    }
-                                ]}
                             >
                                 <Input placeholder="where_house_1" />
                             </Form.Item>
@@ -153,7 +146,10 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                                     min={0.01}
                                     step={0.01}
                                     style={{ width: "100%" }}
-                                    formatter={value => `Rs: ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                    formatter={value =>
+                                        value ? `Rs: ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""
+                                    }
+                                    parser={value => value.replace(/Rs:\s?|(,*)/g, "")}
                                 />
                             </Form.Item>
                         </Col>
@@ -215,7 +211,10 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                                     min={0}
                                     step={0.01}
                                     style={{ width: "100%" }}
-                                    formatter={value => `Rs: ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+                                    formatter={value =>
+                                        value ? `Rs: ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""
+                                    }
+                                    parser={value => value.replace(/Rs:\s?|(,*)/g, "")}
                                 />
                             </Form.Item>
                         </Col>
