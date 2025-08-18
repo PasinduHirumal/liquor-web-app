@@ -18,7 +18,7 @@ const validateProduct = (req, res, next) => {
     images: requiredImageSchema,
 
     // Pricing
-    product_from: Joi.string().min(1).max(200).default("Where House"),
+    superMarket_id: Joi.string().min(1).max(200).default(null),
     cost_price: Joi.number().positive().required(),
     marked_price: Joi.number().positive().required(),
     selling_price: Joi.number().positive().optional(),
@@ -157,7 +157,7 @@ const validatePriceOperation = (req, res, next) => {
 
   const schema = Joi.object({
     // Pricing
-    product_from: Joi.string().min(1).max(200).optional(),
+    superMarket_id: Joi.string().min(1).max(200).optional(),
     cost_price: Joi.number().positive().optional(),
     marked_price: Joi.number().positive().optional(),
     discount_percentage: Joi.number().min(0).max(100).optional(),
