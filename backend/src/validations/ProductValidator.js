@@ -39,14 +39,14 @@ const validateProduct = (req, res, next) => {
       wood_flavours: Joi.array().items(
         Joi.string().min(1).max(50)
       ).min(0).max(10).default([]),
-      sweetness_level: Joi.number().integer().min(1).max(10).default(null),
-      bitterness_level: Joi.number().integer().min(1).max(10).default(null),
-      smokiness_level: Joi.number().integer().min(1).max(10).default(null),
-      finish_type: Joi.string().valid(...finishTypes).default(null),
+      sweetness_level: Joi.number().integer().min(1).max(10).default(0),
+      bitterness_level: Joi.number().integer().min(1).max(10).default(0),
+      smokiness_level: Joi.number().integer().min(1).max(10).default(0),
+      finish_type: Joi.string().valid(...finishTypes).allow(null).default(null),
       finish_notes: Joi.array().items(
         Joi.string().min(1).max(50)
       ).min(0).max(5).default([]),
-      tasting_profile: Joi.string().valid(...tastingProfiles).default(null)
+      tasting_profile: Joi.string().valid(...tastingProfiles).allow(null).default(null)
     }).required(),
     main_image: requiredImageSchema,
     images: requiredImageSchema,
@@ -130,11 +130,11 @@ const validateProductUpdate = (req, res, next) => {
       sweetness_level: Joi.number().integer().min(1).max(10).optional(),
       bitterness_level: Joi.number().integer().min(1).max(10).optional(),
       smokiness_level: Joi.number().integer().min(1).max(10).optional(),
-      finish_type: Joi.string().valid(...finishTypes).optional(),
+      finish_type: Joi.string().valid(...finishTypes).allow(null).optional(),
       finish_notes: Joi.array().items(
         Joi.string().min(1).max(50)
       ).min(0).max(5).optional(),
-      tasting_profile: Joi.string().valid(...tastingProfiles).optional()
+      tasting_profile: Joi.string().valid(...tastingProfiles).allow(null).optional()
     }).optional(),
     main_image: optionalImageSchema,
     images: optionalImageSchema,
