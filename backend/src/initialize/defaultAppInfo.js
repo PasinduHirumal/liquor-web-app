@@ -1,3 +1,4 @@
+import APP_INFO from "../data/AppInfo.js";
 import AppInfoService from "../services/appInfo.service.js";
 
 const appInfoService = new AppInfoService();
@@ -5,14 +6,14 @@ const appInfoService = new AppInfoService();
 
 const createDefaultAppInfo = async () => {
     try {
-        const description = "Main App-Info"
-        const isExistingMainInfo = await appInfoService.findByDescription(description);
+        const AppRegNumber = APP_INFO.REG_NUMBER;
+        const isExistingMainInfo = await appInfoService.findByRegNumber(AppRegNumber);
 
         if (!isExistingMainInfo) {
             const appInfoData = { 
-                description: description,
-                app_version: "1.0",
-                is_liquor_show: true
+                description: APP_INFO.DESCRIPTION,
+                app_version: APP_INFO.APP_VERSION,
+                is_liquor_show: APP_INFO.IS_LIQUOR_SHOW
             };
 
             await appInfoService.create(appInfoData);

@@ -406,6 +406,9 @@ const updateActiveToggle = async (req, res) => {
             });
         }
 
+        // Update App-Info data
+        
+
         const updatedProducts = await productService.findByFilter('is_liquor', '==', true);
         
         return res.status(200).json({ 

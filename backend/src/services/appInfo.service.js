@@ -9,9 +9,9 @@ class AppInfoService extends BaseService {
         })
     }
 
-    async findByDescription(description) {
+    async findByRegNumber(reg_number) {
         try {
-            const docs = await this.findByFilter('description', '==', description);
+            const docs = await this.findByFilter('reg_number', '==', reg_number);
             
             if (docs.length === 0){
                 return null;
