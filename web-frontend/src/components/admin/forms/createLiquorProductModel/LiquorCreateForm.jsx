@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { Form, Button, Spinner, Card } from "react-bootstrap";
 import { toast } from "react-hot-toast";
 import { Formik } from "formik";
-import * as Yup from "yup";
 import { axiosInstance } from "../../../../lib/axios";
 
 import ProductNameBrandFields from "./ProductNameBrandFields";
@@ -11,6 +10,8 @@ import CategoryAndVolumeFields from "./CategoryAndVolumeFields";
 import ProductSourceAndPricingFields from "./ProductSourceAndPricingFields";
 import StockAndStatusFields from "./StockAndStatusFields";
 import ProductImagesUploader from "./ProductImagesUploader";
+import ProductCountryField from "./ProductCountryField";
+import ProductFlavourFields from "./ProductFlavourFields";
 
 const LiquorCreateForm = ({ onSuccess, onCancel }) => {
     const [categories, setCategories] = useState([]);
@@ -24,7 +25,6 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                 const res = await axiosInstance.get('/categories/getAll');
                 const liquorCategories = (res.data.data || []).filter(cat => cat.is_active && cat.is_liquor);
                 setCategories(liquorCategories);
-
             } catch (err) {
                 toast.error('Failed to fetch categories');
                 console.error('Category fetch error:', err);
@@ -125,6 +125,15 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                         alcohol_content: "",
                         volume: "",
                         superMarket_id: "",
+                        country: "",
+                        flavour_profile: {
+                            primary_flavour: "",
+                            notes: "",
+                            sweetness: 0,
+                            bitterness: 0,
+                            smokiness: 0,
+                            finish: "",
+                        },
                         cost_price: "",
                         marked_price: "",
                         discount_percentage: "",
@@ -139,6 +148,8 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                             <ProductNameBrandFields {...{ values, errors, touched, handleChange, handleBlur, loading }} />
                             <ProductDescriptionField {...{ values, errors, touched, handleChange, handleBlur, loading }} />
                             <CategoryAndVolumeFields {...{ categories, values, errors, touched, handleChange, handleBlur, loading }} />
+                            <ProductCountryField {...{ values, errors, touched, handleChange, handleBlur, loading }} />
+                            <ProductFlavourFields {...{ values, errors, touched, handleChange, handleBlur, setFieldValue, loading }} />
                             <ProductSourceAndPricingFields {...{ values, errors, touched, handleChange, handleBlur, loading }} />
                             <StockAndStatusFields {...{ values, errors, touched, handleChange, handleBlur, setFieldValue, loading }} />
                             <ProductImagesUploader {...{ images, mainImage, handleImageChange, removeImage, setMainImage, touched, loading }} />
