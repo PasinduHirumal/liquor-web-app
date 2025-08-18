@@ -9,7 +9,7 @@ import { Navigate, useLocation } from "react-router-dom";
 import DriverList from "../../pages/admin/DriverList";
 import PublicHome from "../PublicHome";
 import LiquorProductDetail from "../../pages/admin/detailPages/LiquorProductDetail";
-import LiquorEditForm from "../../components/admin/forms/LiquorEditForm"
+import LiquorEditForm from "../../components/admin/forms/editLiquorProductModel/LiquorEditForm";
 import OtherProductList from "../../pages/admin/OtherProductList";
 import OtherProductDetail from "../../pages/admin/detailPages/OtherProductDetail";
 import OtherProductEditForm from "../../components/admin/forms/editOtherProductModel/OtherProductEditForm";

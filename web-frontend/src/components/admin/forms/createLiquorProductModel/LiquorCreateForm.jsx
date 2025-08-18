@@ -1,11 +1,16 @@
-import React, { useEffect, useState } from 'react';
-import { Form, Button, Spinner, Row, Col, Card, Alert } from 'react-bootstrap';
-import { toast } from 'react-hot-toast';
-import { FaTrash, FaUpload } from 'react-icons/fa';
-import { Formik } from 'formik';
-import * as Yup from 'yup';
-import { axiosInstance } from '../../../../lib/axios';
-import ImagePreview from "../../../../common/ImagePreview"
+import React, { useEffect, useState } from "react";
+import { Form, Button, Spinner, Card } from "react-bootstrap";
+import { toast } from "react-hot-toast";
+import { Formik } from "formik";
+import * as Yup from "yup";
+import { axiosInstance } from "../../../../lib/axios";
+
+import ProductNameBrandFields from "./ProductNameBrandFields";
+import ProductDescriptionField from "./ProductDescriptionField";
+import CategoryAndVolumeFields from "./CategoryAndVolumeFields";
+import ProductSourceAndPricingFields from "./ProductSourceAndPricingFields";
+import StockAndStatusFields from "./StockAndStatusFields";
+import ProductImagesUploader from "./ProductImagesUploader";
 
 // Validation schema
 const productSchema = Yup.object().shape({
@@ -142,361 +147,50 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
             <Card.Body>
                 <Formik
                     initialValues={{
-                        name: '',
-                        description: '',
-                        category_id: '',
-                        brand: '',
-                        alcohol_content: '',
-                        volume: '',
-                        superMarket_id: '',
-                        cost_price: '',
-                        marked_price: '',
-                        discount_percentage: '',
-                        stock_quantity: '',
+                        name: "",
+                        description: "",
+                        category_id: "",
+                        brand: "",
+                        alcohol_content: "",
+                        volume: "",
+                        superMarket_id: "",
+                        cost_price: "",
+                        marked_price: "",
+                        discount_percentage: "",
+                        stock_quantity: "",
                         is_active: true,
                         is_in_stock: true,
                     }}
                     validationSchema={productSchema}
                     onSubmit={handleSubmit}
                 >
-                    {({
-                        values,
-                        errors,
-                        touched,
-                        handleChange,
-                        handleBlur,
-                        handleSubmit,
-                        setFieldValue,
-                    }) => (
+                    {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
                         <Form onSubmit={handleSubmit}>
-                            <Row>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Product Name *</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="name"
-                                            value={values.name}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={touched.name && !!errors.name}
-                                            disabled={loading}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {errors.name}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Brand *</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="brand"
-                                            value={values.brand}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={touched.brand && !!errors.brand}
-                                            disabled={loading}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {errors.brand}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-
-                            <Form.Group className="mb-3">
-                                <Form.Label>Description *</Form.Label>
-                                <Form.Control
-                                    as="textarea"
-                                    rows={3}
-                                    name="description"
-                                    value={values.description}
-                                    onChange={handleChange}
-                                    onBlur={handleBlur}
-                                    isInvalid={touched.description && !!errors.description}
-                                    disabled={loading}
-                                />
-                                <Form.Control.Feedback type="invalid">
-                                    {errors.description}
-                                </Form.Control.Feedback>
-                            </Form.Group>
-
-                            <Row>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Category *</Form.Label>
-                                        <Form.Select
-                                            name="category_id"
-                                            value={values.category_id}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={touched.category_id && !!errors.category_id}
-                                            disabled={loading}
-                                        >
-                                            <option value="">Select a category</option>
-                                            {categories.map((cat) => (
-                                                <option key={cat.category_id} value={cat.category_id}>
-                                                    {cat.name}
-                                                </option>
-                                            ))}
-                                        </Form.Select>
-                                        <Form.Control.Feedback type="invalid">
-                                            {errors.category_id}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Col>
-                                <Col md={3}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Alcohol Content (%) *</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            name="alcohol_content"
-                                            value={values.alcohol_content}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            min="0"
-                                            max="100"
-                                            step="0.1"
-                                            isInvalid={touched.alcohol_content && !!errors.alcohol_content}
-                                            disabled={loading}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {errors.alcohol_content}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Col>
-                                <Col md={3}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Volume (ml) *</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            name="volume"
-                                            value={values.volume}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            min="1"
-                                            step="1"
-                                            isInvalid={touched.volume && !!errors.volume}
-                                            disabled={loading}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {errors.volume}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-
-                            <Row>
-                                <Col md={12}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Product Source (e.g., Keels, Food City) *</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="superMarket_id"
-                                            value={values.superMarket_id}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            isInvalid={touched.superMarket_id && !!errors.superMarket_id}
-                                            disabled={loading}
-                                            placeholder="Enter where the product is from"
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {errors.superMarket_id}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Col>
-                                <Col md={4}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Cost Price *</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            name="cost_price"
-                                            value={values.cost_price}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            min="0"
-                                            step="0.01"
-                                            isInvalid={touched.cost_price && !!errors.cost_price}
-                                            disabled={loading}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {errors.cost_price}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Col>
-                                <Col md={4}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Marked Price *</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            name="marked_price"
-                                            value={values.marked_price}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            min="0"
-                                            step="0.01"
-                                            isInvalid={touched.marked_price && !!errors.marked_price}
-                                            disabled={loading}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {errors.marked_price}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Col>
-                                <Col md={4}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Discount (%) *</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            name="discount_percentage"
-                                            value={values.discount_percentage}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            min="0"
-                                            max="100"
-                                            step="0.01"
-                                            isInvalid={touched.discount_percentage && !!errors.discount_percentage}
-                                            disabled={loading}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {errors.discount_percentage}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-
-                            <Row>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Stock Quantity *</Form.Label>
-                                        <Form.Control
-                                            type="number"
-                                            name="stock_quantity"
-                                            value={values.stock_quantity}
-                                            onChange={handleChange}
-                                            onBlur={handleBlur}
-                                            min="0"
-                                            step="1"
-                                            isInvalid={touched.stock_quantity && !!errors.stock_quantity}
-                                            disabled={loading}
-                                        />
-                                        <Form.Control.Feedback type="invalid">
-                                            {errors.stock_quantity}
-                                        </Form.Control.Feedback>
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-                            <Row>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3 d-flex align-items-end h-100">
-                                        <div className="d-flex gap-4">
-                                            <Form.Check
-                                                type="switch"
-                                                id="is_active"
-                                                label="Active"
-                                                name="is_active"
-                                                checked={values.is_active}
-                                                onChange={() => setFieldValue('is_active', !values.is_active)}
-                                                disabled={loading}
-                                            />
-                                            <Form.Check
-                                                type="switch"
-                                                id="is_in_stock"
-                                                label="In Stock"
-                                                name="is_in_stock"
-                                                checked={values.is_in_stock}
-                                                onChange={() => setFieldValue('is_in_stock', !values.is_in_stock)}
-                                                disabled={loading}
-                                            />
-                                        </div>
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-
-                            <Form.Group className="mb-3">
-                                <Form.Label>Product Images *</Form.Label>
-                                <div className="border rounded p-3 text-center">
-                                    <label htmlFor="product-images" className="btn btn-outline-primary">
-                                        <FaUpload className="me-2" />
-                                        {images.length > 0 ? 'Add More Images' : 'Upload Images'}
-                                        <input
-                                            id="product-images"
-                                            type="file"
-                                            name="images"
-                                            onChange={handleImageChange}
-                                            multiple
-                                            accept="image/*"
-                                            disabled={loading || images.length >= 5}
-                                            className="d-none"
-                                        />
-                                    </label>
-                                    <p className="small text-muted mt-2 mb-0">
-                                        Upload images
-                                    </p>
-                                    {images.length > 0 && (
-                                        <p className="small text-muted">
-                                            {images.length} image(s) selected
-                                        </p>
-                                    )}
-                                </div>
-                            </Form.Group>
-
-                            {images.length > 0 && (
-                                <div className="mb-4">
-                                    <Form.Label>Image Preview</Form.Label>
-                                    <div className="d-flex flex-wrap gap-3">
-                                        {images.map((img, index) => (
-                                            <div key={index} className="position-relative">
-                                                <ImagePreview
-                                                    src={img}
-                                                    onRemove={() => removeImage(index)}
-                                                />
-                                                <Form.Check
-                                                    type="radio"
-                                                    name="mainImage"
-                                                    label="Main"
-                                                    checked={mainImage === img}
-                                                    onChange={() => setMainImage(img)}
-                                                    className="position-absolute top-0 start-0 m-2 bg-white px-2 rounded"
-                                                />
-                                            </div>
-                                        ))}
-                                    </div>
-                                </div>
-                            )}
-
-                            {images.length === 0 && touched.category_id && (
-                                <Alert variant="warning" className="mb-4">
-                                    Please upload at least one product image
-                                </Alert>
-                            )}
+                            <ProductNameBrandFields {...{ values, errors, touched, handleChange, handleBlur, loading }} />
+                            <ProductDescriptionField {...{ values, errors, touched, handleChange, handleBlur, loading }} />
+                            <CategoryAndVolumeFields {...{ categories, values, errors, touched, handleChange, handleBlur, loading }} />
+                            <ProductSourceAndPricingFields {...{ values, errors, touched, handleChange, handleBlur, loading }} />
+                            <StockAndStatusFields {...{ values, errors, touched, handleChange, handleBlur, setFieldValue, loading }} />
+                            <ProductImagesUploader {...{ images, mainImage, handleImageChange, removeImage, setMainImage, touched, loading }} />
 
                             <div className="d-flex justify-content-end gap-3 mt-4">
                                 <Button
                                     variant="outline-secondary"
                                     onClick={() => {
                                         onCancel();
-                                        toast.info('Creation cancelled.');
+                                        toast.info("Creation cancelled.");
                                     }}
                                     disabled={loading}
                                 >
                                     Cancel
                                 </Button>
-                                <Button
-                                    variant="primary"
-                                    type="submit"
-                                    disabled={loading}
-                                    className="d-flex align-items-center gap-2"
-                                >
+                                <Button variant="primary" type="submit" disabled={loading} className="d-flex align-items-center gap-2">
                                     {loading ? (
                                         <>
-                                            <Spinner animation="border" size="sm" />
-                                            Creating...
+                                            <Spinner animation="border" size="sm" /> Creating...
                                         </>
                                     ) : (
-                                        'Create Product'
+                                        "Create Product"
                                     )}
                                 </Button>
                             </div>
