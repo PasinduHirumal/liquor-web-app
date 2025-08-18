@@ -12,35 +12,6 @@ import ProductSourceAndPricingFields from "./ProductSourceAndPricingFields";
 import StockAndStatusFields from "./StockAndStatusFields";
 import ProductImagesUploader from "./ProductImagesUploader";
 
-// Validation schema
-const productSchema = Yup.object().shape({
-    name: Yup.string().required('Product name is required'),
-    description: Yup.string().required('Description is required'),
-    category_id: Yup.string().required('Category is required'),
-    brand: Yup.string().required('Brand is required'),
-    alcohol_content: Yup.number()
-        .required('Alcohol content is required')
-        .min(0, 'Must be at least 0%')
-        .max(100, 'Cannot exceed 100%'),
-    volume: Yup.number()
-        .required('Volume is required')
-        .min(1, 'Must be at least 1ml'),
-    cost_price: Yup.number()
-        .required('Cost price is required')
-        .min(0, 'Cannot be negative'),
-    marked_price: Yup.number()
-        .required('Marked price is required')
-        .min(0, 'Cannot be negative'),
-    discount_percentage: Yup.number()
-        .required('Discount percentage is required')
-        .min(0, 'Cannot be negative')
-        .max(100, 'Cannot exceed 100%'),
-    stock_quantity: Yup.number()
-        .required('Stock quantity is required')
-        .min(0, 'Cannot be negative')
-        .integer('Must be a whole number'),
-});
-
 const LiquorCreateForm = ({ onSuccess, onCancel }) => {
     const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -161,7 +132,6 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                         is_active: true,
                         is_in_stock: true,
                     }}
-                    validationSchema={productSchema}
                     onSubmit={handleSubmit}
                 >
                     {({ values, errors, touched, handleChange, handleBlur, handleSubmit, setFieldValue }) => (
