@@ -4,14 +4,16 @@ import { Form, Col, Row } from "react-bootstrap";
 const ProductFlavourFields = ({ values, errors, touched, handleChange, handleBlur, setFieldValue, loading }) => (
     <>
         <h5 className="mt-3">Flavour Profile</h5>
+
+        {/* Primary flavour and notes */}
         <Row>
             <Col md={6}>
                 <Form.Group className="mb-3">
                     <Form.Label>Primary Flavour</Form.Label>
                     <Form.Control
                         type="text"
-                        name="flavour_profile.primary_flavour"
-                        value={values.flavour_profile.primary_flavour}
+                        name="flavour.primary_flavour"
+                        value={values.flavour.primary_flavour}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         disabled={loading}
@@ -20,11 +22,41 @@ const ProductFlavourFields = ({ values, errors, touched, handleChange, handleBlu
             </Col>
             <Col md={6}>
                 <Form.Group className="mb-3">
-                    <Form.Label>Notes</Form.Label>
+                    <Form.Label>Flavour Notes (comma separated)</Form.Label>
                     <Form.Control
                         type="text"
-                        name="flavour_profile.notes"
-                        value={values.flavour_profile.notes}
+                        name="flavour.flavour_notes"
+                        value={values.flavour.flavour_notes}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        disabled={loading}
+                    />
+                </Form.Group>
+            </Col>
+        </Row>
+
+        {/* Specific flavour categories */}
+        <Row>
+            <Col md={6}>
+                <Form.Group className="mb-3">
+                    <Form.Label>Fruit Flavours (comma separated)</Form.Label>
+                    <Form.Control
+                        type="text"
+                        name="flavour.fruit_flavours"
+                        value={values.flavour.fruit_flavours}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        disabled={loading}
+                    />
+                </Form.Group>
+            </Col>
+            <Col md={6}>
+                <Form.Group className="mb-3">
+                    <Form.Label>Spice Flavours (comma separated)</Form.Label>
+                    <Form.Control
+                        type="text"
+                        name="flavour.spice_flavours"
+                        value={values.flavour.spice_flavours}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         disabled={loading}
@@ -34,45 +66,26 @@ const ProductFlavourFields = ({ values, errors, touched, handleChange, handleBlu
         </Row>
 
         <Row>
-            <Col md={4}>
+            <Col md={6}>
                 <Form.Group className="mb-3">
-                    <Form.Label>Sweetness (0–10)</Form.Label>
+                    <Form.Label>Herbal Flavours (comma separated)</Form.Label>
                     <Form.Control
-                        type="number"
-                        name="flavour_profile.sweetness"
-                        min="0"
-                        max="10"
-                        value={values.flavour_profile.sweetness}
+                        type="text"
+                        name="flavour.herbal_flavours"
+                        value={values.flavour.herbal_flavours}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         disabled={loading}
                     />
                 </Form.Group>
             </Col>
-            <Col md={4}>
+            <Col md={6}>
                 <Form.Group className="mb-3">
-                    <Form.Label>Bitterness (0–10)</Form.Label>
+                    <Form.Label>Wood Flavours (comma separated)</Form.Label>
                     <Form.Control
-                        type="number"
-                        name="flavour_profile.bitterness"
-                        min="0"
-                        max="10"
-                        value={values.flavour_profile.bitterness}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        disabled={loading}
-                    />
-                </Form.Group>
-            </Col>
-            <Col md={4}>
-                <Form.Group className="mb-3">
-                    <Form.Label>Smokiness (0–10)</Form.Label>
-                    <Form.Control
-                        type="number"
-                        name="flavour_profile.smokiness"
-                        min="0"
-                        max="10"
-                        value={values.flavour_profile.smokiness}
+                        type="text"
+                        name="flavour.wood_flavours"
+                        value={values.flavour.wood_flavours}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         disabled={loading}
@@ -81,14 +94,94 @@ const ProductFlavourFields = ({ values, errors, touched, handleChange, handleBlu
             </Col>
         </Row>
 
+        {/* Intensity levels */}
+        <Row>
+            <Col md={4}>
+                <Form.Group className="mb-3">
+                    <Form.Label>Sweetness Level (0-10)</Form.Label>
+                    <Form.Control
+                        type="number"
+                        name="flavour.sweetness_level"
+                        min="0"
+                        max="10"
+                        value={values.flavour.sweetness_level}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        disabled={loading}
+                    />
+                </Form.Group>
+            </Col>
+            <Col md={4}>
+                <Form.Group className="mb-3">
+                    <Form.Label>Bitterness Level (0-10)</Form.Label>
+                    <Form.Control
+                        type="number"
+                        name="flavour.bitterness_level"
+                        min="0"
+                        max="10"
+                        value={values.flavour.bitterness_level}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        disabled={loading}
+                    />
+                </Form.Group>
+            </Col>
+            <Col md={4}>
+                <Form.Group className="mb-3">
+                    <Form.Label>Smokiness Level (0-10)</Form.Label>
+                    <Form.Control
+                        type="number"
+                        name="flavour.smokiness_level"
+                        min="0"
+                        max="10"
+                        value={values.flavour.smokiness_level}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        disabled={loading}
+                    />
+                </Form.Group>
+            </Col>
+        </Row>
+
+        {/* Finish */}
+        <Row>
+            <Col md={6}>
+                <Form.Group className="mb-3">
+                    <Form.Label>Finish Type</Form.Label>
+                    <Form.Control
+                        type="text"
+                        name="flavour.finish_type"
+                        value={values.flavour.finish_type}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        disabled={loading}
+                    />
+                </Form.Group>
+            </Col>
+            <Col md={6}>
+                <Form.Group className="mb-3">
+                    <Form.Label>Finish Notes (comma separated)</Form.Label>
+                    <Form.Control
+                        type="text"
+                        name="flavour.finish_notes"
+                        value={values.flavour.finish_notes}
+                        onChange={handleChange}
+                        onBlur={handleBlur}
+                        disabled={loading}
+                    />
+                </Form.Group>
+            </Col>
+        </Row>
+
+        {/* Overall tasting profile */}
         <Row>
             <Col md={12}>
                 <Form.Group className="mb-3">
-                    <Form.Label>Finish</Form.Label>
+                    <Form.Label>Tasting Profile</Form.Label>
                     <Form.Control
                         type="text"
-                        name="flavour_profile.finish"
-                        value={values.flavour_profile.finish}
+                        name="flavour.tasting_profile"
+                        value={values.flavour.tasting_profile}
                         onChange={handleChange}
                         onBlur={handleBlur}
                         disabled={loading}
