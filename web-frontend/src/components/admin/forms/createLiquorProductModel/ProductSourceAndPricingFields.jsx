@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
-import { Form, Row, Col, Spinner } from "react-bootstrap";
+import { Form, Row, Col, Spinner, Dropdown } from "react-bootstrap";
 import { axiosInstance } from "../../../../lib/axios";
 
-const ProductSourceAndPricingFields = ({ values, errors, touched, handleChange, handleBlur, loading }) => {
+const ProductSourceAndPricingFields = ({ values, errors, touched, handleChange, handleBlur, loading, setFieldValue }) => {
     const [superMarkets, setSuperMarkets] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [loadingMarkets, setLoadingMarkets] = useState(false);
+    const [selectedMarket, setSelectedMarket] = useState(null);
 
     // Fetch initial supermarket list
     useEffect(() => {
@@ -33,7 +34,7 @@ const ProductSourceAndPricingFields = ({ values, errors, touched, handleChange, 
             try {
                 setLoadingMarkets(true);
                 const res = await axiosInstance.get("/superMarket/search", {
-                    params: { q: searchTerm }
+                    params: { q: searchTerm },
                 });
                 if (res.data.success) {
                     setSuperMarkets(res.data.data || []);
@@ -49,37 +50,64 @@ const ProductSourceAndPricingFields = ({ values, errors, touched, handleChange, 
         return () => clearTimeout(debounce);
     }, [searchTerm]);
 
+    const handleSelectMarket = (market) => {
+        setSelectedMarket(market);
+        setFieldValue("superMarket_id", market.superMarket_id);
+    };
+
     return (
         <>
             <Row>
                 <Col md={12}>
                     <Form.Group className="mb-3">
                         <Form.Label>Product Source *</Form.Label>
-                        <Form.Select
-                            name="superMarket_id"
-                            value={values.superMarket_id}
-                            onChange={handleChange}
-                            onBlur={handleBlur}
-                            isInvalid={touched.superMarket_id && !!errors.superMarket_id}
-                            disabled={loading || loadingMarkets}
-                        >
-                            <option value="">Select a Super Market</option>
-                            {superMarkets.map((market) => (
-                                <option key={market.superMarket_id} value={market.superMarket_id}>
-                                    {market.superMarket_name} ({market.streetAddress})
-                                </option>
-                            ))}
-                        </Form.Select>
-                        {loadingMarkets && <Spinner animation="border" size="sm" className="ms-2" />}
-                        <Form.Control
-                            type="text"
-                            placeholder="Search supermarkets..."
-                            className="mt-2"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            disabled={loading}
-                        />
-                        <Form.Control.Feedback type="invalid">{errors.superMarket_id}</Form.Control.Feedback>
+                        <Dropdown>
+                            <Dropdown.Toggle
+                                variant="outline-secondary"
+                                id="dropdown-supermarket"
+                                disabled={loading || loadingMarkets}
+                                className="w-100 text-start"
+                            >
+                                {selectedMarket
+                                    ? `${selectedMarket.superMarket_name} (${selectedMarket.streetAddress})`
+                                    : "Select a Super Market"}
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu className="w-100 p-2" style={{ maxHeight: "300px", overflowY: "auto" }}>
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Search supermarkets..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    disabled={loading}
+                                    className="mb-2"
+                                />
+
+                                {loadingMarkets && (
+                                    <div className="text-center py-2">
+                                        <Spinner animation="border" size="sm" />
+                                    </div>
+                                )}
+
+                                {!loadingMarkets && superMarkets.length === 0 && (
+                                    <div className="text-muted text-center py-2">No supermarkets found</div>
+                                )}
+
+                                {!loadingMarkets &&
+                                    superMarkets.map((market) => (
+                                        <Dropdown.Item
+                                            key={market.superMarket_id}
+                                            onClick={() => handleSelectMarket(market)}
+                                        >
+                                            {market.superMarket_name} ({market.streetAddress})
+                                        </Dropdown.Item>
+                                    ))}
+                            </Dropdown.Menu>
+                        </Dropdown>
+
+                        {touched.superMarket_id && errors.superMarket_id && (
+                            <div className="invalid-feedback d-block">{errors.superMarket_id}</div>
+                        )}
                     </Form.Group>
                 </Col>
             </Row>
