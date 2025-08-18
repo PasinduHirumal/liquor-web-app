@@ -1,5 +1,6 @@
 import APP_INFO from "../data/AppInfo.js";
 import AppInfoService from "../services/appInfo.service.js";
+import updateLiquorProductsActiveStatus from "../utils/updateActiveToggleForLiquor.js";
 
 const appInfoService = new AppInfoService();
 
@@ -46,6 +47,7 @@ const getMainAppInfo = async (req, res) => {
 const updateAppInfoById = async (req, res) => {
 	try {
         const appInfo_id = req.params.id;
+        const { is_liquor_show } = req.body;
 
         const appInfo = await appInfoService.findById(appInfo_id);
         if (!appInfo) {
@@ -63,8 +65,25 @@ const updateAppInfoById = async (req, res) => {
         if (!updatedAppInfo) {
             return res.status(500).json({ success: false, message: "Failed to update" });
         }
+
+        let result = null;
+        if (is_liquor_show !== undefined) {
+            const is_active = is_liquor_show;
+            result = await updateLiquorProductsActiveStatus(is_active);
+
+            if (!result.success) {
+                return res.status(500).json({ success: false, message: "Failed to update active toggle in liquors" });
+            }
+        }
         
-        return res.status(200).json({ success: true, message: "App-Info updated successfully", data: updatedAppInfo});
+        return res.status(200).json({ 
+            success: true, 
+            message: "App-Info updated successfully", 
+            data: updatedAppInfo,
+            liquor_update: {
+                ...result
+            }
+        });
     } catch (error) {
         console.error("Update App-Info error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });

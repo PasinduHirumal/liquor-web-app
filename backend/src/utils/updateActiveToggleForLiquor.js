@@ -33,6 +33,7 @@ const updateLiquorProductsActiveStatus = async (is_active) => {
         
         return {
             success: true,
+            message: `Successfully updated is_active to ${is_active} for all liquor products`, 
             before_count: products.length,
             updated_count: updatedProducts.length,
             data: updatedProducts

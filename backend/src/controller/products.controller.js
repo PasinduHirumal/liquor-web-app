@@ -393,36 +393,21 @@ const updateActiveToggle = async (req, res) => {
         }
 
         const result = await updateLiquorProductsActiveStatus(is_active);
+        if (!result.success) {
+            return res.status(500).json({ success: false, message: "Failed to update active toggle in liquors" });
+        }
         
         return res.status(200).json({ 
             success: true, 
-            message: `Successfully updated is_active to ${is_active} for all liquor products`, 
+            message: result.message, 
             app_info_data: updatedAppInfo,
-            before_count: result.before_count,
-            updated_count: result.updated_count,
-            data: result.data 
+            liquor_update: {
+                ...result
+            }
         });
     } catch (error) {
         console.error("Update active toggle error:", error.message);
-
-        if (error.message === "No liquor products found") {
-            return res.status(400).json({ 
-                success: false, 
-                message: "Failed to fetch liquor products"
-            });
-        }
-        
-        if (error.message.includes("Failed to update")) {
-            return res.status(500).json({
-                success: false,
-                message: error.message
-            });
-        }
-        
-        return res.status(500).json({ 
-            success: false, 
-            message: "Server Error" 
-        });
+        return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
 
