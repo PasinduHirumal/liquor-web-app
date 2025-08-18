@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
 import OtherProductCard from "../../common/OtherProductCard";
 import { Button, Form, Row, Col, InputGroup } from "react-bootstrap";
-import CreateProductModal from "../../components/admin/forms/CreateProductModal";
+import CreateProductModal from "../../components/admin/forms/createProductModel/CreateProductModal";
 
 const OtherProductList = () => {
     const [products, setProducts] = useState([]);
