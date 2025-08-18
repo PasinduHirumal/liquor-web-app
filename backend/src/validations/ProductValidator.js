@@ -1,6 +1,13 @@
 import Joi from 'joi';
 import { optionalImageSchema, requiredImageSchema } from './imageValidationSchemas.js';
 
+const primaryFlavours = [
+  'Sweet', 'Dry', 'Bitter', 'Smoky', 'Fruity', 'Spicy', 'Herbal', 
+  'Woody', 'Floral', 'Earthy', 'Citrusy', 'Nutty', 'Creamy'
+];
+const finishTypes = ['Short', 'Medium', 'Long'];
+const tastingProfiles = ['Light', 'Medium', 'Full-bodied', 'Complex', 'Smooth', 'Bold'];
+
 // CREATE VALIDATOR - With defaults
 const validateProduct = (req, res, next) => {
   if (!req.body || Object.keys(req.body).length === 0) {
@@ -14,11 +21,38 @@ const validateProduct = (req, res, next) => {
     brand: Joi.string().min(1).max(100).required(),
     alcohol_content: Joi.number().min(0).max(100).required(),
     volume: Joi.number().positive().required(),
+    country: Joi.string().min(1).max(200).required(),
+    flavour: Joi.object({
+      primary_flavour: Joi.string().valid(...primaryFlavours).required(),
+      flavour_notes: Joi.array().items(
+        Joi.string().min(1).max(50)
+      ).min(0).max(15).default([]),
+      fruit_flavours: Joi.array().items(
+        Joi.string().min(1).max(50)
+      ).min(0).max(10).default([]),
+      spice_flavours: Joi.array().items(
+        Joi.string().min(1).max(50)
+      ).min(0).max(10).default([]),
+      herbal_flavours: Joi.array().items(
+        Joi.string().min(1).max(50)
+      ).min(0).max(10).default([]),
+      wood_flavours: Joi.array().items(
+        Joi.string().min(1).max(50)
+      ).min(0).max(10).default([]),
+      sweetness_level: Joi.number().integer().min(1).max(10).default(null),
+      bitterness_level: Joi.number().integer().min(1).max(10).default(null),
+      smokiness_level: Joi.number().integer().min(1).max(10).default(null),
+      finish_type: Joi.string().valid(...finishTypes).default(null),
+      finish_notes: Joi.array().items(
+        Joi.string().min(1).max(50)
+      ).min(0).max(5).default([]),
+      tasting_profile: Joi.string().valid(...tastingProfiles).default(null)
+    }).required(),
     main_image: requiredImageSchema,
     images: requiredImageSchema,
 
     // Pricing
-    superMarket_id: Joi.string().min(1).max(200).default(null),
+    superMarket_id: Joi.string().min(1).max(200).allow(null).default(null),
     cost_price: Joi.number().positive().required(),
     marked_price: Joi.number().positive().required(),
     selling_price: Joi.number().positive().optional(),
@@ -75,6 +109,33 @@ const validateProductUpdate = (req, res, next) => {
     brand: Joi.string().min(1).max(100).optional(),
     alcohol_content: Joi.number().min(0).max(100).optional(),
     volume: Joi.number().positive().optional(),
+    country: Joi.string().min(1).max(200).optional(),
+    flavour: Joi.object({
+      primary_flavour: Joi.string().valid(...primaryFlavours).optional(),
+      flavour_notes: Joi.array().items(
+        Joi.string().min(1).max(50)
+      ).min(0).max(15).optional(),
+      fruit_flavours: Joi.array().items(
+        Joi.string().min(1).max(50)
+      ).min(0).max(10).optional(),
+      spice_flavours: Joi.array().items(
+        Joi.string().min(1).max(50)
+      ).min(0).max(10).optional(),
+      herbal_flavours: Joi.array().items(
+        Joi.string().min(1).max(50)
+      ).min(0).max(10).optional(),
+      wood_flavours: Joi.array().items(
+        Joi.string().min(1).max(50)
+      ).min(0).max(10).optional(),
+      sweetness_level: Joi.number().integer().min(1).max(10).optional(),
+      bitterness_level: Joi.number().integer().min(1).max(10).optional(),
+      smokiness_level: Joi.number().integer().min(1).max(10).optional(),
+      finish_type: Joi.string().valid(...finishTypes).optional(),
+      finish_notes: Joi.array().items(
+        Joi.string().min(1).max(50)
+      ).min(0).max(5).optional(),
+      tasting_profile: Joi.string().valid(...tastingProfiles).optional()
+    }).optional(),
     main_image: optionalImageSchema,
     images: optionalImageSchema,
     
