@@ -111,11 +111,11 @@ const OtherProductDetail = () => {
             <div className="product-detail-error-container">
                 <div className="product-not-found text-center py-5">
                     <FaTimesCircle className="not-found-icon text-danger" size={48} />
-                    <h3 className="mt-3">Product not found</h3>
-                    <p className="text-muted">The requested product could not be located.</p>
+                    <h3 className="mt-3 text-white">Product not found</h3>
+                    <p className="text-white-50">The requested product could not be located.</p>
                     <button
                         onClick={() => navigate(-1)}
-                        className="btn btn-back mt-3"
+                        className="btn btn-light mt-3"
                     >
                         <FaArrowLeft className="me-2" />
                         Back to Products
