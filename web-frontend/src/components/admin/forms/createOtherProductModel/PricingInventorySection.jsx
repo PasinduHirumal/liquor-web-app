@@ -29,24 +29,30 @@ const PricingInventorySection = ({ formData, handleInputChange, isSubmitting }) 
 
     // Debounced search
     useEffect(() => {
-        const fetchSearchResults = async () => {
-            if (!searchTerm.trim()) return;
+        const fetchData = async () => {
             try {
                 setLoading(true);
-                const res = await axiosInstance.get("/superMarket/search", {
-                    params: { q: searchTerm },
-                });
+
+                let res;
+                if (searchTerm.trim()) {
+                    res = await axiosInstance.get("/superMarket/search", {
+                        params: { q: searchTerm },
+                    });
+                } else {
+                    res = await axiosInstance.get("/superMarket/getAllList");
+                }
+
                 if (res.data.success) {
                     setSuperMarkets(res.data.data || []);
                 }
             } catch (error) {
-                console.error("Error searching supermarkets:", error.message);
+                console.error("Error fetching supermarkets:", error.message);
             } finally {
                 setLoading(false);
             }
         };
 
-        const debounceTimer = setTimeout(fetchSearchResults, 500);
+        const debounceTimer = setTimeout(fetchData, 500);
         return () => clearTimeout(debounceTimer);
     }, [searchTerm]);
 
@@ -79,7 +85,6 @@ const PricingInventorySection = ({ formData, handleInputChange, isSubmitting }) 
                             </Dropdown.Toggle>
 
                             <Dropdown.Menu className="w-100 p-2" style={{ maxHeight: "300px", overflowY: "auto" }}>
-                                {/* Search bar inside dropdown */}
                                 <Form.Control
                                     type="text"
                                     placeholder="Search supermarkets..."
