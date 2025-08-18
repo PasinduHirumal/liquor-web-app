@@ -4,8 +4,8 @@ import { toast } from 'react-hot-toast';
 import { FaTrash, FaUpload } from 'react-icons/fa';
 import { Formik } from 'formik';
 import * as Yup from 'yup';
-import { axiosInstance } from '../../../lib/axios';
-import ImagePreview from '../../../common/ImagePreview';
+import { axiosInstance } from '../../../../lib/axios';
+import ImagePreview from "../../../../common/ImagePreview"
 
 // Validation schema
 const productSchema = Yup.object().shape({
@@ -148,7 +148,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                         brand: '',
                         alcohol_content: '',
                         volume: '',
-                        product_from: '',
+                        superMarket_id: '',
                         cost_price: '',
                         marked_price: '',
                         discount_percentage: '',
@@ -294,16 +294,16 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                                         <Form.Label>Product Source (e.g., Keels, Food City) *</Form.Label>
                                         <Form.Control
                                             type="text"
-                                            name="product_from"
-                                            value={values.product_from}
+                                            name="superMarket_id"
+                                            value={values.superMarket_id}
                                             onChange={handleChange}
                                             onBlur={handleBlur}
-                                            isInvalid={touched.product_from && !!errors.product_from}
+                                            isInvalid={touched.superMarket_id && !!errors.superMarket_id}
                                             disabled={loading}
                                             placeholder="Enter where the product is from"
                                         />
                                         <Form.Control.Feedback type="invalid">
-                                            {errors.product_from}
+                                            {errors.superMarket_id}
                                         </Form.Control.Feedback>
                                     </Form.Group>
                                 </Col>
