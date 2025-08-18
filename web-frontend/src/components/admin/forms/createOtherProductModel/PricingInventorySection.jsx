@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { Card, Row, Col, FloatingLabel, Form } from "react-bootstrap";
+import { Card, Row, Col, FloatingLabel, Form, Dropdown, Spinner } from "react-bootstrap";
 import { axiosInstance } from "../../../../lib/axios";
 
 const PricingInventorySection = ({ formData, handleInputChange, isSubmitting }) => {
     const [superMarkets, setSuperMarkets] = useState([]);
     const [searchTerm, setSearchTerm] = useState("");
     const [loading, setLoading] = useState(false);
+    const [selectedMarket, setSelectedMarket] = useState(null);
 
+    // Initial load
     useEffect(() => {
         const fetchMarkets = async () => {
             try {
@@ -25,6 +27,7 @@ const PricingInventorySection = ({ formData, handleInputChange, isSubmitting }) 
         fetchMarkets();
     }, []);
 
+    // Debounced search
     useEffect(() => {
         const fetchSearchResults = async () => {
             if (!searchTerm.trim()) return;
@@ -47,38 +50,66 @@ const PricingInventorySection = ({ formData, handleInputChange, isSubmitting }) 
         return () => clearTimeout(debounceTimer);
     }, [searchTerm]);
 
+    const handleSelectMarket = (market) => {
+        setSelectedMarket(market);
+        handleInputChange({
+            target: {
+                name: "superMarket_id",
+                value: market.superMarket_id,
+            },
+        });
+    };
+
     return (
         <Card className="mb-3">
             <Card.Body>
                 <h6>Pricing & Inventory Information</h6>
-
-                {/* Supermarket Selector */}
                 <Row className="g-2 mb-3">
                     <Col>
-                        <FloatingLabel controlId="superMarket_id" label="Product Source (Super Market)">
-                            <Form.Select
-                                name="superMarket_id"
-                                value={formData.superMarket_id}
-                                onChange={handleInputChange}
+                        <Dropdown>
+                            <Dropdown.Toggle
+                                variant="outline-secondary"
+                                id="dropdown-supermarket"
                                 disabled={isSubmitting || loading}
+                                className="w-100 text-start"
                             >
-                                <option value="">Select a Super Market</option>
-                                {superMarkets.map((market) => (
-                                    <option key={market.superMarket_id} value={market.superMarket_id}>
-                                        {market.superMarket_name} ({market.streetAddress})
-                                    </option>
-                                ))}
-                            </Form.Select>
-                        </FloatingLabel>
-                        {/* Search input for filtering supermarkets */}
-                        <Form.Control
-                            type="text"
-                            placeholder="Search supermarkets..."
-                            className="mt-2"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            disabled={isSubmitting}
-                        />
+                                {selectedMarket
+                                    ? `${selectedMarket.superMarket_name} (${selectedMarket.streetAddress})`
+                                    : "Select a Super Market"}
+                            </Dropdown.Toggle>
+
+                            <Dropdown.Menu className="w-100 p-2" style={{ maxHeight: "300px", overflowY: "auto" }}>
+                                {/* Search bar inside dropdown */}
+                                <Form.Control
+                                    type="text"
+                                    placeholder="Search supermarkets..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    disabled={isSubmitting}
+                                    className="mb-2"
+                                />
+
+                                {loading && (
+                                    <div className="text-center py-2">
+                                        <Spinner animation="border" size="sm" />
+                                    </div>
+                                )}
+
+                                {!loading && superMarkets.length === 0 && (
+                                    <div className="text-muted text-center py-2">No supermarkets found</div>
+                                )}
+
+                                {!loading &&
+                                    superMarkets.map((market) => (
+                                        <Dropdown.Item
+                                            key={market.superMarket_id}
+                                            onClick={() => handleSelectMarket(market)}
+                                        >
+                                            {market.superMarket_name} ({market.streetAddress})
+                                        </Dropdown.Item>
+                                    ))}
+                            </Dropdown.Menu>
+                        </Dropdown>
                     </Col>
                 </Row>
 
