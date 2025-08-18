@@ -7,11 +7,15 @@ import { deleteImages, uploadImages, uploadSingleImage } from '../utils/firebase
 import { validateStockOperation } from '../utils/stockCalculator.js';
 import { validatePriceOperation } from '../utils/priceCalculator.js';
 import { createStockHistory } from './stockHistory.controller.js';
+import updateLiquorProductsActiveStatus from '../utils/updateActiveToggleForLiquor.js';
+import AppInfoService from '../services/appInfo.service.js';
+import APP_INFO from '../data/AppInfo.js';
 
 const productService = new ProductService();
 const categoryService = new CategoryService();
 const stockHistoryService = new StockHistoryService();
 const marketService = new SuperMarketService();
+const appInfoService = new AppInfoService;
 
 const createProduct = async (req, res) => {
 	try {
@@ -379,48 +383,46 @@ const deleteProduct = async (req, res) => {
 const updateActiveToggle = async (req, res) => {
 	try {
         const { is_active } = req.body;
+        const AppRegNumber = APP_INFO.REG_NUMBER;
 
-        const products = await productService.findByFilter('is_liquor', '==', true);
-        if (!products || products.length === 0) {
-            return res.status(400).json({ success: false, message: "Failed to fetch liquor products"});
+        const existingAppInfo = await appInfoService.findByRegNumber(AppRegNumber);
+
+        const updatedAppInfo = await appInfoService.updateById(existingAppInfo.id, {is_liquor_show: is_active});
+        if (!updatedAppInfo) {
+            return res.status(500).json({ success: false, message: "Failed to update app-info" });
         }
 
-        // Update each product's is_active status
-        const updatePromises = products.map(async (product) => {
-            const updateData = {
-                is_active: is_active,
-            };
-            
-            return await productService.updateById(product.product_id, updateData);
-        });
-        
-        // Wait for all updates to complete
-        const updateResults = await Promise.all(updatePromises);
-        
-        // Check if all updates were successful
-        const failedUpdates = updateResults.filter(result => !result);
-        if (failedUpdates.length > 0) {
-            return res.status(500).json({
-                success: false,
-                message: `Failed to update ${failedUpdates.length} products`
-            });
-        }
-
-        // Update App-Info data
-        
-
-        const updatedProducts = await productService.findByFilter('is_liquor', '==', true);
+        const result = await updateLiquorProductsActiveStatus(is_active);
         
         return res.status(200).json({ 
             success: true, 
             message: `Successfully updated is_active to ${is_active} for all liquor products`, 
-            before_count: products.length,
-            updated_count: updatedProducts.length,
-            data: updatedProducts 
+            app_info_data: updatedAppInfo,
+            before_count: result.before_count,
+            updated_count: result.updated_count,
+            data: result.data 
         });
     } catch (error) {
         console.error("Update active toggle error:", error.message);
-        return res.status(500).json({ success: false, message: "Server Error" });
+
+        if (error.message === "No liquor products found") {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Failed to fetch liquor products"
+            });
+        }
+        
+        if (error.message.includes("Failed to update")) {
+            return res.status(500).json({
+                success: false,
+                message: error.message
+            });
+        }
+        
+        return res.status(500).json({ 
+            success: false, 
+            message: "Server Error" 
+        });
     }
 };
 
