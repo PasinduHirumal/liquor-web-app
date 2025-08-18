@@ -14,6 +14,7 @@ class Products {
         this.price = data.price;
 
         // Pricing
+        this.superMarket_id = data.superMarket_id;
         this.product_from = data.product_from; // keels, food city, where house
         this.cost_price = data.cost_price; // ex: keels price
         this.marked_price = data.marked_price; // product price to be sell
