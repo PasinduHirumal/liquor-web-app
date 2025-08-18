@@ -12,7 +12,7 @@ import LiquorProductDetail from "../../pages/admin/detailPages/LiquorProductDeta
 import LiquorEditForm from "../../components/admin/forms/LiquorEditForm"
 import OtherProductList from "../../pages/admin/OtherProductList";
 import OtherProductDetail from "../../pages/admin/detailPages/OtherProductDetail";
-import OtherProductEditForm from "../../components/admin/forms/OtherProductEditForm";
+import OtherProductEditForm from "../../components/admin/forms/editOtherProductModel/OtherProductEditForm";
 import ManageCategory from "../../pages/admin/ManageCategory";
 import DriverDetaiPage from "../../pages/admin/detailPages/DriverDetaiPage";
 import DriverProfileInfo from "../../components/admin/forms/DriverProfileInfo";

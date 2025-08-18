@@ -101,7 +101,7 @@ const CreateProductModal = ({ show, onHide, onProductCreated }) => {
     };
 
     return (
-        <Modal show={show} onHide={() => { handleReset(); onHide(); }} size="lg" centered>
+        <Modal className="pt-5" show={show} onHide={() => { handleReset(); onHide(); }} size="lg" centered>
             <Modal.Header closeButton>
                 <Modal.Title>Create New Product</Modal.Title>
             </Modal.Header>
