@@ -79,7 +79,7 @@ const updateAppInfoById = async (req, res) => {
         return res.status(200).json({ 
             success: true, 
             message: "App-Info updated successfully", 
-            data: updatedAppInfo,
+            app_info_update: updatedAppInfo,
             liquor_update: {
                 ...result
             }

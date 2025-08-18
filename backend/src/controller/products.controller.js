@@ -400,7 +400,7 @@ const updateActiveToggle = async (req, res) => {
         return res.status(200).json({ 
             success: true, 
             message: result.message, 
-            app_info_data: updatedAppInfo,
+            app_info_update: updatedAppInfo,
             liquor_update: {
                 ...result
             }

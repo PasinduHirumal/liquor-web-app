@@ -36,7 +36,7 @@ const updateLiquorProductsActiveStatus = async (is_active) => {
             message: `Successfully updated is_active to ${is_active} for all liquor products`, 
             before_count: products.length,
             updated_count: updatedProducts.length,
-            data: updatedProducts
+            //data: updatedProducts
         };
     } catch (error) {
         throw error; // Re-throw to let the controller handle it
