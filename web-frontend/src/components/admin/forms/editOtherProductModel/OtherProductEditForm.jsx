@@ -11,7 +11,7 @@ import StatusSection from "./StatusSection";
 import MainImageSection from "./MainImageSection";
 import GalleryImagesSection from "./GalleryImagesSection";
 
-import { OtherProductService } from "../../../../lib/otherProducts";
+import { OtherProductService } from "../../../../lib/otherProductEditModel/otherProducts.js";
 
 const OtherProductEditForm = () => {
     const { id } = useParams();
