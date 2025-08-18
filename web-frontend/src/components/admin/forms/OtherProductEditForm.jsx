@@ -3,16 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { axiosInstance } from "../../../lib/axios";
 import toast from "react-hot-toast";
 import {
-    Container,
-    Form,
-    Row,
-    Col,
-    Card,
-    Spinner,
-    Button,
-    Alert,
-    Image,
-    FloatingLabel
+    Container, Form, Row, Col, Card, Spinner, Button, Alert, Image, FloatingLabel
 } from "react-bootstrap";
 import { XCircle, UploadCloud, CheckCircle, Image as ImageIcon } from "react-feather";
 

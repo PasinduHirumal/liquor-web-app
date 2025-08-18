@@ -1,15 +1,6 @@
 import React, { useEffect, useState } from "react";
 import {
-    Modal,
-    Button,
-    Form,
-    Spinner,
-    Row,
-    Col,
-    Alert,
-    FloatingLabel,
-    Image,
-    Card
+    Modal, Button, Form, Spinner, Row, Col, Alert, FloatingLabel, Image, Card
 } from "react-bootstrap";
 import { axiosInstance } from "../../../lib/axios";
 import { FiUpload, FiX, FiImage } from "react-icons/fi";
