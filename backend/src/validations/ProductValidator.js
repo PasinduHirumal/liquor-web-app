@@ -1,6 +1,7 @@
 import Joi from 'joi';
 import { optionalImageSchema, requiredImageSchema } from './imageValidationSchemas.js';
 import { defaultFlavourValidations, optionalFlavourValidations } from './schemas/flavourSchema.js';
+import { countrySchema } from './schemas/countrySchema.js';
 
 // CREATE VALIDATOR - With defaults
 const validateProduct = (req, res, next) => {
@@ -15,7 +16,7 @@ const validateProduct = (req, res, next) => {
     brand: Joi.string().min(1).max(100).required(),
     alcohol_content: Joi.number().min(0).max(100).required(),
     volume: Joi.number().positive().required(),
-    country: Joi.string().min(1).max(200).required(),
+    country: countrySchema.required(),
     flavour: defaultFlavourValidations,
     main_image: requiredImageSchema,
     images: requiredImageSchema,
@@ -78,7 +79,7 @@ const validateProductUpdate = (req, res, next) => {
     brand: Joi.string().min(1).max(100).optional(),
     alcohol_content: Joi.number().min(0).max(100).optional(),
     volume: Joi.number().positive().optional(),
-    country: Joi.string().min(1).max(200).optional(),
+    country: countrySchema.optional(),
     flavour: optionalFlavourValidations,
     main_image: optionalImageSchema,
     images: optionalImageSchema,
