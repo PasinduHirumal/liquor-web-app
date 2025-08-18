@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { axiosInstance } from "../../../lib/axios";
+import { axiosInstance } from "../../../../lib/axios";
 import toast from "react-hot-toast";
 import {
     Container, Form, Row, Col, Card, Spinner, Button, Alert, Image, FloatingLabel
@@ -18,7 +18,7 @@ const LiquorEditForm = () => {
         category_id: "",
         alcohol_content: 0,
         volume: 0,
-        product_from: "",
+        superMarket_id: "",
         cost_price: 0,
         marked_price: 0,
         discount_percentage: 0,
@@ -62,7 +62,7 @@ const LiquorEditForm = () => {
                     category_id: product.category_id?._id || product.category_id || "",
                     alcohol_content: product.alcohol_content || 0,
                     volume: product.volume || 0,
-                    product_from: product.product_from || "", // Fix: Get from product data
+                    superMarket_id: product.superMarket_id || "", // Fix: Get from product data
                     cost_price: product.cost_price || 0,
                     marked_price: product.marked_price || 0,
                     discount_percentage: product.discount_percentage || 0,
@@ -142,7 +142,7 @@ const LiquorEditForm = () => {
         setPriceUpdating(true);
         try {
             const priceData = {
-                product_from: formData.product_from,
+                superMarket_id: formData.superMarket_id,
                 cost_price: formData.cost_price,
                 marked_price: formData.marked_price,
                 discount_percentage: formData.discount_percentage
@@ -381,10 +381,10 @@ const LiquorEditForm = () => {
                                     <Card.Body>
                                         <Row>
                                             <Col md={12}>
-                                                <FloatingLabel controlId="product_from" label="Product Source (e.g., Keels, Food City)" className="mb-3">
+                                                <FloatingLabel controlId="superMarket_id" label="Product Source (e.g., Keels, Food City)" className="mb-3">
                                                     <Form.Control
-                                                        name="product_from"
-                                                        value={formData.product_from}
+                                                        name="superMarket_id"
+                                                        value={formData.superMarket_id}
                                                         onChange={handleChange}
                                                         placeholder="Enter where product is from"
                                                     />
