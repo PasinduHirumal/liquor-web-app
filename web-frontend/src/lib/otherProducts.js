@@ -1,4 +1,4 @@
-import { axiosInstance } from "../../../../lib/axios";
+import { axiosInstance } from "./axios";
 
 export const OtherProductService = {
   async getCategories() {
