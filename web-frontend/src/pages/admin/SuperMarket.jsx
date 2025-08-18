@@ -65,7 +65,13 @@ function SuperMarket() {
             title: 'Name',
             dataIndex: 'superMarket_Name',
             key: 'name',
-            width: 150,
+            width: 180,
+            render: (name, record) => (
+                <div className="fw-bold">
+                    <div>{name}</div>
+                    <div style={{ fontSize: '12px', color: '#888' }}>ID: {record.id}</div>
+                </div>
+            ),
         },
         {
             title: 'Street Address',
