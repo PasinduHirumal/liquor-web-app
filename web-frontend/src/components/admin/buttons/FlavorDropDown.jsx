@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { ChevronDown, ChevronUp, Pencil } from "lucide-react";
 import FlavorEditModal from "../forms/editLiquorProductModel/FlavorEditModal";
-import "./FlavorDropDown.css";
+import "../../../styles/flavorDropdown.css";
 
 const FlavorDropDown = ({ flavour }) => {
     const [open, setOpen] = useState(false);
