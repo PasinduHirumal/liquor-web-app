@@ -1,5 +1,6 @@
-import React from "react";
-import { Card, Row, Col, FloatingLabel, Form, Button, Spinner } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
+import { Card, Row, Col, FloatingLabel, Form, Button, Spinner, InputGroup } from "react-bootstrap";
+import { axiosInstance } from "../../../../lib/axios";
 
 const PricingSection = ({
     formData,
@@ -10,6 +11,42 @@ const PricingSection = ({
     superMarkets,
     loadingMarkets
 }) => {
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredMarkets, setFilteredMarkets] = useState(superMarkets);
+    const [searchLoading, setSearchLoading] = useState(false);
+
+    // Filter or fetch supermarkets based on search term
+    useEffect(() => {
+        const fetchMarkets = async () => {
+            if (!searchTerm.trim()) {
+                setFilteredMarkets(superMarkets);
+                return;
+            }
+
+            setSearchLoading(true);
+            try {
+                const res = await axiosInstance.get("/superMarket/search", {
+                    params: { q: searchTerm }
+                });
+                if (res.data.success) {
+                    setFilteredMarkets(res.data.data || []);
+                }
+            } catch (err) {
+                console.error("Supermarket search error:", err);
+            } finally {
+                setSearchLoading(false);
+            }
+        };
+
+        const debounce = setTimeout(fetchMarkets, 500); // debounce 500ms
+        return () => clearTimeout(debounce);
+    }, [searchTerm, superMarkets]);
+
+    useEffect(() => {
+        // Keep filteredMarkets in sync when superMarkets list changes
+        if (!searchTerm.trim()) setFilteredMarkets(superMarkets);
+    }, [superMarkets, searchTerm]);
+
     return (
         <Card className="mb-4">
             <Card.Header className="d-flex justify-content-between align-items-center">
@@ -28,29 +65,43 @@ const PricingSection = ({
                 </Button>
             </Card.Header>
             <Card.Body>
-                <Row>
+                <Row className="mb-3">
                     <Col md={12}>
-                        <FloatingLabel controlId="superMarket_id" label="Product Source (Supermarket)" className="mb-3">
+                        <FloatingLabel controlId="superMarketSearch" label="Search Supermarket" className="mb-2">
+                            <Form.Control
+                                type="text"
+                                placeholder="Search supermarkets..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                disabled={loadingMarkets}
+                            />
+                        </FloatingLabel>
+
+                        <FloatingLabel controlId="superMarket_id" label="Product Source (Supermarket)">
                             <Form.Select
                                 name="superMarket_id"
                                 value={formData.superMarket_id}
                                 onChange={handleChange}
-                                disabled={loadingMarkets}
+                                disabled={loadingMarkets || searchLoading}
                                 isInvalid={!!errors.superMarket_id}
                             >
                                 <option value="">Select a Supermarket</option>
-                                {superMarkets.map((market) => (
+                                {filteredMarkets.map((market) => (
                                     <option key={market.superMarket_id} value={market.superMarket_id}>
                                         {market.superMarket_name} ({market.streetAddress})
                                     </option>
                                 ))}
                             </Form.Select>
+                            {(loadingMarkets || searchLoading) && (
+                                <Spinner animation="border" size="sm" className="ms-2 mt-1" />
+                            )}
                             <Form.Control.Feedback type="invalid">
                                 {errors.superMarket_id}
                             </Form.Control.Feedback>
                         </FloatingLabel>
                     </Col>
                 </Row>
+
                 <Row>
                     <Col md={6}>
                         <FloatingLabel controlId="cost_price" label="Cost Price (Rs)" className="mb-3">
@@ -87,6 +138,7 @@ const PricingSection = ({
                         </FloatingLabel>
                     </Col>
                 </Row>
+
                 <Row>
                     <Col md={6}>
                         <FloatingLabel controlId="discount_percentage" label="Discount (%)" className="mb-3">
