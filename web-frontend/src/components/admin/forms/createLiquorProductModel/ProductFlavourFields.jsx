@@ -1,5 +1,5 @@
 import React from "react";
-import { Form, Col, Row } from "react-bootstrap";
+import { Form, Col, Row, InputGroup } from "react-bootstrap";
 
 const primaryFlavours = [
     'Sweet', 'Dry', 'Bitter', 'Smoky', 'Fruity', 'Spicy', 'Herbal',
@@ -17,22 +17,32 @@ const ProductFlavourFields = ({
     setFieldValue,
     loading
 }) => {
-    const handleArrayFieldChange = (fieldName, e) => {
-        const value = e.target.value;
-        if (!value.trim()) {
-            setFieldValue(fieldName, []);
+    const handleArrayInput = (fieldName, value, currentArray = []) => {
+        // If backspace pressed on empty input, remove last item
+        if (value === '' && currentArray.length > 0) {
+            const newArray = [...currentArray];
+            newArray.pop();
+            setFieldValue(fieldName, newArray);
             return;
         }
 
-        const arrayValue = value
-            .split(",")
-            .map(item => item.trim())
-            .filter(item => item);
-        setFieldValue(fieldName, arrayValue);
+        // If comma or enter pressed, add to array
+        if (value.endsWith(',') || value.endsWith(' ')) {
+            const itemToAdd = value.slice(0, -1).trim();
+            if (itemToAdd) {
+                setFieldValue(fieldName, [...currentArray, itemToAdd]);
+                return ''; // Clear input after adding
+            }
+            return '';
+        }
+
+        return value; // Return current value if no action needed
     };
 
-    const handleSelectChange = (fieldName, e) => {
-        setFieldValue(fieldName, e.target.value || null);
+    const removeArrayItem = (fieldName, index, currentArray) => {
+        const newArray = [...currentArray];
+        newArray.splice(index, 1);
+        setFieldValue(fieldName, newArray);
     };
 
     const getFieldState = (fieldPath) => {
@@ -56,7 +66,7 @@ const ProductFlavourFields = ({
                         <Form.Select
                             name="flavour.primary_flavour"
                             value={values.flavour.primary_flavour || ""}
-                            onChange={(e) => handleSelectChange("flavour.primary_flavour", e)}
+                            onChange={handleChange}
                             onBlur={handleBlur}
                             disabled={loading}
                             isInvalid={getFieldState("flavour.primary_flavour").isInvalid}
@@ -72,154 +82,155 @@ const ProductFlavourFields = ({
                         </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
+            </Row>
 
-                <Col md={6}>
+            {/* Flavour Notes */}
+            <Row>
+                <Col md={12}>
                     <Form.Group className="mb-3">
-                        <Form.Label>Flavour Notes (comma separated)</Form.Label>
+                        <Form.Label>Flavour Notes</Form.Label>
                         <Form.Control
                             type="text"
-                            name="flavour.flavour_notes"
-                            value={values.flavour.flavour_notes?.join(", ") || ""}
-                            onChange={(e) => handleArrayFieldChange("flavour.flavour_notes", e)}
+                            name="flavour.flavour_notes_input"
+                            value={values.flavour.flavour_notes_input || ""}
+                            onChange={(e) => {
+                                const newValue = handleArrayInput(
+                                    "flavour.flavour_notes",
+                                    e.target.value,
+                                    values.flavour.flavour_notes || []
+                                );
+                                setFieldValue("flavour.flavour_notes_input", newValue);
+                            }}
                             onBlur={handleBlur}
                             disabled={loading}
                             isInvalid={getFieldState("flavour.flavour_notes").isInvalid}
-                            placeholder="e.g. Vanilla, Caramel, Oak"
+                            placeholder="Type a note and press comma or space to add"
                         />
                         <Form.Control.Feedback type="invalid">
                             {getFieldState("flavour.flavour_notes").errorMessage}
                         </Form.Control.Feedback>
+                        <div className="d-flex flex-wrap gap-2 mt-2">
+                            {values.flavour.flavour_notes?.map((note, index) => (
+                                <span key={index} className="badge bg-primary">
+                                    {note}
+                                    <button
+                                        type="button"
+                                        className="ms-2 btn-close btn-close-white"
+                                        style={{ fontSize: '0.5rem' }}
+                                        onClick={() => removeArrayItem(
+                                            "flavour.flavour_notes",
+                                            index,
+                                            values.flavour.flavour_notes
+                                        )}
+                                        aria-label="Remove"
+                                    />
+                                </span>
+                            ))}
+                        </div>
                     </Form.Group>
                 </Col>
             </Row>
 
-            {/* Flavour Categories (All Optional) */}
-            <Row>
-                <Col md={6}>
-                    <Form.Group className="mb-3">
-                        <Form.Label>Fruit Flavours (comma separated)</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="flavour.fruit_flavours"
-                            value={Array.isArray(values.flavour.fruit_flavours)
-                                ? values.flavour.fruit_flavours.join(", ")
-                                : ""}
-                            onChange={(e) => handleArrayFieldChange("flavour.fruit_flavours", e)}
-                            onBlur={handleBlur}
-                            disabled={loading}
-                            placeholder="e.g. Apple, Cherry, Citrus"
-                        />
-                    </Form.Group>
-                </Col>
-                <Col md={6}>
-                    <Form.Group className="mb-3">
-                        <Form.Label>Spice Flavours (comma separated)</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="flavour.spice_flavours"
-                            value={Array.isArray(values.flavour.spice_flavours)
-                                ? values.flavour.spice_flavours.join(", ")
-                                : ""}
-                            onChange={(e) => handleArrayFieldChange("flavour.spice_flavours", e)}
-                            onBlur={handleBlur}
-                            disabled={loading}
-                            placeholder="e.g. Cinnamon, Pepper, Nutmeg"
-                        />
-                    </Form.Group>
-                </Col>
-            </Row>
+            {/* Flavour Categories */}
+            {[
+                { name: 'fruit_flavours', label: 'Fruit Flavours', placeholder: 'e.g. Apple, Cherry' },
+                { name: 'spice_flavours', label: 'Spice Flavours', placeholder: 'e.g. Cinnamon, Pepper' },
+                { name: 'herbal_flavours', label: 'Herbal Flavours', placeholder: 'e.g. Mint, Thyme' },
+                { name: 'wood_flavours', label: 'Wood Flavours', placeholder: 'e.g. Oak, Cedar' }
+            ].map((field) => (
+                <Row key={field.name}>
+                    <Col md={12}>
+                        <Form.Group className="mb-3">
+                            <Form.Label>{field.label}</Form.Label>
+                            <Form.Control
+                                type="text"
+                                name={`flavour.${field.name}_input`}
+                                value={values.flavour[`${field.name}_input`] || ""}
+                                onChange={(e) => {
+                                    const newValue = handleArrayInput(
+                                        `flavour.${field.name}`,
+                                        e.target.value,
+                                        values.flavour[field.name] || []
+                                    );
+                                    setFieldValue(`flavour.${field.name}_input`, newValue);
+                                }}
+                                onBlur={handleBlur}
+                                disabled={loading}
+                                placeholder={field.placeholder}
+                            />
+                            <div className="d-flex flex-wrap gap-2 mt-2">
+                                {values.flavour[field.name]?.map((item, index) => (
+                                    <span key={index} className="badge bg-secondary">
+                                        {item}
+                                        <button
+                                            type="button"
+                                            className="ms-2 btn-close btn-close-white"
+                                            style={{ fontSize: '0.5rem' }}
+                                            onClick={() => removeArrayItem(
+                                                `flavour.${field.name}`,
+                                                index,
+                                                values.flavour[field.name]
+                                            )}
+                                            aria-label="Remove"
+                                        />
+                                    </span>
+                                ))}
+                            </div>
+                        </Form.Group>
+                    </Col>
+                </Row>
+            ))}
 
-            <Row>
-                <Col md={6}>
-                    <Form.Group className="mb-3">
-                        <Form.Label>Herbal Flavours (comma separated)</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="flavour.herbal_flavours"
-                            value={Array.isArray(values.flavour.herbal_flavours)
-                                ? values.flavour.herbal_flavours.join(", ")
-                                : ""}
-                            onChange={(e) => handleArrayFieldChange("flavour.herbal_flavours", e)}
-                            onBlur={handleBlur}
-                            disabled={loading}
-                            placeholder="e.g. Mint, Thyme, Eucalyptus"
-                        />
-                    </Form.Group>
-                </Col>
-                <Col md={6}>
-                    <Form.Group className="mb-3">
-                        <Form.Label>Wood Flavours (comma separated)</Form.Label>
-                        <Form.Control
-                            type="text"
-                            name="flavour.wood_flavours"
-                            value={Array.isArray(values.flavour.wood_flavours)
-                                ? values.flavour.wood_flavours.join(", ")
-                                : ""}
-                            onChange={(e) => handleArrayFieldChange("flavour.wood_flavours", e)}
-                            onBlur={handleBlur}
-                            disabled={loading}
-                            placeholder="e.g. Oak, Cedar, Pine"
-                        />
-                    </Form.Group>
-                </Col>
-            </Row>
-
-            {/* Intensity Levels (All have defaults) */}
+            {/* Intensity Levels */}
             <Row>
                 <Col md={4}>
                     <Form.Group className="mb-3">
                         <Form.Label>Sweetness Level (0-10)</Form.Label>
-                        <Form.Control
-                            type="number"
+                        <Form.Range
                             name="flavour.sweetness_level"
                             min="0"
                             max="10"
-                            value={values.flavour.sweetness_level ?? 0}
-                            onChange={(e) =>
-                                setFieldValue("flavour.sweetness_level", Number(e.target.value))
-                            }
+                            value={values.flavour.sweetness_level || 0}
+                            onChange={handleChange}
                             onBlur={handleBlur}
                             disabled={loading}
                         />
+                        <div className="text-center">{values.flavour.sweetness_level || 0}</div>
                     </Form.Group>
                 </Col>
                 <Col md={4}>
                     <Form.Group className="mb-3">
                         <Form.Label>Bitterness Level (0-10)</Form.Label>
-                        <Form.Control
-                            type="number"
+                        <Form.Range
                             name="flavour.bitterness_level"
                             min="0"
                             max="10"
-                            value={values.flavour.bitterness_level ?? 0}
-                            onChange={(e) =>
-                                setFieldValue("flavour.bitterness_level", Number(e.target.value))
-                            }
+                            value={values.flavour.bitterness_level || 0}
+                            onChange={handleChange}
                             onBlur={handleBlur}
                             disabled={loading}
                         />
+                        <div className="text-center">{values.flavour.bitterness_level || 0}</div>
                     </Form.Group>
                 </Col>
                 <Col md={4}>
                     <Form.Group className="mb-3">
                         <Form.Label>Smokiness Level (0-10)</Form.Label>
-                        <Form.Control
-                            type="number"
+                        <Form.Range
                             name="flavour.smokiness_level"
                             min="0"
                             max="10"
-                            value={values.flavour.smokiness_level ?? 0}
-                            onChange={(e) =>
-                                setFieldValue("flavour.smokiness_level", Number(e.target.value))
-                            }
+                            value={values.flavour.smokiness_level || 0}
+                            onChange={handleChange}
                             onBlur={handleBlur}
                             disabled={loading}
                         />
+                        <div className="text-center">{values.flavour.smokiness_level || 0}</div>
                     </Form.Group>
                 </Col>
             </Row>
 
-            {/* Finish Section (Optional) */}
+            {/* Finish Section */}
             <Row>
                 <Col md={6}>
                     <Form.Group className="mb-3">
@@ -227,7 +238,7 @@ const ProductFlavourFields = ({
                         <Form.Select
                             name="flavour.finish_type"
                             value={values.flavour.finish_type || ""}
-                            onChange={(e) => handleSelectChange("flavour.finish_type", e)}
+                            onChange={handleChange}
                             onBlur={handleBlur}
                             disabled={loading}
                         >
@@ -240,21 +251,46 @@ const ProductFlavourFields = ({
                 </Col>
                 <Col md={6}>
                     <Form.Group className="mb-3">
-                        <Form.Label>Finish Notes (comma separated)</Form.Label>
+                        <Form.Label>Finish Notes</Form.Label>
                         <Form.Control
                             type="text"
-                            name="flavour.finish_notes"
-                            value={values.flavour.finish_notes?.join(", ") || ""}
-                            onChange={(e) => handleArrayFieldChange("flavour.finish_notes", e)}
+                            name="flavour.finish_notes_input"
+                            value={values.flavour.finish_notes_input || ""}
+                            onChange={(e) => {
+                                const newValue = handleArrayInput(
+                                    "flavour.finish_notes",
+                                    e.target.value,
+                                    values.flavour.finish_notes || []
+                                );
+                                setFieldValue("flavour.finish_notes_input", newValue);
+                            }}
                             onBlur={handleBlur}
                             disabled={loading}
-                            placeholder="e.g. Smooth, Lingering, Spicy"
+                            placeholder="Type a note and press comma or space to add"
                         />
+                        <div className="d-flex flex-wrap gap-2 mt-2">
+                            {values.flavour.finish_notes?.map((note, index) => (
+                                <span key={index} className="badge bg-info text-dark">
+                                    {note}
+                                    <button
+                                        type="button"
+                                        className="ms-2 btn-close"
+                                        style={{ fontSize: '0.5rem' }}
+                                        onClick={() => removeArrayItem(
+                                            "flavour.finish_notes",
+                                            index,
+                                            values.flavour.finish_notes
+                                        )}
+                                        aria-label="Remove"
+                                    />
+                                </span>
+                            ))}
+                        </div>
                     </Form.Group>
                 </Col>
             </Row>
 
-            {/* Tasting Profile (Optional) */}
+            {/* Tasting Profile */}
             <Row>
                 <Col md={12}>
                     <Form.Group className="mb-3">
@@ -262,7 +298,7 @@ const ProductFlavourFields = ({
                         <Form.Select
                             name="flavour.tasting_profile"
                             value={values.flavour.tasting_profile || ""}
-                            onChange={(e) => handleSelectChange("flavour.tasting_profile", e)}
+                            onChange={handleChange}
                             onBlur={handleBlur}
                             disabled={loading}
                         >

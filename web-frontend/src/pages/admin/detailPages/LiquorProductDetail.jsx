@@ -6,13 +6,14 @@ import {
     FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit,
     FaCheckCircle, FaTimesCircle, FaArrowLeft, FaPercentage
 } from "react-icons/fa";
+import { Chip } from "@mui/material";
+import { styled } from "@mui/system";
 import "../../../styles/LiquorProductDetail.css";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../../lib/axios";
 import DeleteLiquorButton from "../../../components/admin/buttons/DeleteLiquorButton";
 import ViewProductHistory from "../../../common/ViewProductHistory";
-import { Chip } from "@mui/material";
-import { styled } from "@mui/system";
+import FlavorDropDown from "../../../components/admin/buttons/FlavorDropDown";
 
 const OriginBadge = styled(Chip)(({ theme, origin }) => ({
     position: "absolute",
@@ -67,12 +68,12 @@ const LiquorProductDetail = () => {
     const formatDate = (dateStr) => {
         if (!dateStr) return "N/A";
         try {
-            return new Date(dateStr).toLocaleDateString('en-US', {
+            return new Date(dateStr).toLocaleDateString("en-US", {
                 year: "numeric",
                 month: "short",
                 day: "numeric",
                 hour: "2-digit",
-                minute: "2-digit"
+                minute: "2-digit",
             });
         } catch {
             return "Invalid date";
@@ -107,6 +108,7 @@ const LiquorProductDetail = () => {
                 </div>
             ) : product ? (
                 <>
+                    {/* Header */}
                     <div className="product-header d-flex align-items-center gap-4">
                         <button
                             onClick={() => navigate(-1)}
@@ -123,10 +125,10 @@ const LiquorProductDetail = () => {
                         <div className="product-gallery">
                             <div className="main-image-container">
                                 {product.product_from && (
-                                        <OriginBadge
-                                            label={`From: ${product.product_from}`}
-                                            size="medium"
-                                        />
+                                    <OriginBadge
+                                        label={`From: ${product.product_from}`}
+                                        size="medium"
+                                    />
                                 )}
                                 {activeImage ? (
                                     <img
@@ -134,7 +136,7 @@ const LiquorProductDetail = () => {
                                         alt={product.name}
                                         className="main-image"
                                         onError={(e) => {
-                                            e.target.src = '/placeholder-bottle.jpg';
+                                            e.target.src = "/placeholder-bottle.jpg";
                                         }}
                                     />
                                 ) : (
@@ -160,7 +162,7 @@ const LiquorProductDetail = () => {
                                                     src={img}
                                                     alt={`Thumbnail ${index + 1}`}
                                                     onError={(e) => {
-                                                        e.target.src = '/placeholder-bottle.jpg';
+                                                        e.target.src = "/placeholder-bottle.jpg";
                                                     }}
                                                 />
                                             </div>
@@ -169,7 +171,7 @@ const LiquorProductDetail = () => {
                             )}
                         </div>
 
-                        {/* Product Details */}
+                        {/* Product Info */}
                         <div className="product-info">
                             {/* Price & Discount */}
                             <div className="price-section d-flex align-items-center gap-3 flex-wrap m-0">
@@ -219,6 +221,8 @@ const LiquorProductDetail = () => {
                                 <h3>Description</h3>
                                 <p>{product.description || "No description provided."}</p>
                             </div>
+
+                            <FlavorDropDown flavour={product.flavour} />
 
                             {/* Metadata Grid */}
                             <div className="details-grid m-0">
