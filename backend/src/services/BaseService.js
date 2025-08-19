@@ -108,6 +108,24 @@ class BaseService {
         }
     }
 
+    async count(filters = {}) {
+        try {
+            let query = this.collection;
+            
+            // Apply filters if provided
+            Object.entries(filters).forEach(([field, value]) => {
+                if (value !== undefined && value !== null) {
+                    query = query.where(field, '==', value);
+                }
+            });
+
+            const snapshot = await query.get();
+            return snapshot.size;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async create(data) {
         try {
             // Hash password if it's being created

@@ -1,6 +1,5 @@
 import CompanyService from '../services/company.service.js';
 import SystemService from '../services/system.service.js';
-import ADMIN_ROLES from '../enums/adminRoles.js';
 import DriverService from '../services/driver.service.js';
 import AdminUserService from '../services/adminUsers.service.js';
 
@@ -9,32 +8,20 @@ const systemService = new SystemService();
 const driverService = new DriverService();
 const adminService = new AdminUserService();
 
-const createWhereHouse = async (req, res) => {
+const createWareHouse = async (req, res) => {
 	try {
         const { where_house_name } = req.body;
 
-        const whereHouse = await companyService.findByFilter('where_house_name', '==', where_house_name);
-        if (whereHouse && whereHouse.length > 0) {
+        const whereHouse = await companyService.findByWarehouseName(where_house_name);
+        if (whereHouse) {
             return res.status(400).json({ success: false, message: "Where House already exists"});
         }
 
-        const whereHouses = await companyService.findAll();
-        if (!whereHouses) {
-            return res.status(500).json({ success: false, message: "Server Error", reason: "Error in fetching"});
-        }
-
-        // Sort by created_at in descending order (newest first)
-        const sortedWhereHouses = whereHouses.sort((a, b) => {
-            return new Date(b.created_at) - new Date(a.created_at);
-        });
-
-        const recent_code = sortedWhereHouses[0].where_house_code;
-        const numericPart = recent_code.split('-')[1]; // "B-000001" -> "000001"
-        const incrementedNumber = parseInt(numericPart, 10) + 1; // Convert to number, increment by 1,
-        const code = incrementedNumber.toString().padStart(6, '0'); // pad with zeros to maintain 6 digits
+        const count = await companyService.count();
+        const where_house_code = `B-${(count + 1).toString().padStart(6, '0')}`;
 
         const where_house_data = {
-            where_house_code: `B-${code}`,
+            where_house_code,
             ...req.body
         };
 
@@ -50,7 +37,7 @@ const createWhereHouse = async (req, res) => {
     }
 };
 
-const getCompanyDetails = async (req, res) => {
+const getAllWarehouses = async (req, res) => {
 	try {
         const { isActive } = req.query;
 
@@ -122,37 +109,45 @@ const getCompanyDetails = async (req, res) => {
     }
 };
 
-const updateCompanyDetailById = async (req, res) => {
+const updateWarehouseById = async (req, res) => {
 	try {
         const companyDetailId = req.params.id;
-        const userRole = req.user.role;
-
-        if (!companyDetailId) {
-            return res.status(400).json({ message: "System detail ID is required" });
-        }
-
-        const allowedRoles = [ADMIN_ROLES.SUPER_ADMIN];
-        if (!allowedRoles.includes(userRole)) {
-            return res.status(403).json({ success: false, message: "Access Forbidden" });
-        }
 
         const systemDetail = await companyService.findById(companyDetailId);
         if (!systemDetail) {
-            return res.status(404).json({ success: false, message: "System Detail not found" });
+            return res.status(404).json({ success: false, message: "Warehouse not found" });
         }
 
         const updateData = { ...req.body };
 
-        const updatedData = await companyService.updateById(companyDetailId, updateData);
-        if (!updatedData) {
-            return res.status(500).json({ success: false, message: "Failed to update System Details"});
+        const updatedWarehouse = await companyService.updateById(companyDetailId, updateData);
+        if (!updatedWarehouse) {
+            return res.status(500).json({ success: false, message: "Failed to update Warehouse"});
         }
 
-        return res.status(200).json({ success: true, message: "System Details updated successfully", data: updatedData });
+        return res.status(200).json({ success: true, message: "Warehouse updated successfully", data: updatedWarehouse });
     } catch (error) {
-        console.error("Update company details error:", error.message);
+        console.error("Update Warehouse error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
 
-export { createWhereHouse, getCompanyDetails, updateCompanyDetailById };
+const deleteWarehouseById = async (req, res) => {
+	try {
+        const warehouse_id = req.params.id;
+
+        const warehouse = await companyService.findById(warehouse_id);
+        if (!warehouse) {
+            return res.status(404).json({ success: false, message: "Warehouse not found" });
+        }
+
+        await companyService.deleteById(warehouse_id);
+
+        return res.status(200).json({ success: true, message: "Warehouse deleted successfully"});
+    } catch (error) {
+        console.error("Delete warehouse error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+export { createWareHouse, getAllWarehouses, updateWarehouseById, deleteWarehouseById };
