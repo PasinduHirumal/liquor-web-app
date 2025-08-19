@@ -49,7 +49,9 @@ const FlavorEditModal = ({ show, handleClose, flavour, onUpdated }) => {
         try {
             const payload = {
                 flavour: {
-                    ...formData,
+                    primary_flavour: formData.primary_flavour || null,
+                    tasting_profile: formData.tasting_profile || null,
+                    finish_type: formData.finish_type || null,
                     flavour_notes: formData.flavour_notes
                         ? formData.flavour_notes.split(",").map((s) => s.trim())
                         : [],
@@ -68,6 +70,9 @@ const FlavorEditModal = ({ show, handleClose, flavour, onUpdated }) => {
                     finish_notes: formData.finish_notes
                         ? formData.finish_notes.split(",").map((s) => s.trim())
                         : [],
+                    sweetness_level: formData.sweetness_level ?? 0,
+                    bitterness_level: formData.bitterness_level ?? 0,
+                    smokiness_level: formData.smokiness_level ?? 0,
                 },
             };
 
