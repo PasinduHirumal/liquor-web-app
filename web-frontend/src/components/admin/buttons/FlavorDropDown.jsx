@@ -1,22 +1,35 @@
 import React, { useState } from "react";
-import { ChevronDown, ChevronUp } from "lucide-react";
-import "./FlavorDropDown.css";
+import { ChevronDown, ChevronUp, Pencil } from "lucide-react";
+import FlavorEditModal from "../forms/editLiquorProductModel/FlavorEditModal";
+import "../../../styles/flavorDropdown.css";
 
 const FlavorDropDown = ({ flavour }) => {
     const [open, setOpen] = useState(false);
+    const [showModal, setShowModal] = useState(false);
 
     if (!flavour) return null;
 
     return (
         <div className="flavour-section">
-            <button
-                className="flavour-toggle"
-                onClick={() => setOpen(!open)}
-            >
-                <h3 className="flavour-title">Flavor Profile</h3>
-                {open ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
-            </button>
+            {/* Header Toggle */}
+            <div className="flavour-header">
+                <button className="flavour-toggle" onClick={() => setOpen(!open)}>
+                    <h3 className="flavour-title">Flavor Profile</h3>
+                    {open ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
+                </button>
 
+                {open && (
+                    <button
+                        className="edit-btn"
+                        onClick={() => setShowModal(true)}
+                        title="Edit Flavor Profile"
+                    >
+                        <Pencil size={18} />
+                    </button>
+                )}
+            </div>
+
+            {/* Dropdown Content */}
             <div className={`flavour-content ${open ? "open" : ""}`}>
                 <div className="flavour-grid">
                     <div><span className="label">Primary Flavour:</span> {flavour.primary_flavour || "N/A"}</div>
@@ -33,6 +46,13 @@ const FlavorDropDown = ({ flavour }) => {
                     <div><span className="label">Tasting Profile:</span> {flavour.tasting_profile || "N/A"}</div>
                 </div>
             </div>
+
+            {/* Modal Component */}
+            <FlavorEditModal
+                show={showModal}
+                handleClose={() => setShowModal(false)}
+                flavour={flavour}
+            />
         </div>
     );
 };

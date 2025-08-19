@@ -80,7 +80,7 @@ const LiquorList = () => {
             const anyInactive = products.some((p) => !p.is_active);
             const newActiveValue = anyInactive;
 
-            await axiosInstance.patch("/products/update-activeToggle", { is_active: newActiveValue });
+            await axiosInstance.patch("/appInfo/update/toggle", { is_active: newActiveValue });
             await fetchProducts();
         } catch (err) {
             console.error("Toggle active error:", err);
