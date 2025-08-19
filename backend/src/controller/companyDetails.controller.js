@@ -74,7 +74,7 @@ const getCompanyDetails = async (req, res) => {
 
         // Admins & Drivers
         const drivers = await driverService.findAll();
-        const admins = await adminService.findByRole(ADMIN_ROLES.ADMIN);
+        const admins = await adminService.findAll();
 
         // Add staff information to each warehouse
         const detailsWithStaff = sortedDetails.map(warehouse => {
