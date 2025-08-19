@@ -1,9 +1,13 @@
 import CompanyService from '../services/company.service.js';
 import SystemService from '../services/system.service.js';
 import ADMIN_ROLES from '../enums/adminRoles.js';
+import DriverService from '../services/driver.service.js';
+import AdminUserService from '../services/adminUsers.service.js';
 
 const companyService = new CompanyService();
 const systemService = new SystemService();
+const driverService = new DriverService();
+const adminService = new AdminUserService();
 
 const createWhereHouse = async (req, res) => {
 	try {
@@ -67,13 +71,50 @@ const getCompanyDetails = async (req, res) => {
         const sortedDetails = details.sort((a, b) => {
             return new Date(a.created_at) - new Date(b.created_at);
         });
+
+        // Admins & Drivers
+        const drivers = await driverService.findAll();
+        const admins = await adminService.findByRole(ADMIN_ROLES.ADMIN);
+
+        // Add staff information to each warehouse
+        const detailsWithStaff = sortedDetails.map(warehouse => {
+            // Filter admins for this warehouse
+            const warehouseAdmins = admins.filter(admin => admin.where_house_id === warehouse.id);
+            
+            // Filter drivers for this warehouse
+            const warehouseDrivers = drivers.filter(driver => driver.where_house_id === warehouse.id);
+
+            // Format admin data
+            const formattedAdmins = warehouseAdmins.map(admin => ({
+                id: admin.id,
+                email: admin.email,
+                name: `${admin.firstName} ${admin.lastName}`
+            }));
+
+            // Format driver data
+            const formattedDrivers = warehouseDrivers.map(driver => ({
+                id: driver.id,
+                email: driver.email,
+                name: `${driver.firstName} ${driver.lastName}`
+            }));
+
+            return {
+                ...warehouse,
+                staff: {
+                    admin_count: warehouseAdmins.length,
+                    drivers_count: warehouseDrivers.length,
+                    admins: formattedAdmins,
+                    drivers: formattedDrivers
+                }
+            };
+        });
         
         return res.status(200).json({ 
             success: true, 
             message: "System Details fetched successfully", 
             count: details.length, 
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
-            data: sortedDetails 
+            data: detailsWithStaff  
         });
     } catch (error) {
         console.error("Get System details error:", error.message);

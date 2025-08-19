@@ -53,6 +53,20 @@ class AdminUserService extends BaseService {
         }
     }
 
+    async findByRole(role) {
+        try {
+            const docs = await this.findByFilter('role', '==', role);
+            
+            if (docs.length === 0){
+                return null;
+            }
+
+            return docs;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async comparePassword(plainPassword, hashedPassword) {
         return await bcrypt.compare(plainPassword, hashedPassword);
     }
