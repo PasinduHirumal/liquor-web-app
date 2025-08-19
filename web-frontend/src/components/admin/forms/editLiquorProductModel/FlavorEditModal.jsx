@@ -4,12 +4,19 @@ import { useParams } from "react-router-dom";
 import { axiosInstance } from "../../../../lib/axios";
 import toast from "react-hot-toast";
 
+// Match backend schema
+const primaryFlavours = [
+    "Sweet", "Dry", "Bitter", "Smoky", "Fruity", "Spicy", "Herbal",
+    "Woody", "Floral", "Earthy", "Citrusy", "Nutty", "Creamy"
+];
+const finishTypes = ["Short", "Medium", "Long"];
+const tastingProfiles = ["Light", "Medium", "Full-bodied", "Complex", "Smooth", "Bold"];
+
 const FlavorEditModal = ({ show, handleClose, flavour, onUpdated }) => {
-    const { id: productId } = useParams(); // get product ID from URL
+    const { id: productId } = useParams();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState({});
 
-    // Sync form data when flavour prop changes
     useEffect(() => {
         if (flavour) {
             setFormData({
@@ -24,7 +31,7 @@ const FlavorEditModal = ({ show, handleClose, flavour, onUpdated }) => {
                 bitterness_level: flavour.bitterness_level ?? 0,
                 smokiness_level: flavour.smokiness_level ?? 0,
                 finish_type: flavour.finish_type || "",
-                finish_notes: flavour.finish_notes || "",
+                finish_notes: flavour.finish_notes?.join(", ") || "",
             });
         }
     }, [flavour]);
@@ -58,6 +65,9 @@ const FlavorEditModal = ({ show, handleClose, flavour, onUpdated }) => {
                     wood_flavours: formData.wood_flavours
                         ? formData.wood_flavours.split(",").map((s) => s.trim())
                         : [],
+                    finish_notes: formData.finish_notes
+                        ? formData.finish_notes.split(",").map((s) => s.trim())
+                        : [],
                 },
             };
 
@@ -65,7 +75,7 @@ const FlavorEditModal = ({ show, handleClose, flavour, onUpdated }) => {
 
             toast.success("Flavor profile updated successfully!");
             handleClose();
-            if (onUpdated) onUpdated(); // parent refresh
+            if (onUpdated) onUpdated();
         } catch (error) {
             console.error(error);
             toast.error(
@@ -97,31 +107,39 @@ const FlavorEditModal = ({ show, handleClose, flavour, onUpdated }) => {
                         <Col md={6}>
                             <Form.Group className="mb-3">
                                 <Form.Label className="fw-semibold">Primary Flavour</Form.Label>
-                                <Form.Control
-                                    type="text"
+                                <Form.Select
                                     name="primary_flavour"
                                     value={formData.primary_flavour || ""}
                                     onChange={handleChange}
                                     className="rounded-1"
-                                />
+                                >
+                                    <option value="">-- Select Primary Flavour --</option>
+                                    {primaryFlavours.map((flavour, idx) => (
+                                        <option key={idx} value={flavour}>{flavour}</option>
+                                    ))}
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                         <Col md={6}>
                             <Form.Group className="mb-3">
                                 <Form.Label className="fw-semibold">Tasting Profile</Form.Label>
-                                <Form.Control
-                                    type="text"
+                                <Form.Select
                                     name="tasting_profile"
                                     value={formData.tasting_profile || ""}
                                     onChange={handleChange}
                                     className="rounded-1"
-                                />
+                                >
+                                    <option value="">-- Select Tasting Profile --</option>
+                                    {tastingProfiles.map((profile, idx) => (
+                                        <option key={idx} value={profile}>{profile}</option>
+                                    ))}
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                     </Row>
 
                     <Form.Group className="mb-3">
-                        <Form.Label className="fw-semibold">Flavour Notes</Form.Label>
+                        <Form.Label className="fw-semibold">Flavour Notes (comma separated)</Form.Label>
                         <Form.Control
                             as="textarea"
                             rows={2}
@@ -235,18 +253,22 @@ const FlavorEditModal = ({ show, handleClose, flavour, onUpdated }) => {
                         <Col md={6}>
                             <Form.Group className="mb-3">
                                 <Form.Label className="fw-semibold">Finish Type</Form.Label>
-                                <Form.Control
-                                    type="text"
+                                <Form.Select
                                     name="finish_type"
                                     value={formData.finish_type || ""}
                                     onChange={handleChange}
                                     className="rounded-1"
-                                />
+                                >
+                                    <option value="">-- Select Finish Type --</option>
+                                    {finishTypes.map((type, idx) => (
+                                        <option key={idx} value={type}>{type}</option>
+                                    ))}
+                                </Form.Select>
                             </Form.Group>
                         </Col>
                         <Col md={6}>
                             <Form.Group className="mb-3">
-                                <Form.Label className="fw-semibold">Finish Notes</Form.Label>
+                                <Form.Label className="fw-semibold">Finish Notes (comma separated)</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="finish_notes"
