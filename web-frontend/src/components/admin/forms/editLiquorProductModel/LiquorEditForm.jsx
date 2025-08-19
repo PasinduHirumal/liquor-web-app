@@ -45,6 +45,27 @@ const LiquorEditForm = () => {
     const [priceUpdating, setPriceUpdating] = useState(false);
     const [errors, setErrors] = useState({});
 
+    const [superMarkets, setSuperMarkets] = useState([]);
+    const [loadingMarkets, setLoadingMarkets] = useState(true);
+
+    useEffect(() => {
+        const fetchSuperMarkets = async () => {
+            try {
+                const res = await axiosInstance.get("/superMarket/getAllList");
+                if (res.data.success) {
+                    setSuperMarkets(res.data.data || []);
+                }
+            } catch (err) {
+                toast.error("Failed to load supermarkets");
+                console.error(err);
+            } finally {
+                setLoadingMarkets(false);
+            }
+        };
+
+        fetchSuperMarkets();
+    }, []);
+
     useEffect(() => {
         const fetchCategories = async () => {
             try {
@@ -317,6 +338,8 @@ const LiquorEditForm = () => {
                                     errors={errors}
                                     handlePriceUpdate={handlePriceUpdate}
                                     priceUpdating={priceUpdating}
+                                    superMarkets={superMarkets}
+                                    loadingMarkets={loadingMarkets}
                                 />
                                 <InventorySection
                                     formData={formData}
