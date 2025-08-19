@@ -1,18 +1,12 @@
 import React from "react";
 import { Form, Col, Row } from "react-bootstrap";
 
-const flavourOptions = [
-    "Sweet", "Dry", "Bitter", "Smoky", "Fruity", "Spicy",
-    "Herbal", "Woody", "Floral", "Earthy", "Citrusy",
-    "Nutty", "Creamy"
+const primaryFlavours = [
+    'Sweet', 'Dry', 'Bitter', 'Smoky', 'Fruity', 'Spicy', 'Herbal',
+    'Woody', 'Floral', 'Earthy', 'Citrusy', 'Nutty', 'Creamy'
 ];
-
-const finishTypeOptions = ["Short", "Medium", "Long"];
-
-const tastingProfileOptions = [
-    "Light", "Medium", "Full-bodied",
-    "Complex", "Smooth", "Bold"
-];
+const finishTypes = ['Short', 'Medium', 'Long'];
+const tastingProfiles = ['Light', 'Medium', 'Full-bodied', 'Complex', 'Smooth', 'Bold'];
 
 const ProductFlavourFields = ({
     values,
@@ -23,17 +17,24 @@ const ProductFlavourFields = ({
     setFieldValue,
     loading
 }) => {
-    // Handle comma-separated inputs
     const handleArrayFieldChange = (fieldName, e) => {
         const value = e.target.value;
+        if (!value.trim()) {
+            setFieldValue(fieldName, []);
+            return;
+        }
+
         const arrayValue = value
             .split(",")
-            .map((item) => item.trim())
-            .filter((item) => item);
+            .map(item => item.trim())
+            .filter(item => item);
         setFieldValue(fieldName, arrayValue);
     };
 
-    // Error/touched state helper
+    const handleSelectChange = (fieldName, e) => {
+        setFieldValue(fieldName, e.target.value || null);
+    };
+
     const getFieldState = (fieldPath) => {
         const fieldTouched = touched.flavour?.[fieldPath.split(".")[1]];
         const fieldError = errors.flavour?.[fieldPath.split(".")[1]];
@@ -47,24 +48,23 @@ const ProductFlavourFields = ({
         <>
             <h5 className="mt-3">Flavour Profile</h5>
 
-            {/* Primary flavour + notes */}
+            {/* Primary Flavour (Required) */}
             <Row>
                 <Col md={6}>
                     <Form.Group className="mb-3">
-                        <Form.Label>Primary Flavour</Form.Label>
+                        <Form.Label>Primary Flavour*</Form.Label>
                         <Form.Select
                             name="flavour.primary_flavour"
                             value={values.flavour.primary_flavour || ""}
-                            onChange={handleChange}
+                            onChange={(e) => handleSelectChange("flavour.primary_flavour", e)}
                             onBlur={handleBlur}
                             disabled={loading}
                             isInvalid={getFieldState("flavour.primary_flavour").isInvalid}
+                            required
                         >
-                            <option value="">Select a flavour</option>
-                            {flavourOptions.map((f) => (
-                                <option key={f} value={f}>
-                                    {f}
-                                </option>
+                            <option value="">Select a primary flavour</option>
+                            {primaryFlavours.map(f => (
+                                <option key={f} value={f}>{f}</option>
                             ))}
                         </Form.Select>
                         <Form.Control.Feedback type="invalid">
@@ -79,15 +79,12 @@ const ProductFlavourFields = ({
                         <Form.Control
                             type="text"
                             name="flavour.flavour_notes"
-                            value={Array.isArray(values.flavour.flavour_notes)
-                                ? values.flavour.flavour_notes.join(", ")
-                                : ""}
-                            onChange={(e) =>
-                                handleArrayFieldChange("flavour.flavour_notes", e)
-                            }
+                            value={values.flavour.flavour_notes?.join(", ") || ""}
+                            onChange={(e) => handleArrayFieldChange("flavour.flavour_notes", e)}
                             onBlur={handleBlur}
                             disabled={loading}
                             isInvalid={getFieldState("flavour.flavour_notes").isInvalid}
+                            placeholder="e.g. Vanilla, Caramel, Oak"
                         />
                         <Form.Control.Feedback type="invalid">
                             {getFieldState("flavour.flavour_notes").errorMessage}
@@ -96,7 +93,7 @@ const ProductFlavourFields = ({
                 </Col>
             </Row>
 
-            {/* Other array categories */}
+            {/* Flavour Categories (All Optional) */}
             <Row>
                 <Col md={6}>
                     <Form.Group className="mb-3">
@@ -107,16 +104,11 @@ const ProductFlavourFields = ({
                             value={Array.isArray(values.flavour.fruit_flavours)
                                 ? values.flavour.fruit_flavours.join(", ")
                                 : ""}
-                            onChange={(e) =>
-                                handleArrayFieldChange("flavour.fruit_flavours", e)
-                            }
+                            onChange={(e) => handleArrayFieldChange("flavour.fruit_flavours", e)}
                             onBlur={handleBlur}
                             disabled={loading}
-                            isInvalid={getFieldState("flavour.fruit_flavours").isInvalid}
+                            placeholder="e.g. Apple, Cherry, Citrus"
                         />
-                        <Form.Control.Feedback type="invalid">
-                            {getFieldState("flavour.fruit_flavours").errorMessage}
-                        </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
                 <Col md={6}>
@@ -128,16 +120,11 @@ const ProductFlavourFields = ({
                             value={Array.isArray(values.flavour.spice_flavours)
                                 ? values.flavour.spice_flavours.join(", ")
                                 : ""}
-                            onChange={(e) =>
-                                handleArrayFieldChange("flavour.spice_flavours", e)
-                            }
+                            onChange={(e) => handleArrayFieldChange("flavour.spice_flavours", e)}
                             onBlur={handleBlur}
                             disabled={loading}
-                            isInvalid={getFieldState("flavour.spice_flavours").isInvalid}
+                            placeholder="e.g. Cinnamon, Pepper, Nutmeg"
                         />
-                        <Form.Control.Feedback type="invalid">
-                            {getFieldState("flavour.spice_flavours").errorMessage}
-                        </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
             </Row>
@@ -152,16 +139,11 @@ const ProductFlavourFields = ({
                             value={Array.isArray(values.flavour.herbal_flavours)
                                 ? values.flavour.herbal_flavours.join(", ")
                                 : ""}
-                            onChange={(e) =>
-                                handleArrayFieldChange("flavour.herbal_flavours", e)
-                            }
+                            onChange={(e) => handleArrayFieldChange("flavour.herbal_flavours", e)}
                             onBlur={handleBlur}
                             disabled={loading}
-                            isInvalid={getFieldState("flavour.herbal_flavours").isInvalid}
+                            placeholder="e.g. Mint, Thyme, Eucalyptus"
                         />
-                        <Form.Control.Feedback type="invalid">
-                            {getFieldState("flavour.herbal_flavours").errorMessage}
-                        </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
                 <Col md={6}>
@@ -173,25 +155,20 @@ const ProductFlavourFields = ({
                             value={Array.isArray(values.flavour.wood_flavours)
                                 ? values.flavour.wood_flavours.join(", ")
                                 : ""}
-                            onChange={(e) =>
-                                handleArrayFieldChange("flavour.wood_flavours", e)
-                            }
+                            onChange={(e) => handleArrayFieldChange("flavour.wood_flavours", e)}
                             onBlur={handleBlur}
                             disabled={loading}
-                            isInvalid={getFieldState("flavour.wood_flavours").isInvalid}
+                            placeholder="e.g. Oak, Cedar, Pine"
                         />
-                        <Form.Control.Feedback type="invalid">
-                            {getFieldState("flavour.wood_flavours").errorMessage}
-                        </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
             </Row>
 
-            {/* Intensity levels */}
+            {/* Intensity Levels (All have defaults) */}
             <Row>
                 <Col md={4}>
                     <Form.Group className="mb-3">
-                        <Form.Label>Sweetness Level (0–10)</Form.Label>
+                        <Form.Label>Sweetness Level (0-10)</Form.Label>
                         <Form.Control
                             type="number"
                             name="flavour.sweetness_level"
@@ -203,16 +180,12 @@ const ProductFlavourFields = ({
                             }
                             onBlur={handleBlur}
                             disabled={loading}
-                            isInvalid={getFieldState("flavour.sweetness_level").isInvalid}
                         />
-                        <Form.Control.Feedback type="invalid">
-                            {getFieldState("flavour.sweetness_level").errorMessage}
-                        </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
                 <Col md={4}>
                     <Form.Group className="mb-3">
-                        <Form.Label>Bitterness Level (0–10)</Form.Label>
+                        <Form.Label>Bitterness Level (0-10)</Form.Label>
                         <Form.Control
                             type="number"
                             name="flavour.bitterness_level"
@@ -224,16 +197,12 @@ const ProductFlavourFields = ({
                             }
                             onBlur={handleBlur}
                             disabled={loading}
-                            isInvalid={getFieldState("flavour.bitterness_level").isInvalid}
                         />
-                        <Form.Control.Feedback type="invalid">
-                            {getFieldState("flavour.bitterness_level").errorMessage}
-                        </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
                 <Col md={4}>
                     <Form.Group className="mb-3">
-                        <Form.Label>Smokiness Level (0–10)</Form.Label>
+                        <Form.Label>Smokiness Level (0-10)</Form.Label>
                         <Form.Control
                             type="number"
                             name="flavour.smokiness_level"
@@ -245,16 +214,12 @@ const ProductFlavourFields = ({
                             }
                             onBlur={handleBlur}
                             disabled={loading}
-                            isInvalid={getFieldState("flavour.smokiness_level").isInvalid}
                         />
-                        <Form.Control.Feedback type="invalid">
-                            {getFieldState("flavour.smokiness_level").errorMessage}
-                        </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
             </Row>
 
-            {/* Finish */}
+            {/* Finish Section (Optional) */}
             <Row>
                 <Col md={6}>
                     <Form.Group className="mb-3">
@@ -262,21 +227,15 @@ const ProductFlavourFields = ({
                         <Form.Select
                             name="flavour.finish_type"
                             value={values.flavour.finish_type || ""}
-                            onChange={handleChange}
+                            onChange={(e) => handleSelectChange("flavour.finish_type", e)}
                             onBlur={handleBlur}
                             disabled={loading}
-                            isInvalid={getFieldState("flavour.finish_type").isInvalid}
                         >
-                            <option value="">Select finish type</option>
-                            {finishTypeOptions.map((f) => (
-                                <option key={f} value={f}>
-                                    {f}
-                                </option>
+                            <option value="">Select finish type (optional)</option>
+                            {finishTypes.map(f => (
+                                <option key={f} value={f}>{f}</option>
                             ))}
                         </Form.Select>
-                        <Form.Control.Feedback type="invalid">
-                            {getFieldState("flavour.finish_type").errorMessage}
-                        </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
                 <Col md={6}>
@@ -285,24 +244,17 @@ const ProductFlavourFields = ({
                         <Form.Control
                             type="text"
                             name="flavour.finish_notes"
-                            value={Array.isArray(values.flavour.finish_notes)
-                                ? values.flavour.finish_notes.join(", ")
-                                : ""}
-                            onChange={(e) =>
-                                handleArrayFieldChange("flavour.finish_notes", e)
-                            }
+                            value={values.flavour.finish_notes?.join(", ") || ""}
+                            onChange={(e) => handleArrayFieldChange("flavour.finish_notes", e)}
                             onBlur={handleBlur}
                             disabled={loading}
-                            isInvalid={getFieldState("flavour.finish_notes").isInvalid}
+                            placeholder="e.g. Smooth, Lingering, Spicy"
                         />
-                        <Form.Control.Feedback type="invalid">
-                            {getFieldState("flavour.finish_notes").errorMessage}
-                        </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
             </Row>
 
-            {/* Overall tasting profile */}
+            {/* Tasting Profile (Optional) */}
             <Row>
                 <Col md={12}>
                     <Form.Group className="mb-3">
@@ -310,21 +262,15 @@ const ProductFlavourFields = ({
                         <Form.Select
                             name="flavour.tasting_profile"
                             value={values.flavour.tasting_profile || ""}
-                            onChange={handleChange}
+                            onChange={(e) => handleSelectChange("flavour.tasting_profile", e)}
                             onBlur={handleBlur}
                             disabled={loading}
-                            isInvalid={getFieldState("flavour.tasting_profile").isInvalid}
                         >
-                            <option value="">Select tasting profile</option>
-                            {tastingProfileOptions.map((p) => (
-                                <option key={p} value={p}>
-                                    {p}
-                                </option>
+                            <option value="">Select tasting profile (optional)</option>
+                            {tastingProfiles.map(p => (
+                                <option key={p} value={p}>{p}</option>
                             ))}
                         </Form.Select>
-                        <Form.Control.Feedback type="invalid">
-                            {getFieldState("flavour.tasting_profile").errorMessage}
-                        </Form.Control.Feedback>
                     </Form.Group>
                 </Col>
             </Row>

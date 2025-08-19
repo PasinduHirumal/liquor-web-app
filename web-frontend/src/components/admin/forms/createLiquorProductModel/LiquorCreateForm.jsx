@@ -85,8 +85,23 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
         setLoading(true);
 
         try {
+            // Clean up the flavour object before submission
+            const cleanedFlavour = {
+                ...values.flavour,
+                flavour_notes: values.flavour.flavour_notes || [],
+                fruit_flavours: values.flavour.fruit_flavours || [],
+                spice_flavours: values.flavour.spice_flavours || [],
+                herbal_flavours: values.flavour.herbal_flavours || [],
+                wood_flavours: values.flavour.wood_flavours || [],
+                finish_notes: values.flavour.finish_notes || [],
+                sweetness_level: values.flavour.sweetness_level || 0,
+                bitterness_level: values.flavour.bitterness_level || 0,
+                smokiness_level: values.flavour.smokiness_level || 0
+            };
+
             const payload = {
                 ...values,
+                flavour: cleanedFlavour,
                 main_image: mainImage,
                 images: images.filter((img) => img !== mainImage),
                 is_liquor: true,
@@ -95,7 +110,6 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
             };
 
             const res = await axiosInstance.post('/products/create', payload);
-
             toast.success('Product created successfully!');
             onSuccess(res.data.data);
             setImages([]);
@@ -127,7 +141,7 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                         superMarket_id: "",
                         country: "",
                         flavour: {
-                            primary_flavour: "",
+                            primary_flavour: null,
                             flavour_notes: [],
                             fruit_flavours: [],
                             spice_flavours: [],
@@ -136,9 +150,9 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                             sweetness_level: 0,
                             bitterness_level: 0,
                             smokiness_level: 0,
-                            finish_type: "",
+                            finish_type: null,
                             finish_notes: [],
-                            tasting_profile: "",
+                            tasting_profile: null,
                         },
                         cost_price: "",
                         marked_price: "",
