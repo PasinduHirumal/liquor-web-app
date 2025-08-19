@@ -1,23 +1,20 @@
+import MAIN_WAREHOUSE_DATA from '../data/MainWarehouse.js';
 import CompanyService from '../services/company.service.js';
 
 const companyService = new CompanyService();
 
 const createDefaultCompanyDetails = async () => {
     try {
-        const defaultCode = "B-000001";
+        const defaultCode = MAIN_WAREHOUSE_DATA.CODE;
         const main_where_house = await companyService.findByFilter('where_house_code', '==', defaultCode);
 
         if (!main_where_house) {
-            const code = 1; // Fixed: Use decimal 1 instead of octal 000001
             const companyData = { 
-                where_house_code: `B-${code.toString().padStart(6, '0')}`, // Pad with zeros to get "B-000001"
-                where_house_name: "Main Warehouse",
-                where_house_location: {
-                    lat: null,
-                    lng: null
-                },
-                delivery_charge_for_1KM: 0.01,
-                service_charge: 0.00,
+                where_house_code: MAIN_WAREHOUSE_DATA.CODE,
+                where_house_name: MAIN_WAREHOUSE_DATA.NAME,
+                where_house_location: MAIN_WAREHOUSE_DATA.LOCATION,
+                delivery_charge_for_1KM: MAIN_WAREHOUSE_DATA.DELIVERY_CHARGE_FOR_1KM,
+                service_charge: MAIN_WAREHOUSE_DATA.SERVICE_CHARGE,
                 isActive: true
             };
 
