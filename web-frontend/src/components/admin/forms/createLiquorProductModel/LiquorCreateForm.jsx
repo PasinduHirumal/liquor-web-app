@@ -85,19 +85,27 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
         setLoading(true);
 
         try {
-            // Clean up the flavour object before submission
             const cleanedFlavour = {
-                ...values.flavour,
+                primary_flavour: values.flavour.primary_flavour,
                 flavour_notes: values.flavour.flavour_notes || [],
                 fruit_flavours: values.flavour.fruit_flavours || [],
                 spice_flavours: values.flavour.spice_flavours || [],
                 herbal_flavours: values.flavour.herbal_flavours || [],
                 wood_flavours: values.flavour.wood_flavours || [],
-                finish_notes: values.flavour.finish_notes || [],
                 sweetness_level: values.flavour.sweetness_level || 0,
                 bitterness_level: values.flavour.bitterness_level || 0,
-                smokiness_level: values.flavour.smokiness_level || 0
+                smokiness_level: values.flavour.smokiness_level || 0,
+                finish_type: values.flavour.finish_type || null,
+                finish_notes: values.flavour.finish_notes || [],
+                tasting_profile: values.flavour.tasting_profile || null
             };
+
+            delete cleanedFlavour.flavour_notes_input;
+            delete cleanedFlavour.fruit_flavours_input;
+            delete cleanedFlavour.spice_flavours_input;
+            delete cleanedFlavour.herbal_flavours_input;
+            delete cleanedFlavour.wood_flavours_input;
+            delete cleanedFlavour.finish_notes_input;
 
             const payload = {
                 ...values,
@@ -143,15 +151,21 @@ const LiquorCreateForm = ({ onSuccess, onCancel }) => {
                         flavour: {
                             primary_flavour: null,
                             flavour_notes: [],
+                            flavour_notes_input: "",
                             fruit_flavours: [],
+                            fruit_flavours_input: "",
                             spice_flavours: [],
+                            spice_flavours_input: "",
                             herbal_flavours: [],
+                            herbal_flavours_input: "",
                             wood_flavours: [],
+                            wood_flavours_input: "",
                             sweetness_level: 0,
                             bitterness_level: 0,
                             smokiness_level: 0,
                             finish_type: null,
                             finish_notes: [],
+                            finish_notes_input: "",
                             tasting_profile: null,
                         },
                         cost_price: "",
