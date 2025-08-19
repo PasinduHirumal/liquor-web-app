@@ -7,6 +7,7 @@ import populateUser from '../utils/populateUser.js';
 import populateDriver from '../utils/populateDriver.js';
 import populateWhereHouse from "../utils/populateWhere_House.js";
 import { populateAddressWithUserIdInData } from '../utils/populateAddress.js';
+import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
 
 
 const orderService = new OrdersService();
@@ -62,7 +63,9 @@ const getAllOrders = async (req, res) => {
 
         // Sort by created_at in descending order (newest first)
         const sortedOrders = populatedOrders.sort((a, b) => {
-            return new Date(b.created_at) - new Date(a.created_at);
+            const dateA = getDateFromTimestamp(a.created_at);
+            const dateB = getDateFromTimestamp(b.created_at);
+            return dateB - dateA;
         });
 
         return res.status(200).json({ 
