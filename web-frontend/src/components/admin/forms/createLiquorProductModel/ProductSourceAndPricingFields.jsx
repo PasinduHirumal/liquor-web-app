@@ -25,27 +25,25 @@ const ProductSourceAndPricingFields = ({ values, errors, touched, handleChange, 
         fetchMarkets();
     }, []);
 
-    // Search supermarkets
     useEffect(() => {
-        if (!searchTerm.trim()) return;
-
-        const fetchSearchResults = async () => {
+        const fetchMarketsBySearch = async () => {
             try {
                 setLoadingMarkets(true);
-                const res = await axiosInstance.get("/superMarket/search", {
-                    params: { q: searchTerm }
-                });
+                const res = searchTerm.trim()
+                    ? await axiosInstance.get("/superMarket/search", { params: { q: searchTerm } })
+                    : await axiosInstance.get("/superMarket/getAllList");
+
                 if (res.data.success) {
                     setSuperMarkets(res.data.data || []);
                 }
             } catch (error) {
-                console.error("Error searching supermarkets:", error.message);
+                console.error("Error fetching supermarkets:", error.message);
             } finally {
                 setLoadingMarkets(false);
             }
         };
 
-        const debounce = setTimeout(fetchSearchResults, 500); // debounce
+        const debounce = setTimeout(fetchMarketsBySearch, 500);
         return () => clearTimeout(debounce);
     }, [searchTerm]);
 
@@ -55,8 +53,16 @@ const ProductSourceAndPricingFields = ({ values, errors, touched, handleChange, 
                 <Col md={12}>
                     <Form.Group className="mb-3">
                         <Form.Label>Product Source *</Form.Label>
+                        <Form.Control
+                            type="text"
+                            placeholder="Search supermarkets..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            disabled={loading}
+                        />
                         <Form.Select
                             name="superMarket_id"
+                            className="mt-2"
                             value={values.superMarket_id}
                             onChange={handleChange}
                             onBlur={handleBlur}
@@ -71,14 +77,6 @@ const ProductSourceAndPricingFields = ({ values, errors, touched, handleChange, 
                             ))}
                         </Form.Select>
                         {loadingMarkets && <Spinner animation="border" size="sm" className="ms-2" />}
-                        <Form.Control
-                            type="text"
-                            placeholder="Search supermarkets..."
-                            className="mt-2"
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            disabled={loading}
-                        />
                         <Form.Control.Feedback type="invalid">{errors.superMarket_id}</Form.Control.Feedback>
                     </Form.Group>
                 </Col>
