@@ -42,7 +42,7 @@ const FlavorDropDown = ({ flavour }) => {
                     <div><span className="label">Bitterness Level:</span> {flavour.bitterness_level ?? "N/A"}</div>
                     <div><span className="label">Smokiness Level:</span> {flavour.smokiness_level ?? "N/A"}</div>
                     <div><span className="label">Finish Type:</span> {flavour.finish_type || "N/A"}</div>
-                    <div><span className="label">Finish Notes:</span> {flavour.finish_notes || "N/A"}</div>
+                    <div><span className="label">Finish Notes:</span> {flavour.finish_notes?.join(", ") || "N/A"}</div>
                     <div><span className="label">Tasting Profile:</span> {flavour.tasting_profile || "N/A"}</div>
                 </div>
             </div>

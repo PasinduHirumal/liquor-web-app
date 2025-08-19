@@ -61,6 +61,15 @@ const BasicInfoSection = ({ formData, handleChange, categories, errors }) => {
                         {errors.category_id}
                     </Form.Control.Feedback>
                 </FloatingLabel>
+
+                <FloatingLabel controlId="country" label="Country" className="mb-3">
+                    <Form.Control
+                        name="country"
+                        value={formData.country || ""}
+                        onChange={handleChange}
+                        placeholder="Enter country of origin"
+                    />
+                </FloatingLabel>
             </Card.Body>
         </Card>
     );
