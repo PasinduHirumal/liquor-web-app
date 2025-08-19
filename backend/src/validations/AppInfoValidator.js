@@ -46,6 +46,7 @@ const validateLiquorActiveToggleUpdate = (req, res, next) => {
   
   const schema = Joi.object({
     is_liquor_show: Joi.boolean().optional(),
+    is_active: Joi.boolean().optional(),
   })
   .min(1) // Require at least one field to update
   .options({ stripUnknown: true });; 
