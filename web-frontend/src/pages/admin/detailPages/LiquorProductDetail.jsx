@@ -4,7 +4,7 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import {
     FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit,
-    FaCheckCircle, FaTimesCircle, FaArrowLeft, FaPercentage
+    FaCheckCircle, FaTimesCircle, FaArrowLeft, FaPercentage, FaGlobe 
 } from "react-icons/fa";
 import { Chip } from "@mui/material";
 import { styled } from "@mui/system";
@@ -213,6 +213,10 @@ const LiquorProductDetail = () => {
                                 <div className="stock-quantity">
                                     <FaBoxOpen className="quantity-icon" />
                                     <span>{product.stock_quantity || 0} units available</span>
+                                </div>
+                                <div className="stock-quantity">
+                                    <FaGlobe className="quantity-icon" />
+                                    <span>{product.country}</span>
                                 </div>
                             </div>
 
