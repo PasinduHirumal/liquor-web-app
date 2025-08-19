@@ -13,8 +13,8 @@ const super_admin = ADMIN_ROLES.SUPER_ADMIN;
 
 router.get('/getAll', authenticateUser, authorizeRoles(super_admin), getAllAppData);
 router.get('/getMainAppInfo', authenticateUser, authorizeRoles(super_admin), getMainAppInfo);
+router.patch('/update/toggle', authenticateUser, authorizeRoles(super_admin), validateLiquorActiveToggleUpdate, updateActiveToggle);
 router.patch('/update/:id', authenticateUser, authorizeRoles(super_admin), validateAppInfoUpdate, updateAppInfoById);
-router.patch('/update/liquor_toggle', authenticateUser, authorizeRoles(super_admin), validateLiquorActiveToggleUpdate, updateActiveToggle);
 
 
 export default router;

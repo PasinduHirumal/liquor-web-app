@@ -1,3 +1,4 @@
+import SUPER_ADMIN_DATA from '../data/SuperAdmin.js';
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import AdminUserService from '../services/adminUsers.service.js';
 
@@ -5,17 +6,17 @@ const adminService = new AdminUserService();
 
 const createDefaultSuperAdmin = async () => {
     try {
-        const email = process.env.SUPER_ADMIN_EMAIL;
+        const email = SUPER_ADMIN_DATA.EMAIL;
         const existingSuperAdmin = await adminService.findByEmail(email);
 
         if (!existingSuperAdmin) {
             
             const superAdminData  = {
-                email: process.env.SUPER_ADMIN_EMAIL,
-                password: process.env.SUPER_ADMIN_PASSWORD,
-                firstName: process.env.SUPER_ADMIN_FIRST_NAME ,
-                lastName: process.env.SUPER_ADMIN_LAST_NAME,            
-                phone: process.env.SUPER_ADMIN_PHONE,
+                email: SUPER_ADMIN_DATA.EMAIL,
+                password: SUPER_ADMIN_DATA.PASSWORD,
+                firstName: SUPER_ADMIN_DATA.FIRST_NAME,
+                lastName: SUPER_ADMIN_DATA.LAST_NAME,            
+                phone: SUPER_ADMIN_DATA.PHONE,
 
                 role: ADMIN_ROLES.SUPER_ADMIN,
                 googleId: '',
