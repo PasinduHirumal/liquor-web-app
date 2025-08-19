@@ -2,10 +2,17 @@ import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { axiosInstance } from "../../../../lib/axios";
 import toast from "react-hot-toast";
-import {
-    Container, Form, Row, Col, Card, Spinner, Button, Alert, Image, FloatingLabel
-} from "react-bootstrap";
-import { XCircle, UploadCloud, CheckCircle } from "react-feather";
+import { Container, Form, Row, Col, Card, Spinner, Button } from "react-bootstrap";
+import { CheckCircle } from "react-feather";
+
+// Import refactored sections
+import BasicInfoSection from "./BasicInfoSection";
+import PricingSection from "./PricingSection";
+import InventorySection from "./InventorySection";
+import SpecificationsSection from "./SpecificationsSection";
+import StatusSection from "./StatusSection";
+import MainImageSection from "./MainImageSection";
+import AdditionalImagesSection from "./AdditionalImagesSection";
 
 const LiquorEditForm = () => {
     const { id } = useParams();
@@ -37,6 +44,27 @@ const LiquorEditForm = () => {
     const [updating, setUpdating] = useState(false);
     const [priceUpdating, setPriceUpdating] = useState(false);
     const [errors, setErrors] = useState({});
+
+    const [superMarkets, setSuperMarkets] = useState([]);
+    const [loadingMarkets, setLoadingMarkets] = useState(true);
+
+    useEffect(() => {
+        const fetchSuperMarkets = async () => {
+            try {
+                const res = await axiosInstance.get("/superMarket/getAllList");
+                if (res.data.success) {
+                    setSuperMarkets(res.data.data || []);
+                }
+            } catch (err) {
+                toast.error("Failed to load supermarkets");
+                console.error(err);
+            } finally {
+                setLoadingMarkets(false);
+            }
+        };
+
+        fetchSuperMarkets();
+    }, []);
 
     useEffect(() => {
         const fetchCategories = async () => {
@@ -294,431 +322,55 @@ const LiquorEditForm = () => {
                 <Card.Header className="bg-primary text-white">
                     <h2 className="mb-0">Edit Liquor Product</h2>
                 </Card.Header>
-
                 <Card.Body>
                     <Form onSubmit={handleSubmit} encType="multipart/form-data">
                         <Row>
                             <Col md={8}>
-                                {/* Basic Information Section */}
-                                <Card className="mb-4">
-                                    <Card.Header>
-                                        <h5 className="mb-0">Basic Information</h5>
-                                    </Card.Header>
-                                    <Card.Body>
-                                        <FloatingLabel controlId="name" label="Product Name" className="mb-3">
-                                            <Form.Control
-                                                name="name"
-                                                value={formData.name}
-                                                onChange={handleChange}
-                                                required
-                                                isInvalid={!!errors.name}
-                                                placeholder="Enter product name"
-                                            />
-                                            <Form.Control.Feedback type="invalid">
-                                                {errors.name}
-                                            </Form.Control.Feedback>
-                                        </FloatingLabel>
-
-                                        <FloatingLabel controlId="description" label="Description" className="mb-3">
-                                            <Form.Control
-                                                as="textarea"
-                                                name="description"
-                                                value={formData.description}
-                                                onChange={handleChange}
-                                                style={{ height: '100px' }}
-                                                placeholder="Enter product description"
-                                            />
-                                        </FloatingLabel>
-
-                                        <FloatingLabel controlId="brand" label="Brand" className="mb-3">
-                                            <Form.Control
-                                                name="brand"
-                                                value={formData.brand}
-                                                onChange={handleChange}
-                                                placeholder="Enter brand name"
-                                            />
-                                        </FloatingLabel>
-
-                                        <FloatingLabel controlId="category" label="Category" className="mb-3">
-                                            <Form.Select
-                                                name="category_id"
-                                                value={formData.category_id}
-                                                onChange={handleChange}
-                                                required
-                                                isInvalid={!!errors.category_id}
-                                            >
-                                                <option value="">Select a category</option>
-                                                {categories.map((cat) => (
-                                                    <option key={cat._id || cat.category_id} value={cat._id || cat.category_id}>
-                                                        {cat.name}
-                                                    </option>
-                                                ))}
-                                            </Form.Select>
-                                            <Form.Control.Feedback type="invalid">
-                                                {errors.category_id}
-                                            </Form.Control.Feedback>
-                                        </FloatingLabel>
-                                    </Card.Body>
-                                </Card>
-
-                                {/* Pricing Section */}
-                                <Card className="mb-4">
-                                    <Card.Header className="d-flex justify-content-between align-items-center">
-                                        <h5 className="mb-0">Update Pricing</h5>
-                                        <Button
-                                            variant="outline-primary"
-                                            size="sm"
-                                            onClick={handlePriceUpdate}
-                                            disabled={priceUpdating}
-                                        >
-                                            {priceUpdating ? (
-                                                <Spinner as="span" animation="border" size="sm" />
-                                            ) : (
-                                                "Update Price Only"
-                                            )}
-                                        </Button>
-                                    </Card.Header>
-                                    <Card.Body>
-                                        <Row>
-                                            <Col md={12}>
-                                                <FloatingLabel controlId="superMarket_id" label="Product Source (e.g., Keels, Food City)" className="mb-3">
-                                                    <Form.Control
-                                                        name="superMarket_id"
-                                                        value={formData.superMarket_id}
-                                                        onChange={handleChange}
-                                                        placeholder="Enter where product is from"
-                                                    />
-                                                </FloatingLabel>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col md={6}>
-                                                <FloatingLabel controlId="cost_price" label="Cost Price (Rs)" className="mb-3">
-                                                    <Form.Control
-                                                        name="cost_price"
-                                                        type="number"
-                                                        value={formData.cost_price}
-                                                        onChange={handleChange}
-                                                        step="0.01"
-                                                        min="0"
-                                                        isInvalid={!!errors.cost_price}
-                                                        placeholder="0.00"
-                                                    />
-                                                    <Form.Control.Feedback type="invalid">
-                                                        {errors.cost_price}
-                                                    </Form.Control.Feedback>
-                                                </FloatingLabel>
-                                            </Col>
-                                            <Col md={6}>
-                                                <FloatingLabel controlId="marked_price" label="Marked Price (Rs)" className="mb-3">
-                                                    <Form.Control
-                                                        name="marked_price"
-                                                        type="number"
-                                                        value={formData.marked_price}
-                                                        onChange={handleChange}
-                                                        step="0.01"
-                                                        min="0.01"
-                                                        isInvalid={!!errors.marked_price}
-                                                        placeholder="0.00"
-                                                    />
-                                                    <Form.Control.Feedback type="invalid">
-                                                        {errors.marked_price}
-                                                    </Form.Control.Feedback>
-                                                </FloatingLabel>
-                                            </Col>
-                                        </Row>
-                                        <Row>
-                                            <Col md={6}>
-                                                <FloatingLabel controlId="discount_percentage" label="Discount (%)" className="mb-3">
-                                                    <Form.Control
-                                                        name="discount_percentage"
-                                                        type="number"
-                                                        value={formData.discount_percentage}
-                                                        onChange={handleChange}
-                                                        step="1"
-                                                        min="0"
-                                                        max="100"
-                                                        isInvalid={!!errors.discount_percentage}
-                                                        placeholder="0"
-                                                    />
-                                                    <Form.Control.Feedback type="invalid">
-                                                        {errors.discount_percentage}
-                                                    </Form.Control.Feedback>
-                                                </FloatingLabel>
-                                            </Col>
-                                        </Row>
-                                    </Card.Body>
-                                </Card>
-
-                                {/* Inventory Section */}
-                                <Card className="mb-4">
-                                    <Card.Header className="d-flex justify-content-between align-items-center">
-                                        <h5 className="mb-0">Manage Inventory</h5>
-                                        <Button
-                                            variant="outline-primary"
-                                            size="sm"
-                                            onClick={handleInventoryUpdate}
-                                            disabled={updating}
-                                        >
-                                            {updating ? (
-                                                <Spinner as="span" animation="border" size="sm" />
-                                            ) : (
-                                                "Update Stock Only"
-                                            )}
-                                        </Button>
-                                    </Card.Header>
-                                    <Card.Body>
-                                        <Row>
-                                            <Col md={6}>
-                                                <div className="mb-3">
-                                                    <div className={`p-3 rounded ${formData.stock_quantity > 10 ? 'bg-success' : formData.stock_quantity > 0 ? 'bg-warning' : 'bg-danger'} text-white`}>
-                                                        {formData.stock_quantity} units available
-                                                    </div>
-                                                </div>
-                                            </Col>
-                                            <Col md={6}>
-                                                <FloatingLabel controlId="add_quantity" label="Add Quantity" className="mb-3">
-                                                    <Form.Control
-                                                        name="add_quantity"
-                                                        type="number"
-                                                        value={formData.add_quantity || 0}
-                                                        onChange={handleChange}
-                                                        min="0"
-                                                        placeholder="0"
-                                                    />
-                                                </FloatingLabel>
-                                            </Col>
-                                            <Col md={6}>
-                                                <FloatingLabel controlId="withdraw_quantity" label="Withdraw Quantity" className="mb-3">
-                                                    <Form.Control
-                                                        name="withdraw_quantity"
-                                                        type="number"
-                                                        value={formData.withdraw_quantity || 0}
-                                                        onChange={handleChange}
-                                                        min="0"
-                                                        placeholder="0"
-                                                    />
-                                                </FloatingLabel>
-                                            </Col>
-                                        </Row>
-                                    </Card.Body>
-                                </Card>
-
-                                {/* Product Specifications */}
-                                <Card className="mb-4">
-                                    <Card.Header>
-                                        <h5 className="mb-0">Product Specifications</h5>
-                                    </Card.Header>
-                                    <Card.Body>
-                                        <Row>
-                                            <Col md={6}>
-                                                <FloatingLabel controlId="alcohol" label="Alcohol Content (ABV%)" className="mb-3">
-                                                    <Form.Control
-                                                        name="alcohol_content"
-                                                        type="number"
-                                                        value={formData.alcohol_content}
-                                                        onChange={handleChange}
-                                                        step="0.1"
-                                                        min="0"
-                                                        max="100"
-                                                        placeholder="0.0"
-                                                    />
-                                                </FloatingLabel>
-                                            </Col>
-                                            <Col md={6}>
-                                                <FloatingLabel controlId="volume" label="Volume (ml)" className="mb-3">
-                                                    <Form.Control
-                                                        name="volume"
-                                                        type="number"
-                                                        value={formData.volume}
-                                                        onChange={handleChange}
-                                                        min="0"
-                                                        placeholder="0"
-                                                    />
-                                                </FloatingLabel>
-                                            </Col>
-                                        </Row>
-                                    </Card.Body>
-                                </Card>
+                                <BasicInfoSection
+                                    formData={formData}
+                                    handleChange={handleChange}
+                                    categories={categories}
+                                    errors={errors}
+                                />
+                                <PricingSection
+                                    formData={formData}
+                                    handleChange={handleChange}
+                                    errors={errors}
+                                    handlePriceUpdate={handlePriceUpdate}
+                                    priceUpdating={priceUpdating}
+                                    superMarkets={superMarkets}
+                                    loadingMarkets={loadingMarkets}
+                                />
+                                <InventorySection
+                                    formData={formData}
+                                    handleChange={handleChange}
+                                    handleInventoryUpdate={handleInventoryUpdate}
+                                    updating={updating}
+                                />
+                                <SpecificationsSection
+                                    formData={formData}
+                                    handleChange={handleChange}
+                                />
                             </Col>
-
                             <Col md={4}>
-                                {/* Status & Images Section */}
-                                <Card className="mb-4">
-                                    <Card.Header>
-                                        <h5 className="mb-0">Status</h5>
-                                    </Card.Header>
-                                    <Card.Body>
-                                        <Form.Check
-                                            type="switch"
-                                            id="is_active"
-                                            label="Active Product"
-                                            name="is_active"
-                                            checked={formData.is_active}
-                                            onChange={handleChange}
-                                            className="mb-3"
-                                        />
-                                        <Form.Check
-                                            type="switch"
-                                            id="is_in_stock"
-                                            label="In Stock"
-                                            name="is_in_stock"
-                                            checked={formData.is_in_stock}
-                                            onChange={handleChange}
-                                        />
-                                    </Card.Body>
-                                </Card>
-
-                                {/* Main Image Section */}
-                                <Card className="mb-4">
-                                    <Card.Header>
-                                        <h5 className="mb-0">Main Product Image</h5>
-                                    </Card.Header>
-                                    <Card.Body>
-                                        <div className="mb-3">
-                                            <Form.Label>Current Main Image</Form.Label>
-                                            {!existingMainImage && !newMainImageBase64 ? (
-                                                <Alert variant="info">No main image uploaded yet</Alert>
-                                            ) : (
-                                                <div className="d-flex justify-content-center">
-                                                    <div className="position-relative">
-                                                        <Image
-                                                            src={newMainImageBase64 || existingMainImage}
-                                                            alt="main-product"
-                                                            thumbnail
-                                                            style={{ width: '100%', maxHeight: '200px', objectFit: 'contain' }}
-                                                            onError={(e) => (e.target.src = "/placeholder-bottle.jpg")}
-                                                        />
-                                                        <Button
-                                                            variant="danger"
-                                                            size="sm"
-                                                            className="position-absolute top-0 end-0 p-0 rounded-circle"
-                                                            style={{ width: '20px', height: '20px', transform: 'translate(30%, -30%)' }}
-                                                            onClick={newMainImageBase64 ? removeNewMainImage : removeExistingMainImage}
-                                                            title="Remove image"
-                                                        >
-                                                            <XCircle size={16} />
-                                                        </Button>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="mb-3">
-                                            <Form.Label>Upload New Main Image</Form.Label>
-                                            <Form.Control
-                                                type="file"
-                                                accept="image/*"
-                                                onChange={handleMainImageChange}
-                                                className="d-none"
-                                                id="mainImageUpload"
-                                            />
-                                            <Button
-                                                variant="outline-primary"
-                                                as="label"
-                                                htmlFor="mainImageUpload"
-                                                className="w-100 d-flex align-items-center justify-content-center gap-2"
-                                            >
-                                                <UploadCloud size={16} />
-                                                Upload Main Image
-                                            </Button>
-                                            <Form.Text className="text-muted">
-                                                Recommended ratio: 1:1 (square)
-                                            </Form.Text>
-                                        </div>
-                                    </Card.Body>
-                                </Card>
-
-                                {/* Additional Images Section */}
-                                <Card>
-                                    <Card.Header>
-                                        <h5 className="mb-0">Additional Product Images</h5>
-                                    </Card.Header>
-                                    <Card.Body>
-                                        <div className="mb-3">
-                                            <Form.Label>Current Images</Form.Label>
-                                            {existingImages.length === 0 ? (
-                                                <Alert variant="info">No additional images uploaded yet</Alert>
-                                            ) : (
-                                                <div className="d-flex flex-wrap gap-2">
-                                                    {existingImages.map((url, idx) => (
-                                                        <div key={idx} className="position-relative">
-                                                            <Image
-                                                                src={url}
-                                                                alt={`existing-${idx}`}
-                                                                thumbnail
-                                                                style={{ width: 80, height: 80, objectFit: 'contain' }}
-                                                                onError={(e) => (e.target.src = "/placeholder-bottle.jpg")}
-                                                            />
-                                                            <Button
-                                                                variant="danger"
-                                                                size="sm"
-                                                                className="position-absolute top-0 end-0 p-0 rounded-circle"
-                                                                style={{ width: '20px', height: '20px', transform: 'translate(30%, -30%)' }}
-                                                                onClick={() => removeExistingImage(url)}
-                                                                title="Remove image"
-                                                            >
-                                                                <XCircle size={16} />
-                                                            </Button>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </div>
-
-                                        <div className="mb-3">
-                                            <Form.Label>Add New Images</Form.Label>
-                                            <Form.Control
-                                                type="file"
-                                                multiple
-                                                accept="image/*"
-                                                onChange={handleNewImagesChange}
-                                                className="d-none"
-                                                id="imageUpload"
-                                            />
-                                            <Button
-                                                variant="outline-primary"
-                                                as="label"
-                                                htmlFor="imageUpload"
-                                                className="w-100 d-flex align-items-center justify-content-center gap-2"
-                                            >
-                                                <UploadCloud size={16} />
-                                                Upload Images
-                                            </Button>
-                                            <Form.Text className="text-muted">
-                                                Total Images ({(existingImages.length + newImagesBase64.length)})
-                                            </Form.Text>
-                                        </div>
-
-                                        {newImagesBase64.length > 0 && (
-                                            <div className="mt-2">
-                                                <h6>New Images to Upload</h6>
-                                                <div className="d-flex flex-wrap gap-2">
-                                                    {newImagesBase64.map((base64, idx) => (
-                                                        <div key={idx} className="position-relative">
-                                                            <Image
-                                                                src={base64}
-                                                                alt={`new-${idx}`}
-                                                                thumbnail
-                                                                style={{ width: 80, height: 80, objectFit: 'contain' }}
-                                                            />
-                                                            <Button
-                                                                variant="danger"
-                                                                size="sm"
-                                                                className="position-absolute top-0 end-0 p-0 rounded-circle"
-                                                                style={{ width: '20px', height: '20px', transform: 'translate(30%, -30%)' }}
-                                                                onClick={() => removeNewImage(idx)}
-                                                                title="Remove image"
-                                                            >
-                                                                <XCircle size={16} />
-                                                            </Button>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        )}
-                                    </Card.Body>
-                                </Card>
+                                <StatusSection
+                                    formData={formData}
+                                    handleChange={handleChange}
+                                />
+                                <MainImageSection
+                                    existingMainImage={existingMainImage}
+                                    newMainImageBase64={newMainImageBase64}
+                                    handleMainImageChange={handleMainImageChange}
+                                    removeExistingMainImage={removeExistingMainImage}
+                                    removeNewMainImage={removeNewMainImage}
+                                />
+                                <AdditionalImagesSection
+                                    existingImages={existingImages}
+                                    newImagesBase64={newImagesBase64}
+                                    handleNewImagesChange={handleNewImagesChange}
+                                    removeExistingImage={removeExistingImage}
+                                    removeNewImage={removeNewImage}
+                                />
                             </Col>
                         </Row>
 
