@@ -78,14 +78,6 @@ const populateAddressWithUserIdInData = async (data) => {
             userId = category.userId || category.customerId || category.customer_id;
         }
             
-        console.log('Debug info:', { 
-            addressId, 
-            userId, 
-            orderId: category.order_id || category.id,
-            user_id_type: typeof category.user_id,
-            user_id_value: category.user_id 
-        });
-            
         if (addressId && userId) {
             try {
                 const address = await addressService.findById(userId, addressId);
@@ -95,7 +87,7 @@ const populateAddressWithUserIdInData = async (data) => {
                         savedAddress: `${address.city || ''}, ${address.state || ''}, ${address.postalCode || ''}, ${address.country || ''}`.replace(/^,\s*|,\s*$/g, ''), // Remove leading/trailing commas
                         streetAddress: address.streetAddress || '',
                         // Include full address object for debugging
-                        fullAddress: address
+                        //fullAddress: address
                     };
                 } else {
                     console.warn(`Address not found for userId: ${userId}, addressId: ${addressId}`);
