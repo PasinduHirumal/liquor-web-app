@@ -7,8 +7,14 @@
     overflow: hidden !important;
 }
 
+.flavour-header {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+}
+
 .flavour-toggle {
-    width: 100% !important;
+    flex: 1;
     background: none !important;
     border: none !important;
     padding: 16px !important;
@@ -16,6 +22,20 @@
     justify-content: space-between !important;
     align-items: center !important;
     cursor: pointer !important;
+}
+
+.edit-btn {
+    background: #f0f0f0 !important;
+    border: none !important;
+    padding: 8px !important;
+    margin-right: 10px !important;
+    border-radius: 6px !important;
+    cursor: pointer !important;
+    transition: background 0.3s !important;
+}
+
+.edit-btn:hover {
+    background: #ddd !important;
 }
 
 .flavour-title {
@@ -38,14 +58,14 @@
 }
 
 .flavour-grid {
-    display: grid !important;
+    display: grid;
     grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)) !important;
     gap: 12px 20px !important;
     padding: 16px !important;
 }
 
 .flavour-grid div {
-    background: #f9f9f9;
+    background: #f9f9f9 !important;
     padding: 10px 14px !important;
     border-radius: 8px !important;
     font-size: 0.95rem !important;
