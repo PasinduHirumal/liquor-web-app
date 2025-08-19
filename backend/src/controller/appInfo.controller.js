@@ -96,17 +96,25 @@ const updateActiveToggle = async (req, res) => {
             return res.status(404).json({ success: false, message: "App not found"});
         }
 
-        let toggleValue;
-        if (is_liquor_show !== undefined) {
-            toggleValue = Boolean(is_liquor_show);
-        } else if (is_active !== undefined) {
-            toggleValue = Boolean(is_active);
-        } else {
+        if (is_liquor_show === undefined && is_active === undefined) {
             return res.status(400).json({ success: false, message: "Either is_liquor_show or is_active must be provided" });
         }
 
+        const updateData = {};
+        let toggleValue;
+        
+        if (is_liquor_show !== undefined) {
+            toggleValue = Boolean(is_liquor_show);
+            updateData.is_liquor_show = toggleValue;
+        }
+        
+        if (is_active !== undefined) {
+            toggleValue = Boolean(is_active);
+            updateData.is_liquor_show = toggleValue;
+        }
+
         // update app-info
-        const updatedApp = await appInfoService.updateById(app.id, {is_liquor_show: toggleValue});
+        const updatedApp = await appInfoService.updateById(app.id, updateData);
 
         // update all liquors
         const productActiveStatus = toggleValue;
