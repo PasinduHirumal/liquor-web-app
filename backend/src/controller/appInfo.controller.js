@@ -70,10 +70,6 @@ const updateAppInfoById = async (req, res) => {
         if (is_liquor_show !== undefined) {
             const is_active = is_liquor_show;
             result = await updateLiquorProductsActiveStatus(is_active);
-
-            if (!result.success) {
-                return res.status(500).json({ success: false, message: "Failed to update active toggle in liquors" });
-            }
         }
         
         return res.status(200).json({ 
@@ -90,4 +86,44 @@ const updateAppInfoById = async (req, res) => {
     }
 };
 
-export { getAllAppData, getMainAppInfo, updateAppInfoById };
+const updateActiveToggle = async (req, res) => {
+	try {
+        const AppRegNumber = APP_INFO.REG_NUMBER;
+        const { is_liquor_show, is_active } = req.body;
+
+        const app = await appInfoService.findByRegNumber(AppRegNumber);
+        if (!app) {
+            return res.status(404).json({ success: false, message: "App not found"});
+        }
+
+        let toggleValue;
+        if (is_liquor_show !== undefined) {
+            toggleValue = Boolean(is_liquor_show);
+        } else if (is_active !== undefined) {
+            toggleValue = Boolean(is_active);
+        } else {
+            return res.status(400).json({ success: false, message: "Either is_liquor_show or is_active must be provided" });
+        }
+
+        // update app-info
+        const updatedApp = await appInfoService.updateById(app.id, {is_liquor_show: toggleValue});
+
+        // update all liquors
+        const productActiveStatus = toggleValue;
+        const result = await updateLiquorProductsActiveStatus(productActiveStatus);
+
+        return res.status(200).json({ 
+            success: true, 
+            message: "Successfully updated liquor settings",
+            data: {
+                app_liquor_show: toggleValue,
+                products_updated: result.successful_updates
+            }
+        });
+    } catch (error) {
+        console.error("Update active toggle error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+export { getAllAppData, getMainAppInfo, updateAppInfoById, updateActiveToggle };

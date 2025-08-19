@@ -23,22 +23,24 @@ const updateLiquorProductsActiveStatus = async (is_active) => {
         const updateResults = await Promise.all(updatePromises);
         
         // Check if all updates were successful
-        const failedUpdates = updateResults.filter(result => !result);
+        const failedUpdates = updateResults.filter(result => !result || result.error);
         if (failedUpdates.length > 0) {
             throw new Error(`Failed to update ${failedUpdates.length} products`);
         }
 
         // Fetch updated products
-        const updatedProducts = await productService.findByFilter('is_liquor', '==', true);
+        //const updatedProducts = await productService.findByFilter('is_liquor', '==', true);
         
         return {
             success: true,
             message: `Successfully updated is_active to ${is_active} for all liquor products`, 
             before_count: products.length,
-            updated_count: updatedProducts.length,
+            updated_count: products.length,
+            successful_updates: updateResults.length
             //data: updatedProducts
         };
     } catch (error) {
+        console.error("updateLiquorProductsActiveStatus error:", error.message);
         throw error; // Re-throw to let the controller handle it
     }
 };
