@@ -37,6 +37,7 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                     delivery_charge_for_1KM: recordToEdit.delivery_charge_for_1KM ?? "",
                     service_charge: recordToEdit.service_charge ?? "",
                     isActive: recordToEdit.isActive ?? false,
+                    isLiquorActive: recordToEdit.isLiquorActive ?? false,
                 });
             } catch (err) {
                 toast.error(err.response?.data?.message || "Failed to load warehouse details");
@@ -68,6 +69,7 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                 delivery_charge_for_1KM: Number(values.delivery_charge_for_1KM),
                 service_charge: Number(values.service_charge),
                 isActive: values.isActive,
+                isLiquorActive: values.isLiquorActive,
             };
 
             const response = await axiosInstance.patch(
@@ -231,10 +233,26 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                                 />
                             </Form.Item>
                         </Col>
+                    </Row>
+
+                    <Row gutter={16}>
                         <Col span={12}>
                             <Form.Item
                                 name="isActive"
-                                label="Status"
+                                label="System Status"
+                                valuePropName="checked"
+                            >
+                                <Switch
+                                    checkedChildren="Active"
+                                    unCheckedChildren="Inactive"
+                                    style={{ marginTop: 6 }}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="isLiquorActive"
+                                label="Liquor Status"
                                 valuePropName="checked"
                             >
                                 <Switch

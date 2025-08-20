@@ -119,7 +119,7 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                     </Col>
                 </Row>
 
-                {/* Service Charge & Status */}
+                {/* Service Charge */}
                 <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item
@@ -131,10 +131,24 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                             <InputNumber min={0} step={0.01} style={{ width: '100%' }} />
                         </Form.Item>
                     </Col>
+                </Row>
+
+                {/* Status */}
+                <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item
                             name="isActive"
-                            label="Status"
+                            label="System Status"
+                            valuePropName="checked"
+                            initialValue={true}
+                        >
+                            <Switch checkedChildren="Active" unCheckedChildren="Inactive" />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name="isLiquorActive"
+                            label="Liquor Status"
                             valuePropName="checked"
                             initialValue={true}
                         >

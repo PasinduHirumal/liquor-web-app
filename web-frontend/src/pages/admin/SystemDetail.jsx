@@ -20,7 +20,7 @@ const SystemDetail = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [editingId, setEditingId] = useState(null);
-    
+
     // Staff modal states
     const [showStaffModal, setShowStaffModal] = useState(false);
     const [selectedStaff, setSelectedStaff] = useState(null);
@@ -159,6 +159,21 @@ const SystemDetail = () => {
             ),
         },
         {
+            title: 'Liquor Status',
+            dataIndex: 'isLiquorActive',
+            key: 'isLiquorActive',
+            filters: [
+                { text: 'Active', value: true },
+                { text: 'Inactive', value: false }
+            ],
+            onFilter: (value, record) => record.isActive === value,
+            render: (isActive) => (
+                <Tag color={isActive ? 'green' : 'red'}>
+                    {isActive ? 'Active' : 'Inactive'}
+                </Tag>
+            ),
+        },
+        {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
@@ -236,9 +251,9 @@ const SystemDetail = () => {
             >
                 {selectedStaff && (
                     <div>
-                        <Descriptions 
-                            bordered 
-                            size="small" 
+                        <Descriptions
+                            bordered
+                            size="small"
                             style={{ marginBottom: 16 }}
                             column={2}
                         >
