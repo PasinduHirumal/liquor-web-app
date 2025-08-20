@@ -18,7 +18,27 @@ const createWareHouse = async (req, res) => {
         }
 
         const count = await companyService.count();
-        const where_house_code = `B-${(count + 1).toString().padStart(6, '0')}`;
+        let where_house_code;
+        let isUnique = false;
+        let attempts = 0;
+
+        while (!isUnique && attempts < 10) {
+            const timestamp = Date.now().toString().slice(-4);
+            where_house_code = `B-${(count + 1).toString().padStart(2, '0')}${timestamp}`;
+            
+            const existing = await companyService.findByWarehouseCode(where_house_code);
+            if (!existing) {
+                isUnique = true;
+            } else {
+                attempts++;
+                // Small delay to ensure different timestamp
+                await new Promise(resolve => setTimeout(resolve, 1));
+            }
+        }
+
+        if (!isUnique) {
+            return res.status(500).json({ success: false, message: "Unable to generate unique warehouse code" });
+        }
 
         const where_house_data = {
             where_house_code,

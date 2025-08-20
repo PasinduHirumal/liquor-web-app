@@ -1,6 +1,7 @@
 import Joi from 'joi';
 import postalCodeSchema from './schemas/postalCodeSchema.js';
 import locationSchema from './schemas/locationSchema.js';
+import { countrySchema } from './schemas/countrySchema.js';
 
 // CREATE VALIDATOR - With defaults
 const validateSuperMarket = (req, res, next) => {
@@ -15,7 +16,7 @@ const validateSuperMarket = (req, res, next) => {
     city: Joi.string().min(1).max(100).required(),
     state: Joi.string().min(1).max(100).required(),
     postalCode: postalCodeSchema.required(),
-    country: Joi.string().min(2).max(100).required(),
+    country: countrySchema.required(),
     streetAddress: Joi.string().min(2).max(300).required(),
     location: locationSchema.required(),
 
@@ -60,7 +61,7 @@ const validateSuperMarketUpdate = (req, res, next) => {
     city: Joi.string().min(1).max(100).optional(),
     state: Joi.string().min(1).max(100).optional(),
     postalCode: postalCodeSchema.optional(),
-    country: Joi.string().min(2).max(100).optional(),
+    country: countrySchema.optional(),
     streetAddress: Joi.string().min(2).max(300).optional(),
 
     isActive: Joi.boolean().default(true),

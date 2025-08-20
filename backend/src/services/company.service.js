@@ -24,6 +24,20 @@ class CompanyService extends BaseService {
         }
     }
 
+    async findByWarehouseCode(warehouse_code) {
+        try {
+            const docs = await this.findByFilter('where_house_code', '==', warehouse_code);
+            
+            if (docs.length === 0){
+                return null;
+            }
+
+            return docs[0];
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default CompanyService;
