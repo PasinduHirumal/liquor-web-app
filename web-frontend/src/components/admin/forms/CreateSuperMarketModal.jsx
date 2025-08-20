@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Form, Input, Switch, Button, message, Space } from "antd";
+import { Modal, Form, Input, Switch, Button, message, Space, InputNumber } from "antd";
 import { axiosInstance } from "../../../lib/axios";
 
 function CreateSuperMarketModal({ open, onClose, onSuccess }) {
@@ -9,18 +9,38 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
     const handleCreate = async (values) => {
         try {
             setCreating(true);
-            const res = await axiosInstance.post("/superMarket/create", values);
+
+            // Include location object
+            const payload = {
+                ...values,
+                location: {
+                    lat: values.lat || null,
+                    lng: values.lng || null,
+                },
+            };
+
+            const res = await axiosInstance.post("/superMarket/create", payload);
+
             if (res.data?.success) {
                 message.success("Supermarket created successfully");
                 form.resetFields();
                 onClose();
                 onSuccess();
             } else {
-                message.error("Failed to create supermarket");
+                const errorMsg = res.data?.message || "Failed to create supermarket";
+                message.error(errorMsg);
             }
         } catch (err) {
             const errorMsg = err.response?.data?.message || "Server Error";
-            message.error(errorMsg);
+
+            // Show backend validation errors if available
+            if (err.response?.data?.errors) {
+                err.response.data.errors.forEach(e => {
+                    message.error(`${e.field}: ${e.message}`);
+                });
+            } else {
+                message.error(errorMsg);
+            }
         } finally {
             setCreating(false);
         }
@@ -51,6 +71,7 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
                 >
                     <Input />
                 </Form.Item>
+
                 <Form.Item
                     label="Street Address"
                     name="streetAddress"
@@ -58,6 +79,7 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
                 >
                     <Input />
                 </Form.Item>
+
                 <Form.Item
                     label="City"
                     name="city"
@@ -65,6 +87,7 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
                 >
                     <Input />
                 </Form.Item>
+
                 <Form.Item
                     label="State"
                     name="state"
@@ -72,6 +95,7 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
                 >
                     <Input />
                 </Form.Item>
+
                 <Form.Item
                     label="Postal Code"
                     name="postalCode"
@@ -79,6 +103,7 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
                 >
                     <Input />
                 </Form.Item>
+
                 <Form.Item
                     label="Country"
                     name="country"
@@ -86,6 +111,20 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
                 >
                     <Input />
                 </Form.Item>
+
+                {/* Location fields */}
+                <Form.Item label="Latitude" name="lat" rules={[
+                    { type: 'number', min: -90, max: 90, message: 'Latitude must be between -90 and 90' }
+                ]}>
+                    <InputNumber style={{ width: '100%' }} placeholder="Latitude" />
+                </Form.Item>
+
+                <Form.Item label="Longitude" name="lng" rules={[
+                    { type: 'number', min: -180, max: 180, message: 'Longitude must be between -180 and 180' }
+                ]}>
+                    <InputNumber style={{ width: '100%' }} placeholder="Longitude" />
+                </Form.Item>
+
                 <Form.Item
                     label="Active"
                     name="isActive"
@@ -93,6 +132,7 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
                 >
                     <Switch defaultChecked />
                 </Form.Item>
+
                 <Form.Item>
                     <Space>
                         <Button type="primary" htmlType="submit" loading={creating}>

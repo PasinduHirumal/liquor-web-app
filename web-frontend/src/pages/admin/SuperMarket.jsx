@@ -100,6 +100,19 @@ function SuperMarket() {
             width: 120,
         },
         {
+            title: 'Location',
+            dataIndex: 'location',
+            key: 'location',
+            width: 150,
+            render: (loc) => {
+                if (!loc) return '-';
+                if (typeof loc === 'object' && loc.lat !== undefined && loc.lng !== undefined) {
+                    return `Lat: ${loc.lat}, Lng: ${loc.lng}`;
+                }
+                return loc.toString();
+            }
+        },
+        {
             title: 'Country',
             dataIndex: 'country',
             key: 'country',

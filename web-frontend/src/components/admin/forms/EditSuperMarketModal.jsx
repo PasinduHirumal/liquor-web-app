@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Form, Input, Switch, Button, message, Space } from "antd";
+import { Modal, Form, Input, InputNumber, Switch, Button, message, Space } from "antd";
 import { axiosInstance } from "../../../lib/axios";
 
 function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
@@ -16,6 +16,8 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
                 postalCode: marketData.postalCode,
                 country: marketData.country,
                 isActive: marketData.isActive,
+                lat: marketData.location?.lat || null,
+                lng: marketData.location?.lng || null,
             });
         }
     }, [marketData, form]);
@@ -23,17 +25,34 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
     const handleUpdate = async (values) => {
         try {
             setUpdating(true);
-            const res = await axiosInstance.patch(`/superMarket/update/${marketData.id}`, values);
+
+            const payload = {
+                ...values,
+                location: {
+                    lat: values.lat || null,
+                    lng: values.lng || null,
+                },
+            };
+
+            const res = await axiosInstance.patch(`/superMarket/update/${marketData.id}`, payload);
+
             if (res.data?.success) {
                 message.success("Supermarket updated successfully");
                 onClose();
                 onSuccess();
             } else {
-                message.error("Failed to update supermarket");
+                const errorMsg = res.data?.message || "Failed to update supermarket";
+                message.error(errorMsg);
             }
         } catch (err) {
-            const errorMsg = err.response?.data?.message || "Server Error";
-            message.error(errorMsg);
+            if (err.response?.data?.errors) {
+                err.response.data.errors.forEach(e => {
+                    message.error(`${e.field}: ${e.message}`);
+                });
+            } else {
+                const errorMsg = err.response?.data?.message || "Server Error";
+                message.error(errorMsg);
+            }
         } finally {
             setUpdating(false);
         }
@@ -43,7 +62,7 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
         <Modal
             title="Edit Supermarket"
             open={open}
-            onCancel={onClose}
+            onCancel={() => { form.resetFields(); onClose(); }}
             footer={null}
             destroyOnClose
             maskClosable={false}
@@ -91,6 +110,24 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
                 >
                     <Input />
                 </Form.Item>
+
+                {/* Location fields */}
+                <Form.Item
+                    label="Latitude"
+                    name="lat"
+                    rules={[{ type: 'number', min: -90, max: 90, message: 'Latitude must be between -90 and 90' }]}
+                >
+                    <InputNumber style={{ width: '100%' }} placeholder="Latitude" />
+                </Form.Item>
+
+                <Form.Item
+                    label="Longitude"
+                    name="lng"
+                    rules={[{ type: 'number', min: -180, max: 180, message: 'Longitude must be between -180 and 180' }]}
+                >
+                    <InputNumber style={{ width: '100%' }} placeholder="Longitude" />
+                </Form.Item>
+
                 <Form.Item
                     label="Active"
                     name="isActive"
@@ -98,12 +135,13 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
                 >
                     <Switch />
                 </Form.Item>
+
                 <Form.Item>
                     <Space>
                         <Button type="primary" htmlType="submit" loading={updating}>
                             Update
                         </Button>
-                        <Button onClick={onClose}>
+                        <Button onClick={() => { form.resetFields(); onClose(); }}>
                             Cancel
                         </Button>
                     </Space>
