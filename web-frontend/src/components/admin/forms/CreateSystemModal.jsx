@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { Modal, Form, Input, InputNumber, Switch, Button, Row, Col, Typography } from 'antd';
+import { Modal, Form, Input, InputNumber, Switch, Button, Row, Col } from 'antd';
 import { axiosInstance } from '../../../lib/axios';
 import toast from 'react-hot-toast';
-
-const { Text } = Typography;
 
 const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
     const [form] = Form.useForm();
@@ -15,8 +13,9 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
             const response = await axiosInstance.post('/system/create', values);
             onCreateSuccess(response.data.data);
             form.resetFields();
+            toast.success("Warehouse created successfully");
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to create system configuration');
+            toast.error(error.response?.data?.message || 'Failed to create warehouse');
         } finally {
             setLoading(false);
         }
@@ -24,8 +23,8 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
 
     return (
         <Modal
-            title="Create System Configuration"
-            visible={show}
+            title="Create Warehouse"
+            open={show} // ✅ updated from "visible" (deprecated) to "open"
             onCancel={onHide}
             maskClosable={false}
             afterClose={() => form.resetFields()}
@@ -49,13 +48,15 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                 layout="vertical"
                 onFinish={handleSubmit}
             >
+                {/* Warehouse Name */}
                 <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item
                             name="where_house_name"
                             label="Warehouse Name"
+                            rules={[{ required: true, message: 'Please enter warehouse name!' }]}
                         >
-                            <Input placeholder="where_house_1" />
+                            <Input placeholder="Warehouse 1" />
                         </Form.Item>
                     </Col>
                     <Col span={12}>
@@ -70,19 +71,30 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                     </Col>
                 </Row>
 
+                {/* Address Field */}
+                <Row gutter={16}>
+                    <Col span={24}>
+                        <Form.Item
+                            name="address"
+                            label="Address"
+                            rules={[
+                                { required: true, message: 'Please enter address!' },
+                                { min: 2, max: 350, message: 'Address must be between 2 and 350 characters' }
+                            ]}
+                        >
+                            <Input.TextArea placeholder="123 Main St, City, Country" rows={3} />
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+                {/* Latitude / Longitude */}
                 <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item
                             name={['where_house_location', 'lat']}
                             label="Latitude"
                             rules={[
-                                { required: false },
-                                {
-                                    type: 'number',
-                                    min: -90,
-                                    max: 90,
-                                    message: 'Latitude must be between -90 and 90'
-                                }
+                                { type: 'number', min: -90, max: 90, message: 'Latitude must be between -90 and 90' }
                             ]}
                         >
                             <InputNumber placeholder="Latitude" style={{ width: '100%' }} />
@@ -93,13 +105,7 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                             name={['where_house_location', 'lng']}
                             label="Longitude"
                             rules={[
-                                { required: false },
-                                {
-                                    type: 'number',
-                                    min: -180,
-                                    max: 180,
-                                    message: 'Longitude must be between -180 and 180'
-                                }
+                                { type: 'number', min: -180, max: 180, message: 'Longitude must be between -180 and 180' }
                             ]}
                         >
                             <InputNumber placeholder="Longitude" style={{ width: '100%' }} />
@@ -107,6 +113,7 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                     </Col>
                 </Row>
 
+                {/* Service Charge & Status */}
                 <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item
