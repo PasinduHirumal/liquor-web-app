@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Form, Input, Switch, Button, message, Space, InputNumber } from "antd";
+import { Modal, Form, Input, Switch, Button, message, Space, Row, Col, InputNumber } from "antd";
 import { axiosInstance } from "../../../lib/axios";
 
 function CreateSuperMarketModal({ open, onClose, onSuccess }) {
@@ -10,7 +10,6 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
         try {
             setCreating(true);
 
-            // Include location object
             const payload = {
                 ...values,
                 location: {
@@ -31,14 +30,12 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
                 message.error(errorMsg);
             }
         } catch (err) {
-            const errorMsg = err.response?.data?.message || "Server Error";
-
-            // Show backend validation errors if available
             if (err.response?.data?.errors) {
                 err.response.data.errors.forEach(e => {
                     message.error(`${e.field}: ${e.message}`);
                 });
             } else {
+                const errorMsg = err.response?.data?.message || "Server Error";
                 message.error(errorMsg);
             }
         } finally {
@@ -57,89 +54,129 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
             open={open}
             onCancel={handleCancel}
             footer={null}
+            destroyOnClose
             maskClosable={false}
+            width={700}
         >
             <Form
                 layout="vertical"
                 form={form}
                 onFinish={handleCreate}
+                scrollToFirstError
             >
-                <Form.Item
-                    label="Name"
-                    name="superMarket_Name"
-                    rules={[{ required: true, message: 'Please enter supermarket name' }]}
-                >
-                    <Input />
-                </Form.Item>
+                <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Name"
+                            name="superMarket_Name"
+                            rules={[{ required: true, message: 'Please enter supermarket name' }]}
+                        >
+                            <Input placeholder="Enter supermarket name" />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Country"
+                            name="country"
+                            rules={[{ required: true, message: 'Please enter country' }]}
+                        >
+                            <Input placeholder="Enter country" />
+                        </Form.Item>
+                    </Col>
+                </Row>
 
                 <Form.Item
                     label="Street Address"
                     name="streetAddress"
                     rules={[{ required: true, message: 'Please enter street address' }]}
                 >
-                    <Input />
+                    <Input.TextArea
+                        placeholder="Enter full street address"
+                        rows={2}
+                        autoSize={{ minRows: 2, maxRows: 3 }}
+                    />
                 </Form.Item>
+
+                <Row gutter={16}>
+                    <Col span={8}>
+                        <Form.Item
+                            label="City"
+                            name="city"
+                            rules={[{ required: true, message: 'Please enter city' }]}
+                        >
+                            <Input placeholder="Enter city" />
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item
+                            label="State"
+                            name="state"
+                            rules={[{ required: true, message: 'Please enter state' }]}
+                        >
+                            <Input placeholder="Enter state" />
+                        </Form.Item>
+                    </Col>
+                    <Col span={8}>
+                        <Form.Item
+                            label="Postal Code"
+                            name="postalCode"
+                            rules={[{ required: true, message: 'Please enter postal code' }]}
+                        >
+                            <Input placeholder="Enter postal code" />
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+                <Row gutter={16}>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Latitude"
+                            name="lat"
+                            rules={[
+                                { type: 'number', min: -90, max: 90, message: 'Latitude must be between -90 and 90' }
+                            ]}
+                        >
+                            <InputNumber
+                                style={{ width: '100%' }}
+                                placeholder="Latitude (-90 to 90)"
+                                precision={6}
+                                step={0.000001}
+                            />
+                        </Form.Item>
+                    </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            label="Longitude"
+                            name="lng"
+                            rules={[
+                                { type: 'number', min: -180, max: 180, message: 'Longitude must be between -180 and 180' }
+                            ]}
+                        >
+                            <InputNumber
+                                style={{ width: '100%' }}
+                                placeholder="Longitude (-180 to 180)"
+                                precision={6}
+                                step={0.000001}
+                            />
+                        </Form.Item>
+                    </Col>
+                </Row>
 
                 <Form.Item
-                    label="City"
-                    name="city"
-                    rules={[{ required: true, message: 'Please enter city' }]}
-                >
-                    <Input />
-                </Form.Item>
-
-                <Form.Item
-                    label="State"
-                    name="state"
-                    rules={[{ required: true, message: 'Please enter state' }]}
-                >
-                    <Input />
-                </Form.Item>
-
-                <Form.Item
-                    label="Postal Code"
-                    name="postalCode"
-                    rules={[{ required: true, message: 'Please enter postal code' }]}
-                >
-                    <Input />
-                </Form.Item>
-
-                <Form.Item
-                    label="Country"
-                    name="country"
-                    rules={[{ required: true, message: 'Please enter country' }]}
-                >
-                    <Input />
-                </Form.Item>
-
-                {/* Location fields */}
-                <Form.Item label="Latitude" name="lat" rules={[
-                    { type: 'number', min: -90, max: 90, message: 'Latitude must be between -90 and 90' }
-                ]}>
-                    <InputNumber style={{ width: '100%' }} placeholder="Latitude" />
-                </Form.Item>
-
-                <Form.Item label="Longitude" name="lng" rules={[
-                    { type: 'number', min: -180, max: 180, message: 'Longitude must be between -180 and 180' }
-                ]}>
-                    <InputNumber style={{ width: '100%' }} placeholder="Longitude" />
-                </Form.Item>
-
-                <Form.Item
-                    label="Active"
+                    label="Status"
                     name="isActive"
                     valuePropName="checked"
                 >
-                    <Switch defaultChecked />
+                    <Switch checkedChildren="Active" unCheckedChildren="Inactive" defaultChecked />
                 </Form.Item>
 
-                <Form.Item>
+                <Form.Item style={{ marginBottom: 0, textAlign: 'right' }}>
                     <Space>
-                        <Button type="primary" htmlType="submit" loading={creating}>
-                            Create
-                        </Button>
-                        <Button onClick={handleCancel}>
+                        <Button onClick={handleCancel} disabled={creating}>
                             Cancel
+                        </Button>
+                        <Button type="primary" htmlType="submit" loading={creating}>
+                            Create Supermarket
                         </Button>
                     </Space>
                 </Form.Item>
