@@ -17,7 +17,7 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
         } catch (error) {
             if (error.response?.data?.errors?.length > 0) {
                 error.response.data.errors.forEach(err => {
-                    toast.error(`${err.field}: ${err.message}`);
+                    toast.error(`${err.message}`);
                 });
             } else {
                 toast.error(error.response?.data?.message || 'Failed to create warehouse');
