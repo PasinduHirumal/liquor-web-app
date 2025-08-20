@@ -17,11 +17,9 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
         const fetchData = async () => {
             setInitialLoading(true);
             try {
-                // First get all company details
                 const res = await axiosInstance.get("/system/details");
                 const allDetails = res.data.data;
 
-                // Find the specific record we want to edit
                 const recordToEdit = allDetails.find(item => item.id === companyDetailId);
 
                 if (!recordToEdit) {
@@ -32,10 +30,10 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
 
                 setCurrentRecord(recordToEdit);
 
-                // Set form values
                 form.setFieldsValue({
                     where_house_name: recordToEdit.where_house_name || "",
                     where_house_location: recordToEdit.where_house_location || { lat: "", lng: "" },
+                    address: recordToEdit.address || "",
                     delivery_charge_for_1KM: recordToEdit.delivery_charge_for_1KM ?? "",
                     service_charge: recordToEdit.service_charge ?? "",
                     isActive: recordToEdit.isActive ?? false,
@@ -50,7 +48,6 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
 
         fetchData();
 
-        // Cleanup function to reset form when modal closes
         return () => {
             form.resetFields();
             setCurrentRecord(null);
@@ -67,18 +64,17 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                     lat: values.where_house_location.lat ? Number(values.where_house_location.lat) : null,
                     lng: values.where_house_location.lng ? Number(values.where_house_location.lng) : null,
                 },
+                address: values.address,
                 delivery_charge_for_1KM: Number(values.delivery_charge_for_1KM),
                 service_charge: Number(values.service_charge),
                 isActive: values.isActive,
             };
 
-            // Update the specific record
             const response = await axiosInstance.patch(
                 `/system/update/${companyDetailId}`,
                 payload
             );
 
-            // Call the success handler with updated data
             onUpdateSuccess({
                 ...currentRecord,
                 ...payload,
@@ -89,7 +85,11 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
             toast.success("Warehouse details updated successfully");
             onHide();
         } catch (err) {
-            toast.error(err.response?.data?.message || "Failed to update warehouse details");
+            if (err.response?.data?.errors?.length > 0) {
+                err.response.data.errors.forEach(e => toast.error(`${e.field}: ${e.message}`));
+            } else {
+                toast.error(err.response?.data?.message || "Failed to update warehouse details");
+            }
         } finally {
             setLoading(false);
         }
@@ -132,6 +132,7 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                             <Form.Item
                                 name="where_house_name"
                                 label="Warehouse Name"
+                                rules={[{ required: true, message: "Please input warehouse name!" }]}
                             >
                                 <Input placeholder="where_house_1" />
                             </Form.Item>
@@ -156,12 +157,24 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                     </Row>
 
                     <Row gutter={16}>
+                        <Col span={24}>
+                            <Form.Item
+                                name="address"
+                                label="Address"
+                                rules={[{ required: true, message: "Please input warehouse address!" }]}
+                            >
+                                <Input.TextArea rows={2} placeholder="Enter warehouse address" />
+                            </Form.Item>
+                        </Col>
+                    </Row>
+
+                    <Row gutter={16}>
                         <Col span={12}>
                             <Form.Item
                                 name={["where_house_location", "lat"]}
                                 label="Latitude"
                                 rules={[
-                                    { required: false, message: "Please input latitude!" },
+                                    { required: false },
                                     {
                                         type: "number",
                                         min: -90,
@@ -182,7 +195,7 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                                 name={["where_house_location", "lng"]}
                                 label="Longitude"
                                 rules={[
-                                    { required: false, message: "Please input longitude!" },
+                                    { required: false },
                                     {
                                         type: "number",
                                         min: -180,
