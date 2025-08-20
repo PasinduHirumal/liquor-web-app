@@ -11,6 +11,7 @@ class SuperMarket {
         this.postalCode = data.postalCode;
         this.country = data.country;
         this.streetAddress = data.streetAddress;
+        this.location = data.location;
 
         // For backend process
         this.isActive = data.isActive;

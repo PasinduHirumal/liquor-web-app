@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import locationSchema from './schemas/locationSchema';
 
 // CREATE VALIDATOR - With defaults
 const validateCompanyDetails = (req, res, next) => {
@@ -8,12 +9,11 @@ const validateCompanyDetails = (req, res, next) => {
   
   const schema = Joi.object({
     where_house_name: Joi.string().min(1).max(100).required(),
-    where_house_location: Joi.object({
-        lat: Joi.number().min(-90).max(90).allow(null),
-        lng: Joi.number().min(-180).max(180).allow(null),
-    }).default({ lat: null, lng: null }),
+    where_house_location: locationSchema.default({ lat: null, lng: null }),
+    address: Joi.string().min(2).max(350).required(),
     delivery_charge_for_1KM: Joi.number().positive().precision(2).default(0.01),
     service_charge: Joi.number().min(0).precision(2).default(0),
+    isLiquorActive: Joi.boolean().default(true),
     isActive: Joi.boolean().default(true),
   })
   .min(1) // Require at least one field to update
@@ -52,12 +52,11 @@ const validateCompanyDetailsUpdate = (req, res, next) => {
   const schema = Joi.object({
     //where_house_code: Joi.string().optional(),
     where_house_name: Joi.string().min(1).max(100).optional(),
-    where_house_location: Joi.object({
-        lat: Joi.number().min(-90).max(90).required(),
-        lng: Joi.number().min(-180).max(180).required(),
-    }).allow(null).optional(),
+    where_house_location: locationSchema.optional(),
+    address: Joi.string().min(1).max(350).optional(),
     delivery_charge_for_1KM: Joi.number().positive().precision(2).optional(),
     service_charge: Joi.number().min(0).precision(2).optional(),
+    isLiquorActive: Joi.boolean().optional(),
     isActive: Joi.boolean().optional(),
   })
   .min(1) // Require at least one field to update
