@@ -229,7 +229,22 @@ const OtherProductEditForm = () => {
             navigate("/other-product-list");
         } catch (error) {
             console.error(error);
-            toast.error(error?.response?.data?.message || "Update failed");
+
+            const serverErrors = error?.response?.data?.errors;
+            if (Array.isArray(serverErrors) && serverErrors.length > 0) {
+                serverErrors.forEach(err => {
+                    toast.error(`${err.field}: ${err.message}`);
+                });
+                setErrors((prev) => {
+                    const ne = { ...prev };
+                    serverErrors.forEach(err => {
+                        ne[err.field] = err.message;
+                    });
+                    return ne;
+                });
+            } else {
+                toast.error(error?.response?.data?.message || "Update failed");
+            }
         } finally {
             setSubmitting(false);
         }
