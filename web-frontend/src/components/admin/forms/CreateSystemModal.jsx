@@ -15,7 +15,13 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
             form.resetFields();
             toast.success("Warehouse created successfully");
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to create warehouse');
+            if (error.response?.data?.errors?.length > 0) {
+                error.response.data.errors.forEach(err => {
+                    toast.error(`${err.field}: ${err.message}`);
+                });
+            } else {
+                toast.error(error.response?.data?.message || 'Failed to create warehouse');
+            }
         } finally {
             setLoading(false);
         }
