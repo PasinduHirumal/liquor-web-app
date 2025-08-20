@@ -1,5 +1,5 @@
 import Joi from 'joi';
-import locationSchema from './schemas/locationSchema';
+import locationSchema from './schemas/locationSchema.js';
 
 // CREATE VALIDATOR - With defaults
 const validateCompanyDetails = (req, res, next) => {
