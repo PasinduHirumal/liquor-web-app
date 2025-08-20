@@ -5,7 +5,7 @@ const companyService = new CompanyService();
 const populateWhereHouse = async (data) => {
     const populateOne = async (category) => {
         // Check for both userId and user_id field names
-        const userIdField = category.hasOwnProperty('where_house_id') ? 'where_house_id' : 'whereHouseId';
+        const userIdField = category.hasOwnProperty('where_house_id') ? 'where_house_id' : 'warehouse_id';
         const userIdValue = category[userIdField];
         
         // Handle both string ID and object with ID
