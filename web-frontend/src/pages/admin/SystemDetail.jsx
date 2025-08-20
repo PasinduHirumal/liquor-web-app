@@ -2,11 +2,11 @@ import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
 import {
     Table, Card, Row, Col, Typography,
-    Button, Space, Tag, Modal, Descriptions
+    Button, Space, Tag, Modal, Descriptions, Popconfirm
 } from "antd";
 import {
     EditOutlined, ReloadOutlined, PlusOutlined,
-    UserOutlined, TeamOutlined, CarOutlined
+    UserOutlined, CarOutlined, DeleteOutlined
 } from '@ant-design/icons';
 import toast from "react-hot-toast";
 import EditSystemModal from "../../components/admin/forms/EditSystemModal";
@@ -42,6 +42,16 @@ const SystemDetail = () => {
         fetchCompanyDetails();
     }, []);
 
+    const handleDelete = async (id) => {
+        try {
+            await axiosInstance.delete(`/system/delete/${id}`);
+            setCompanyDetails(prev => prev.filter(item => item.id !== id));
+            toast.success("Warehouse deleted successfully");
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to delete warehouse");
+        }
+    };
+
     const handleViewStaff = (staff, type, warehouseName) => {
         setSelectedStaff({ ...staff, warehouseName });
         setStaffModalType(type);
@@ -49,21 +59,9 @@ const SystemDetail = () => {
     };
 
     const staffColumns = [
-        {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
-        },
-        {
-            title: 'Email',
-            dataIndex: 'email',
-            key: 'email',
-        },
-        {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
-        },
+        { title: 'Name', dataIndex: 'name', key: 'name' },
+        { title: 'Email', dataIndex: 'email', key: 'email' },
+        { title: 'ID', dataIndex: 'id', key: 'id' },
     ];
 
     const columns = [
@@ -111,7 +109,7 @@ const SystemDetail = () => {
                                 size="small"
                                 icon={<UserOutlined />}
                                 onClick={() => handleViewStaff(staff, 'admins', record.where_house_name)}
-                                disabled={!staff.admin_count || staff.admin_count === 0}
+                                disabled={!staff.admin_count}
                             >
                                 View
                             </Button>
@@ -123,7 +121,7 @@ const SystemDetail = () => {
                                 size="small"
                                 icon={<CarOutlined />}
                                 onClick={() => handleViewStaff(staff, 'drivers', record.where_house_name)}
-                                disabled={!staff.drivers_count || staff.drivers_count === 0}
+                                disabled={!staff.drivers_count}
                             >
                                 View
                             </Button>
@@ -166,7 +164,7 @@ const SystemDetail = () => {
                 { text: 'Active', value: true },
                 { text: 'Inactive', value: false }
             ],
-            onFilter: (value, record) => record.isActive === value,
+            onFilter: (value, record) => record.isLiquorActive === value,
             render: (isActive) => (
                 <Tag color={isActive ? 'green' : 'red'}>
                     {isActive ? 'Active' : 'Inactive'}
@@ -177,14 +175,28 @@ const SystemDetail = () => {
             title: 'Action',
             key: 'action',
             render: (_, record) => (
-                <Button
-                    type="text"
-                    icon={<EditOutlined />}
-                    onClick={() => {
-                        setEditingId(record.id);
-                        setShowEditModal(true);
-                    }}
-                />
+                <Space>
+                    <Button
+                        type="text"
+                        icon={<EditOutlined />}
+                        onClick={() => {
+                            setEditingId(record.id);
+                            setShowEditModal(true);
+                        }}
+                    />
+                    <Popconfirm
+                        title="Are you sure you want to delete this warehouse?"
+                        onConfirm={() => handleDelete(record.id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Button
+                            type="text"
+                            danger
+                            icon={<DeleteOutlined />}
+                        />
+                    </Popconfirm>
+                </Space>
             ),
         }
     ];
