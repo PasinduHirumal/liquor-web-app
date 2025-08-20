@@ -2,10 +2,11 @@ import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
 import {
     Table, Card, Row, Col, Typography,
-    Button, Space, Tag
+    Button, Space, Tag, Modal, Descriptions
 } from "antd";
 import {
-    EditOutlined, ReloadOutlined, PlusOutlined
+    EditOutlined, ReloadOutlined, PlusOutlined,
+    UserOutlined, TeamOutlined, CarOutlined
 } from '@ant-design/icons';
 import toast from "react-hot-toast";
 import EditSystemModal from "../../components/admin/forms/EditSystemModal";
@@ -19,6 +20,11 @@ const SystemDetail = () => {
     const [showEditModal, setShowEditModal] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [editingId, setEditingId] = useState(null);
+    
+    // Staff modal states
+    const [showStaffModal, setShowStaffModal] = useState(false);
+    const [selectedStaff, setSelectedStaff] = useState(null);
+    const [staffModalType, setStaffModalType] = useState(''); // 'admins' or 'drivers'
 
     const fetchCompanyDetails = async () => {
         setLoading(true);
@@ -35,6 +41,30 @@ const SystemDetail = () => {
     useEffect(() => {
         fetchCompanyDetails();
     }, []);
+
+    const handleViewStaff = (staff, type, warehouseName) => {
+        setSelectedStaff({ ...staff, warehouseName });
+        setStaffModalType(type);
+        setShowStaffModal(true);
+    };
+
+    const staffColumns = [
+        {
+            title: 'Name',
+            dataIndex: 'name',
+            key: 'name',
+        },
+        {
+            title: 'Email',
+            dataIndex: 'email',
+            key: 'email',
+        },
+        {
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+        },
+    ];
 
     const columns = [
         {
@@ -58,6 +88,46 @@ const SystemDetail = () => {
                     <Space direction="vertical" size={0}>
                         <Text>Lat: {location.lat ?? 'N/A'}</Text>
                         <Text>Lng: {location.lng ?? 'N/A'}</Text>
+                    </Space>
+                ) : 'N/A',
+        },
+        {
+            title: 'Warehouse Address',
+            dataIndex: 'address',
+            key: 'address',
+            render: (text) => text || 'N/A',
+        },
+        {
+            title: 'Staff Members',
+            dataIndex: 'staff',
+            key: 'staff',
+            render: (staff, record) =>
+                staff ? (
+                    <Space direction="vertical" size="small">
+                        <Space size="small">
+                            <Text>Admins: {staff.admin_count ?? 0}</Text>
+                            <Button
+                                type="link"
+                                size="small"
+                                icon={<UserOutlined />}
+                                onClick={() => handleViewStaff(staff, 'admins', record.where_house_name)}
+                                disabled={!staff.admin_count || staff.admin_count === 0}
+                            >
+                                View
+                            </Button>
+                        </Space>
+                        <Space size="small">
+                            <Text>Drivers: {staff.drivers_count ?? 0}</Text>
+                            <Button
+                                type="link"
+                                size="small"
+                                icon={<CarOutlined />}
+                                onClick={() => handleViewStaff(staff, 'drivers', record.where_house_name)}
+                                disabled={!staff.drivers_count || staff.drivers_count === 0}
+                            >
+                                View
+                            </Button>
+                        </Space>
                     </Space>
                 ) : 'N/A',
         },
@@ -96,7 +166,7 @@ const SystemDetail = () => {
                     type="text"
                     icon={<EditOutlined />}
                     onClick={() => {
-                        setEditingId(record.id); // ← use the row's ID
+                        setEditingId(record.id);
                         setShowEditModal(true);
                     }}
                 />
@@ -146,6 +216,53 @@ const SystemDetail = () => {
                     style={{ marginTop: 16 }}
                 />
             </Card>
+
+            {/* Staff Modal */}
+            <Modal
+                title={
+                    <Space>
+                        {staffModalType === 'admins' ? <UserOutlined /> : <CarOutlined />}
+                        {staffModalType === 'admins' ? 'Admins' : 'Drivers'} - {selectedStaff?.warehouseName}
+                    </Space>
+                }
+                open={showStaffModal}
+                onCancel={() => setShowStaffModal(false)}
+                footer={[
+                    <Button key="close" onClick={() => setShowStaffModal(false)}>
+                        Close
+                    </Button>
+                ]}
+                width={800}
+            >
+                {selectedStaff && (
+                    <div>
+                        <Descriptions 
+                            bordered 
+                            size="small" 
+                            style={{ marginBottom: 16 }}
+                            column={2}
+                        >
+                            <Descriptions.Item label="Total Count">
+                                {staffModalType === 'admins' ? selectedStaff.admin_count : selectedStaff.drivers_count}
+                            </Descriptions.Item>
+                            <Descriptions.Item label="Warehouse">
+                                {selectedStaff.warehouseName}
+                            </Descriptions.Item>
+                        </Descriptions>
+
+                        <Table
+                            columns={staffColumns}
+                            dataSource={staffModalType === 'admins' ? selectedStaff.admins : selectedStaff.drivers}
+                            pagination={false}
+                            size="small"
+                            rowKey="id"
+                            locale={{
+                                emptyText: `No ${staffModalType} found`
+                            }}
+                        />
+                    </div>
+                )}
+            </Modal>
 
             <EditSystemModal
                 show={showEditModal}
