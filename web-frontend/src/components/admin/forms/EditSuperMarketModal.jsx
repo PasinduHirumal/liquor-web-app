@@ -8,9 +8,7 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
 
     useEffect(() => {
         if (marketData && open) {
-            // Ensure location object has proper structure
-            const locationData = marketData.location || {};
-
+            const location = marketData.location || {};
             form.setFieldsValue({
                 superMarket_Name: marketData.superMarket_Name || "",
                 streetAddress: marketData.streetAddress || "",
@@ -19,8 +17,8 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
                 postalCode: marketData.postalCode || "",
                 country: marketData.country || "",
                 isActive: marketData.isActive !== undefined ? marketData.isActive : true,
-                lat: locationData.lat || null,
-                lng: locationData.lng || null,
+                lat: location.lat ?? null,
+                lng: location.lng ?? null,
             });
         }
     }, [marketData, form, open]);
@@ -29,7 +27,7 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
         try {
             setUpdating(true);
 
-            // Prepare payload with proper location structure
+            // Merge latitude and longitude into location object
             const payload = {
                 superMarket_Name: values.superMarket_Name,
                 streetAddress: values.streetAddress,
@@ -39,14 +37,15 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
                 country: values.country,
                 isActive: values.isActive,
                 location: {
-                    lat: values.lat || null,
-                    lng: values.lng || null,
+                    ...(values.lat !== undefined && values.lat !== null ? { lat: values.lat } : {}),
+                    ...(values.lng !== undefined && values.lng !== null ? { lng: values.lng } : {}),
                 },
             };
 
-            // Remove undefined/null values to avoid validation issues
+            // Remove empty objects or fields to avoid validation issues
+            if (Object.keys(payload.location).length === 0) delete payload.location;
             Object.keys(payload).forEach(key => {
-                if (payload[key] === undefined || payload[key] === null) {
+                if (payload[key] === undefined || payload[key] === null || payload[key] === "") {
                     delete payload[key];
                 }
             });
@@ -169,7 +168,6 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
                             name="lat"
                             rules={[
                                 {
-                                    required: false,
                                     type: 'number',
                                     min: -90,
                                     max: 90,
@@ -191,7 +189,6 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
                             name="lng"
                             rules={[
                                 {
-                                    required: false,
                                     type: 'number',
                                     min: -180,
                                     max: 180,
