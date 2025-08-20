@@ -36,6 +36,7 @@ import reportsRoutes from "./src/routes/reports.routes.js";
 import bannerRoutes from "./src/routes/banner.routes.js";
 import superMarketRoutes from "./src/routes/superMarket.routes.js";
 import appInfoRoutes from "./src/routes/appInfo.routes.js";
+import ratingsRoutes from "./src/routes/ratings.routes.js";
 
 
 
@@ -79,6 +80,7 @@ app.use("/api/reports", reportsRoutes);
 app.use("/api/banners", bannerRoutes);
 app.use("/api/superMarket", superMarketRoutes);
 app.use("/api/appInfo", appInfoRoutes);
+app.use("/api/ratings", ratingsRoutes);
 
 
 //  Route handler for the root path
