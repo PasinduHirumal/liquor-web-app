@@ -15,6 +15,7 @@ import ViewProductHistory from "../../../common/ViewProductHistory";
 import { Chip } from "@mui/material";
 import { styled } from "@mui/system";
 import RatingStars from "../../../common/RatingStars";
+import RatingCommentCards from "../../../common/RatingCommentcards";
 
 const OriginBadge = styled(Chip)(({ theme, origin }) => ({
     position: "absolute",
@@ -342,6 +343,7 @@ const OtherProductDetail = () => {
                             </div>
                         </div>
                     </div>
+                    <RatingCommentCards productId={product.product_id || product.id} />
                 </>
             ) : null}
         </div>
