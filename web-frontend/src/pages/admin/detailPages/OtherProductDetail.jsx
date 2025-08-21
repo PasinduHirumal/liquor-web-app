@@ -14,6 +14,7 @@ import DeleteOtherProductButton from "../../../components/admin/buttons/DeleteOt
 import ViewProductHistory from "../../../common/ViewProductHistory";
 import { Chip } from "@mui/material";
 import { styled } from "@mui/system";
+import RatingStars from "../../../common/RatingStars";
 
 const OriginBadge = styled(Chip)(({ theme, origin }) => ({
     position: "absolute",
@@ -252,6 +253,10 @@ const OtherProductDetail = () => {
                                     <FaBoxOpen />
                                     <span>{product.stock_quantity || 0} units available</span>
                                 </div>
+                            </div>
+
+                            <div className="rating">
+                                <RatingStars productId={product.product_id || product.id} />
                             </div>
 
                             <div className="product-description">
