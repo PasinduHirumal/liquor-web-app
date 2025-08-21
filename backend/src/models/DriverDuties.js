@@ -5,6 +5,8 @@ class DriverDuties {
 
         this.driver_id = data.driver_id;
         this.order_id = data.order_id;
+        this.warehouse_id = data.warehouse_id;
+        this.superMarket_ids = data.superMarket_ids;
 
         this.is_completed = data.is_completed;
         this.is_driver_accepted = data.is_driver_accepted;

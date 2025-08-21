@@ -2,18 +2,22 @@ import OrdersService from '../services/orders.service.js';
 import DriverService from "../services/driver.service.js";
 import CompanyService from "../services/company.service.js";
 import DriverDutyService from '../services/driverDuty.service.js';
+import ProductService from '../services/product.service.js';
+import OtherProductService from '../services/otherProduct.service.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
 import populateUser from '../utils/populateUser.js';
 import populateDriver from '../utils/populateDriver.js';
 import populateWhereHouse from "../utils/populateWhere_House.js";
-import { populateAddressWithUserIdInData } from '../utils/populateAddress.js';
 import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
+import { populateAddressWithUserIdInData } from '../utils/populateAddress.js';
 
 
 const orderService = new OrdersService();
 const driverService = new DriverService();
 const dutyService = new DriverDutyService();
 const companyService = new CompanyService();
+const liquorService = new ProductService();
+const groceryService = new OtherProductService();
 
 
 const getAllOrders = async (req, res) => {
@@ -160,14 +164,48 @@ const updateOrder = async (req, res) => {
             }
 
             if (failedChecks.length > 0) {
-                return res.status(400).json({ success: false, message: failedChecks.join('.\n') });
+                return res.status(400).json({ success: false, message: failedChecks.join(', ') });
             }
 
             // create driver duty
             try {
+                const product_ids = [];
+                const Super_Market_ids = [];
+
+                if (order.items && order.items.length > 0) {
+                    order.items.forEach(item => {
+                       if (item.product_id) {
+                        product_ids.push(item.product_id);
+                       } 
+                    });
+                }
+
+                if (product_ids.length > 0) {
+                    for (const product_id of product_ids) {
+                        try {
+                            let tempProduct = await liquorService.findById(product_id);
+                            if (!tempProduct) {
+                                tempProduct = await groceryService.findById(product_id);
+                            }
+
+                            const product = tempProduct;
+
+                            if (product && product.superMarket_id) {
+                                if (!Super_Market_ids.includes(product.superMarket_id)) {
+                                    Super_Market_ids.push(product.superMarket_id);
+                                }
+                            }
+                        } catch (productError) {
+                            console.error(`Error fetching product ${product_id}:`, productError);
+                        }
+                    }
+                }
+
                 const driverDutyData = {
                     driver_id: assigned_driver_id,
                     order_id: order.order_id,
+                    warehouse_id: order.warehouse_id,
+                    superMarket_ids: Super_Market_ids,
                     is_completed: false,
                     is_driver_accepted: false,
                     is_re_assigning_driver: order.assigned_driver_id !== undefined

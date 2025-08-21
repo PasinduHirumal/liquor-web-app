@@ -118,8 +118,10 @@ const getAllDrivers = async (req, res) => {
             ? await driverService.findWithFilters(filters)
             : await driverService.findAll();
 
+        const populatedDrivers = await populateWhereHouse(filteredDrivers);
+
         // Remove password field from each driver object
-        const sanitizedDrivers = filteredDrivers.map(driver => {
+        const sanitizedDrivers = populatedDrivers.map(driver => {
             const { password, ...driverWithoutPassword } = driver;
             return driverWithoutPassword;
         });

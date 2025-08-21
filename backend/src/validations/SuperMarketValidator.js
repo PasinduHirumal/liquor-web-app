@@ -63,6 +63,7 @@ const validateSuperMarketUpdate = (req, res, next) => {
     postalCode: postalCodeSchema.optional(),
     country: countrySchema.optional(),
     streetAddress: Joi.string().min(2).max(300).optional(),
+    location: locationSchema.optional(),
 
     isActive: Joi.boolean().default(true),
   })
