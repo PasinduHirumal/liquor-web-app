@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import { Modal, Form, Input, Switch, Button, message, Space, Row, Col, InputNumber } from "antd";
+import { Modal, Form, Input, Switch, Button, Space, Row, Col, InputNumber } from "antd";
 import { axiosInstance } from "../../../lib/axios";
+import toast from "react-hot-toast";
 
 function CreateSuperMarketModal({ open, onClose, onSuccess }) {
     const [creating, setCreating] = useState(false);
@@ -21,22 +22,22 @@ function CreateSuperMarketModal({ open, onClose, onSuccess }) {
             const res = await axiosInstance.post("/superMarket/create", payload);
 
             if (res.data?.success) {
-                message.success("Supermarket created successfully");
+                toast.success(res.data.message || "Supermarket created successfully");
                 form.resetFields();
                 onClose();
                 onSuccess();
             } else {
                 const errorMsg = res.data?.message || "Failed to create supermarket";
-                message.error(errorMsg);
+                toast.error(errorMsg);
             }
         } catch (err) {
             if (err.response?.data?.errors) {
                 err.response.data.errors.forEach(e => {
-                    message.error(`${e.field}: ${e.message}`);
+                    toast.error(`${e.field}: ${e.message}`);
                 });
             } else {
                 const errorMsg = err.response?.data?.message || "Server Error";
-                message.error(errorMsg);
+                toast.error(errorMsg);
             }
         } finally {
             setCreating(false);
