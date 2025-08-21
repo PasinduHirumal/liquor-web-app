@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Table, Tag, Spin, message, Button, Space, Tooltip, Input } from "antd";
-import { EditOutlined, SearchOutlined } from "@ant-design/icons";
+import { Table, Tag, Spin, message, Button, Space, Tooltip, Input, Popconfirm } from "antd";
+import { EditOutlined, SearchOutlined, DeleteOutlined } from "@ant-design/icons";
 import { axiosInstance } from "../../lib/axios";
 import CreateSuperMarketModal from "../../components/admin/forms/CreateSuperMarketModal";
 import EditSuperMarketModal from "../../components/admin/forms/EditSuperMarketModal";
+import toast from "react-hot-toast";
 
 function SuperMarket() {
     const [markets, setMarkets] = useState([]);
@@ -24,15 +25,15 @@ function SuperMarket() {
             const res = await axiosInstance.get("/superMarket/getAll");
             if (res.data?.success) {
                 setMarkets(res.data.data);
-                setFilteredData(res.data.data); // initialize filtered data
+                setFilteredData(res.data.data);
             } else {
                 setError("Failed to fetch supermarkets");
-                message.error("Failed to fetch supermarkets");
+                toast.error("Failed to fetch supermarkets");
             }
         } catch (err) {
             const errorMsg = err.response?.data?.message || "Server Error";
             setError(errorMsg);
-            message.error(errorMsg);
+            toast.error(errorMsg);
         } finally {
             setLoading(false);
         }
@@ -45,6 +46,24 @@ function SuperMarket() {
     const handleEditClick = (record) => {
         setSelectedMarket(record);
         setIsEditModalOpen(true);
+    };
+
+    const handleDelete = async (id) => {
+        try {
+            setLoading(true);
+            const res = await axiosInstance.delete(`/superMarket/delete/${id}`);
+            if (res.data?.success) {
+                toast.success("Supermarket deleted successfully");
+                fetchMarkets();
+            } else {
+                toast.error(res.data?.message || "Failed to delete supermarket");
+            }
+        } catch (err) {
+            const errorMsg = err.response?.data?.message || "Server Error";
+            toast.error(errorMsg);
+        } finally {
+            setLoading(false);
+        }
     };
 
     // Search handler
@@ -140,7 +159,7 @@ function SuperMarket() {
         {
             title: 'Action',
             key: 'action',
-            width: 80,
+            width: 120,
             fixed: 'right',
             render: (_, record) => (
                 <Space>
@@ -151,6 +170,20 @@ function SuperMarket() {
                             onClick={() => handleEditClick(record)}
                         />
                     </Tooltip>
+                    <Popconfirm
+                        title="Are you sure you want to delete this supermarket?"
+                        onConfirm={() => handleDelete(record.id)}
+                        okText="Yes"
+                        cancelText="No"
+                    >
+                        <Tooltip title="Delete">
+                            <Button
+                                icon={<DeleteOutlined />}
+                                type="link"
+                                danger
+                            />
+                        </Tooltip>
+                    </Popconfirm>
                 </Space>
             ),
         },
