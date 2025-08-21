@@ -345,10 +345,18 @@ const AdminNavbar = () => {
                         <StyledNavLink
                             to={`/profile/${user?._id || user?.id}`}
                             onClick={closeMobileMenu}
-                            sx={{ mr: 2 }}
                         >
                             Profile
                         </StyledNavLink>
+                        {isSuperAdmin && (
+                            <StyledNavLink
+                                to={`/app-info`}
+                                onClick={closeMobileMenu}
+                                sx={{ mr: 2 }}
+                            >
+                                App Info
+                            </StyledNavLink>
+                        )}
 
                         <Button variant="contained" color="error" startIcon={<LogoutIcon />} onClick={handleLogout}>
                             Logout
@@ -538,6 +546,15 @@ const AdminNavbar = () => {
                                 Profile
                             </StyledNavLink>
 
+                            {isSuperAdmin && (
+                                <StyledNavLink
+                                    to={`/app-info`}
+                                    onClick={closeMobileMenu}
+                                    sx={{ mb: 2 }}
+                                >
+                                    App Info
+                                </StyledNavLink>
+                            )}
                             <Button
                                 variant="contained"
                                 color="error"
