@@ -40,8 +40,10 @@ const getMarketById = async (req, res) => {
         if (!superMarket) {
             return res.status(404).json({ success: false, message: "Super Market not found"});
         }
-        
-        return res.status(200).json({ success: true, message: "Super market fetched successfully", data: superMarket });
+
+        const { searchTokens, ...supermarketWithoutSearchTokens } = superMarket;
+
+        return res.status(200).json({ success: true, message: "Super market fetched successfully", data: supermarketWithoutSearchTokens });
     } catch (error) {
         console.error("Get super market by id error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
@@ -261,7 +263,9 @@ const updateMarketById = async (req, res) => {
             return res.status(500).json({ success: false, message: "Server Error" });
         }
         
-        return res.status(200).json({ success: true, message: "Super market updated successfully", data: updatedMarket });
+        const { searchTokens, ...supermarketWithoutSearchTokens } = updatedMarket;
+
+        return res.status(200).json({ success: true, message: "Super market updated successfully", data: supermarketWithoutSearchTokens });
     } catch (error) {
         console.error("Method_name error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });

@@ -210,7 +210,9 @@ const getProductById = async (req, res) => {
 
         const populatedProduct = await populateCategory(product, userRole);
 
-        return res.status(200).json({ success: true, message: "Product fetched successfully", data: populatedProduct });
+        const { searchTokens, ...productWithoutSearchTokens } = populatedProduct;
+
+        return res.status(200).json({ success: true, message: "Product fetched successfully", data: productWithoutSearchTokens });
     } catch (error) {
         console.error("Get product by id error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
@@ -343,7 +345,9 @@ const updateProduct = async (req, res) => {
 
         const populatedProduct = await populateCategory(updatedProduct);
 
-        return res.status(201).json({ success: true, message: "Product updated successfully", data: populatedProduct });
+        const { searchTokens, ...productWithoutSearchTokens } = populatedProduct;
+
+        return res.status(201).json({ success: true, message: "Product updated successfully", data: productWithoutSearchTokens });
     } catch (error) {
         console.error("Update product error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
