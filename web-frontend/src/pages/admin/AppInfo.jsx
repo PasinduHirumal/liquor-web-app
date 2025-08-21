@@ -9,13 +9,11 @@ import {
     Card,
     Switch,
     Tag,
-    Modal,
-    Form,
-    Input,
     Button,
 } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
+import AppInfoEditModal from "../../components/admin/forms/AppInfoEditModal";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -30,7 +28,6 @@ function AppInfo() {
     // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState(null);
-    const [form] = Form.useForm();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -81,33 +78,7 @@ function AppInfo() {
 
     const handleEdit = (record) => {
         setSelectedRecord(record);
-        form.setFieldsValue(record);
         setIsModalOpen(true);
-    };
-
-    const handleModalOk = async () => {
-        try {
-            const values = form.getFieldsValue();
-
-            const res = await axiosInstance.patch(`/appInfo/update/${selectedRecord.id}`, values);
-
-            toast.success(res.data.message || "Updated successfully");
-
-            // Update UI state
-            setAllAppData((prev) =>
-                prev.map((item) =>
-                    item.id === selectedRecord.id ? { ...item, ...values } : item
-                )
-            );
-            if (mainAppData?.id === selectedRecord.id) {
-                setMainAppData((prev) => ({ ...prev, ...values }));
-            }
-
-            setIsModalOpen(false);
-            setSelectedRecord(null);
-        } catch (err) {
-            toast.error(err.response?.data?.message || "Failed to update");
-        }
     };
 
     const columns = [
@@ -215,32 +186,16 @@ function AppInfo() {
                 </TabPane>
             </Tabs>
 
-            {/* Edit Modal */}
-            <Modal
-                title="Edit App Info"
-                open={isModalOpen}
-                onCancel={() => setIsModalOpen(false)}
-                onOk={handleModalOk}
-                okText="Save"
-            >
-                <Form form={form} layout="vertical">
-                    <Form.Item label="ID" name="id">
-                        <Input disabled />
-                    </Form.Item>
-                    <Form.Item label="Reg Number" name="reg_number">
-                        <Input disabled />
-                    </Form.Item>
-                    <Form.Item label="Description" name="description">
-                        <Input />
-                    </Form.Item>
-                    <Form.Item label="App Version" name="app_version">
-                        <Input type="number" />
-                    </Form.Item>
-                    <Form.Item label="Liquor Show" name="is_liquor_show">
-                        <Input disabled />
-                    </Form.Item>
-                </Form>
-            </Modal>
+            {/* Import external modal */}
+            <AppInfoEditModal
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                selectedRecord={selectedRecord}
+                setSelectedRecord={setSelectedRecord}
+                setAllAppData={setAllAppData}
+                setMainAppData={setMainAppData}
+                mainAppData={mainAppData}
+            />
         </Card>
     );
 }
