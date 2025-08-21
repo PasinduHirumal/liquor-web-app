@@ -9,7 +9,8 @@ const validateCompanyDetails = (req, res, next) => {
   
   const schema = Joi.object({
     where_house_name: Joi.string().min(1).max(100).required(),
-    where_house_location: locationSchema.default({ lat: null, lng: null }),
+    //where_house_location: locationSchema.default({ lat: null, lng: null }),
+    where_house_location: locationSchema.required(),
     address: Joi.string().min(2).max(350).required(),
     delivery_charge_for_1KM: Joi.number().positive().precision(2).default(0.01),
     service_charge: Joi.number().min(0).precision(2).default(0),
