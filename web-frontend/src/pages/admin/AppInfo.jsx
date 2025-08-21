@@ -44,11 +44,10 @@ function AppInfo() {
 
             toast.success(res.data.message || "Updated successfully");
 
-            const updateState = (data) => {
-                return data.map((item) =>
+            const updateState = (data) =>
+                data.map((item) =>
                     item.id === record.id ? { ...item, is_liquor_show: newValue } : item
                 );
-            };
 
             setMainAppData((prev) => (prev?.id === record.id ? { ...prev, is_liquor_show: newValue } : prev));
             setAllAppData((prev) => updateState(prev));
@@ -61,16 +60,17 @@ function AppInfo() {
     };
 
     const columns = [
-        { title: "ID", dataIndex: "id", key: "id" },
-        { title: "Reg Number", dataIndex: "reg_number", key: "reg_number" },
-        { title: "Description", dataIndex: "description", key: "description" },
-        { title: "App Version", dataIndex: "app_version", key: "app_version" },
+        { title: "ID", dataIndex: "id", key: "id", width: 80 },
+        { title: "Reg Number", dataIndex: "reg_number", key: "reg_number", width: 150 },
+        { title: "Description", dataIndex: "description", key: "description", width: 250 },
+        { title: "App Version", dataIndex: "app_version", key: "app_version", width: 120 },
         {
             title: "Liquor Show",
             dataIndex: "is_liquor_show",
             key: "is_liquor_show",
+            width: 150,
             render: (value, record) => (
-                <div className="flex items-center">
+                <div className="flex items-center gap-2">
                     <Switch
                         checked={value}
                         loading={updatingId === record.id}
@@ -84,12 +84,14 @@ function AppInfo() {
             title: "Created At",
             dataIndex: "createdAt",
             key: "createdAt",
+            width: 200,
             render: (value) => (value ? new Date(value).toLocaleString() : "N/A"),
         },
         {
             title: "Updated At",
             dataIndex: "updatedAt",
             key: "updatedAt",
+            width: 200,
             render: (value) => (value ? new Date(value).toLocaleString() : "N/A"),
         },
     ];
@@ -111,7 +113,7 @@ function AppInfo() {
     }
 
     return (
-        <Card className="p-4">
+        <Card className="p-4" style={{ borderRadius: 0 }}>
             <Title level={3}>App Info</Title>
 
             <Tabs defaultActiveKey="main">
@@ -126,6 +128,7 @@ function AppInfo() {
                             rowKey="id"
                             pagination={false}
                             bordered
+                            scroll={{ x: 1200 }}
                         />
                     )}
                 </TabPane>
@@ -140,6 +143,7 @@ function AppInfo() {
                             dataSource={allAppData}
                             rowKey="id"
                             bordered
+                            scroll={{ x: 1200 }}
                         />
                     )}
                 </TabPane>
