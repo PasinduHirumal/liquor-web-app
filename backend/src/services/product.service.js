@@ -94,7 +94,15 @@ class ProductService extends BaseService {
             objectData.description,
             objectData.brand,
             objectData.country,
-            objectData.flavour.primary_flavour,
+            objectData.flavour?.primary_flavour,
+            ...(objectData.flavour?.flavour_notes || []),
+            ...(objectData.flavour?.fruit_flavours || []),
+            ...(objectData.flavour?.spice_flavours || []),
+            ...(objectData.flavour?.herbal_flavours || []),
+            ...(objectData.flavour?.wood_flavours || []),
+            ...(objectData.flavour?.finish_notes || []),
+            objectData.flavour?.finish_type,
+            objectData.flavour?.tasting_profile,
             objectData.product_from,
         ];
 
@@ -162,27 +170,28 @@ class ProductService extends BaseService {
         try {
             console.log('Starting search tokens migration...');
             
-            const allMarkets = await this.findAll();
+            const allDocs = await this.findAll();
             let processed = 0;
             let errors = 0;
             
-            for (const market of allMarkets) {
+            for (const doc of allDocs) {
                 try {
-                    const searchTokens = this.generateSearchTokens(market);
-                    await super.updateById(market.id, { searchTokens });
+                    const searchTokens = this.generateSearchTokens(doc);
+                    const doc_id = doc.id != null ? doc.id : doc.product_id;
+                    await super.updateById(doc_id, { searchTokens });
                     processed++;
                     
                     if (processed % 10 === 0) {
-                        console.log(`Processed ${processed}/${allMarkets.length} documents...`);
+                        console.log(`Processed ${processed}/${allDocs.length} documents...`);
                     }
                 } catch (error) {
-                    console.error(`Error updating document ${market.id}:`, error.message);
+                    console.error(`Error updating document ${doc.id}:`, error.message);
                     errors++;
                 }
             }
             
             console.log(`Migration complete! Processed: ${processed}, Errors: ${errors}`);
-            return { processed, errors, total: allMarkets.length };
+            return { processed, errors, total: allDocs.length };
         } catch (error) {
             console.error('Migration failed:', error.message);
             throw error;
