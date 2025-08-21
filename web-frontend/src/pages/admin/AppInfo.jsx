@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
-import { Table, Tabs, Typography, Spin, Alert, Card } from "antd";
+import { Table, Tabs, Typography, Spin, Alert, Card, Switch, Tag } from "antd";
+import toast from "react-hot-toast";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -10,6 +11,7 @@ function AppInfo() {
     const [allAppData, setAllAppData] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [updatingId, setUpdatingId] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -31,7 +33,33 @@ function AppInfo() {
         fetchData();
     }, []);
 
-    // Table Columns
+    const handleToggle = async (record) => {
+        try {
+            setUpdatingId(record.id);
+            const newValue = !record.is_liquor_show;
+
+            const res = await axiosInstance.patch("/appInfo/update/toggle", {
+                is_liquor_show: newValue,
+            });
+
+            toast.success(res.data.message || "Updated successfully");
+
+            const updateState = (data) => {
+                return data.map((item) =>
+                    item.id === record.id ? { ...item, is_liquor_show: newValue } : item
+                );
+            };
+
+            setMainAppData((prev) => (prev?.id === record.id ? { ...prev, is_liquor_show: newValue } : prev));
+            setAllAppData((prev) => updateState(prev));
+
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to update");
+        } finally {
+            setUpdatingId(null);
+        }
+    };
+
     const columns = [
         { title: "ID", dataIndex: "id", key: "id" },
         { title: "Reg Number", dataIndex: "reg_number", key: "reg_number" },
@@ -41,7 +69,16 @@ function AppInfo() {
             title: "Liquor Show",
             dataIndex: "is_liquor_show",
             key: "is_liquor_show",
-            render: (value) => (value ? "Yes" : "No"),
+            render: (value, record) => (
+                <div className="flex items-center">
+                    <Switch
+                        checked={value}
+                        loading={updatingId === record.id}
+                        onChange={() => handleToggle(record)}
+                    />
+                    <Tag color={value ? "green" : "red"}>{value ? "Yes" : "No"}</Tag>
+                </div>
+            ),
         },
         {
             title: "Created At",
@@ -78,7 +115,6 @@ function AppInfo() {
             <Title level={3}>App Info</Title>
 
             <Tabs defaultActiveKey="main">
-                {/* Main App Info */}
                 <TabPane tab="Main App Info" key="main">
                     <Title level={4}>Main Application Information</Title>
                     {!mainAppData ? (
@@ -94,7 +130,6 @@ function AppInfo() {
                     )}
                 </TabPane>
 
-                {/* All App Data */}
                 <TabPane tab={`All App Data (${allAppData.length})`} key="all">
                     <Title level={4}>All Application Data</Title>
                     {allAppData.length === 0 ? (

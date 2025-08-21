@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Form, Input, InputNumber, Switch, Button, message, Space, Row, Col } from "antd";
 import { axiosInstance } from "../../../lib/axios";
+import toast from "react-hot-toast";
 
 function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
     const [form] = Form.useForm();
@@ -53,24 +54,24 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
             const res = await axiosInstance.patch(`/superMarket/update/${marketData.id}`, payload);
 
             if (res.data?.success) {
-                message.success("Supermarket updated successfully");
+                toast.success("Supermarket updated successfully");
                 form.resetFields();
                 onClose();
                 onSuccess();
             } else {
                 const errorMsg = res.data?.message || "Failed to update supermarket";
-                message.error(errorMsg);
+                toast.error(errorMsg);
             }
         } catch (err) {
             console.error("Update error:", err);
 
             if (err.response?.data?.errors) {
                 err.response.data.errors.forEach(e => {
-                    message.error(`${e.field}: ${e.message}`);
+                    toast.error(`${e.field}: ${e.message}`);
                 });
             } else {
                 const errorMsg = err.response?.data?.message || "Server Error";
-                message.error(errorMsg);
+                toast.error(errorMsg);
             }
         } finally {
             setUpdating(false);
