@@ -32,6 +32,8 @@ class OtherProducts {
 
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;
+
+        this.searchTokens = data.searchTokens;
     }
 
 

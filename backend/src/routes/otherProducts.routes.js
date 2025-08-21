@@ -1,7 +1,7 @@
 import express from 'express';
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import { authenticateUser, authorizeRoles } from '../middleware/authMiddleware.js';
-import { createProduct, deleteProduct, getAllProducts, getProductById, updateProduct } from '../controller/otherProducts.controller.js';
+import { createProduct, deleteProduct, getAllProducts, getProductById, migrateSearchTokens, updateProduct } from '../controller/otherProducts.controller.js';
 import { validateOtherProduct, validateOtherProductUpdate, validatePriceOperation, validateQuantityOperation } from '../validations/OtherProductValidator.js';
 
 const router = express.Router();
@@ -19,5 +19,8 @@ router.patch('/update/:id', authenticateUser, authorizeRoles(admin, super_admin)
 router.patch('/update-price/:id', authenticateUser, authorizeRoles(admin, super_admin), validatePriceOperation, updateProduct);
 router.patch('/update-quantity/:id', authenticateUser, authorizeRoles(admin, super_admin), validateQuantityOperation, updateProduct);
 router.delete('/delete/:id', authenticateUser, authorizeRoles(super_admin), deleteProduct);
+
+//  Run this end-point once to add search tokens to existing documents after create & update
+router.post('/migrate', authenticateUser, authorizeRoles(admin, super_admin), migrateSearchTokens);
 
 export default router;

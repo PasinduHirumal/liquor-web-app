@@ -179,12 +179,18 @@ const getAllProducts = async (req, res) => {
             return new Date(a.stock_quantity) - new Date(b.stock_quantity);
         });
 
+        // Remove searchTokens field from each product object
+        const sanitizedProducts = sortedProducts.map(product => {
+            const { searchTokens, ...productsWithoutSearchTokens } = product;
+            return productsWithoutSearchTokens;
+        });
+
         return res.status(200).json({ 
             success: true, 
             message: "Fetching products successful",
             count: sortedProducts.length,
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
-            data: sortedProducts
+            data: sanitizedProducts
         });
     } catch (error) {
         console.error("Fetch products error:", error.message);
@@ -370,4 +376,24 @@ const deleteProduct = async (req, res) => {
     }
 };
 
-export { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct };
+// Migration endpoint (call this once to update existing data)
+const migrateSearchTokens = async (req, res) => {
+    try {
+        const result = await productService.addSearchTokensToExistingDocuments();
+        
+        return res.status(200).json({
+            success: true,
+            message: "Search tokens migration completed",
+            ...result
+        });
+    } catch (error) {
+        console.error("Migration error:", error.message);
+        return res.status(500).json({ 
+            success: false, 
+            message: "Migration failed",
+            error: error.message 
+        });
+    }
+};
+
+export { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, migrateSearchTokens };
