@@ -1,16 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
-import {
-    Table,
-    Tabs,
-    Typography,
-    Spin,
-    Alert,
-    Card,
-    Switch,
-    Tag,
-    Button,
-} from "antd";
+import { Table, Tabs, Typography, Spin, Alert, Card, Switch, Tag, Button } from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import AppInfoEditModal from "../../components/admin/forms/AppInfoEditModal";
