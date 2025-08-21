@@ -73,6 +73,7 @@ function AppInfo() {
                 <div className="flex items-center gap-2">
                     <Switch
                         checked={value}
+                        className="mx-2"
                         loading={updatingId === record.id}
                         onChange={() => handleToggle(record)}
                     />
