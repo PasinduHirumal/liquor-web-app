@@ -13,6 +13,7 @@ const AppInfoEditModal = ({
     mainAppData
 }) => {
     const [form] = Form.useForm();
+    const [loading, setLoading] = React.useState(false);
 
     React.useEffect(() => {
         if (selectedRecord) {
@@ -22,6 +23,7 @@ const AppInfoEditModal = ({
 
     const handleModalOk = async () => {
         try {
+            setLoading(true);
             const values = form.getFieldsValue();
             const res = await axiosInstance.patch(`/appInfo/update/${selectedRecord.id}`, values);
 
@@ -42,6 +44,8 @@ const AppInfoEditModal = ({
             setSelectedRecord(null);
         } catch (err) {
             toast.error(err.response?.data?.message || "Failed to update");
+        } finally {
+            setLoading(false);
         }
     };
 
@@ -52,6 +56,7 @@ const AppInfoEditModal = ({
             onCancel={() => setIsModalOpen(false)}
             onOk={handleModalOk}
             okText="Save"
+            confirmLoading={loading}
         >
             <Form form={form} layout="vertical">
                 <Form.Item label="ID" name="id">
