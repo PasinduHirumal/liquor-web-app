@@ -10,6 +10,16 @@ class ProductService extends BaseService {
         })
     }
 
+    async findAllBySuperMarket(superMarket_id) {
+        try {
+            const docs = await this.findByFilter('superMarket_id', '==', superMarket_id);
+
+            return docs;
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default ProductService;

@@ -1,7 +1,11 @@
 import SuperMarketService from "../services/superMarket.service.js";
+import OtherProductService from "../services/otherProduct.service.js";
+import ProductService from "../services/product.service.js";
 import ADMIN_ROLES from "../enums/adminRoles.js";
 
 const marketService = new SuperMarketService();
+const groceryService = new OtherProductService();
+const liquorService = new ProductService();
 
 const createMarket = async (req, res) => {
 	try {
@@ -82,6 +86,12 @@ const getAllMarkets = async (req, res) => {
         if (sortedMarkets) {
             sortDescription.push("by date: createdAt descending (newest first)");
         }
+
+        // Remove searchTokens field from each supermarket object
+        const sanitizedSupermarkets = sortedMarkets.map(supermarket => {
+            const { searchTokens, ...supermarketsWithoutSearchTokens } = supermarket;
+            return supermarketsWithoutSearchTokens;
+        });
         
         return res.status(200).json({ 
             success: true, 
@@ -89,7 +99,7 @@ const getAllMarkets = async (req, res) => {
             count: filteredMarkets.length, 
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
             sorted: sortDescription.length > 0 ? sortDescription.join(', ') : null, 
-            data: sortedMarkets 
+            data: sanitizedSupermarkets 
         });
     } catch (error) {
         console.error("Get all supermarkets error:", error.message);
@@ -258,4 +268,31 @@ const updateMarketById = async (req, res) => {
     }
 };
 
-export { createMarket, getMarketById, getAllMarkets, updateMarketById, searchMarketsAdvanced, migrateSearchTokens, getAllMarketsList};
+const deleteSuperMarketById = async (req, res) => {
+	try {
+        const superMarket_id = req.params.id;
+        
+        const superMarket = await marketService.findById(superMarket_id);
+        if (!superMarket) {
+            return res.status(404).json({ success: false, message: "Super market not found"});
+        }
+
+        const groceryProducts = await groceryService.findAllBySuperMarket(superMarket_id);
+        const liquorProducts = await liquorService.findAllBySuperMarket(superMarket_id);
+
+        const TotalProducts = groceryProducts.length + liquorProducts.length;
+
+        if (TotalProducts > 0) {
+            return res.status(400).json({ success: false, message: `Can't delete Super Market. It has ${TotalProducts} products` });
+        }
+        
+        await marketService.deleteById(superMarket_id);
+
+        return res.status(200).json({ success: true, message: "Super Market deleted successfully"});
+    } catch (error) {
+        console.error("Delete super market error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+export { createMarket, getMarketById, getAllMarkets, updateMarketById, searchMarketsAdvanced, migrateSearchTokens, getAllMarketsList, deleteSuperMarketById};

@@ -10,6 +10,16 @@ class OtherProductService extends BaseService {
         })
     }
 
+    async findAllBySuperMarket(superMarket_id) {
+        try {
+            const docs = await this.findByFilter('superMarket_id', '==', superMarket_id);
+
+            return docs;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     // functions
     async getTotalStockValue() {
         try {
