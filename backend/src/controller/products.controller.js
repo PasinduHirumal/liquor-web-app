@@ -188,12 +188,18 @@ const getAllProducts = async (req, res) => {
             return new Date(a.stock_quantity) - new Date(b.stock_quantity);
         });
 
+        // Remove searchTokens field from each product object
+        const sanitizedProducts = sortedProducts.map(product => {
+            const { searchTokens, ...productsWithoutSearchTokens } = product;
+            return productsWithoutSearchTokens;
+        });
+
         return res.status(200).json({ 
             success: true, 
             message: "Fetching products successful",
             count: sortedProducts.length,
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
-            data: sortedProducts
+            data: sanitizedProducts
         });
     } catch (error) {
         console.error("Fetch products error:", error.message);
