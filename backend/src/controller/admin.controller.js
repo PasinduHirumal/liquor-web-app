@@ -52,7 +52,7 @@ const getAllAdmins = async (req, res) => {
         if (where_house_id !== undefined) {
             const where_house = await companyService.findById(where_house_id);
             if (!where_house) {
-                return res.status(400).json({ success: false, message: "Invalid where house id" });
+                return res.status(400).json({ success: false, message: "Invalid warehouse id" });
             }
             
             filters.where_house_id = where_house_id;
@@ -121,7 +121,10 @@ const updateAdmin = async (req, res) => {
 
         const where_house = await companyService.findById(where_house_id);
         if (!where_house) {
-            return res.status(400).json({ success: false, message: "Invalid where house id" });
+            return res.status(400).json({ success: false, message: "Invalid Warehouse id" });
+        }
+        if (!where_house.isActive) {
+            return res.status(400).json({ success: false, message: "Warehouse is in Not-Active" });
         }
 
         // Authorization logic

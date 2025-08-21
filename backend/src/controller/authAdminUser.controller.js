@@ -17,9 +17,14 @@ const register = async (req, res) => {
             return res.status(400).json({ success: false, message: "User already exists" });
         }
 
-        const where_house = await companyService.findById(where_house_id);
-        if (!where_house) {
-            return res.status(400).json({ success: false, message: "Invalid where house id" });
+        if (where_house_id !== "N/A" && where_house_id !== undefined) {
+            const where_house = await companyService.findById(where_house_id);
+            if (!where_house) {
+                return res.status(400).json({ success: false, message: "Invalid warehouse id" });
+            }
+            if (!where_house.isActive) {
+                return res.status(400).json({ success: false, message: "Warehouse is in Not-Active" });
+            }
         }
 
         const admin = await adminService.create(req.body);
