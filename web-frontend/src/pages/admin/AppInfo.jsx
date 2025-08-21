@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
-import { Table, Tabs, Typography, Spin, Alert, Card, Switch, Tag } from "antd";
+import { Table, Tabs, Typography, Spin, Alert, Card, Switch, Tag, Button } from "antd";
+import { EditOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
+import AppInfoEditModal from "../../components/admin/forms/AppInfoEditModal";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -12,6 +14,10 @@ function AppInfo() {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [updatingId, setUpdatingId] = useState(null);
+
+    // Modal state
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [selectedRecord, setSelectedRecord] = useState(null);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -49,14 +55,20 @@ function AppInfo() {
                     item.id === record.id ? { ...item, is_liquor_show: newValue } : item
                 );
 
-            setMainAppData((prev) => (prev?.id === record.id ? { ...prev, is_liquor_show: newValue } : prev));
+            setMainAppData((prev) =>
+                prev?.id === record.id ? { ...prev, is_liquor_show: newValue } : prev
+            );
             setAllAppData((prev) => updateState(prev));
-
         } catch (err) {
             toast.error(err.response?.data?.message || "Failed to update");
         } finally {
             setUpdatingId(null);
         }
+    };
+
+    const handleEdit = (record) => {
+        setSelectedRecord(record);
+        setIsModalOpen(true);
     };
 
     const columns = [
@@ -94,6 +106,20 @@ function AppInfo() {
             key: "updatedAt",
             width: 200,
             render: (value) => (value ? new Date(value).toLocaleString() : "N/A"),
+        },
+        {
+            title: "Action",
+            key: "action",
+            width: 100,
+            render: (_, record) => (
+                <Button
+                    type="link"
+                    icon={<EditOutlined />}
+                    onClick={() => handleEdit(record)}
+                >
+                    Edit
+                </Button>
+            ),
         },
     ];
 
@@ -149,6 +175,17 @@ function AppInfo() {
                     )}
                 </TabPane>
             </Tabs>
+
+            {/* Import external modal */}
+            <AppInfoEditModal
+                isModalOpen={isModalOpen}
+                setIsModalOpen={setIsModalOpen}
+                selectedRecord={selectedRecord}
+                setSelectedRecord={setSelectedRecord}
+                setAllAppData={setAllAppData}
+                setMainAppData={setMainAppData}
+                mainAppData={mainAppData}
+            />
         </Card>
     );
 }
