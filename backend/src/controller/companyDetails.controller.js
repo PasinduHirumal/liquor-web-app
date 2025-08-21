@@ -10,11 +10,15 @@ const adminService = new AdminUserService();
 
 const createWareHouse = async (req, res) => {
 	try {
-        const { where_house_name } = req.body;
+        const { where_house_name, where_house_location } = req.body;
 
-        const whereHouse = await companyService.findByWarehouseName(where_house_name);
-        if (whereHouse) {
-            return res.status(400).json({ success: false, message: "Where House already exists"});
+        const existingWarehouseByName  = await companyService.findByWarehouseName(where_house_name);
+        if (existingWarehouseByName) {
+            return res.status(400).json({ success: false, message: "Warehouse already exists"});
+        }
+        const existingWarehouseByLocation  = await companyService.findByWarehouseLocation(where_house_location);
+        if (existingWarehouseByLocation) {
+            return res.status(400).json({ success: false, message: "Warehouse already exists"});
         }
 
         const count = await companyService.count();
@@ -50,7 +54,7 @@ const createWareHouse = async (req, res) => {
             return res.status(500).json({ success: false, message: "Server Error", reason: "Error in creating"});
         }
         
-        return res.status(200).json({ success: true, message: "Where House created successfully", data: new_where_house });
+        return res.status(200).json({ success: true, message: "Warehouse created successfully", data: new_where_house });
     } catch (error) {
         console.error("Create where house error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
@@ -131,16 +135,31 @@ const getAllWarehouses = async (req, res) => {
 
 const updateWarehouseById = async (req, res) => {
 	try {
-        const companyDetailId = req.params.id;
+        const warehouse_id = req.params.id;
+        const { where_house_name, where_house_location } = req.body;
 
-        const systemDetail = await companyService.findById(companyDetailId);
-        if (!systemDetail) {
+        const warehouse = await companyService.findById(warehouse_id);
+        if (!warehouse) {
             return res.status(404).json({ success: false, message: "Warehouse not found" });
+        }
+
+        if (where_house_name !== undefined){
+            const existingWarehouseByName  = await companyService.findByWarehouseName(where_house_name);
+            if (existingWarehouseByName && existingWarehouseByName.id !== warehouse.id) {
+                return res.status(400).json({ success: false, message: "Can't update name. Warehouse already exists"});
+            }
+        }
+
+        if (where_house_location !== undefined) {
+            const existingWarehouseByLocation  = await companyService.findByWarehouseLocation(where_house_location);
+            if (existingWarehouseByLocation && existingWarehouseByLocation.id !== warehouse.id) {
+                return res.status(400).json({ success: false, message: "Can't update location. Warehouse already exists"});
+            }
         }
 
         const updateData = { ...req.body };
 
-        const updatedWarehouse = await companyService.updateById(companyDetailId, updateData);
+        const updatedWarehouse = await companyService.updateById(warehouse_id, updateData);
         if (!updatedWarehouse) {
             return res.status(500).json({ success: false, message: "Failed to update Warehouse"});
         }
