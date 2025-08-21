@@ -1,0 +1,11 @@
+.rating-card {
+    border: 1px solid #eaeaea;
+    border-radius: 10px;
+    background: #fafafa;
+}
+.rating-stars .star {
+    color: #ccc;
+}
+.rating-stars .star.filled {
+    color: #f4c150;
+}

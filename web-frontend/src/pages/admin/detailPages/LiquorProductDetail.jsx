@@ -15,6 +15,7 @@ import DeleteLiquorButton from "../../../components/admin/buttons/DeleteLiquorBu
 import ViewProductHistory from "../../../common/ViewProductHistory";
 import FlavorDropDown from "../../../components/admin/buttons/FlavorDropDown";
 import RatingStars from "../../../common/RatingStars";
+import RatingCommentCards from "../../../common/RatingCommentcards";
 
 const OriginBadge = styled(Chip)(({ theme, origin }) => ({
     position: "absolute",
@@ -290,6 +291,7 @@ const LiquorProductDetail = () => {
                             </div>
                         </div>
                     </div>
+                    <RatingCommentCards productId={product.product_id || product.id} />
                 </>
             ) : (
                 <div className="product-not-found text-center py-5">
