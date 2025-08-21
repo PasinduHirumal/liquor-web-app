@@ -367,7 +367,7 @@ const deleteProduct = async (req, res) => {
             await deleteImages(product.images);
             await deleteImages(product.main_image);
         } catch (imageError) {
-            console.error("Failed to delete banner images:", imageError.message);
+            console.error("Failed to delete product images:", imageError.message);
             return res.status(500).json({ success: false, message: "Server Error" });
         }
 

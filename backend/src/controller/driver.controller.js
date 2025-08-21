@@ -3,7 +3,7 @@ import CompanyService from "../services/company.service.js";
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import BACKGROUND_STATUS from "../enums/driverBackgroundStatus.js";
 import populateWhereHouse from "../utils/populateWhere_House.js";
-import { uploadImages, uploadSingleImage } from '../utils/firebaseStorage.js';
+import { deleteImages, uploadImages, uploadSingleImage } from '../utils/firebaseStorage.js';
 
 const driverService = new DriverService();
 const companyService = new CompanyService();
@@ -22,7 +22,10 @@ const createDriver = async (req, res) => {
 
         const where_house = await companyService.findById(where_house_id);
         if (!where_house) {
-            return res.status(400).json({ success: false, message: "Invalid where house id" });
+            return res.status(400).json({ success: false, message: "Invalid warehouse id" });
+        }
+        if (!where_house.isActive) {
+            return res.status(400).json({ success: false, message: "Warehouse is in Not-Active" });
         }
         
         if (profileImage !== undefined) {
@@ -185,7 +188,11 @@ const updateDriver = async (req, res) => {
         if (where_house_id !== undefined) {
             const where_house = await companyService.findById(where_house_id);
             if (!where_house) {
-                return res.status(400).json({ success: false, message: "Invalid where house id" });
+                return res.status(400).json({ success: false, message: "Invalid Warehouse id" });
+            }
+
+            if (!where_house.isActive) {
+                return res.status(400).json({ success: false, message: "Warehouse is in Not-Active" });
             }
         }
 
@@ -284,6 +291,18 @@ const deleteDriver = async (req, res) => {
         const driverToDelete = await driverService.findById(driverId);
         if (!driverToDelete) {
             return res.status(404).json({ success: false, message: "Driver not found"});
+        }
+
+        try {
+            await deleteImages(driverToDelete.profileImage);
+            await deleteImages(driverToDelete.documents.licenseImage);
+            await deleteImages(driverToDelete.documents.nicImage);
+            await deleteImages(driverToDelete.documents.vehicleRegistrationImage);
+            await deleteImages(driverToDelete.documents.insuranceImage);
+            await deleteImages(driverToDelete.documents.bankStatementImage);
+        } catch (imageError) {
+            console.error("Failed to delete product images:", imageError.message);
+            return res.status(500).json({ success: false, message: "Server Error" });
         }
 
         await driverService.deleteById(driverId);
