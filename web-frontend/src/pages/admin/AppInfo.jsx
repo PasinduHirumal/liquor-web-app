@@ -40,12 +40,9 @@ function AppInfo() {
                         <tr className="bg-gray-100">
                             <th className="border px-4 py-2 text-left">ID</th>
                             <th className="border px-4 py-2 text-left">Reg Number</th>
-                            <th className="border px-4 py-2 text-left">App Name</th>
-                            <th className="border px-4 py-2 text-left">Version</th>
+                            <th className="border px-4 py-2 text-left">Description</th>
+                            <th className="border px-4 py-2 text-left">App Version</th>
                             <th className="border px-4 py-2 text-left">Liquor Show</th>
-                            <th className="border px-4 py-2 text-left">Active</th>
-                            <th className="border px-4 py-2 text-left">Created At</th>
-                            <th className="border px-4 py-2 text-left">Updated At</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -53,19 +50,10 @@ function AppInfo() {
                             <tr key={item.id}>
                                 <td className="border px-4 py-2">{item.id}</td>
                                 <td className="border px-4 py-2">{item.reg_number}</td>
-                                <td className="border px-4 py-2">{item.app_name}</td>
-                                <td className="border px-4 py-2">{item.version}</td>
+                                <td className="border px-4 py-2">{item.description}</td>
+                                <td className="border px-4 py-2">{item.app_version}</td>
                                 <td className="border px-4 py-2">
                                     {item.is_liquor_show ? "Yes" : "No"}
-                                </td>
-                                <td className="border px-4 py-2">
-                                    {item.is_active ? "Active" : "Inactive"}
-                                </td>
-                                <td className="border px-4 py-2">
-                                    {new Date(item.createdAt).toLocaleString()}
-                                </td>
-                                <td className="border px-4 py-2">
-                                    {new Date(item.updatedAt).toLocaleString()}
                                 </td>
                             </tr>
                         ))}
