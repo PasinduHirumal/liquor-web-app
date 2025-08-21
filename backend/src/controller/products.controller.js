@@ -411,4 +411,24 @@ const updateActiveToggle = async (req, res) => {
     }
 };
 
-export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, updateActiveToggle};
+// Migration endpoint (call this once to update existing data)
+const migrateSearchTokens = async (req, res) => {
+    try {
+        const result = await productService.addSearchTokensToExistingDocuments();
+        
+        return res.status(200).json({
+            success: true,
+            message: "Search tokens migration completed",
+            ...result
+        });
+    } catch (error) {
+        console.error("Migration error:", error.message);
+        return res.status(500).json({ 
+            success: false, 
+            message: "Migration failed",
+            error: error.message 
+        });
+    }
+};
+
+export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, updateActiveToggle, migrateSearchTokens};
