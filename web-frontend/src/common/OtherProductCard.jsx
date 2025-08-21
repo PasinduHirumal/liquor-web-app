@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import RatingStars from "./RatingStars";
 
 const OtherProductCard = ({ product, adminOnly = false, userOnly = true }) => {
     const combinedImages = React.useMemo(() => {
@@ -119,6 +120,8 @@ const OtherProductCard = ({ product, adminOnly = false, userOnly = true }) => {
                     <h6 className="card-title text-truncate mb-1" style={{ color: "#fff" }}>
                         {product.name}
                     </h6>
+
+                    <RatingStars productId={product.product_id || product.id} />
 
                     <p className="card-text mb-1">
                         <small style={{ color: "#9ca3af" }}>

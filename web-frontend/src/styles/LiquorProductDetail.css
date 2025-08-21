@@ -147,6 +147,15 @@
     border-radius: 20px;
 }
 
+.rating {
+    display: flex;
+    color: #7f8c8d;
+    padding: 0.5rem 0.8rem;
+    background-color: rgba(127, 140, 141, 0.1);
+    border-radius: 20px;
+    width: fit-content;
+}
+
 .quantity-icon {
     font-size: 1.1rem;
 }

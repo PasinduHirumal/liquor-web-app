@@ -4,7 +4,7 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import {
     FaWineBottle, FaBoxOpen, FaCalendarAlt, FaEdit,
-    FaCheckCircle, FaTimesCircle, FaArrowLeft, FaPercentage, FaGlobe 
+    FaCheckCircle, FaTimesCircle, FaArrowLeft, FaPercentage, FaGlobe
 } from "react-icons/fa";
 import { Chip } from "@mui/material";
 import { styled } from "@mui/system";
@@ -14,6 +14,7 @@ import { axiosInstance } from "../../../lib/axios";
 import DeleteLiquorButton from "../../../components/admin/buttons/DeleteLiquorButton";
 import ViewProductHistory from "../../../common/ViewProductHistory";
 import FlavorDropDown from "../../../components/admin/buttons/FlavorDropDown";
+import RatingStars from "../../../common/RatingStars";
 
 const OriginBadge = styled(Chip)(({ theme, origin }) => ({
     position: "absolute",
@@ -218,6 +219,10 @@ const LiquorProductDetail = () => {
                                     <FaGlobe className="quantity-icon" />
                                     <span>{product.country}</span>
                                 </div>
+                            </div>
+
+                            <div className="rating">
+                                <RatingStars productId={product.product_id || product.id} />
                             </div>
 
                             {/* Description */}
