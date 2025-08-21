@@ -75,6 +75,16 @@ class OrdersService extends BaseService {
         }
     }
 
+    async findAllByWarehouseId(warehouse_id) {
+        try {
+            const docs = await this.findByFilter('warehouse_id', '==', warehouse_id);
+
+            return docs;
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default OrdersService;

@@ -2,11 +2,13 @@ import CompanyService from '../services/company.service.js';
 import SystemService from '../services/system.service.js';
 import DriverService from '../services/driver.service.js';
 import AdminUserService from '../services/adminUsers.service.js';
+import OrdersService from '../services/orders.service.js';
 
 const companyService = new CompanyService();
 const systemService = new SystemService();
 const driverService = new DriverService();
 const adminService = new AdminUserService();
+const ordersService = new OrdersService();
 
 const createWareHouse = async (req, res) => {
 	try {
@@ -178,6 +180,13 @@ const deleteWarehouseById = async (req, res) => {
         const warehouse = await companyService.findById(warehouse_id);
         if (!warehouse) {
             return res.status(404).json({ success: false, message: "Warehouse not found" });
+        }
+
+        const ordersForWarehouse = await ordersService.findAllByWarehouseId(warehouse_id);
+        const OrdersCount = ordersForWarehouse.length;
+
+        if (OrdersCount > 0) {
+            return res.status(400).json({ success: false, message: `Can't delete Warehouse. It has ${OrdersCount} orders` });
         }
 
         await companyService.deleteById(warehouse_id);
