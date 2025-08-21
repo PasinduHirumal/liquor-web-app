@@ -24,6 +24,27 @@ class SuperMarketService extends BaseService {
         }
     }
 
+    async findByLocation(location) {
+        try {
+            const addDocs  = await this.findAll();
+            
+            const GPS_TOLERANCE = 0.0001; 
+
+            const duplicateLocation = addDocs.find(place => {
+                if (!place.location) return false;
+                
+                const latDiff = Math.abs(place.location.lat - location.lat);
+                const lngDiff = Math.abs(place.location.lng - location.lng);
+                
+                return latDiff <= GPS_TOLERANCE && lngDiff <= GPS_TOLERANCE;
+            });
+            
+            return duplicateLocation || null;
+        } catch (error) {
+            throw error;
+        }
+    }
+
     // PRIMARY SEARCH METHOD - Use this in your controller
     async searchMarkets(searchTerm) {
         try {

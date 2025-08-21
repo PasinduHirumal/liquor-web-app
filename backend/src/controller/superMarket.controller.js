@@ -5,9 +5,9 @@ const marketService = new SuperMarketService();
 
 const createMarket = async (req, res) => {
 	try {
-        const { streetAddress, orders_count } = req.body;
+        const { location, orders_count } = req.body;
 
-        const existingSuperMarket = await marketService.findByStreetAddress(streetAddress);
+        const existingSuperMarket = await marketService.findByLocation(location);
         if (existingSuperMarket) {
             return res.status(400).json({ success: false, message: "Super Market already exists"});
         }
@@ -224,8 +224,8 @@ const migrateSearchTokens = async (req, res) => {
 const updateMarketById = async (req, res) => {
 	try {
         const superMarketId = req.params.id;
-        const { isActive } = req.body;
-        const user_role = req.user? req.user.role : null;
+        const { isActive, location } = req.body;
+        const user_role = req.user?.role ?? null;
 
         const superMarket = await marketService.findById(superMarketId);
         if (!superMarket) {
@@ -235,6 +235,13 @@ const updateMarketById = async (req, res) => {
         const is_SuperAdmin = ADMIN_ROLES.SUPER_ADMIN;
         if (isActive !== undefined && user_role !== is_SuperAdmin) {
             return res.status(403).json({ message: "Access Forbidden" });
+        }
+
+        if (location !== undefined) {
+            const existingSuperMarket = await marketService.findByLocation(location);
+            if (existingSuperMarket) {
+                return res.status(400).json({ success: false, message: "Super Market already exists"});
+            }
         }
 
         const updateData = { ...req.body };
