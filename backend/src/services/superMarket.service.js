@@ -8,6 +8,9 @@ class SuperMarketService extends BaseService {
             createdAtField: 'createdAt',
             updatedAtField: 'updatedAt'
         })
+
+        // Set the ID field name for this service(for searchMultiWords)
+        this.idField = 'id';
     }
 
     async findByStreetAddress(address) {
@@ -46,7 +49,7 @@ class SuperMarketService extends BaseService {
     }
 
     // PRIMARY SEARCH METHOD - Use this in your controller
-    async searchMarkets(searchTerm) {
+    async search(searchTerm) {
         try {
             if (!searchTerm || searchTerm.trim() === '') {
                 return await this.findAll();
@@ -64,7 +67,7 @@ class SuperMarketService extends BaseService {
     }
 
     // ADVANCED SEARCH - Search for multiple words
-    async searchMarketsMultiWord(searchTerm) {
+    async searchMultiWords(searchTerm) {
         try {
             if (!searchTerm || searchTerm.trim() === '') {
                 return await this.findAll();
@@ -73,7 +76,7 @@ class SuperMarketService extends BaseService {
             const searchWords = searchTerm.toLowerCase().trim().split(/\s+/);
             
             if (searchWords.length === 1) {
-                return await this.searchMarkets(searchTerm);
+                return await this.search(searchTerm);
             }
 
             // For multiple words, we need to fetch results for each word and find intersection
@@ -83,10 +86,12 @@ class SuperMarketService extends BaseService {
                 const wordResults = await this.findByFilter('searchTokens', 'array-contains', word);
                 
                 if (results === null) {
-                    results = new Set(wordResults.map(doc => doc.id));
+                    const validResults = wordResults.filter(doc => doc && doc[this.idField] && doc[this.idField].toString().trim() !== '');
+                    results = new Set(validResults.map(doc => doc[this.idField]));
                 } else {
                     // Keep only documents that contain all words (intersection)
-                    const wordIds = new Set(wordResults.map(doc => doc.id));
+                    const validWordResults = wordResults.filter(doc => doc && doc[this.idField] && doc[this.idField].toString().trim() !== '');
+                    const wordIds = new Set(validWordResults.map(doc => doc[this.idField]));
                     results = new Set([...results].filter(id => wordIds.has(id)));
                 }
                 
@@ -98,9 +103,15 @@ class SuperMarketService extends BaseService {
 
             // Fetch the actual documents
             const finalResults = [];
-            for (const id of results) {
-                const doc = await this.findById(id);
-                if (doc) finalResults.push(doc);
+            for (const docId of results) {
+                if (docId && docId.toString().trim() !== '') {
+                    try {
+                        const doc = await this.findById(docId);
+                        if (doc) finalResults.push(doc);
+                    } catch (docError) {
+                        console.warn(`Error fetching document with ID ${docId}:`, docError.message);
+                    }
+                }
             }
             
             return finalResults;
@@ -219,7 +230,7 @@ class SuperMarketService extends BaseService {
             let results;
             
             if (searchTerm && searchTerm.trim() !== '') {
-                results = await this.searchMarkets(searchTerm);
+                results = await this.search(searchTerm);
                 
                 // Apply additional filters on the search results
                 if (Object.keys(filters).length > 0) {

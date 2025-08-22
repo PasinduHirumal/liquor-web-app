@@ -154,9 +154,9 @@ const searchMarketsAdvanced = async (req, res) => {
         let results;
         
         if (multiWord === 'true') {
-            results = await marketService.searchMarketsMultiWord(searchTerm);
+            results = await marketService.searchMultiWords(searchTerm);
         } else {
-            results = await marketService.searchMarkets(searchTerm);
+            results = await marketService.search(searchTerm);
         }
         
         // Apply additional filters
