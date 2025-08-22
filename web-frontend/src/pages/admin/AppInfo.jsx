@@ -4,6 +4,9 @@ import { Table, Tabs, Typography, Spin, Alert, Card, Switch, Tag, Button } from 
 import { EditOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import AppInfoEditModal from "../../components/admin/forms/AppInfoEditModal";
+import SuperMarketMigrate from "../../components/admin/buttons/migrate/SuperMarketMigrate";
+import LiquorMigrate from "../../components/admin/buttons/migrate/LiquorMigrate";
+import GroceryMigrate from "../../components/admin/buttons/migrate/GroceryMigrate";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -141,7 +144,13 @@ function AppInfo() {
 
     return (
         <Card className="p-4" style={{ borderRadius: 0 }}>
-            <Title level={3}>App Info</Title>
+            <div className="flex justify-between items-center mb-4">
+                <Title level={3}>App Info</Title>
+                {/* ✅ Migration Button */}
+                <SuperMarketMigrate />
+                <LiquorMigrate />
+                <GroceryMigrate />
+            </div>
 
             <Tabs defaultActiveKey="main">
                 <TabPane tab="Main App Info" key="main">
