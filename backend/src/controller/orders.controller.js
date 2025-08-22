@@ -144,6 +144,8 @@ const updateOrder = async (req, res) => {
             return res.status(400).json({ success: false, message: `Order is already accepted by driver: ${driver.firstName} ${driver.lastName}` });
         }
 
+        const SuperMarket_ids_for_order_table = [];
+
         if (isAssigningDriver && !order.is_driver_accepted) {
             const driver = await driverService.findById(assigned_driver_id);
             if (!driver) {
@@ -193,6 +195,7 @@ const updateOrder = async (req, res) => {
                             if (product && product.superMarket_id) {
                                 if (!Super_Market_ids.includes(product.superMarket_id)) {
                                     Super_Market_ids.push(product.superMarket_id);
+                                    SuperMarket_ids_for_order_table.push(product.superMarket_id);
                                 }
                             }
                         } catch (productError) {
@@ -224,6 +227,7 @@ const updateOrder = async (req, res) => {
         }
 
         const updateData = { ...req.body };
+        updateData.superMarket_ids = SuperMarket_ids_for_order_table;
 
         if (isAssigningDriver) updateData.status = ORDER_STATUS.PROCESSING;
 

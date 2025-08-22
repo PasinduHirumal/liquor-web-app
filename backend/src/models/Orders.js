@@ -24,6 +24,7 @@ class Orders {
         this.notes = data.notes;
         this.status = data.status;
         this.warehouse_id = data.warehouse_id;
+        this.superMarket_ids = data.superMarket_ids;
         this.assigned_driver_id = data.assigned_driver_id;
         this.is_driver_accepted = data.is_driver_accepted;
 
