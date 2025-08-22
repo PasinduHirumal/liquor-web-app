@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
 import { axiosInstance } from "../../lib/axios";
 import LiquorProductCard from "../../common/LiquorProductCard";
 import LiquorCreateForm from "../../components/admin/forms/createLiquorProductModel/LiquorCreateForm";
+import { debounce } from "lodash";
 
 const LiquorList = () => {
     const [products, setProducts] = useState([]);
@@ -10,14 +11,17 @@ const LiquorList = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [filters, setFilters] = useState({
-        is_liquor: "true", // ✅ always true for liquor list
+        is_liquor: "true",
         is_active: "",
         is_in_stock: "",
         categoryId: "",
     });
+    const [searchTerm, setSearchTerm] = useState("");
+    const [isSearching, setIsSearching] = useState(false);
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [toggleLoading, setToggleLoading] = useState(false);
 
+    // fetch categories & products (without search)
     const fetchProducts = async () => {
         try {
             setLoading(true);
@@ -29,22 +33,12 @@ const LiquorList = () => {
             setCategories(activeCategories);
 
             const params = {};
-
-            if (filters.is_liquor !== "") {
-                params.is_liquor = filters.is_liquor === "true";
-            }
-            if (filters.is_active !== "") {
-                params.is_active = filters.is_active === "true";
-            }
-            if (filters.is_in_stock !== "") {
-                params.is_in_stock = filters.is_in_stock === "true";
-            }
-            if (filters.categoryId) {
-                params.category_id = filters.categoryId;
-            }
+            if (filters.is_liquor !== "") params.is_liquor = filters.is_liquor === "true";
+            if (filters.is_active !== "") params.is_active = filters.is_active === "true";
+            if (filters.is_in_stock !== "") params.is_in_stock = filters.is_in_stock === "true";
+            if (filters.categoryId) params.category_id = filters.categoryId;
 
             const productsResponse = await axiosInstance.get("/products/getAll/dashboard", { params });
-
             setProducts(productsResponse.data.data || []);
             setError(null);
         } catch (err) {
@@ -55,9 +49,44 @@ const LiquorList = () => {
         }
     };
 
+    // search with debounce
+    const debouncedSearch = useCallback(
+        debounce(async (searchValue, filters) => {
+            if (!searchValue.trim()) {
+                fetchProducts();
+                return;
+            }
+            try {
+                setIsSearching(true);
+                const params = {
+                    q: searchValue,
+                    is_liquor: true,
+                };
+                if (filters.is_active !== "") params.is_active = filters.is_active === "true";
+                if (filters.is_in_stock !== "") params.is_in_stock = filters.is_in_stock === "true";
+                if (filters.categoryId) params.category_id = filters.categoryId;
+
+                const res = await axiosInstance.get("/products/search/dashboard", { params });
+                setProducts(res.data.data || []);
+                setError(null);
+            } catch (err) {
+                console.error("Search error:", err);
+                setError(err.message || "Failed to search products");
+            } finally {
+                setIsSearching(false);
+            }
+        }, 500),
+        []
+    );
+
+    // effect for filters & search
     useEffect(() => {
-        fetchProducts();
-    }, [filters]);
+        if (searchTerm.trim()) {
+            debouncedSearch(searchTerm, filters);
+        } else {
+            fetchProducts();
+        }
+    }, [filters, searchTerm, debouncedSearch]);
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -79,7 +108,6 @@ const LiquorList = () => {
             setToggleLoading(true);
             const anyInactive = products.some((p) => !p.is_active);
             const newActiveValue = anyInactive;
-
             await axiosInstance.patch("/appInfo/update/toggle", { is_active: newActiveValue });
             await fetchProducts();
         } catch (err) {
@@ -117,6 +145,16 @@ const LiquorList = () => {
                         Create Item
                     </Button>
                 </div>
+            </div>
+
+            {/* Search Bar */}
+            <div className="mb-4" style={{ maxWidth: "400px" }}>
+                <Form.Control
+                    type="text"
+                    placeholder="Search liquor products..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
             </div>
 
             {/* Filters */}
@@ -197,21 +235,22 @@ const LiquorList = () => {
             </div>
 
             {/* Loading */}
-            {loading && (
+            {(loading || isSearching) && (
                 <div className="d-flex justify-content-center align-items-center text-white" style={{ minHeight: "60vh" }}>
                     <div className="spinner-border" role="status" />
+                    <span className="ms-2">{isSearching ? "Searching..." : "Loading..."}</span>
                 </div>
             )}
 
             {/* Error */}
-            {!loading && error && (
+            {!loading && !isSearching && error && (
                 <div className="alert alert-danger text-center" role="alert">
                     {error}
                 </div>
             )}
 
             {/* Products */}
-            {!loading && !error && (
+            {!loading && !isSearching && !error && (
                 <div className="row g-4">
                     {products.length > 0 ? (
                         products.map((product) => (
@@ -225,7 +264,9 @@ const LiquorList = () => {
                     ) : (
                         <div className="col-12">
                             <div className="alert alert-info text-center">
-                                No products found matching your filters
+                                {searchTerm
+                                    ? `No products found for "${searchTerm}" with current filters.`
+                                    : "No products found matching your filters"}
                             </div>
                         </div>
                     )}
