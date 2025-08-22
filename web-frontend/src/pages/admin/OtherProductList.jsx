@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { axiosInstance } from "../../lib/axios";
 import OtherProductCard from "../../common/OtherProductCard";
-import { Button, Form, Row, Col, InputGroup } from "react-bootstrap";
+import { Button, Form, Row, Col } from "react-bootstrap";
 import CreateProductModal from "../../components/admin/forms/createOtherProductModel/CreateProductModal";
+import { debounce } from "lodash";
 
 const OtherProductList = () => {
     const [products, setProducts] = useState([]);
@@ -17,18 +18,29 @@ const OtherProductList = () => {
         category_id: "",
     });
 
+    const [searchTerm, setSearchTerm] = useState("");
+    const [isSearching, setIsSearching] = useState(false);
+
+    // Fetch categories on mount
     useEffect(() => {
         fetchCategories();
     }, []);
 
+    // Fetch products whenever filters change (or search term)
     useEffect(() => {
-        fetchProducts();
-    }, [filters]);
+        if (searchTerm.trim()) {
+            debouncedSearch(searchTerm, filters);
+        } else {
+            fetchProducts();
+        }
+    }, [filters, searchTerm]);
 
     const fetchCategories = async () => {
         try {
             const response = await axiosInstance.get("/categories/getAll");
-            const activeCategories = (response.data.data || []).filter((cat) => cat.is_active && !cat.is_liquor);
+            const activeCategories = (response.data.data || []).filter(
+                (cat) => cat.is_active && !cat.is_liquor
+            );
             setCategories(activeCategories);
         } catch (err) {
             console.error("Failed to fetch categories:", err);
@@ -41,33 +53,57 @@ const OtherProductList = () => {
             setError(null);
 
             const params = {};
-
             if (filters.is_active !== "") params.is_active = filters.is_active;
             if (filters.is_in_stock !== "") params.is_in_stock = filters.is_in_stock;
-            if (filters.category_id !== "") params.category_id = filters.category_id;
+            if (filters.category_id) params.category_id = filters.category_id;
 
-            const response = await axiosInstance.get("/other-products/getAll/dashboard", {
-                params: params
-            });
-
-            const allProducts = response.data.data || [];
-            setProducts(allProducts);
+            const response = await axiosInstance.get("/other-products/getAll/dashboard", { params });
+            setProducts(response.data.data || []);
         } catch (err) {
             setError(err.message || "Failed to fetch products");
-            console.error("Fetch products error:", err);
         } finally {
             setLoading(false);
         }
     };
 
-    const handleProductCreated = () => {
-        fetchProducts();
-        setShowCreateModal(false);
-    };
+    // Debounced search
+    const debouncedSearch = useCallback(
+        debounce(async (query, filters) => {
+            try {
+                setIsSearching(true);
+                const params = { q: query };
+                if (filters.is_active !== "") params.is_active = filters.is_active;
+                if (filters.is_in_stock !== "") params.is_in_stock = filters.is_in_stock;
+                if (filters.category_id) params.category_id = filters.category_id;
+
+                const response = await axiosInstance.get("/other-products/search/dashboard", { params });
+                setProducts(response.data.data || []);
+                setError(null);
+            } catch (err) {
+                console.error("Search error:", err);
+                setError(err.message || "Failed to search products");
+            } finally {
+                setIsSearching(false);
+            }
+        }, 500),
+        []
+    );
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
         setFilters((prev) => ({ ...prev, [name]: value }));
+    };
+
+    const handleCategoryClick = (categoryId) => {
+        setFilters((prev) => ({
+            ...prev,
+            category_id: prev.category_id === categoryId ? "" : categoryId,
+        }));
+    };
+
+    const handleProductCreated = () => {
+        fetchProducts();
+        setShowCreateModal(false);
     };
 
     return (
@@ -85,6 +121,17 @@ const OtherProductList = () => {
                 onProductCreated={handleProductCreated}
             />
 
+            {/* Search Bar */}
+            <div className="mb-3" style={{ maxWidth: "400px" }}>
+                <Form.Control
+                    type="text"
+                    placeholder="Search products..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+
+            {/* Filters */}
             <div className="p-3 rounded mb-4 border" style={{ backgroundColor: "#010524ff" }}>
                 <Row className="align-items-center mb-3 text-white">
                     <Col md={3} className="mb-3">
@@ -109,91 +156,59 @@ const OtherProductList = () => {
                     </Col>
                 </Row>
 
-                <div className="mt-3">
+                {/* Categories */}
+                <div className="mt-3 d-flex gap-2 overflow-auto pb-2" style={{ whiteSpace: "nowrap" }}>
                     <div
-                        className="d-flex gap-2 overflow-auto pb-2"
-                        style={{ whiteSpace: "nowrap", scrollSnapType: "x mandatory" }}
+                        className={`category-pill ${!filters.category_id ? "active" : ""}`}
+                        onClick={() => handleCategoryClick("")}
+                        style={{
+                            cursor: "pointer",
+                            padding: "8px 16px",
+                            borderRadius: "20px",
+                            backgroundColor: !filters.category_id ? "#1976d2" : "#f0f0f0",
+                            color: !filters.category_id ? "white" : "inherit",
+                            flexShrink: 0,
+                        }}
                     >
+                        All
+                    </div>
+                    {categories.map((category) => (
                         <div
-                            className={`border border-primary category-pill ${!filters.category_id ? "active" : "outline-secondary"}`}
-                            onClick={() => setFilters(prev => ({ ...prev, category_id: "" }))}
+                            key={category.category_id}
+                            className={`category-pill ${filters.category_id === category.category_id ? "active" : ""}`}
+                            onClick={() => handleCategoryClick(category.category_id)}
                             style={{
                                 cursor: "pointer",
                                 padding: "8px 16px",
                                 borderRadius: "20px",
-                                backgroundColor: !filters.category_id ? "#1976d2" : "#f0f0f0",
-                                color: !filters.category_id ? "white" : "inherit",
-                                transition: "all 0.2s",
-                                display: "flex",
-                                alignItems: "center",
-                                whiteSpace: "nowrap",
+                                backgroundColor: filters.category_id === category.category_id ? "#1976d2" : "#f0f0f0",
+                                color: filters.category_id === category.category_id ? "white" : "inherit",
                                 flexShrink: 0,
                             }}
                         >
-                            All
+                            {category.icon && <img src={category.icon} alt={category.name} style={{ width: "20px", height: "20px", borderRadius: "50%", marginRight: "8px" }} />}
+                            {category.name}
                         </div>
-
-                        {categories.map(category => (
-                            <div
-                                key={category.category_id}
-                                className={`border border-primary category-pill ${filters.category_id === category.category_id ? "active" : ""}`}
-                                onClick={() =>
-                                    setFilters(prev => ({ ...prev, category_id: category.category_id }))
-                                }
-                                style={{
-                                    cursor: "pointer",
-                                    padding: "8px 16px",
-                                    borderRadius: "20px",
-                                    backgroundColor:
-                                        filters.category_id === category.category_id ? "#1976d2" : "#f0f0f0",
-                                    color:
-                                        filters.category_id === category.category_id ? "white" : "inherit",
-                                    transition: "all 0.2s",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    whiteSpace: "nowrap",
-                                    flexShrink: 0,
-                                }}
-                            >
-                                {category.icon && (
-                                    <img
-                                        src={category.icon}
-                                        alt={category.name}
-                                        style={{
-                                            width: "20px",
-                                            height: "20px",
-                                            borderRadius: "50%",
-                                            objectFit: "cover",
-                                            marginRight: "8px",
-                                        }}
-                                    />
-                                )}
-                                {category.name}
-                            </div>
-                        ))}
-                    </div>
+                    ))}
                 </div>
             </div>
 
-            {loading ? (
+            {/* Products */}
+            {(loading || isSearching) ? (
                 <div className="d-flex justify-content-center align-items-center text-white" style={{ minHeight: "60vh" }}>
                     <div className="spinner-border" role="status" />
+                    <span className="ms-2">{isSearching ? "Searching..." : "Loading..."}</span>
                 </div>
             ) : error ? (
                 <div className="alert alert-danger">{error}</div>
             ) : products.length > 0 ? (
                 <div className="row g-4">
                     {products.map((product) => (
-                        <OtherProductCard
-                            key={product.product_id}
-                            product={product}
-                            adminOnly={true}
-                            userOnly={false}
-                        />
+                        <OtherProductCard key={product.product_id} product={product} adminOnly={true} userOnly={false} />
                     ))}
                 </div>
             ) : (
-                <div className="alert alert-info">No products found with selected filters.</div>
+                <div className="alert alert-info">No products found with selected filters or search.</div>
             )}
         </div>
     );
