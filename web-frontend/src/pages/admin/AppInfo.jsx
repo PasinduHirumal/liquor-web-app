@@ -1,9 +1,24 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
-import { Table, Tabs, Typography, Spin, Alert, Card, Switch, Tag, Button } from "antd";
+import {
+    Table,
+    Tabs,
+    Typography,
+    Spin,
+    Alert,
+    Card,
+    Switch,
+    Tag,
+    Button
+} from "antd";
 import { EditOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
+
+// Components
 import AppInfoEditModal from "../../components/admin/forms/AppInfoEditModal";
+import SuperMarketMigrate from "../../components/admin/buttons/migrate/SuperMarketMigrate";
+import LiquorMigrate from "../../components/admin/buttons/migrate/LiquorMigrate";
+import GroceryMigrate from "../../components/admin/buttons/migrate/GroceryMigrate";
 
 const { Title } = Typography;
 const { TabPane } = Tabs;
@@ -27,7 +42,6 @@ function AppInfo() {
                     axiosInstance.get("/appInfo/getMainAppInfo"),
                     axiosInstance.get("/appInfo/getAll"),
                 ]);
-
                 setMainAppData(mainRes.data.data || null);
                 setAllAppData(allRes.data.data || []);
             } catch (err) {
@@ -43,7 +57,6 @@ function AppInfo() {
         try {
             setUpdatingId(record.id);
             const newValue = !record.is_liquor_show;
-
             const res = await axiosInstance.patch("/appInfo/update/toggle", {
                 is_liquor_show: newValue,
             });
@@ -125,7 +138,7 @@ function AppInfo() {
 
     if (loading) {
         return (
-            <div className="p-5 flex text-center bg-white">
+            <div className="p-5 flex justify-center bg-white">
                 <Spin tip="Loading app info..." size="large" />
             </div>
         );
@@ -141,7 +154,14 @@ function AppInfo() {
 
     return (
         <Card className="p-4" style={{ borderRadius: 0 }}>
-            <Title level={3}>App Info</Title>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <Title level={3}>App Info</Title>
+                <div className="d-flex gap-2">
+                    <SuperMarketMigrate />
+                    <LiquorMigrate />
+                    <GroceryMigrate />
+                </div>
+            </div>
 
             <Tabs defaultActiveKey="main">
                 <TabPane tab="Main App Info" key="main">
@@ -176,7 +196,6 @@ function AppInfo() {
                 </TabPane>
             </Tabs>
 
-            {/* Import external modal */}
             <AppInfoEditModal
                 isModalOpen={isModalOpen}
                 setIsModalOpen={setIsModalOpen}

@@ -219,17 +219,24 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                         <Col span={12}>
                             <Form.Item
                                 name="service_charge"
-                                label="Service Charge"
-                                rules={[{ required: true, message: "Please input service charge!" }]}
+                                label="Service Charge (%)"
+                                rules={[
+                                    { required: true, message: "Please input service charge!" },
+                                    {
+                                        type: "number",
+                                        min: 0,
+                                        max: 100,
+                                        message: "Service charge must be between 0% and 100%",
+                                    },
+                                ]}
                             >
                                 <InputNumber
                                     min={0}
-                                    step={0.01}
+                                    max={100}
+                                    step={0.1}
                                     style={{ width: "100%" }}
-                                    formatter={value =>
-                                        value ? `Rs: ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""
-                                    }
-                                    parser={value => value.replace(/Rs:\s?|(,*)/g, "")}
+                                    formatter={(value) => (value !== undefined ? `${value}%` : "")}
+                                    parser={(value) => value.replace("%", "")}
                                 />
                             </Form.Item>
                         </Col>

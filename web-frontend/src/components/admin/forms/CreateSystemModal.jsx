@@ -119,16 +119,31 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                     </Col>
                 </Row>
 
-                {/* Service Charge */}
+                {/* Service Charge (%) */}
                 <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item
                             name="service_charge"
-                            label="Service Charge"
+                            label="Service Charge (%)"
                             initialValue={0}
-                            rules={[{ required: true, message: 'Please input service charge!' }]}
+                            rules={[
+                                { required: true, message: 'Please input service charge!' },
+                                {
+                                    type: 'number',
+                                    min: 0,
+                                    max: 100,
+                                    message: 'Service charge must be between 0% and 100%',
+                                },
+                            ]}
                         >
-                            <InputNumber min={0} step={0.01} style={{ width: '100%' }} />
+                            <InputNumber
+                                min={0}
+                                max={100}
+                                step={0.1}
+                                style={{ width: '100%' }}
+                                formatter={(value) => `${value}%`}
+                                parser={(value) => value.replace('%', '')}
+                            />
                         </Form.Item>
                     </Col>
                 </Row>
