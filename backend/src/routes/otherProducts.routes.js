@@ -1,7 +1,7 @@
 import express from 'express';
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import { authenticateUser, authorizeRoles } from '../middleware/authMiddleware.js';
-import { createProduct, deleteProduct, getAllProducts, getProductById, migrateSearchTokens, updateProduct } from '../controller/otherProducts.controller.js';
+import { createProduct, deleteProduct, getAllProducts, getProductById, migrateSearchTokens, searchGroceryAdvanced, updateProduct } from '../controller/otherProducts.controller.js';
 import { validateOtherProduct, validateOtherProductUpdate, validatePriceOperation, validateQuantityOperation } from '../validations/OtherProductValidator.js';
 
 const router = express.Router();
@@ -22,5 +22,9 @@ router.delete('/delete/:id', authenticateUser, authorizeRoles(super_admin), dele
 
 //  Run this end-point once to add search tokens to existing documents after create & update
 router.post('/migrate', authenticateUser, authorizeRoles(admin, super_admin), migrateSearchTokens);
+
+// Advanced search for liquors
+router.get('/search/feed', searchGroceryAdvanced);
+router.get('/search/dashboard', authenticateUser, authorizeRoles(admin, super_admin), searchGroceryAdvanced);
 
 export default router;
