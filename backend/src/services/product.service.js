@@ -21,7 +21,7 @@ class ProductService extends BaseService {
     }
 
     // PRIMARY SEARCH METHOD - Use this in your controller
-    async searchMarkets(searchTerm) {
+    async search(searchTerm) {
         try {
             if (!searchTerm || searchTerm.trim() === '') {
                 return await this.findAll();
@@ -39,7 +39,7 @@ class ProductService extends BaseService {
     }
 
     // ADVANCED SEARCH - Search for multiple words
-    async searchMarketsMultiWord(searchTerm) {
+    async searchMultiWords(searchTerm) {
         try {
             if (!searchTerm || searchTerm.trim() === '') {
                 return await this.findAll();
@@ -48,7 +48,7 @@ class ProductService extends BaseService {
             const searchWords = searchTerm.toLowerCase().trim().split(/\s+/);
             
             if (searchWords.length === 1) {
-                return await this.searchMarkets(searchTerm);
+                return await this.search(searchTerm);
             }
 
             // For multiple words, we need to fetch results for each word and find intersection
@@ -204,7 +204,7 @@ class ProductService extends BaseService {
             let results;
             
             if (searchTerm && searchTerm.trim() !== '') {
-                results = await this.searchMarkets(searchTerm);
+                results = await this.search(searchTerm);
                 
                 // Apply additional filters on the search results
                 if (Object.keys(filters).length > 0) {
