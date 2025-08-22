@@ -232,7 +232,6 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                             >
                                 <InputNumber
                                     min={0}
-                                    max={100}
                                     step={0.1}
                                     style={{ width: "100%" }}
                                     formatter={(value) => (value !== undefined ? `${value}%` : "")}
