@@ -54,7 +54,7 @@ const LiquorAll = () => {
           is_active: filters.is_active === "true",
           is_in_stock: filters.is_in_stock === "true",
         };
-        
+
         if (filters.categoryId) {
           params.category_id = filters.categoryId;
         }
@@ -121,11 +121,11 @@ const LiquorAll = () => {
   return (
     <div className="container-fluid py-2" style={{ backgroundColor: "#010524ff", minHeight: "100vh" }}>
       <div className="mb-4">
-        <h2 className="mb-3 text-white">Liquor Products</h2>
+        <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+          <h2 className="text-white mb-0">Liquor Products</h2>
 
-        {/* Search Bar */}
-        <div className="row mb-3">
-          <div className="col-12 col-md-6">
+          {/* Search Bar */}
+          <div className="mt-2 mt-md-0" style={{ maxWidth: "300px", flex: "1 1 auto" }}>
             <div className="input-group">
               <input
                 type="text"
@@ -136,7 +136,7 @@ const LiquorAll = () => {
                 style={{
                   backgroundColor: "#ffffffff",
                   color: "#000000ff",
-                  border: "1px solid #1c1f2b"
+                  border: "1px solid #1c1f2b",
                 }}
               />
               {searchTerm && (
@@ -146,7 +146,7 @@ const LiquorAll = () => {
                   onClick={clearSearch}
                   style={{
                     borderColor: "#1c1f2b",
-                    color: "#fff"
+                    color: "#fff",
                   }}
                 >
                   <i className="fas fa-times"></i>
@@ -233,10 +233,10 @@ const LiquorAll = () => {
         <div className="mb-3">
           <span className="text-white">
             Searching for: "{searchTerm}"
-            <button 
+            <button
               className="btn btn-link text-white p-0 ms-2"
               onClick={clearSearch}
-              style={{textDecoration: 'none'}}
+              style={{ textDecoration: 'none' }}
             >
               <small>Clear</small>
             </button>
@@ -269,7 +269,7 @@ const LiquorAll = () => {
           ) : (
             <div className="col-12">
               <div className="alert alert-info" role="alert">
-                {searchTerm 
+                {searchTerm
                   ? `No products found for "${searchTerm}" with the current filters.`
                   : "No products match the current filters."
                 }
