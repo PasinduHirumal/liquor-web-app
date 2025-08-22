@@ -56,7 +56,7 @@ const validateCompanyDetailsUpdate = (req, res, next) => {
     where_house_location: locationSchema.optional(),
     address: Joi.string().min(1).max(350).optional(),
     delivery_charge_for_1KM: Joi.number().positive().precision(2).optional(),
-    service_charge: Joi.number().min(0).precision(2).optional(),
+    service_charge: Joi.number().min(0).max(100).precision(2).optional(),
     isLiquorActive: Joi.boolean().optional(),
     isActive: Joi.boolean().optional(),
   })
