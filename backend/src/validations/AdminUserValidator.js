@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import phoneValidator from './phoneNumberValidationSchema.js';
+import ADMIN_ROLES from '../enums/adminRoles.js';
 
 // CREATE VALIDATOR - With defaults
 const validateAdminUser = (req, res, next) => {
@@ -14,7 +15,7 @@ const validateAdminUser = (req, res, next) => {
     lastName: Joi.string().min(2).max(50).required(),
     phone: phoneValidator.required(),
     
-    role: Joi.string().valid('pending', 'admin', 'super_admin').default('pending'),
+    role: Joi.string().valid(...Object.values(ADMIN_ROLES)).default(ADMIN_ROLES.PENDING),
     googleId: Joi.string().allow('').default(''),
     where_house_id: Joi.string().default("N/A"),
     isActive: Joi.boolean().default(true),
@@ -72,7 +73,7 @@ const validateAdminUserUpdate = (req, res, next) => {
     lastName: Joi.string().min(2).max(50).optional(),
     phone: phoneValidator.optional(),
     
-    role: Joi.string().valid('pending', 'admin', 'super_admin').optional(),
+    role: Joi.string().valid(...Object.values(ADMIN_ROLES)).optional(),
     googleId: Joi.string().allow('').optional(),
     where_house_id: Joi.string().optional(),
     isActive: Joi.boolean().optional(),
