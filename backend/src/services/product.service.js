@@ -8,6 +8,9 @@ class ProductService extends BaseService {
             createdAtField: 'created_at',
             updatedAtField: 'updated_at'
         })
+
+        // Set the ID field name for this service(for searchMultiWords)
+        this.idField = 'product_id';
     }
 
     async findAllBySuperMarket(superMarket_id) {
@@ -58,10 +61,12 @@ class ProductService extends BaseService {
                 const wordResults = await this.findByFilter('searchTokens', 'array-contains', word);
                 
                 if (results === null) {
-                    results = new Set(wordResults.map(doc => doc.id));
+                    const validResults = wordResults.filter(doc => doc && doc[this.idField] && doc[this.idField].toString().trim() !== '');
+                    results = new Set(validResults.map(doc => doc[this.idField]));
                 } else {
                     // Keep only documents that contain all words (intersection)
-                    const wordIds = new Set(wordResults.map(doc => doc.id));
+                    const validWordResults = wordResults.filter(doc => doc && doc[this.idField] && doc[this.idField].toString().trim() !== '');
+                    const wordIds = new Set(validWordResults.map(doc => doc[this.idField]));
                     results = new Set([...results].filter(id => wordIds.has(id)));
                 }
                 
@@ -73,9 +78,15 @@ class ProductService extends BaseService {
 
             // Fetch the actual documents
             const finalResults = [];
-            for (const id of results) {
-                const doc = await this.findById(id);
-                if (doc) finalResults.push(doc);
+            for (const docId of results) {
+                if (docId && docId.toString().trim() !== '') {
+                    try {
+                        const doc = await this.findById(docId);
+                        if (doc) finalResults.push(doc);
+                    } catch (docError) {
+                        console.warn(`Error fetching document with ID ${docId}:`, docError.message);
+                    }
+                }
             }
             
             return finalResults;
