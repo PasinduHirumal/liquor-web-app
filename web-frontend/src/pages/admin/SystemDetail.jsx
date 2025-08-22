@@ -136,10 +136,11 @@ const SystemDetail = () => {
             render: (value) => value ?? 'N/A',
         },
         {
-            title: 'Service Charge',
+            title: 'Service Charge (%)',
             dataIndex: 'service_charge',
             key: 'service_charge',
-            render: (value) => value ?? 'N/A',
+            render: (value) =>
+                value !== null && value !== undefined ? `${value}%` : 'N/A',
         },
         {
             title: 'System Status',
