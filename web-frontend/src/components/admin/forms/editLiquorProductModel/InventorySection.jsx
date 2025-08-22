@@ -7,7 +7,7 @@ const InventorySection = ({ formData, handleChange, handleInventoryUpdate, updat
             <Card.Header className="d-flex justify-content-between align-items-center">
                 <h5 className="mb-0">Manage Inventory</h5>
                 <Button
-                    variant="outline-primary"
+                    variant="primary"
                     size="sm"
                     onClick={handleInventoryUpdate}
                     disabled={updating}

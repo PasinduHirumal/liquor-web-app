@@ -334,6 +334,10 @@ const LiquorEditForm = () => {
                                     categories={categories}
                                     errors={errors}
                                 />
+                                <SpecificationsSection
+                                    formData={formData}
+                                    handleChange={handleChange}
+                                />
                                 <PricingSection
                                     formData={formData}
                                     handleChange={handleChange}
@@ -348,10 +352,6 @@ const LiquorEditForm = () => {
                                     handleChange={handleChange}
                                     handleInventoryUpdate={handleInventoryUpdate}
                                     updating={updating}
-                                />
-                                <SpecificationsSection
-                                    formData={formData}
-                                    handleChange={handleChange}
                                 />
                             </Col>
                             <Col md={4}>
