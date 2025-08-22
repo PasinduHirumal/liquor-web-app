@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { axiosInstance } from "../lib/axios";
 import OtherProductCard from "../common/OtherProductCard";
+import { debounce } from "lodash";
 
 const OtherProductAll = () => {
     const [products, setProducts] = useState([]);
@@ -13,6 +14,8 @@ const OtherProductAll = () => {
         is_in_stock: "true",
         categoryId: "",
     });
+    const [searchTerm, setSearchTerm] = useState("");
+    const [isSearching, setIsSearching] = useState(false);
 
     // Fetch categories only once
     useEffect(() => {
@@ -35,32 +38,65 @@ const OtherProductAll = () => {
         fetchCategories();
     }, []);
 
-    // Fetch products when filters change
-    useEffect(() => {
-        const fetchProducts = async () => {
+    // Fetch products with filters (no search)
+    const fetchProductsWithFilters = async (filters) => {
+        try {
+            setLoadingProducts(true);
+            const params = {
+                is_liquor: false,
+                is_active: filters.is_active === "true",
+                is_in_stock: filters.is_in_stock === "true",
+            };
+            if (filters.categoryId) params.category_id = filters.categoryId;
+
+            const res = await axiosInstance.get("/other-products/getAll", { params });
+            setProducts(res.data.data || []);
+        } catch (err) {
+            setError(err.message || "Failed to fetch products");
+            console.error("Product fetch error:", err);
+        } finally {
+            setLoadingProducts(false);
+        }
+    };
+
+    // Debounced search function
+    const debouncedSearch = useCallback(
+        debounce(async (searchValue, filters) => {
+            if (!searchValue.trim()) {
+                fetchProductsWithFilters(filters);
+                return;
+            }
+
             try {
-                setLoadingProducts(true);
+                setIsSearching(true);
                 const params = {
+                    q: searchValue,
                     is_liquor: false,
                     is_active: filters.is_active === "true",
                     is_in_stock: filters.is_in_stock === "true",
                 };
-                if (filters.categoryId) {
-                    params.category_id = filters.categoryId;
-                }
+                if (filters.categoryId) params.category_id = filters.categoryId;
 
-                const res = await axiosInstance.get("/other-products/getAll", { params });
+                const res = await axiosInstance.get("/other-products/search/feed", { params });
                 setProducts(res.data.data || []);
             } catch (err) {
-                setError(err.message || "Failed to fetch products");
-                console.error("Product fetch error:", err);
+                setError(err.message || "Failed to search products");
+                console.error("Search error:", err);
             } finally {
-                setLoadingProducts(false);
+                setIsSearching(false);
             }
-        };
+        }, 500),
+        []
+    );
 
-        fetchProducts();
-    }, [filters]);
+    // Fetch products when filters or search change
+    useEffect(() => {
+        if (searchTerm.trim()) {
+            debouncedSearch(searchTerm, filters);
+        } else {
+            fetchProductsWithFilters(filters);
+        }
+    }, [filters, searchTerm, debouncedSearch]);
 
     const handleCategoryClick = (categoryId) => {
         setFilters((prev) => ({
@@ -69,10 +105,46 @@ const OtherProductAll = () => {
         }));
     };
 
+    const handleSearchChange = (e) => {
+        setSearchTerm(e.target.value);
+    };
+
+    const clearSearch = () => setSearchTerm("");
+
     return (
         <div className="container-fluid py-4" style={{ backgroundColor: "#010524ff", minHeight: "100vh" }}>
             <div className="mb-4">
-                <h2 className="mb-3 text-white">Grocery Items</h2>
+                <div className="d-flex justify-content-between align-items-center mb-3 flex-wrap">
+                    <h2 className="mb-0 text-white">Grocery Items</h2>
+
+                    {/* Search Bar */}
+                    <div className="mt-2 mt-md-0" style={{ maxWidth: "300px", flex: "1 1 auto" }}>
+                        <div className="input-group">
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Search grocery products..."
+                                value={searchTerm}
+                                onChange={handleSearchChange}
+                                style={{
+                                    backgroundColor: "#ffffffff",
+                                    color: "#000000ff",
+                                    border: "1px solid #1c1f2b",
+                                }}
+                            />
+                            {searchTerm && (
+                                <button
+                                    className="btn btn-outline-secondary"
+                                    type="button"
+                                    onClick={clearSearch}
+                                    style={{ borderColor: "#1c1f2b", color: "#fff" }}
+                                >
+                                    <i className="fas fa-times"></i>
+                                </button>
+                            )}
+                        </div>
+                    </div>
+                </div>
 
                 {/* Category Filter */}
                 {!loadingCategories && (
@@ -105,14 +177,8 @@ const OtherProductAll = () => {
                                         cursor: "pointer",
                                         padding: "8px 16px",
                                         borderRadius: "20px",
-                                        backgroundColor:
-                                            filters.categoryId === category.category_id
-                                                ? "#1976d2"
-                                                : "#f0f0f0",
-                                        color:
-                                            filters.categoryId === category.category_id
-                                                ? "white"
-                                                : "inherit",
+                                        backgroundColor: filters.categoryId === category.category_id ? "#1976d2" : "#f0f0f0",
+                                        color: filters.categoryId === category.category_id ? "white" : "inherit",
                                         transition: "all 0.2s",
                                         display: "flex",
                                         alignItems: "center",
@@ -123,13 +189,7 @@ const OtherProductAll = () => {
                                         <img
                                             src={category.icon}
                                             alt={category.name}
-                                            style={{
-                                                width: "24px",
-                                                height: "24px",
-                                                borderRadius: "50%",
-                                                objectFit: "cover",
-                                                marginRight: "8px",
-                                            }}
+                                            style={{ width: "24px", height: "24px", borderRadius: "50%", objectFit: "cover", marginRight: "8px" }}
                                         />
                                     )}
                                     <span>{category.name}</span>
@@ -140,28 +200,41 @@ const OtherProductAll = () => {
                 )}
             </div>
 
+            {/* Search Status */}
+            {searchTerm && (
+                <div className="mb-3">
+                    <span className="text-white">
+                        Searching for: "{searchTerm}"
+                        <button
+                            className="btn btn-link text-white p-0 ms-2"
+                            onClick={clearSearch}
+                            style={{ textDecoration: "none" }}
+                        >
+                            <small>Clear</small>
+                        </button>
+                    </span>
+                </div>
+            )}
+
             {/* Products Grid */}
-            {loadingProducts ? (
-                <div
-                    className="d-flex justify-content-center align-items-center text-white"
-                    style={{ minHeight: "50vh" }}
-                >
+            {isSearching || loadingProducts ? (
+                <div className="d-flex justify-content-center align-items-center text-white" style={{ minHeight: "50vh" }}>
                     <div className="spinner-border" role="status" />
+                    <span className="ms-2">{isSearching ? "Searching..." : "Loading products..."}</span>
                 </div>
             ) : error ? (
-                <div className="alert alert-danger" role="alert">
-                    {error}
-                </div>
+                <div className="alert alert-danger" role="alert">{error}</div>
             ) : (
                 <div className="row g-4">
                     {products.length > 0 ? (
-                        products.map((product) => (
-                            <OtherProductCard key={product.product_id} product={product} />
-                        ))
+                        products.map((product) => <OtherProductCard key={product.product_id} product={product} />)
                     ) : (
                         <div className="col-12">
                             <div className="alert alert-info" role="alert">
-                                No products available.
+                                {searchTerm
+                                    ? `No products found for "${searchTerm}" with the current filters.`
+                                    : "No products match the current filters."
+                                }
                             </div>
                         </div>
                     )}
