@@ -85,6 +85,46 @@ class OrdersService extends BaseService {
         }
     }
 
+    async findAllByProductId(product_id, status = null) {
+        try {
+            let allOrders;
+            if (status) {
+                allOrders = await this.findByFilter('status', '==', status);
+            } else {
+                allOrders = await this.findAll();
+            }
+            
+            // Filter orders that contain the specific product_id in their items array
+            const ordersWithProduct = allOrders.filter(order => {
+                return order.items && order.items.some(item => item.product_id === product_id);
+            });
+
+            return ordersWithProduct;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    // Alternative method using Firestore query (more efficient for large datasets)
+    // Note: This requires restructuring your data to have a separate field for product IDs
+    async findAllByProductIdOptimized(product_id) {
+        try {
+            // This approach would work if you stored product_ids as a separate array field
+            // Example: product_ids: ["Mv8h6zgcZEzo3i1gidKQ", "injwcpVSvM1JVqHIKh2T"]
+            const docsRef = await this.collection
+                .where('product_ids', 'array-contains', product_id)
+                .get();
+
+            if (docsRef.empty) {
+                return [];
+            }
+
+            return docsRef.docs.map(doc => new this.ModelClass(doc.id, doc.data()));
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default OrdersService;

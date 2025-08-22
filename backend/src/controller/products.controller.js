@@ -2,20 +2,24 @@ import ProductService from '../services/product.service.js';
 import StockHistoryService from '../services/stockHistory.service.js';
 import SuperMarketService from '../services/superMarket.service.js';
 import CategoryService from '../services/category.service.js';
+import OrdersService from '../services/orders.service.js';
+import AppInfoService from '../services/appInfo.service.js';
 import populateCategory from '../utils/populateCategory.js';
+import APP_INFO from '../data/AppInfo.js';
+import ORDER_STATUS from '../enums/orderStatus.js';
+import updateLiquorProductsActiveStatus from '../utils/updateActiveToggleForLiquor.js';
 import { deleteImages, uploadImages, uploadSingleImage } from '../utils/firebaseStorage.js';
 import { validateStockOperation } from '../utils/stockCalculator.js';
 import { validatePriceOperation } from '../utils/priceCalculator.js';
 import { createStockHistory } from './stockHistory.controller.js';
-import updateLiquorProductsActiveStatus from '../utils/updateActiveToggleForLiquor.js';
-import AppInfoService from '../services/appInfo.service.js';
-import APP_INFO from '../data/AppInfo.js';
+
 
 const productService = new ProductService();
 const categoryService = new CategoryService();
 const stockHistoryService = new StockHistoryService();
 const marketService = new SuperMarketService();
-const appInfoService = new AppInfoService;
+const appInfoService = new AppInfoService();
+const ordersService = new OrdersService
 
 const createProduct = async (req, res) => {
 	try {
@@ -371,6 +375,16 @@ const deleteProduct = async (req, res) => {
         const product = await productService.findById(productId);
         if (!product) {
             return res.status(404).json({ success: false, message: "Product not found"});
+        }
+
+        const orders_pending = await ordersService.findAllByProductId(productId, ORDER_STATUS.PENDING);
+        const orders_processing = await ordersService.findAllByProductId(productId, ORDER_STATUS.PROCESSING);
+        const orders_out_for_delivery = await ordersService.findAllByProductId(productId, ORDER_STATUS.OUT_FOR_DELIVERY);
+
+        const TotalOrders = orders_pending.length + orders_processing.length + orders_out_for_delivery.length;
+
+        if (TotalOrders > 0) {
+            return res.status(404).json({ success: false, message: `Can't delete product. Product has ${TotalOrders} orders in on going`});
         }
         
         try {
