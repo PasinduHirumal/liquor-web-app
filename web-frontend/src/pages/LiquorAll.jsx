@@ -37,19 +37,23 @@ const LiquorAll = () => {
     fetchCategories();
   }, []);
 
-  // Debounced search function
+  // Debounced search function with multi-word detection
   const debouncedSearch = useCallback(
     debounce(async (searchValue, filters) => {
       if (!searchValue.trim()) {
-        // If search is empty, fetch all products with filters
         fetchProductsWithFilters(filters);
         return;
       }
 
       try {
         setIsSearching(true);
+
+        // Detect if search term has multiple words
+        const isMultiWord = searchValue.trim().split(/\s+/).length > 1;
+
         const params = {
           q: searchValue,
+          multiWord: isMultiWord,
           is_liquor: true,
           is_active: filters.is_active === "true",
           is_in_stock: filters.is_in_stock === "true",
@@ -67,7 +71,7 @@ const LiquorAll = () => {
       } finally {
         setIsSearching(false);
       }
-    }, 500), // 500ms debounce
+    }, 500),
     []
   );
 
