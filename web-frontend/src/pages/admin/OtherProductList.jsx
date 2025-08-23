@@ -66,17 +66,28 @@ const OtherProductList = () => {
         }
     };
 
-    // Debounced search
+    // Debounced search with multi-word support
     const debouncedSearch = useCallback(
         debounce(async (query, filters) => {
             try {
                 setIsSearching(true);
-                const params = { q: query };
+
+                // detect if multi-word
+                const isMultiWord = query.trim().split(/\s+/).length > 1;
+
+                const params = {
+                    q: query.trim(),
+                    multiWord: isMultiWord,
+                };
                 if (filters.is_active !== "") params.is_active = filters.is_active;
                 if (filters.is_in_stock !== "") params.is_in_stock = filters.is_in_stock;
                 if (filters.category_id) params.category_id = filters.category_id;
 
-                const response = await axiosInstance.get("/other-products/search/dashboard", { params });
+                const response = await axiosInstance.get(
+                    "/other-products/search/dashboard",
+                    { params }
+                );
+
                 setProducts(response.data.data || []);
                 setError(null);
             } catch (err) {
