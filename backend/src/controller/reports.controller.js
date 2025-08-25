@@ -1,10 +1,15 @@
 import OrdersService from '../services/orders.service.js';
 import DriverService from "../services/driver.service.js";
+import ProductService from '../services/product.service.js';
+import OtherProductService from '../services/otherProduct.service.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
 import { generateOrdersPDF } from '../utils/generatePDF.js';
+import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
 
 const orderService = new OrdersService();
 const driverService = new DriverService();
+const liquorService = new ProductService();
+const groceryService = new OtherProductService();
 
 const getOrdersReport = async (req, res) => {
 	try {
@@ -110,14 +115,19 @@ const getOrdersReport = async (req, res) => {
 
 const getFinanceReport = async (req, res) => {
 	try {
-        const { where_house_id, format, start_date, end_date } = req.query;
+        const { status = ORDER_STATUS.DELIVERED, where_house_id, format, start_date, end_date } = req.query;
 
         const filters = {};
         const filterDescription = [];
 
-        filters.status = ORDER_STATUS.PROCESSING;
-        filterDescription.push(`status: ${ORDER_STATUS.DELIVERED}`);
-
+        if (status !== undefined){
+            if (status && !Object.values(ORDER_STATUS).includes(status)) {
+                return res.status(400).json({ success: false, message: "Invalid status value" });
+            }
+            
+            filters.status = status;
+            filterDescription.push(`status: ${status}`);
+        }
         if (where_house_id !== undefined) {
             const where_house = await companyService.findById(where_house_id);
             if (!where_house) {
@@ -167,6 +177,82 @@ const getFinanceReport = async (req, res) => {
             return new Date(a.created_at) - new Date(b.created_at);
         });
 
+        // Get all unique product IDs to minimize database calls
+        const allProductIds = [...new Set(
+            sortedOrders.flatMap(order => 
+                order.items?.map(item => item.product_id) || []
+            )
+        )];
+
+        // Fetch all product profits at once
+        const productProfits = {};
+        await Promise.all(
+            allProductIds.map(async (productId) => {
+                try {
+                    let profit = 0;
+                    profit = await groceryService.getProfitForProduct(productId);
+                    if (!profit) {
+                        profit = await liquorService.getProfitForProduct(productId);
+                    }
+
+                    productProfits[productId] = profit !== false ? profit : 0;
+                } catch (error) {
+                    console.error(`Error fetching profit for product ${productId}:`, error);
+                    productProfits[productId] = 0;
+                }
+            })
+        );
+
+        let Total_Profit_From_Products = 0
+
+        // Filter orders to include only specific fields
+        const filteredOrderData = sortedOrders.map(order => {
+            const processedItems = order.items?.map(item => {
+                const unitProfit = productProfits[item.product_id] || 0;
+                const unitPrice = parseFloat(item.unit_price || 0);
+                
+                return {
+                    product_id: item.product_id,
+                    product_name: item.product_name,
+                    unit_price_of_product_selling: unitPrice,
+                    unit_price_of_product_cost: unitPrice - unitProfit,
+                    unit_profit_of_product: parseFloat(unitProfit.toFixed(2)),
+                    quantity: item.quantity,
+                    is_profit: unitProfit > 0,
+                    total_price_for_products_selling: parseFloat((unitPrice * item.quantity).toFixed(2)),
+                    total_price_for_products_cost: parseFloat(((unitPrice - unitProfit) * item.quantity).toFixed(2)),
+                    total_profit_for_products: parseFloat((unitProfit * item.quantity).toFixed(2)),
+                    
+                };
+            }) || [];
+
+            // Calculate total profit from all products in this order
+            const totalProfitFromProducts = processedItems.reduce((sum, item) => sum + item.total_profit_for_products, 0);
+            Total_Profit_From_Products += totalProfitFromProducts;
+
+            const deliveryFee = parseFloat(order.delivery_fee || 0);
+            const taxAmount = parseFloat(order.tax_amount || 0);
+            const subtotal = parseFloat(order.subtotal || 0);
+            const totalAmount = parseFloat(order.total_amount || 0);
+
+            return {
+                order_id: order.order_id,
+                order_number: order.order_number,
+                order_date: getDateFromTimestamp(order.order_date),
+                warehouse_id: order.warehouse_id,
+                items: processedItems,
+                income: {
+                    profit_from_products: parseFloat(totalProfitFromProducts.toFixed(2)),
+                    delivery_fee: parseFloat(deliveryFee.toFixed(2)),
+                    service_charge: parseFloat(taxAmount.toFixed(2)),
+                    total_income: parseFloat((totalProfitFromProducts + deliveryFee + taxAmount).toFixed(2))
+                },
+                total_cost: parseFloat((subtotal - totalProfitFromProducts).toFixed(2)),
+                total_income: parseFloat((totalProfitFromProducts + deliveryFee + taxAmount).toFixed(2)),
+                total_amount: parseFloat(totalAmount.toFixed(2)),
+            };
+        });
+
         const Income_Result = await orderService.getTotalIncomeValues(sortedOrders);
 
         const message = "Orders report fetched successfully";
@@ -176,13 +262,15 @@ const getFinanceReport = async (req, res) => {
             count: completedOrders.length,
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
             income : {
-                total_delivery_charges: Income_Result.Total_Delivery_Fee,
-                total_tax_charges: Income_Result.Total_TAX
+                total_delivery_charges: parseFloat(Income_Result.Total_Delivery_Fee || 0),
+                total_tax_charges: parseFloat(Income_Result.Total_TAX || 0),
+                total_profits_from_products: parseFloat(Total_Profit_From_Products.toFixed(2)),
             },
-            data: sortedOrders
+            total_balance: Income_Result.Total_Balance,
+            data: filteredOrderData
         });
     } catch (error) {
-        console.error("Method_name error:", error.message);
+        console.error("Get finance report error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };

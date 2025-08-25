@@ -68,6 +68,16 @@ class ProductService extends BaseService {
         return Array.from(tokens);
     }
 
+    async getProfitForProduct(product_id) {
+        try {
+            const product = await this.findById(product_id);
+            if (!product) return false;
+
+            return product.selling_price - product.cost_price;
+        } catch (error) {
+            throw error;
+        }
+    }
 
 }
 

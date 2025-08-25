@@ -137,9 +137,15 @@ class OrdersService extends BaseService {
                 return sum + deliveryValue;
             }, 0);
 
+            const totalBalance = orders.reduce((sum, order) => {
+                const balanceValue = order.total_amount;
+                return sum + balanceValue;
+            }, 0);
+
             return {
                 Total_TAX: parseFloat(totalTAX.toFixed(2)),
-                Total_Delivery_Fee: parseFloat(totalDeliveries.toFixed(2))
+                Total_Delivery_Fee: parseFloat(totalDeliveries.toFixed(2)),
+                Total_Balance: parseFloat(totalBalance.toFixed(2))
             };
         } catch (error) {
             throw error;
