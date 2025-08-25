@@ -108,5 +108,84 @@ const getOrdersReport = async (req, res) => {
     }
 };
 
+const getFinanceReport = async (req, res) => {
+	try {
+        const { where_house_id, format, start_date, end_date } = req.query;
 
-export { getOrdersReport };
+        const filters = {};
+        const filterDescription = [];
+
+        filters.status = ORDER_STATUS.PROCESSING;
+        filterDescription.push(`status: ${ORDER_STATUS.DELIVERED}`);
+
+        if (where_house_id !== undefined) {
+            const where_house = await companyService.findById(where_house_id);
+            if (!where_house) {
+                return res.status(400).json({ success: false, message: "Invalid where house id" });
+            }
+            
+            filters.where_house_id = where_house_id;
+            filterDescription.push(`where_house_id: ${where_house_id}`);
+        }
+        if (start_date !== undefined || end_date !== undefined) {
+            if (start_date && end_date) {
+                const startDate = new Date(start_date);
+                const endDate = new Date(end_date);
+                
+                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: "Invalid date format. Use YYYY-MM-DD or MM/DD/YYYY" 
+                    });
+                }
+                
+                if (startDate > endDate) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: "Start date must be before or equal to end date" 
+                    });
+                }
+                
+                // Set time to beginning and end of day
+                startDate.setHours(0, 0, 0, 0);
+                endDate.setHours(23, 59, 59, 999);
+                
+                filters.dateRange = { start: startDate, end: endDate };
+                filterDescription.push(`date range: ${start_date} to ${end_date}`);
+            } else {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Both start_date and end_date are required for date filtering" 
+                });
+            }
+        }
+        
+        const completedOrders = await orderService.findWithFilters(filters);
+
+        // Sort by created_at in ascending order (oldest first)
+        const sortedOrders = completedOrders.sort((a, b) => {
+            return new Date(a.created_at) - new Date(b.created_at);
+        });
+
+        const Income_Result = await orderService.getTotalIncomeValues(sortedOrders);
+
+        const message = "Orders report fetched successfully";
+        return res.status(200).json({ 
+            success: true, 
+            message: format === 'pdf'? `PDF created successfully & ${message}` : message,
+            count: completedOrders.length,
+            filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
+            income : {
+                total_delivery_charges: Income_Result.Total_Delivery_Fee,
+                total_tax_charges: Income_Result.Total_TAX
+            },
+            data: sortedOrders
+        });
+    } catch (error) {
+        console.error("Method_name error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+
+export { getOrdersReport, getFinanceReport };

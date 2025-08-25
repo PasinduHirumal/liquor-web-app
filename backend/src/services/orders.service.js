@@ -125,6 +125,27 @@ class OrdersService extends BaseService {
         }
     }
 
+    async getTotalIncomeValues(orders) {
+        try {
+            const totalTAX = orders.reduce((sum, order) => {
+                const taxValue = order.tax_amount;
+                return sum + taxValue;
+            }, 0);
+
+            const totalDeliveries = orders.reduce((sum, order) => {
+                const deliveryValue = order.delivery_fee;
+                return sum + deliveryValue;
+            }, 0);
+
+            return {
+                Total_TAX: parseFloat(totalTAX.toFixed(2)),
+                Total_Delivery_Fee: parseFloat(totalDeliveries.toFixed(2))
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default OrdersService;
