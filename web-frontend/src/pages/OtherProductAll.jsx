@@ -59,7 +59,7 @@ const OtherProductAll = () => {
         }
     };
 
-    // Debounced search function
+    // Debounced search function with multiword detection
     const debouncedSearch = useCallback(
         debounce(async (searchValue, filters) => {
             if (!searchValue.trim()) {
@@ -69,8 +69,11 @@ const OtherProductAll = () => {
 
             try {
                 setIsSearching(true);
+                const isMultiWord = searchValue.trim().split(/\s+/).length > 1;
+
                 const params = {
                     q: searchValue,
+                    multiWord: isMultiWord,
                     is_liquor: false,
                     is_active: filters.is_active === "true",
                     is_in_stock: filters.is_in_stock === "true",

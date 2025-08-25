@@ -49,7 +49,7 @@ const LiquorList = () => {
         }
     };
 
-    // search with debounce
+    // search with debounce + multiword support
     const debouncedSearch = useCallback(
         debounce(async (searchValue, filters) => {
             if (!searchValue.trim()) {
@@ -58,8 +58,13 @@ const LiquorList = () => {
             }
             try {
                 setIsSearching(true);
+
+                // detect multi-word
+                const isMultiWord = searchValue.trim().split(/\s+/).length > 1;
+
                 const params = {
-                    q: searchValue,
+                    q: searchValue.trim(),
+                    multiWord: isMultiWord,
                     is_liquor: true,
                 };
                 if (filters.is_active !== "") params.is_active = filters.is_active === "true";
