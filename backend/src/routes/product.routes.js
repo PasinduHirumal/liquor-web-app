@@ -1,8 +1,9 @@
 import express from 'express';
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import { authenticateUser, authorizeRoles } from '../middleware/authMiddleware.js';
-import { createProduct, deleteProduct, getAllProducts, getProductById, migrateSearchTokens, searchLiquorsAdvanced, updateProduct } from '../controller/products.controller.js';
+import { createProduct, deleteProduct, getAllProducts, getProductById, migrateSearchTokens, updateProduct } from '../controller/products.controller.js';
 import { validateInventoryUpdate, validatePriceOperation, validateProduct, validateProductUpdate } from '../validations/ProductValidator.js';
+import { searchProductAdvanced } from '../controller/search.controller.js';
 
 const router = express.Router();
 
@@ -24,7 +25,7 @@ router.delete('/delete/:id', authenticateUser, authorizeRoles(super_admin), dele
 router.post('/migrate', authenticateUser, authorizeRoles(admin, super_admin), migrateSearchTokens);
 
 // Advanced search for liquors
-router.get('/search/feed', searchLiquorsAdvanced);
-router.get('/search/dashboard', authenticateUser, authorizeRoles(admin, super_admin), searchLiquorsAdvanced);
+router.get('/search/feed', searchProductAdvanced);
+router.get('/search/dashboard', authenticateUser, authorizeRoles(admin, super_admin), searchProductAdvanced);
 
 export default router;
