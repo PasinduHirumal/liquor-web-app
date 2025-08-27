@@ -16,8 +16,11 @@ import {
 import {
   Menu as MenuIcon,
   Close as CloseIcon,
+  Search as SearchIcon,
   Login as LoginIcon,
 } from "@mui/icons-material";
+import { Modal, Input } from "antd";
+import { SearchOutlined } from "@ant-design/icons";
 
 // Styled NavLink for dark theme
 const StyledNavLink = styled(NavLink)(({ theme }) => ({
@@ -41,10 +44,14 @@ const PublicNavbar = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [searchModalOpen, setSearchModalOpen] = useState(false); // ✅ modal state
 
   const handleLogin = () => navigate("/login");
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
   const closeMobileMenu = () => setMobileMenuOpen(false);
+
+  const openSearchModal = () => setSearchModalOpen(true);
+  const closeSearchModal = () => setSearchModalOpen(false);
 
   return (
     <>
@@ -88,6 +95,10 @@ const PublicNavbar = () => {
               Grocery Items
             </StyledNavLink>
 
+            {/* ✅ Search Icon for Desktop */}
+            <IconButton color="inherit" onClick={openSearchModal}>
+              <SearchIcon sx={{ color: "white" }} />
+            </IconButton>
             {/* 
             <Button
               variant="contained"
@@ -125,6 +136,13 @@ const PublicNavbar = () => {
               </Fade>
             </IconButton>
           )}
+
+          {/* ✅ Search Icon for Mobile */}
+          {isMobile && (
+            <IconButton color="inherit" onClick={openSearchModal}>
+              <SearchIcon sx={{ color: "white" }} />
+            </IconButton>
+          )}
         </Toolbar>
 
         {/* Mobile Slide-down Menu */}
@@ -153,7 +171,11 @@ const PublicNavbar = () => {
                 Liquor Items
               </StyledNavLink>
 
-              <StyledNavLink to="/other-product-all" onClick={closeMobileMenu} sx={{ mb: 2 }}>
+              <StyledNavLink
+                to="/other-product-all"
+                onClick={closeMobileMenu}
+                sx={{ mb: 2 }}
+              >
                 Grocery Items
               </StyledNavLink>
 
@@ -182,6 +204,22 @@ const PublicNavbar = () => {
           </Slide>
         )}
       </AppBar>
+
+      {/* ✅ Search Modal */}
+      <Modal
+        title="Search"
+        open={searchModalOpen}
+        onCancel={closeSearchModal}
+        footer={null}
+        centered
+      >
+        <Input.Search
+          placeholder="Search for products..."
+          enterButton={<SearchOutlined />}
+          size="large"
+          onSearch={(value) => console.log("Searching:", value)}
+        />
+      </Modal>
     </>
   );
 };
