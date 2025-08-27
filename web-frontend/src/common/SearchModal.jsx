@@ -145,9 +145,8 @@ const SearchModal = ({ open, onClose }) => {
       {/* Results Area */}
       <div style={{
         flex: 1,
-        overflow: "auto",
-        padding: "16px",
-        paddingTop: 0
+        display: "flex",
+        flexDirection: "column"
       }}>
         {loading && (
           <div style={{ textAlign: "center", padding: "40px" }}>
@@ -182,26 +181,31 @@ const SearchModal = ({ open, onClose }) => {
               marginBottom: "16px",
               padding: "8px 0",
               borderBottom: "1px solid #1c1f2b"
-            }}>
+            }}
+            className="px-3">
               Found {searchResults.length} product{searchResults.length !== 1 ? 's' : ''}
             </div>
 
-            <div className="row">
-              {searchResults.map((product) => (
-                <React.Fragment key={product.id || product.product_id}>
-                  {product.is_liquor ? (
-                    <LiquorProductCard
-                      product={product}
-                      userOnly={true}
-                    />
-                  ) : (
-                    <OtherProductCard
-                      product={product}
-                      userOnly={true}
-                    />
-                  )}
-                </React.Fragment>
-              ))}
+            {/* Scrollable product list */}
+            <div
+              className="overflow-auto"
+              style={{
+                flex: 1,
+                maxHeight: "calc(90vh - 180px)",
+                paddingRight: "8px"
+              }}
+            >
+              <div className="row g-3 px-2 m-0">
+                {searchResults.map((product) => (
+                  <React.Fragment key={product.id || product.product_id}>
+                    {product.is_liquor ? (
+                      <LiquorProductCard product={product} userOnly={true} />
+                    ) : (
+                      <OtherProductCard product={product} userOnly={true} />
+                    )}
+                  </React.Fragment>
+                ))}
+              </div>
             </div>
           </>
         )}
