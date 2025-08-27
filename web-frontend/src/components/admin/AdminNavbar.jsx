@@ -330,7 +330,7 @@ const AdminNavbar = () => {
                             </DesktopDropdownMenu>
                         </Box>
 
-                        <StyledNavLink to="/order-list" onClick={closeMobileMenu} sx={{ px: 3 }}>
+                        <StyledNavLink to="/order-list" onClick={closeMobileMenu}>
                             <Badge
                                 badgeContent={pendingCount}
                                 color="error"
@@ -348,6 +348,7 @@ const AdminNavbar = () => {
                         >
                             Profile
                         </StyledNavLink>
+                        
                         {isSuperAdmin && (
                             <StyledNavLink
                                 to={`/app-info`}
