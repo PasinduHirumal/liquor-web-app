@@ -28,7 +28,8 @@ const SearchModal = ({ open, onClose }) => {
         params: {
           q: value,
           is_active: true,
-          is_in_stock: true
+          is_in_stock: true,
+          multiWord: true
         }
       });
 
