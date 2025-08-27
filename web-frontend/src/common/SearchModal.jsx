@@ -1,21 +1,23 @@
 import React from "react";
-import { Modal, Input } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Modal, Input, Button } from "antd";
+import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
 
 const SearchModal = ({ open, onClose }) => {
   return (
     <Modal
-      title={<span style={{ color: "#fff",fontWeight: "bold" }}>Search</span>}
+      title={<span style={{ color: "#fff", fontWeight: "bold" }}>Search</span>}
       open={open}
       onCancel={onClose}
       footer={null}
       closable={false}
+      maskClosable={false}
       style={{
         top: 70,
       }}
       width="95%"
       bodyStyle={{
         paddingTop: "16px",
+        backgroundColor: "#010524ff",
       }}
       styles={{
         header: {
@@ -23,10 +25,23 @@ const SearchModal = ({ open, onClose }) => {
           color: "#fff",
         },
         content: {
-          backgroundColor: "#010524ff", 
+          backgroundColor: "#010524ff",
         },
       }}
     >
+      {/* Custom Close Button */}
+      <Button
+        type="text"
+        icon={<CloseOutlined style={{ color: "#fff", fontSize: "16px" }} />}
+        onClick={onClose}
+        style={{
+          position: "absolute",
+          top: 10,
+          right: 10,
+          zIndex: 1,
+        }}
+      />
+
       <Input.Search
         placeholder="Search for products..."
         enterButton={<SearchOutlined />}
