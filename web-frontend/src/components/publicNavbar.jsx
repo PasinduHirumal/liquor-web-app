@@ -36,6 +36,16 @@ const StyledNavLink = styled(NavLink)(({ theme }) => ({
   },
 }));
 
+// Styled Search IconButton for hover effect
+const StyledSearchButton = styled(IconButton)(({ theme }) => ({
+  color: theme.palette.common.white,
+  borderRadius: theme.shape.borderRadius,
+  transition: "background-color 0.3s ease",
+  "&:hover": {
+    backgroundColor: "#5f0404ff",
+  },
+}));
+
 const PublicNavbar = () => {
   const navigate = useNavigate();
   const theme = useTheme();
@@ -85,10 +95,11 @@ const PublicNavbar = () => {
             </StyledNavLink>
 
             {/* ✅ Search Icon for Desktop */}
-            <IconButton color="inherit" onClick={openSearchModal}>
-              <SearchIcon sx={{ color: "white" }} />
-            </IconButton>
+            <StyledSearchButton onClick={openSearchModal}>
+              <SearchIcon />
+            </StyledSearchButton>
 
+            {/* 
             <Button
               variant="contained"
               sx={{
@@ -102,31 +113,31 @@ const PublicNavbar = () => {
             >
               Login
             </Button>
+            */}
+
           </Box>
 
-          {/* Mobile Menu Icon */}
+          {/* ✅ Mobile: Search button + Menu button grouped */}
           {isMobile && (
-            <IconButton
-              color="inherit"
-              edge="end"
-              onClick={toggleMobileMenu}
-              aria-label="menu"
-              sx={{ ml: "auto" }}
-            >
-              <Fade in={!mobileMenuOpen} unmountOnExit>
-                <MenuIcon sx={{ color: "white", fontSize: 28 }} />
-              </Fade>
-              <Fade in={mobileMenuOpen} unmountOnExit>
-                <CloseIcon sx={{ color: "white", fontSize: 28 }} />
-              </Fade>
-            </IconButton>
-          )}
-          
-          {/* ✅ Search Icon for Mobile */}
-          {isMobile && (
-            <IconButton color="inherit" onClick={openSearchModal}>
-              <SearchIcon sx={{ color: "white" }} />
-            </IconButton>
+            <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+              <StyledSearchButton onClick={openSearchModal}>
+                <SearchIcon />
+              </StyledSearchButton>
+
+              <IconButton
+                color="inherit"
+                edge="end"
+                onClick={toggleMobileMenu}
+                aria-label="menu"
+              >
+                <Fade in={!mobileMenuOpen} unmountOnExit>
+                  <MenuIcon sx={{ color: "white", fontSize: 28 }} />
+                </Fade>
+                <Fade in={mobileMenuOpen} unmountOnExit>
+                  <CloseIcon sx={{ color: "white", fontSize: 28 }} />
+                </Fade>
+              </IconButton>
+            </Box>
           )}
         </Toolbar>
 
@@ -160,6 +171,7 @@ const PublicNavbar = () => {
                 Grocery Items
               </StyledNavLink>
 
+              {/* 
               <Button
                 fullWidth
                 variant="contained"
@@ -176,6 +188,8 @@ const PublicNavbar = () => {
               >
                 Login
               </Button>
+              */}
+
             </Box>
           </Slide>
         )}
