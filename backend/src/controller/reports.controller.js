@@ -255,6 +255,8 @@ const getFinanceReport = async (req, res) => {
 
         const Income_Result = await orderService.getTotalIncomeValues(sortedOrders);
 
+        const Total_Income = (Income_Result.Total_TAX + Income_Result.Total_Delivery_Fee + Total_Profit_From_Products) || 0;
+
         const message = "Orders report fetched successfully";
         return res.status(200).json({ 
             success: true, 
@@ -265,6 +267,7 @@ const getFinanceReport = async (req, res) => {
                 total_delivery_charges: parseFloat(Income_Result.Total_Delivery_Fee || 0),
                 total_tax_charges: parseFloat(Income_Result.Total_TAX || 0),
                 total_profits_from_products: parseFloat(Total_Profit_From_Products.toFixed(2)),
+                total_income: parseFloat(Total_Income.toFixed(2)),
             },
             total_balance: Income_Result.Total_Balance,
             data: filteredOrderData
