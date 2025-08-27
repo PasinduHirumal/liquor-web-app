@@ -113,7 +113,7 @@ export const adminRoutes = [
         ),
     },
     {
-        path: "/download-reports",
+        path: "/reports",
         element: (
             <AdminProtectedRoute>
                 <Report />
