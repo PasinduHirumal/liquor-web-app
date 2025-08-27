@@ -25,7 +25,11 @@ const SearchModal = ({ open, onClose }) => {
 
     try {
       const response = await axiosInstance.get("/search/all", {
-        params: { q: value }
+        params: {
+          q: value,
+          is_active: true,
+          is_in_stock: true
+        }
       });
 
       if (response.data.success) {
@@ -182,7 +186,7 @@ const SearchModal = ({ open, onClose }) => {
               padding: "8px 0",
               borderBottom: "1px solid #1c1f2b"
             }}
-            className="px-3">
+              className="px-3">
               Found {searchResults.length} product{searchResults.length !== 1 ? 's' : ''}
             </div>
 
