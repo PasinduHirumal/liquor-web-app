@@ -5,7 +5,7 @@ import { SearchOutlined } from "@ant-design/icons";
 const SearchModal = ({ open, onClose }) => {
   return (
     <Modal
-      title="Search"
+      title={<span style={{ color: "#fff",fontWeight: "bold" }}>Search</span>}
       open={open}
       onCancel={onClose}
       footer={null}
@@ -15,7 +15,16 @@ const SearchModal = ({ open, onClose }) => {
       }}
       width="95%"
       bodyStyle={{
-        padding: "16px",
+        paddingTop: "16px",
+      }}
+      styles={{
+        header: {
+          backgroundColor: "#010524ff",
+          color: "#fff",
+        },
+        content: {
+          backgroundColor: "#010524ff", 
+        },
       }}
     >
       <Input.Search
@@ -23,6 +32,10 @@ const SearchModal = ({ open, onClose }) => {
         enterButton={<SearchOutlined />}
         size="large"
         onSearch={(value) => console.log("Searching:", value)}
+        style={{
+          backgroundColor: "#010524ff",
+          color: "#fff",
+        }}
       />
     </Modal>
   );
