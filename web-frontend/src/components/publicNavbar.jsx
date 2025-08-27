@@ -11,7 +11,6 @@ import {
   styled,
   Slide,
   Fade,
-  Typography,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
@@ -19,8 +18,7 @@ import {
   Search as SearchIcon,
   Login as LoginIcon,
 } from "@mui/icons-material";
-import { Modal, Input } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import SearchModal from "../common/SearchModal";
 
 // Styled NavLink for dark theme
 const StyledNavLink = styled(NavLink)(({ theme }) => ({
@@ -44,7 +42,7 @@ const PublicNavbar = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [searchModalOpen, setSearchModalOpen] = useState(false); // ✅ modal state
+  const [searchModalOpen, setSearchModalOpen] = useState(false);
 
   const handleLogin = () => navigate("/login");
   const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
@@ -55,22 +53,13 @@ const PublicNavbar = () => {
 
   return (
     <>
-      <AppBar
-        position="fixed"
-        elevation={4}
-        sx={{
-          backgroundColor: "#a30000ff",
-        }}
-      >
+      <AppBar position="fixed" elevation={4} sx={{ backgroundColor: "#a30000ff" }}>
         <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2 } }}>
           <Box
             component={NavLink}
             to="/"
             onClick={closeMobileMenu}
-            style={{
-              textDecoration: "none",
-              color: "white",
-            }}
+            style={{ textDecoration: "none", color: "white" }}
             sx={{
               display: "flex",
               alignItems: "center",
@@ -99,24 +88,20 @@ const PublicNavbar = () => {
             <IconButton color="inherit" onClick={openSearchModal}>
               <SearchIcon sx={{ color: "white" }} />
             </IconButton>
-            {/* 
+
             <Button
               variant="contained"
               sx={{
                 ml: 2,
                 backgroundColor: theme.palette.info.main,
                 color: "#fff",
-                "&:hover": {
-                  backgroundColor: theme.palette.info.dark,
-                },
+                "&:hover": { backgroundColor: theme.palette.info.dark },
               }}
               startIcon={<LoginIcon />}
               onClick={handleLogin}
             >
               Login
             </Button>
-            */}
-
           </Box>
 
           {/* Mobile Menu Icon */}
@@ -136,7 +121,7 @@ const PublicNavbar = () => {
               </Fade>
             </IconButton>
           )}
-
+          
           {/* ✅ Search Icon for Mobile */}
           {isMobile && (
             <IconButton color="inherit" onClick={openSearchModal}>
@@ -171,15 +156,10 @@ const PublicNavbar = () => {
                 Liquor Items
               </StyledNavLink>
 
-              <StyledNavLink
-                to="/other-product-all"
-                onClick={closeMobileMenu}
-                sx={{ mb: 2 }}
-              >
+              <StyledNavLink to="/other-product-all" onClick={closeMobileMenu}>
                 Grocery Items
               </StyledNavLink>
 
-              {/* 
               <Button
                 fullWidth
                 variant="contained"
@@ -187,9 +167,7 @@ const PublicNavbar = () => {
                 sx={{
                   backgroundColor: theme.palette.info.main,
                   color: "#fff",
-                  "&:hover": {
-                    backgroundColor: theme.palette.info.dark,
-                  },
+                  "&:hover": { backgroundColor: theme.palette.info.dark },
                 }}
                 onClick={() => {
                   handleLogin();
@@ -198,28 +176,13 @@ const PublicNavbar = () => {
               >
                 Login
               </Button>
-              */}
-
             </Box>
           </Slide>
         )}
       </AppBar>
 
-      {/* ✅ Search Modal */}
-      <Modal
-        title="Search"
-        open={searchModalOpen}
-        onCancel={closeSearchModal}
-        footer={null}
-        centered
-      >
-        <Input.Search
-          placeholder="Search for products..."
-          enterButton={<SearchOutlined />}
-          size="large"
-          onSearch={(value) => console.log("Searching:", value)}
-        />
-      </Modal>
+      {/* ✅ Separated Search Modal */}
+      <SearchModal open={searchModalOpen} onClose={closeSearchModal} />
     </>
   );
 };
