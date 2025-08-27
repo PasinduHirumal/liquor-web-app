@@ -1,9 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { Modal, Input, Button, Spin, Alert, Empty } from "antd";
 import { SearchOutlined, CloseOutlined } from "@ant-design/icons";
 import { axiosInstance } from "../lib/axios";
 import LiquorProductCard from "./LiquorProductCard";
 import OtherProductCard from "./OtherProductCard";
+import { debounce } from "lodash";
 
 const SearchModal = ({ open, onClose }) => {
   const [searchTerm, setSearchTerm] = useState("");
@@ -12,12 +13,15 @@ const SearchModal = ({ open, onClose }) => {
   const [error, setError] = useState(null);
   const [hasSearched, setHasSearched] = useState(false);
 
-  const handleSearch = async (value) => {
-    if (!value.trim()) return;
+  const fetchSearchResults = async (value) => {
+    if (!value.trim()) {
+      setSearchResults([]);
+      setHasSearched(false);
+      return;
+    }
 
     setLoading(true);
     setError(null);
-    setSearchTerm(value);
 
     try {
       const response = await axiosInstance.get("/search/all", {
@@ -38,6 +42,22 @@ const SearchModal = ({ open, onClose }) => {
     }
   };
 
+  // Debounced search function
+  const debouncedSearch = useCallback(
+    debounce((value) => {
+      fetchSearchResults(value);
+    }, 500),
+    [] // Ensure it's created only once
+  );
+
+  // Trigger search automatically when searchTerm changes
+  useEffect(() => {
+    debouncedSearch(searchTerm);
+    return () => {
+      debouncedSearch.cancel(); // Cleanup on unmount
+    };
+  }, [searchTerm, debouncedSearch]);
+
   const handleClear = () => {
     setSearchTerm("");
     setSearchResults([]);
@@ -48,10 +68,7 @@ const SearchModal = ({ open, onClose }) => {
   useEffect(() => {
     if (!open) {
       // Reset state when modal closes
-      setSearchTerm("");
-      setSearchResults([]);
-      setError(null);
-      setHasSearched(false);
+      handleClear();
     }
   }, [open]);
 
@@ -110,21 +127,18 @@ const SearchModal = ({ open, onClose }) => {
 
       {/* Search Input */}
       <div style={{ padding: "16px", borderBottom: "1px solid #1c1f2b" }}>
-        <Input.Search
+        <Input
           placeholder="Search for products..."
-          enterButton={<SearchOutlined />}
           size="large"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
-          onSearch={handleSearch}
-          loading={loading}
           allowClear
           onClear={handleClear}
           style={{
-            backgroundColor: "#0b0d17",
+            backgroundColor: "#fff",
             border: "1px solid #1c1f2b",
+            color: "#1c1f2b"
           }}
-          inputStyle={{ color: "#fff" }}
         />
       </div>
 
