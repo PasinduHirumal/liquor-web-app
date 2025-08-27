@@ -351,13 +351,15 @@ const AdminNavbar = () => {
                             </StyledNavLink>
                         )}
 
-                        <StyledNavLink
-                            to={`/reports`}
-                            onClick={closeMobileMenu}
-                        >
-                            Reports
-                        </StyledNavLink>
-
+                        {isSuperAdmin && (
+                            <StyledNavLink
+                                to={`/reports`}
+                                onClick={closeMobileMenu}
+                            >
+                                Reports
+                            </StyledNavLink>
+                        )}
+                        
                         <StyledNavLink
                             to={`/profile/${user?._id || user?.id}`}
                             onClick={closeMobileMenu}
