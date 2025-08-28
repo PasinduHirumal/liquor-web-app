@@ -150,19 +150,6 @@ const FinanceReport = () => {
       key: "total_cost",
       render: (value) => <Text type="danger">Rs: {value.toFixed(2)}</Text>,
     },
-    {
-      title: "Profit/Loss",
-      key: "profit_loss",
-      render: (_, record) => {
-        const profit = record.total_income - record.total_cost;
-        const isProfit = profit >= 0;
-        return (
-          <Tag color={isProfit ? "green" : "red"}>
-            {isProfit ? "+" : ""}Rs: {profit.toFixed(2)}
-          </Tag>
-        );
-      },
-    },
   ];
 
   // Order Details Modal
