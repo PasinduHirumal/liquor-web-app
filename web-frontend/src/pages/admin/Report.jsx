@@ -136,19 +136,19 @@ const FinanceReport = () => {
       title: "Total Amount",
       dataIndex: "total_amount",
       key: "total_amount",
-      render: (value) => <Text strong>${value.toFixed(2)}</Text>,
+      render: (value) => <Text strong>Rs: {value.toFixed(2)}</Text>,
     },
     {
       title: "Total Income",
       dataIndex: "total_income",
       key: "total_income",
-      render: (value) => <Text type="success">${value.toFixed(2)}</Text>,
+      render: (value) => <Text type="success">Rs: {value.toFixed(2)}</Text>,
     },
     {
       title: "Total Cost",
       dataIndex: "total_cost",
       key: "total_cost",
-      render: (value) => <Text type="danger">${value.toFixed(2)}</Text>,
+      render: (value) => <Text type="danger">Rs: {value.toFixed(2)}</Text>,
     },
     {
       title: "Profit/Loss",
@@ -158,7 +158,7 @@ const FinanceReport = () => {
         const isProfit = profit >= 0;
         return (
           <Tag color={isProfit ? "green" : "red"}>
-            {isProfit ? "+" : ""}${profit.toFixed(2)}
+            {isProfit ? "+" : ""}Rs: {profit.toFixed(2)}
           </Tag>
         );
       },
@@ -181,13 +181,13 @@ const FinanceReport = () => {
       title: "Selling Price",
       dataIndex: "unit_price_of_product_selling",
       key: "unit_price_of_product_selling",
-      render: (value) => `$${value.toFixed(2)}`,
+      render: (value) => `Rs: ${value.toFixed(2)}`,
     },
     {
       title: "Cost Price",
       dataIndex: "unit_price_of_product_cost",
       key: "unit_price_of_product_cost",
-      render: (value) => `$${value.toFixed(2)}`,
+      render: (value) => `Rs: ${value.toFixed(2)}`,
     },
     {
       title: "Unit Profit",
@@ -195,7 +195,7 @@ const FinanceReport = () => {
       key: "unit_profit_of_product",
       render: (value) => (
         <Tag color={value >= 0 ? "green" : "red"}>
-          {value >= 0 ? "+" : ""}${value.toFixed(2)}
+          {value >= 0 ? "+" : ""}Rs: {value.toFixed(2)}
         </Tag>
       ),
     },
@@ -205,7 +205,7 @@ const FinanceReport = () => {
       key: "total_profit_for_products",
       render: (value) => (
         <Text strong type={value >= 0 ? "success" : "danger"}>
-          {value >= 0 ? "+" : ""}${value.toFixed(2)}
+          {value >= 0 ? "+" : ""}Rs: {value.toFixed(2)}
         </Text>
       ),
     },
@@ -271,7 +271,7 @@ const FinanceReport = () => {
               title="Total Income"
               value={reportData.income?.total_income || 0}
               precision={2}
-              prefix="$"
+              prefix="Rs: "
               valueStyle={{ color: "#3f8600" }}
             />
           </Card>
@@ -282,7 +282,7 @@ const FinanceReport = () => {
               title="Total Balance"
               value={reportData.total_balance || 0}
               precision={2}
-              prefix="$"
+              prefix="Rs: "
               valueStyle={{ color: "#3f8600" }}
             />
           </Card>
@@ -290,7 +290,7 @@ const FinanceReport = () => {
       </Row>
 
       {/* Income Breakdown */}
-      <Collapse defaultActiveKey={['1']} style={{ marginBottom: "20px" }}>
+      <Collapse defaultActiveKey={['1']} style={{ marginBottom: "20px", background: '#fff' }}>
         <Panel header="Income Breakdown" key="1">
           <Row gutter={16}>
             <Col span={6}>
@@ -298,7 +298,7 @@ const FinanceReport = () => {
                 title="Delivery Charges"
                 value={reportData.income?.total_delivery_charges || 0}
                 precision={2}
-                prefix="$"
+                prefix="Rs: "
               />
             </Col>
             <Col span={6}>
@@ -306,7 +306,7 @@ const FinanceReport = () => {
                 title="Tax Charges"
                 value={reportData.income?.total_tax_charges || 0}
                 precision={2}
-                prefix="$"
+                prefix="Rs: "
               />
             </Col>
             <Col span={6}>
@@ -314,7 +314,7 @@ const FinanceReport = () => {
                 title="Product Profits"
                 value={reportData.income?.total_profits_from_products || 0}
                 precision={2}
-                prefix="$"
+                prefix="Rs: "
                 valueStyle={{
                   color: reportData.income?.total_profits_from_products >= 0 ? "#3f8600" : "#cf1322"
                 }}
@@ -325,7 +325,7 @@ const FinanceReport = () => {
                 title="Total Income"
                 value={reportData.income?.total_income || 0}
                 precision={2}
-                prefix="$"
+                prefix="Rs: "
                 valueStyle={{ color: "#3f8600" }}
               />
             </Col>
@@ -387,7 +387,7 @@ const FinanceReport = () => {
                   title="Total Cost"
                   value={selectedOrder.total_cost}
                   precision={2}
-                  prefix="$"
+                  prefix="Rs: "
                 />
               </Col>
               <Col span={12}>
@@ -395,7 +395,7 @@ const FinanceReport = () => {
                   title="Total Income"
                   value={selectedOrder.total_income}
                   precision={2}
-                  prefix="$"
+                  prefix="Rs: "
                 />
               </Col>
             </Row>
@@ -411,7 +411,7 @@ const FinanceReport = () => {
                       title="Product Profit"
                       value={selectedOrder.income.profit_from_products}
                       precision={2}
-                      prefix="$"
+                      prefix="Rs: "
                     />
                   </Col>
                   <Col span={8}>
@@ -419,7 +419,7 @@ const FinanceReport = () => {
                       title="Delivery Fee"
                       value={selectedOrder.income.delivery_fee}
                       precision={2}
-                      prefix="$"
+                      prefix="Rs: "
                     />
                   </Col>
                   <Col span={8}>
@@ -427,7 +427,7 @@ const FinanceReport = () => {
                       title="Service Charge"
                       value={selectedOrder.income.service_charge}
                       precision={2}
-                      prefix="$"
+                      prefix="Rs: "
                     />
                   </Col>
                 </Row>
