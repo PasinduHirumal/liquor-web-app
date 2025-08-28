@@ -43,7 +43,6 @@ const FinanceReport = () => {
     }
   };
 
-
   const showOrderDetails = (order) => {
     setSelectedOrder(order);
     setModalVisible(true);
@@ -168,8 +167,8 @@ const FinanceReport = () => {
       <Divider />
 
       {/* Summary Section */}
-      <Row gutter={16} style={{ marginBottom: "20px" }}>
-        <Col span={6}>
+      <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
+        <Col xs={24} sm={12} md={8} lg={6}>
           <Card>
             <Statistic
               title="Total Orders"
@@ -178,7 +177,7 @@ const FinanceReport = () => {
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col xs={24} sm={12} md={8} lg={6}>
           <Card>
             <Statistic
               title="Total Income"
@@ -189,7 +188,7 @@ const FinanceReport = () => {
             />
           </Card>
         </Col>
-        <Col span={6}>
+        <Col xs={24} sm={12} md={8} lg={6}>
           <Card>
             <Statistic
               title="Total Balance"
@@ -205,8 +204,8 @@ const FinanceReport = () => {
       {/* Income Breakdown */}
       <Collapse defaultActiveKey={['1']} style={{ marginBottom: "20px", background: '#fff' }}>
         <Panel header="Income Breakdown" key="1">
-          <Row gutter={16}>
-            <Col span={6}>
+          <Row gutter={[16, 16]}>
+            <Col xs={24} sm={12} md={6}>
               <Statistic
                 title="Delivery Charges"
                 value={reportData.income?.total_delivery_charges || 0}
@@ -214,7 +213,7 @@ const FinanceReport = () => {
                 prefix="Rs: "
               />
             </Col>
-            <Col span={6}>
+            <Col xs={24} sm={12} md={6}>
               <Statistic
                 title="Tax Charges"
                 value={reportData.income?.total_tax_charges || 0}
@@ -222,7 +221,7 @@ const FinanceReport = () => {
                 prefix="Rs: "
               />
             </Col>
-            <Col span={6}>
+            <Col xs={24} sm={12} md={6}>
               <Statistic
                 title="Product Profits"
                 value={reportData.income?.total_profits_from_products || 0}
@@ -233,7 +232,7 @@ const FinanceReport = () => {
                 }}
               />
             </Col>
-            <Col span={6}>
+            <Col xs={24} sm={12} md={6}>
               <Statistic
                 title="Total Income"
                 value={reportData.income?.total_income || 0}
@@ -260,6 +259,7 @@ const FinanceReport = () => {
           dataSource={reportData.data || []}
           rowKey="order_id"
           pagination={{ pageSize: 5 }}
+          scroll={{ x: "max-content" }}
         />
       </Card>
 
@@ -269,16 +269,18 @@ const FinanceReport = () => {
         open={modalVisible}
         onCancel={() => setModalVisible(false)}
         footer={null}
-        width={800}
+        width="90%"
+        style={{ top: 70 }}
+        bodyStyle={{ overflowX: "auto" }}
       >
         {selectedOrder && (
-          <div>
-            <Row gutter={16} style={{ marginBottom: "16px" }}>
-              <Col span={12}>
+          <div style={{ overflowX: "auto" }}>
+            <Row gutter={[16, 16]} style={{ marginBottom: "16px" }}>
+              <Col xs={24} md={12}>
                 <Text strong>Order Date: </Text>
                 {moment(selectedOrder.order_date).format("MMM D, YYYY h:mm A")}
               </Col>
-              <Col span={12}>
+              <Col xs={24} md={12}>
                 <Text strong>Warehouse: </Text>
                 {selectedOrder.warehouse_id}
               </Col>
@@ -290,12 +292,13 @@ const FinanceReport = () => {
               rowKey="product_id"
               pagination={false}
               size="small"
+              scroll={{ x: "max-content" }}   // ✅ Horizontal scroll for modal table
             />
 
             <Divider />
 
-            <Row gutter={16}>
-              <Col span={12}>
+            <Row gutter={[16, 16]}>
+              <Col xs={24} md={12}>
                 <Statistic
                   title="Total Cost"
                   value={selectedOrder.total_cost}
@@ -303,7 +306,7 @@ const FinanceReport = () => {
                   prefix="Rs: "
                 />
               </Col>
-              <Col span={12}>
+              <Col xs={24} md={12}>
                 <Statistic
                   title="Total Income"
                   value={selectedOrder.total_income}
@@ -318,8 +321,8 @@ const FinanceReport = () => {
             <Row>
               <Col span={24}>
                 <Title level={5}>Income Breakdown</Title>
-                <Row gutter={16}>
-                  <Col span={8}>
+                <Row gutter={[16, 16]}>
+                  <Col xs={24} sm={12} md={8}>
                     <Statistic
                       title="Product Profit"
                       value={selectedOrder.income.profit_from_products}
@@ -327,7 +330,7 @@ const FinanceReport = () => {
                       prefix="Rs: "
                     />
                   </Col>
-                  <Col span={8}>
+                  <Col xs={24} sm={12} md={8}>
                     <Statistic
                       title="Delivery Fee"
                       value={selectedOrder.income.delivery_fee}
@@ -335,7 +338,7 @@ const FinanceReport = () => {
                       prefix="Rs: "
                     />
                   </Col>
-                  <Col span={8}>
+                  <Col xs={24} sm={12} md={8}>
                     <Statistic
                       title="Service Charge"
                       value={selectedOrder.income.service_charge}
