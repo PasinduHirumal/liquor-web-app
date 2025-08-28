@@ -209,7 +209,7 @@ const FinanceReport = () => {
             <Col xs={24} sm={12} md={6}>
               <Statistic
                 title="Delivery Charges"
-                value={reportData.income?.total_delivery_charges}
+                value={reportData.income.total_delivery_charges}
                 precision={2}
                 prefix="Rs: "
               />
@@ -217,7 +217,7 @@ const FinanceReport = () => {
             <Col xs={24} sm={12} md={6}>
               <Statistic
                 title="Tax Charges"
-                value={reportData.income?.total_tax_charges}
+                value={reportData.income.total_tax_charges}
                 precision={2}
                 prefix="Rs: "
               />
@@ -225,11 +225,11 @@ const FinanceReport = () => {
             <Col xs={24} sm={12} md={6}>
               <Statistic
                 title="Product Profits"
-                value={reportData.income?.total_profits_from_products}
+                value={reportData.income.total_profits_from_products}
                 precision={2}
                 prefix="Rs: "
                 valueStyle={{
-                  color: reportData.income?.total_profits_from_products >= 0 ? "#3f8600" : "#cf1322"
+                  color: reportData.income.total_profits_from_products >= 0 ? "#3f8600" : "#cf1322"
                 }}
               />
             </Col>
