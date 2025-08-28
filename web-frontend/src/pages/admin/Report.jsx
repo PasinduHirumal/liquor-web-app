@@ -182,7 +182,7 @@ const FinanceReport = () => {
           <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
             <Statistic
               title="Total Income"
-              value={reportData.income?.total_income || 0}
+              value={reportData.income?.total_income}
               precision={2}
               prefix="Rs: "
               valueStyle={{ color: "#3f8600" }}
@@ -193,7 +193,7 @@ const FinanceReport = () => {
           <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
             <Statistic
               title="Total Balance"
-              value={reportData.total_balance || 0}
+              value={reportData.total_balance}
               precision={2}
               prefix="Rs: "
               valueStyle={{ color: "#3f8600" }}
@@ -209,7 +209,7 @@ const FinanceReport = () => {
             <Col xs={24} sm={12} md={6}>
               <Statistic
                 title="Delivery Charges"
-                value={reportData.income?.total_delivery_charges || 0}
+                value={reportData.income?.total_delivery_charges}
                 precision={2}
                 prefix="Rs: "
               />
@@ -217,7 +217,7 @@ const FinanceReport = () => {
             <Col xs={24} sm={12} md={6}>
               <Statistic
                 title="Tax Charges"
-                value={reportData.income?.total_tax_charges || 0}
+                value={reportData.income?.total_tax_charges}
                 precision={2}
                 prefix="Rs: "
               />
@@ -225,7 +225,7 @@ const FinanceReport = () => {
             <Col xs={24} sm={12} md={6}>
               <Statistic
                 title="Product Profits"
-                value={reportData.income?.total_profits_from_products || 0}
+                value={reportData.income?.total_profits_from_products}
                 precision={2}
                 prefix="Rs: "
                 valueStyle={{
