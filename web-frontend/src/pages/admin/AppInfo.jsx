@@ -138,7 +138,7 @@ function AppInfo() {
 
     if (loading) {
         return (
-            <div className="p-5 flex justify-center bg-white">
+            <div className="pt-5 flex text-center bg-white">
                 <Spin tip="Loading app info..." size="large" />
             </div>
         );

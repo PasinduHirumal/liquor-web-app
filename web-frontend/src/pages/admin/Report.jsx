@@ -1,28 +1,21 @@
 import React, { useState, useEffect } from "react";
 import {
   Card, Table, Spin, Alert, Statistic, Row, Col, Typography, Divider,
-  Collapse, Tag, Button, DatePicker, Select, Space, Modal
+  Collapse, Tag, Button, Modal
 } from "antd";
 import {
-  DollarOutlined, ShoppingOutlined, FilePdfOutlined, DownloadOutlined, EyeOutlined
+  DollarOutlined, ShoppingOutlined, EyeOutlined
 } from "@ant-design/icons";
 import { axiosInstance } from "../../lib/axios";
 import moment from "moment";
 
 const { Title, Text } = Typography;
 const { Panel } = Collapse;
-const { RangePicker } = DatePicker;
-const { Option } = Select;
 
 const FinanceReport = () => {
   const [reportData, setReportData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [filters, setFilters] = useState({
-    status: "out_for_delivery",
-    start_date: null,
-    end_date: null
-  });
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [modalVisible, setModalVisible] = useState(false);
 
@@ -30,15 +23,14 @@ const FinanceReport = () => {
     fetchReport();
   }, []);
 
-  const fetchReport = async (params = {}) => {
+  const fetchReport = async () => {
     try {
       setLoading(true);
       setError(null);
 
       const response = await axiosInstance.get("/reports/finance", {
         params: {
-          status: filters.status,
-          ...params
+          status: "out_for_delivery",
         },
       });
 
@@ -51,37 +43,6 @@ const FinanceReport = () => {
     }
   };
 
-  const handleFilterChange = (name, value) => {
-    setFilters(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleDateRangeChange = (dates) => {
-    if (dates && dates.length === 2) {
-      setFilters(prev => ({
-        ...prev,
-        start_date: dates[0].format("YYYY-MM-DD"),
-        end_date: dates[1].format("YYYY-MM-DD")
-      }));
-    } else {
-      setFilters(prev => ({
-        ...prev,
-        start_date: null,
-        end_date: null
-      }));
-    }
-  };
-
-  const applyFilters = () => {
-    const params = {};
-    if (filters.start_date && filters.end_date) {
-      params.start_date = filters.start_date;
-      params.end_date = filters.end_date;
-    }
-    if (filters.status) {
-      params.status = filters.status;
-    }
-    fetchReport(params);
-  };
 
   const showOrderDetails = (order) => {
     setSelectedOrder(order);
@@ -90,7 +51,7 @@ const FinanceReport = () => {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center h-64">
+      <div className="flex pt-5 text-center bg-white">
         <Spin size="large" />
       </div>
     );
@@ -152,7 +113,7 @@ const FinanceReport = () => {
     },
   ];
 
-  // Order Details Modal
+  // Order Details Modal Columns
   const orderDetailColumns = [
     {
       title: "Product",
@@ -203,41 +164,6 @@ const FinanceReport = () => {
       <Title level={2} style={{ color: "#fff" }}>
         <DollarOutlined /> Finance Report
       </Title>
-
-      {/* Filters Section */}
-      <Card style={{ marginBottom: "20px" }}>
-        <Title level={5}>Filters</Title>
-        <Space direction="vertical" style={{ width: "100%" }} size="middle">
-          <Space>
-            <Select
-              value={filters.status}
-              onChange={(value) => handleFilterChange("status", value)}
-              style={{ width: 200 }}
-            >
-              <Option value="out_for_delivery">Out for Delivery</Option>
-              <Option value="delivered">Delivered</Option>
-              <Option value="cancelled">Cancelled</Option>
-            </Select>
-
-            <RangePicker
-              onChange={handleDateRangeChange}
-              style={{ width: 300 }}
-            />
-
-            <Button type="primary" onClick={applyFilters}>
-              Apply Filters
-            </Button>
-          </Space>
-
-          {reportData.filtered && (
-            <Alert
-              message={`Filters Applied: ${reportData.filtered}`}
-              type="info"
-              showIcon
-            />
-          )}
-        </Space>
-      </Card>
 
       <Divider />
 
@@ -340,7 +266,7 @@ const FinanceReport = () => {
       {/* Order Details Modal */}
       <Modal
         title={`Order Details: ${selectedOrder?.order_number}`}
-        visible={modalVisible}
+        open={modalVisible}
         onCancel={() => setModalVisible(false)}
         footer={null}
         width={800}
