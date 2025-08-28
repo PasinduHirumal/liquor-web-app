@@ -181,7 +181,7 @@ const FinanceReport = () => {
           <Card>
             <Statistic
               title="Total Income"
-              value={reportData.income?.total_income || 0}
+              value={reportData.income.total_income}
               precision={2}
               prefix="Rs: "
               valueStyle={{ color: "#3f8600" }}
@@ -235,7 +235,7 @@ const FinanceReport = () => {
             <Col xs={24} sm={12} md={6}>
               <Statistic
                 title="Total Income"
-                value={reportData.income?.total_income || 0}
+                value={reportData.income?.total_income}
                 precision={2}
                 prefix="Rs: "
                 valueStyle={{ color: "#3f8600" }}
@@ -292,7 +292,7 @@ const FinanceReport = () => {
               rowKey="product_id"
               pagination={false}
               size="small"
-              scroll={{ x: "max-content" }}   // ✅ Horizontal scroll for modal table
+              scroll={{ x: "max-content" }}
             />
 
             <Divider />
@@ -322,15 +322,18 @@ const FinanceReport = () => {
               <Col span={24}>
                 <Title level={5}>Income Breakdown</Title>
                 <Row gutter={[16, 16]}>
-                  <Col xs={24} sm={12} md={8}>
+                  <Col xs={24} sm={12} md={6}>
                     <Statistic
                       title="Product Profit"
                       value={selectedOrder.income.profit_from_products}
                       precision={2}
                       prefix="Rs: "
+                      valueStyle={{
+                        color: selectedOrder.income.profit_from_products >= 0 ? "#3f8600" : "#cf1322"
+                      }}
                     />
                   </Col>
-                  <Col xs={24} sm={12} md={8}>
+                  <Col xs={24} sm={12} md={6}>
                     <Statistic
                       title="Delivery Fee"
                       value={selectedOrder.income.delivery_fee}
@@ -338,12 +341,21 @@ const FinanceReport = () => {
                       prefix="Rs: "
                     />
                   </Col>
-                  <Col xs={24} sm={12} md={8}>
+                  <Col xs={24} sm={12} md={6}>
                     <Statistic
                       title="Service Charge"
                       value={selectedOrder.income.service_charge}
                       precision={2}
                       prefix="Rs: "
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} md={6}>
+                    <Statistic
+                      title="Total Income"
+                      value={selectedOrder.income.total_income}
+                      precision={2}
+                      prefix="Rs: "
+                      valueStyle={{ color: "#3f8600" }}
                     />
                   </Col>
                 </Row>
