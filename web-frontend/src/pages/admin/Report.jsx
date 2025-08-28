@@ -169,19 +169,20 @@ const FinanceReport = () => {
       {/* Summary Section */}
       <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
         <Col xs={24} sm={12} md={8} lg={6}>
-          <Card>
+          <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
             <Statistic
               title="Total Orders"
               value={reportData.count}
               prefix={<ShoppingOutlined />}
+              valueStyle={{ color: "#1890ff" }}
             />
           </Card>
         </Col>
         <Col xs={24} sm={12} md={8} lg={6}>
-          <Card>
+          <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
             <Statistic
               title="Total Income"
-              value={reportData.income.total_income}
+              value={reportData.income?.total_income || 0}
               precision={2}
               prefix="Rs: "
               valueStyle={{ color: "#3f8600" }}
@@ -189,7 +190,7 @@ const FinanceReport = () => {
           </Card>
         </Col>
         <Col xs={24} sm={12} md={8} lg={6}>
-          <Card>
+          <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
             <Statistic
               title="Total Balance"
               value={reportData.total_balance || 0}
