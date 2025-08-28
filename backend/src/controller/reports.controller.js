@@ -2,14 +2,17 @@ import OrdersService from '../services/orders.service.js';
 import DriverService from "../services/driver.service.js";
 import ProductService from '../services/product.service.js';
 import OtherProductService from '../services/otherProduct.service.js';
+import CompanyService from '../services/company.service.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
 import { generateOrdersPDF } from '../utils/generatePDF.js';
 import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
+import populateWhereHouse from '../utils/populateWhere_House.js';
 
 const orderService = new OrdersService();
 const driverService = new DriverService();
 const liquorService = new ProductService();
 const groceryService = new OtherProductService();
+const warehouseService = new CompanyService();
 
 const getOrdersReport = async (req, res) => {
 	try {
@@ -278,5 +281,63 @@ const getFinanceReport = async (req, res) => {
     }
 };
 
+const getDriversReport = async (req, res) => {
+	try {
+        const { where_house_id } = req.query;
 
-export { getOrdersReport, getFinanceReport };
+        const filters = {};
+        const filterDescription = [];
+
+        if (where_house_id !== undefined) {
+            const warehouse = await warehouseService.findById(where_house_id);
+            if (!warehouse) {
+                return res.status(404).json({ success: false, message: "Warehouse not found"});
+            }
+
+            filters.where_house_id = where_house_id;
+            filterDescription.push(`warehouse_id: ${where_house_id}`);
+        }
+
+        const filteredDrivers = Object.keys(filters).length > 0 
+            ? await driverService.findWithFilters(filters)
+            : await driverService.findAll();
+
+        // Sort by created_at in ascending order (oldest first)
+        const sortedDrivers = filteredDrivers.sort((a, b) => {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+
+        const driversReportData = sortedDrivers.map(driver => {
+            return {
+                driver_id: driver.id,
+                email: driver.email,
+                full_name: `${driver.firstName} ${driver.lastName}`,
+                phone: driver.phone,
+                nic_number: driver.nic_number,
+                license_number: driver.license_number,
+                warehouse_id: driver.where_house_id,
+                backgroundCheckStatus: driver.backgroundCheckStatus,
+                isActive: driver.isActive,
+                isDocumentVerified: driver.isDocumentVerified,
+                totalDeliveries: driver.totalDeliveries,
+                completedDeliveries: driver.completedDeliveries,
+                cancelledDeliveries: driver.cancelledDeliveries, 
+            };
+        })
+
+        const populatedDrivers = await populateWhereHouse(driversReportData);
+        
+        return res.status(200).json({ 
+            success: true, 
+            message: "Drivers report fetched successfully", 
+            count: driversReportData.length,
+            data: populatedDrivers
+        });
+    } catch (error) {
+        console.error("Drivers report error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+
+export { getOrdersReport, getFinanceReport, getDriversReport };
