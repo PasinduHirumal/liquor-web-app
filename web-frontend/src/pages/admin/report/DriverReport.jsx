@@ -228,7 +228,7 @@ const DriverReport = () => {
     return (
         <div style={{ padding: "20px" }}>
             <Title level={2} style={{ color: "#fff", marginBottom: 20 }}>
-                <CarOutlined /> Driver Performance Report
+                <CarOutlined /> Driver Report
             </Title>
 
             {/* Filter Section */}

@@ -3,7 +3,7 @@ import FinanceReport from './FinanceReport';
 import DriverReport from './DriverReport';
 
 const Report = () => {
-  const [activeComponent, setActiveComponent] = useState('UserLogin');
+  const [activeComponent, setActiveComponent] = useState('FinanceReport');
 
   const renderComponent = () => {
     switch (activeComponent) {
@@ -17,25 +17,27 @@ const Report = () => {
   };
 
   return (
-    <>
-      <div className="pt-0 pt-md-3">
-        <div className="btn-group w-50 gap-2 mb-3 px-3" role="group" aria-label="Login Toggle">
+    <div className="pt-0 pt-md-3">
+      <div className="overflow-auto px-3 mb-3">
+        <div className="d-flex gap-2">
           <button
-            className={`btn ${activeComponent === 'FinanceReport' ? 'btn-primary' : 'btn-outline-primary'}`}
+            className={`btn rounded-pill ${activeComponent === 'FinanceReport' ? 'btn-primary' : 'btn-outline-primary'}`}
+            style={{ minWidth: '130px', flex: '0 0 auto' }}
             onClick={() => setActiveComponent('FinanceReport')}
           >
             Finance Report
           </button>
           <button
-            className={`btn ${activeComponent === 'DriverReport' ? 'btn-primary' : 'btn-outline-primary'}`}
+            className={`btn rounded-pill ${activeComponent === 'DriverReport' ? 'btn-primary' : 'btn-outline-primary'}`}
+            style={{ minWidth: '130px', flex: '0 0 auto' }}
             onClick={() => setActiveComponent('DriverReport')}
           >
             Driver Report
           </button>
         </div>
-        <div>{renderComponent()}</div>
       </div>
-    </>
+      <div>{renderComponent()}</div>
+    </div>
   );
 };
 
