@@ -6,7 +6,7 @@ import {
 import {
   DollarOutlined, ShoppingOutlined, EyeOutlined
 } from "@ant-design/icons";
-import { axiosInstance } from "../../lib/axios";
+import { axiosInstance } from "../../../lib/axios";
 import moment from "moment";
 
 const { Title, Text } = Typography;

@@ -24,7 +24,7 @@ import DriverDocumentInfo from "../../components/admin/forms/DriverDocumentInfo"
 import OrderLIst from "../../pages/admin/OrderList";
 import OrderDetail from "../../pages/admin/detailPages/OrderDetail";
 import SystemDetail from "../../pages/admin/SystemDetail";
-import Report from "../../pages/admin/Report";
+import Report from "../../pages/admin/report/Report";
 import ManageBanner from "../../pages/admin/ManageBanner";
 import SuperMarket from "../../pages/admin/SuperMarket";
 import AppInfo from "../../pages/admin/AppInfo";
