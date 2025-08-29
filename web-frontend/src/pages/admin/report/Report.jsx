@@ -21,14 +21,14 @@ const Report = () => {
       <div className="overflow-auto px-3 mb-3">
         <div className="d-flex gap-2">
           <button
-            className={`btn rounded-pill ${activeComponent === 'FinanceReport' ? 'btn-primary' : 'btn-outline-primary'}`}
+            className={`btn rounded-pill ${activeComponent === 'FinanceReport' ? 'btn-primary' : 'btn-outline-light'}`}
             style={{ minWidth: '130px', flex: '0 0 auto' }}
             onClick={() => setActiveComponent('FinanceReport')}
           >
             Finance Report
           </button>
           <button
-            className={`btn rounded-pill ${activeComponent === 'DriverReport' ? 'btn-primary' : 'btn-outline-primary'}`}
+            className={`btn rounded-pill ${activeComponent === 'DriverReport' ? 'btn-primary' : 'btn-outline-light'}`}
             style={{ minWidth: '130px', flex: '0 0 auto' }}
             onClick={() => setActiveComponent('DriverReport')}
           >
