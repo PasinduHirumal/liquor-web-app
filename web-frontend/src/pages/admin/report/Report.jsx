@@ -19,7 +19,7 @@ const Report = () => {
   return (
     <>
       <div className="pt-0 pt-md-3">
-        <div className="btn-group w-50 gap-2 mb-4" role="group" aria-label="Login Toggle">
+        <div className="btn-group w-50 gap-2 mb-0 px-3" role="group" aria-label="Login Toggle">
           <button
             className={`btn ${activeComponent === 'FinanceReport' ? 'btn-primary' : 'btn-outline-primary'}`}
             onClick={() => setActiveComponent('FinanceReport')}
