@@ -25,6 +25,7 @@ import MainLayout from "./layout/Mainlayout";
 import LiquorAll from "./pages/LiquorAll";
 import OtherProductAll from "./pages/OtherProductAll";
 import ScrollToTop from "./common/ScrollToTop";
+import ScrollTopButton from "./common/ScrollTopButton";
 
 function App() {
   const adminCheckAuth = useAdminAuthStore((state) => state.checkAuth);
@@ -42,7 +43,8 @@ function App() {
       <Router>
         <ToastProvider />
         <ScrollToTop />
-
+        <ScrollTopButton />
+        
         <Routes>
           <Route path="/" element={<MainLayout />}>
 
