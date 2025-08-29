@@ -142,7 +142,7 @@ const FinanceReport = () => {
       key: "unit_profit_of_product",
       render: (value) => (
         <Tag color={value >= 0 ? "green" : "red"}>
-          {value >= 0 ? "+" : ""}Rs: {value.toFixed(2)}
+          Rs: {value >= 0 ? "+" : ""}{value.toFixed(2)}
         </Tag>
       ),
     },
@@ -152,7 +152,7 @@ const FinanceReport = () => {
       key: "total_profit_for_products",
       render: (value) => (
         <Text strong type={value >= 0 ? "success" : "danger"}>
-          {value >= 0 ? "+" : ""}Rs: {value.toFixed(2)}
+          Rs: {value >= 0 ? "+" : ""}{value.toFixed(2)}
         </Text>
       ),
     },
