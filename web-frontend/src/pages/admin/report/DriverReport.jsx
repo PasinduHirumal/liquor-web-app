@@ -1,40 +1,13 @@
 import React, { useState, useEffect } from "react";
 import {
-    Card,
-    Table,
-    Spin,
-    Alert,
-    Statistic,
-    Row,
-    Col,
-    Typography,
-    Divider,
-    Tag,
-    Button,
-    Space,
-    Tooltip,
-    Modal,
-    Progress,
-    Select,
-    message,
-    Badge,
-    Avatar,
-    List
+    Card, Table, Spin, Alert, Statistic, Row, Col, Typography,
+    Divider, Tag, Button, Space, Tooltip, Modal, Select, message, Badge, Avatar, List
 } from "antd";
 import {
-    UserOutlined,
-    PhoneOutlined,
-    MailOutlined,
-    IdcardOutlined,
-    CarOutlined,
-    EyeOutlined,
-    ReloadOutlined,
-    CheckCircleOutlined,
-    CloseCircleOutlined,
-    ClockCircleOutlined
+    UserOutlined, PhoneOutlined, MailOutlined, IdcardOutlined, CarOutlined,
+    EyeOutlined, ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined
 } from "@ant-design/icons";
 import { axiosInstance } from "../../../lib/axios";
-import moment from "moment";
 
 const { Title, Text } = Typography;
 const { Option } = Select;
@@ -103,7 +76,7 @@ const DriverReport = () => {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-64">
+            <div className="flex pt-5 text-center bg-white">
                 <Spin size="large" tip="Loading driver report..." />
             </div>
         );
