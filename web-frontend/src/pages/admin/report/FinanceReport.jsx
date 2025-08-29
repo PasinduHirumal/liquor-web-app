@@ -249,11 +249,6 @@ const FinanceReport = () => {
       {/* Orders Table */}
       <Card
         title={`Orders (${reportData.count})`}
-        extra={
-          <Text>
-            Generated: {new Date().toLocaleString()}
-          </Text>
-        }
       >
         <Table
           columns={columns}

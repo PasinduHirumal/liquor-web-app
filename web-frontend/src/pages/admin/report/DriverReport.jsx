@@ -115,7 +115,6 @@ const DriverReport = () => {
             title: "Driver",
             dataIndex: "full_name",
             key: "driver",
-            fixed: "left",
             width: 200,
             render: (text, record) => (
                 <Space>
@@ -214,7 +213,6 @@ const DriverReport = () => {
             title: "Actions",
             key: "actions",
             width: 100,
-            fixed: "right",
             render: (_, record) => (
                 <Button
                     type="link"
@@ -309,13 +307,6 @@ const DriverReport = () => {
             {/* Drivers Table */}
             <Card
                 title={`Drivers (${filteredDrivers.length})`}
-                extra={
-                    <Tooltip title="Report generation time">
-                        <Text type="secondary">
-                            Generated: {new Date().toLocaleString()}
-                        </Text>
-                    </Tooltip>
-                }
             >
                 <Table
                     columns={columns}
