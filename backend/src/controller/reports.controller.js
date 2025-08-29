@@ -1,15 +1,16 @@
 import OrdersService from '../services/orders.service.js';
 import DriverService from "../services/driver.service.js";
-import ProductService from '../services/product.service.js';
-import OtherProductService from '../services/otherProduct.service.js';
+import OrderItemsService from '../services/orderItems.service.js';
+import CompanyService from '../services/company.service.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
 import { generateOrdersPDF } from '../utils/generatePDF.js';
 import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
+import populateWhereHouse from '../utils/populateWhere_House.js';
 
 const orderService = new OrdersService();
 const driverService = new DriverService();
-const liquorService = new ProductService();
-const groceryService = new OtherProductService();
+const orderItemsService = new OrderItemsService();
+const warehouseService = new CompanyService();
 
 const getOrdersReport = async (req, res) => {
 	try {
@@ -114,7 +115,7 @@ const getOrdersReport = async (req, res) => {
 };
 
 const getFinanceReport = async (req, res) => {
-	try {
+    try {
         const { status = ORDER_STATUS.DELIVERED, where_house_id, format, start_date, end_date } = req.query;
 
         const filters = {};
@@ -177,53 +178,62 @@ const getFinanceReport = async (req, res) => {
             return new Date(a.created_at) - new Date(b.created_at);
         });
 
-        // Get all unique product IDs to minimize database calls
-        const allProductIds = [...new Set(
-            sortedOrders.flatMap(order => 
-                order.items?.map(item => item.product_id) || []
-            )
-        )];
+        // Get order IDs for order items fetching
+        const orderIds = sortedOrders.map(order => order.order_id);
 
-        // Fetch all product profits at once
-        const productProfits = {};
-        await Promise.all(
-            allProductIds.map(async (productId) => {
-                try {
-                    let profit = 0;
-                    profit = await groceryService.getProfitForProduct(productId);
-                    if (!profit) {
-                        profit = await liquorService.getProfitForProduct(productId);
-                    }
+        let orderItemsMapping = {};
 
-                    productProfits[productId] = profit !== false ? profit : 0;
-                } catch (error) {
-                    console.error(`Error fetching profit for product ${productId}:`, error);
-                    productProfits[productId] = 0;
-                }
-            })
-        );
+        try {
+            orderItemsMapping = await orderItemsService.getOrderItemsMapping(orderIds);
+        } catch (error) {
+            console.error('Error fetching order items mapping:', error);
+            // Continue with empty mapping as fallback
+        }
 
         let Total_Profit_From_Products = 0
 
         // Filter orders to include only specific fields
         const filteredOrderData = sortedOrders.map(order => {
             const processedItems = order.items?.map(item => {
-                const unitProfit = productProfits[item.product_id] || 0;
-                const unitPrice = parseFloat(item.unit_price || 0);
+                const orderItemData = orderItemsMapping[order.order_id]?.[item.product_id];
                 
-                return {
-                    product_id: item.product_id,
-                    product_name: item.product_name,
-                    unit_price_of_product_selling: unitPrice,
-                    unit_price_of_product_cost: unitPrice - unitProfit,
-                    unit_profit_of_product: parseFloat(unitProfit.toFixed(2)),
-                    quantity: item.quantity,
-                    is_profit: unitProfit > 0,
-                    total_price_for_products_selling: parseFloat((unitPrice * item.quantity).toFixed(2)),
-                    total_price_for_products_cost: parseFloat(((unitPrice - unitProfit) * item.quantity).toFixed(2)),
-                    total_profit_for_products: parseFloat((unitProfit * item.quantity).toFixed(2)),
+                if (orderItemData) {
+                    // Use data directly from OrderItems table
+                    const quantity = orderItemData.product_quantity || item.quantity;
+                    const unitSellingPrice = orderItemData.unit_selling_price;
+                    const unitCostPrice = orderItemData.unit_cost_price;
+                    const unitProfitValue = orderItemData.unit_profit_value;
                     
-                };
+                    return {
+                        product_id: item.product_id,
+                        product_name: orderItemData.product_name,
+                        unit_price_of_product_selling: parseFloat(unitSellingPrice.toFixed(2)),
+                        unit_price_of_product_cost: parseFloat(unitCostPrice.toFixed(2)),
+                        unit_profit_of_product: parseFloat(unitProfitValue.toFixed(2)),
+                        quantity: quantity,
+                        is_profit: unitProfitValue > 0,
+                        total_price_for_products_selling: parseFloat((unitSellingPrice * quantity).toFixed(2)),
+                        total_price_for_products_cost: parseFloat((unitCostPrice * quantity).toFixed(2)),
+                        total_profit_for_products: parseFloat((unitProfitValue * quantity).toFixed(2)),
+                    };
+                } else {
+                    // Fallback to original logic if order item not found
+                    const unitPrice = parseFloat(item.unit_price || 0);
+                    const unitProfit = 0; // Default to 0 if no order item data
+                    
+                    return {
+                        product_id: item.product_id,
+                        product_name: item.product_name,
+                        unit_price_of_product_selling: unitPrice,
+                        unit_price_of_product_cost: unitPrice - unitProfit,
+                        unit_profit_of_product: parseFloat(unitProfit.toFixed(2)),
+                        quantity: item.quantity,
+                        is_profit: unitProfit > 0,
+                        total_price_for_products_selling: parseFloat((unitPrice * item.quantity).toFixed(2)),
+                        total_price_for_products_cost: parseFloat(((unitPrice - unitProfit) * item.quantity).toFixed(2)),
+                        total_profit_for_products: parseFloat((unitProfit * item.quantity).toFixed(2)),
+                    };
+                }
             }) || [];
 
             // Calculate total profit from all products in this order
@@ -278,5 +288,67 @@ const getFinanceReport = async (req, res) => {
     }
 };
 
+const getDriversReport = async (req, res) => {
+	try {
+        const { where_house_id } = req.query;
 
-export { getOrdersReport, getFinanceReport };
+        const filters = {};
+        const filterDescription = [];
+
+        if (where_house_id !== undefined) {
+            const warehouse = await warehouseService.findById(where_house_id);
+            if (!warehouse) {
+                return res.status(404).json({ success: false, message: "Warehouse not found"});
+            }
+
+            filters.where_house_id = where_house_id;
+            filterDescription.push(`warehouse_id: ${where_house_id}`);
+        }
+
+        const filteredDrivers = Object.keys(filters).length > 0 
+            ? await driverService.findWithFilters(filters)
+            : await driverService.findAll();
+
+        // Sort by created_at in ascending order (oldest first)
+        const sortedDrivers = filteredDrivers.sort((a, b) => {
+            return new Date(b.createdAt) - new Date(a.createdAt);
+        });
+
+        const driversReportData = await Promise.all(sortedDrivers.map(async (driver) => {
+            const deliveryOverviewResult = await orderService.getDeliveryStats(driver.id);
+
+            return {
+                driver_id: driver.id,
+                email: driver.email,
+                full_name: `${driver.firstName} ${driver.lastName}`,
+                phone: driver.phone,
+                nic_number: driver.nic_number,
+                license_number: driver.license_number,
+                warehouse_id: driver.where_house_id,
+                backgroundCheckStatus: driver.backgroundCheckStatus,
+                isActive: driver.isActive,
+                isDocumentVerified: driver.isDocumentVerified,
+                notAcceptedDeliveries: deliveryOverviewResult.notAccepted,
+                onGoingDeliveries: deliveryOverviewResult.onGoing,
+                completedDeliveries: deliveryOverviewResult.completed,
+                cancelledDeliveries: deliveryOverviewResult.cancelled,
+                totalDeliveries: deliveryOverviewResult.total,
+            };
+        }));
+
+        const populatedDrivers = await populateWhereHouse(driversReportData);
+        
+        return res.status(200).json({ 
+            success: true, 
+            message: "Drivers report fetched successfully", 
+            count: driversReportData.length,
+            data: populatedDrivers
+        });
+    } catch (error) {
+        console.error("Drivers report error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+
+export { getOrdersReport, getFinanceReport, getDriversReport };

@@ -4,12 +4,14 @@ import CompanyService from "../services/company.service.js";
 import DriverDutyService from '../services/driverDuty.service.js';
 import ProductService from '../services/product.service.js';
 import OtherProductService from '../services/otherProduct.service.js';
+import OrderItemsService from '../services/orderItems.service.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
 import populateUser from '../utils/populateUser.js';
 import populateDriver from '../utils/populateDriver.js';
 import populateWhereHouse from "../utils/populateWhere_House.js";
 import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
 import { populateAddressWithUserIdInData } from '../utils/populateAddress.js';
+import { createOrderItem } from './orderItems.controller.js';
 
 
 const orderService = new OrdersService();
@@ -18,6 +20,7 @@ const dutyService = new DriverDutyService();
 const companyService = new CompanyService();
 const liquorService = new ProductService();
 const groceryService = new OtherProductService();
+const orderItemsService = new OrderItemsService();
 
 
 const getAllOrders = async (req, res) => {
@@ -226,6 +229,41 @@ const updateOrder = async (req, res) => {
             }
         }
 
+        // get product id's and quantity
+        const orderItemsToCreate = [];
+        if (order.items && order.items.length > 0) {
+            order.items.forEach(item => {
+                if (item.product_id && item.quantity) {
+                    orderItemsToCreate.push({
+                        product_id: item.product_id,
+                        quantity: item.quantity
+                    });
+                }
+            });
+        }
+
+        // call createOrderItem
+        const orderItemResults = [];
+        if (orderItemsToCreate.length > 0) {
+            for (const itemData of orderItemsToCreate) {
+                try {
+                    const result = await createOrderItem({
+                        order_id: order.order_id,
+                        product_id: itemData.product_id,
+                        quantity: itemData.quantity
+                    });
+                    
+                    if (result.success) {
+                        orderItemResults.push(result.result);
+                    } else {
+                        console.error(`Failed to create order item for product ${itemData.product_id}:`, result.error);
+                    }
+                } catch (error) {
+                    console.error(`Error creating order item for product ${itemData.product_id}:`, error);
+                }
+            }
+        }
+
         const updateData = { ...req.body };
         updateData.superMarket_ids = SuperMarket_ids_for_order_table;
 
@@ -249,6 +287,7 @@ const updateOrder = async (req, res) => {
             success: true, 
             message: successMessage, 
             data: {
+                order_items: orderItemResults,
                 duty: driver_duty,
                 order: updatedOrder
             }

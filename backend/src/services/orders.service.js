@@ -1,5 +1,6 @@
 import BaseService from "./BaseService.js";
 import Orders from "../models/Orders.js";
+import ORDER_STATUS from "../enums/orderStatus.js";
 
 
 class OrdersService extends BaseService {
@@ -146,6 +147,43 @@ class OrdersService extends BaseService {
                 Total_TAX: parseFloat(totalTAX.toFixed(2)),
                 Total_Delivery_Fee: parseFloat(totalDeliveries.toFixed(2)),
                 Total_Balance: parseFloat(totalBalance.toFixed(2))
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getDeliveryStats(driver_id) {
+        try {
+            const docs_total = await this.findByFilter('assigned_driver_id', '==', driver_id);
+
+            const docs_completed = await this.collection
+                .where('assigned_driver_id', '==', driver_id)
+                .where('status', '==', ORDER_STATUS.DELIVERED)
+                .get();
+
+            const docs_cancelled = await this.collection
+                .where('assigned_driver_id', '==', driver_id)
+                .where('status', '==', ORDER_STATUS.CANCELLED)
+                .get();
+
+            const docs_not_accepted = await this.collection
+                .where('assigned_driver_id', '==', driver_id)
+                .where('status', '==', ORDER_STATUS.PROCESSING)
+                .get();
+
+            const docs_on_going = await this.collection
+                .where('assigned_driver_id', '==', driver_id)
+                .where('status', '==', ORDER_STATUS.OUT_FOR_DELIVERY)
+                .get();
+
+
+            return {
+                total: docs_total.length,
+                completed: docs_completed.size,
+                cancelled: docs_cancelled.size,
+                notAccepted: docs_not_accepted.size,
+                onGoing: docs_on_going.size
             };
         } catch (error) {
             throw error;

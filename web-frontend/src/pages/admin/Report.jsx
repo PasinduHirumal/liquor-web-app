@@ -93,10 +93,10 @@ const FinanceReport = () => {
       render: (items) => items.length,
     },
     {
-      title: "Total Amount",
-      dataIndex: "total_amount",
-      key: "total_amount",
-      render: (value) => <Text strong>Rs: {value.toFixed(2)}</Text>,
+      title: "Total Cost",
+      dataIndex: "total_cost",
+      key: "total_cost",
+      render: (value) => <Text type="danger">Rs: {value.toFixed(2)}</Text>,
     },
     {
       title: "Total Income",
@@ -105,10 +105,10 @@ const FinanceReport = () => {
       render: (value) => <Text type="success">Rs: {value.toFixed(2)}</Text>,
     },
     {
-      title: "Total Cost",
-      dataIndex: "total_cost",
-      key: "total_cost",
-      render: (value) => <Text type="danger">Rs: {value.toFixed(2)}</Text>,
+      title: "Total Amount",
+      dataIndex: "total_amount",
+      key: "total_amount",
+      render: (value) => <Text strong>Rs: {value.toFixed(2)}</Text>,
     },
   ];
 

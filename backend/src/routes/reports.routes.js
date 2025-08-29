@@ -1,7 +1,7 @@
 import express from 'express';
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import { authenticateUser, authorizeRoles } from '../middleware/authMiddleware.js';
-import { getFinanceReport, getOrdersReport } from '../controller/reports.controller.js';
+import { getDriversReport, getFinanceReport, getOrdersReport } from '../controller/reports.controller.js';
 
 const router = express.Router();
 
@@ -12,5 +12,6 @@ const super_admin = ADMIN_ROLES.SUPER_ADMIN;
 
 router.get('/orders', authenticateUser, authorizeRoles(super_admin), getOrdersReport);
 router.get('/finance', authenticateUser, authorizeRoles(super_admin), getFinanceReport);
+router.get('/drivers', authenticateUser, authorizeRoles(super_admin), getDriversReport);
 
 export default router;
