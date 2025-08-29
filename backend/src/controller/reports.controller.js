@@ -314,7 +314,9 @@ const getDriversReport = async (req, res) => {
             return new Date(b.createdAt) - new Date(a.createdAt);
         });
 
-        const driversReportData = sortedDrivers.map(driver => {
+        const driversReportData = await Promise.all(sortedDrivers.map(async (driver) => {
+            const deliveryOverviewResult = await orderService.getDeliveryStats(driver.id);
+
             return {
                 driver_id: driver.id,
                 email: driver.email,
@@ -326,11 +328,13 @@ const getDriversReport = async (req, res) => {
                 backgroundCheckStatus: driver.backgroundCheckStatus,
                 isActive: driver.isActive,
                 isDocumentVerified: driver.isDocumentVerified,
-                totalDeliveries: driver.totalDeliveries,
-                completedDeliveries: driver.completedDeliveries,
-                cancelledDeliveries: driver.cancelledDeliveries, 
+                notAcceptedDeliveries: deliveryOverviewResult.notAccepted,
+                onGoingDeliveries: deliveryOverviewResult.onGoing,
+                completedDeliveries: deliveryOverviewResult.completed,
+                cancelledDeliveries: deliveryOverviewResult.cancelled,
+                totalDeliveries: deliveryOverviewResult.total,
             };
-        })
+        }));
 
         const populatedDrivers = await populateWhereHouse(driversReportData);
         
