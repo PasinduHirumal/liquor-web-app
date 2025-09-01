@@ -251,8 +251,8 @@ const updateMarketById = async (req, res) => {
 
         if (location !== undefined) {
             const existingSuperMarket = await marketService.findByLocation(location);
-            if (existingSuperMarket) {
-                return res.status(400).json({ success: false, message: "Super Market already exists"});
+            if (existingSuperMarket && existingSuperMarket.id !== superMarketId) {
+                return res.status(400).json({ success: false, message: "There is a Super Market already exists for this location"});
             }
         }
 
