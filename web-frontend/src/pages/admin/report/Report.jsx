@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import FinanceReport from './FinanceReport';
 import DriverReport from './DriverReport';
+import OrderReport from './OrderReport';
 
 const Report = () => {
   const [activeComponent, setActiveComponent] = useState('FinanceReport');
@@ -11,6 +12,8 @@ const Report = () => {
         return <FinanceReport />;
       case 'DriverReport':
         return <DriverReport />;
+      case 'OrderReport':
+        return <OrderReport />;
       default:
         return <FinanceReport />;
     }
@@ -33,6 +36,13 @@ const Report = () => {
             onClick={() => setActiveComponent('DriverReport')}
           >
             Driver Report
+          </button>
+          <button
+            className={`btn rounded-pill ${activeComponent === 'OrderReport' ? 'btn-primary' : 'btn-outline-light'}`}
+            style={{ minWidth: '130px', flex: '0 0 auto' }}
+            onClick={() => setActiveComponent('OrderReport')}
+          >
+            Oredr Report
           </button>
         </div>
       </div>
