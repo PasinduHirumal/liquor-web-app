@@ -2,17 +2,19 @@ import OrdersService from '../services/orders.service.js';
 import DriverService from "../services/driver.service.js";
 import OrderItemsService from '../services/orderItems.service.js';
 import CompanyService from '../services/company.service.js';
+import SuperMarketService from '../services/superMarket.service.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
-import { generateOrdersPDF } from '../utils/generatePDF.js';
 import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
 import populateWhereHouse from '../utils/populateWhere_House.js';
+import { generateOrdersPDF } from '../utils/generatePDF.js';
 
 const orderService = new OrdersService();
 const driverService = new DriverService();
 const orderItemsService = new OrderItemsService();
 const warehouseService = new CompanyService();
+const superMarketService = new SuperMarketService();
 
-const getOrdersReport = async (req, res) => {
+const getOrdersReportWithPDF = async (req, res) => {
 	try {
         const { status, is_driver_accepted, where_house_id, format, start_date, end_date } = req.query;
 
@@ -110,6 +112,109 @@ const getOrdersReport = async (req, res) => {
         });
     } catch (error) {
         console.error("Create orders report error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+const getOrdersReport = async (req, res) => {
+	try {
+        const { status = ORDER_STATUS.DELIVERED, start_date, end_date } = req.query;
+
+        const filters = {};
+        const filterDescription = [];
+
+        if (status !== undefined){
+            if (status && !Object.values(ORDER_STATUS).includes(status)) {
+                return res.status(400).json({ success: false, message: "Invalid status value" });
+            }
+            
+            filters.status = status;
+            filterDescription.push(`status: ${status}`);
+        }
+        if (start_date !== undefined || end_date !== undefined) {
+            if (start_date && end_date) {
+                const startDate = new Date(start_date);
+                const endDate = new Date(end_date);
+                
+                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: "Invalid date format. Use YYYY-MM-DD or MM/DD/YYYY" 
+                    });
+                }
+                
+                if (startDate > endDate) {
+                    return res.status(400).json({ 
+                        success: false, 
+                        message: "Start date must be before or equal to end date" 
+                    });
+                }
+                
+                // Set time to beginning and end of day
+                startDate.setHours(0, 0, 0, 0);
+                endDate.setHours(23, 59, 59, 999);
+                
+                filters.dateRange = { start: startDate, end: endDate };
+                filterDescription.push(`date range: ${start_date} to ${end_date}`);
+            } else {
+                return res.status(400).json({ 
+                    success: false, 
+                    message: "Both start_date and end_date are required for date filtering" 
+                });
+            }
+        }
+
+        const warehouses = await warehouseService.findAll();
+        const warehouseReportData = await Promise.all(warehouses.map(async (warehouse) => {
+            filters.warehouse_id = warehouse.id;
+            const orderCount = await orderService.getOrdersCountForWarehouse(filters);
+            
+            // Destructure to exclude unwanted fields
+            const { 
+                delivery_charge_for_1KM, 
+                service_charge, 
+                where_house_location, 
+                created_at, 
+                updated_at, 
+                ...filteredWarehouse 
+            } = warehouse;
+
+            return {
+                ...filteredWarehouse,
+                order_count: orderCount
+            };
+        }));
+
+        const supermarkets = await superMarketService.findAll();
+        const supermarketReportData = await Promise.all(supermarkets.map(async (supermarket) => {
+            //filters.warehouse_id = supermarket.id;
+            //const orderCount = await orderService.getOrdersCountForWarehouse(filters);
+
+            return {
+                id: supermarket.id,
+                name: `${supermarket.superMarket_Name} - ${supermarket.city}`,
+                streetAddress: supermarket.streetAddress,
+                isActive: supermarket.isActive,
+                orders_count: supermarket.orders_count
+            };
+        }));
+        
+        return res.status(200).json({ 
+            success: true, 
+            message: "Orders report fetched successfully",
+            data: {
+                warehouse_report: {
+                    count: warehouseReportData.length,
+                    data: warehouseReportData
+                },
+                supermarket_report: {
+                    count: supermarketReportData.length,
+                    data: supermarketReportData
+                }
+            }
+        });
+    } catch (error) {
+        console.error("Get orders report error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };

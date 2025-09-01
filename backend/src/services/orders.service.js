@@ -190,6 +190,16 @@ class OrdersService extends BaseService {
         }
     }
 
+    async getOrdersCountForWarehouse(filters) {
+        try {
+            const orders = await this.findWithFilters(filters);
+
+            return orders.length;
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default OrdersService;
