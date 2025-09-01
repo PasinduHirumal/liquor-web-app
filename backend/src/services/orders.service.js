@@ -190,11 +190,35 @@ class OrdersService extends BaseService {
         }
     }
 
-    async getOrdersCountForWarehouse(filters) {
+    async getOrdersCountForWarehouse(filters = {}) {
         try {
             const orders = await this.findWithFilters(filters);
 
             return orders.length;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getOrdersCountForSuperMarket(supermarket_id, additionalFilters = {}) {
+        try {
+            let query = this.collection.where('superMarket_ids', 'array-contains', supermarket_id);
+
+            // Apply additional filters (except date range which needs special handling)
+            Object.entries(additionalFilters).forEach(([field, value]) => {
+                if (field !== 'dateRange' && value !== undefined && value !== null) {
+                    query = query.where(field, '==', value);
+                }
+            });
+
+            // Handle date range separately if needed
+            if (additionalFilters.dateRange) {
+                const { start, end } = additionalFilters.dateRange;
+                query = query.where('created_at', '>=', start).where('created_at', '<=', end);
+            }
+
+            const ordersRef = await query.get();
+            return ordersRef.size;
         } catch (error) {
             throw error;
         }

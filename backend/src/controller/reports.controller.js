@@ -187,15 +187,14 @@ const getOrdersReport = async (req, res) => {
 
         const supermarkets = await superMarketService.findAll();
         const supermarketReportData = await Promise.all(supermarkets.map(async (supermarket) => {
-            //filters.warehouse_id = supermarket.id;
-            //const orderCount = await orderService.getOrdersCountForWarehouse(filters);
+            const orderCount = await orderService.getOrdersCountForSuperMarket(supermarket.id, filters);
 
             return {
                 id: supermarket.id,
                 name: `${supermarket.superMarket_Name} - ${supermarket.city}`,
                 streetAddress: supermarket.streetAddress,
                 isActive: supermarket.isActive,
-                orders_count: supermarket.orders_count
+                orders_count: orderCount
             };
         }));
         
