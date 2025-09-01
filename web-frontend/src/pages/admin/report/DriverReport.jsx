@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import {
     Card, Table, Spin, Alert, Statistic, Row, Col, Typography,
-    Divider, Tag, Button, Space, Tooltip, Modal, Select, message, Badge, Avatar, List
+    Divider, Tag, Button, Space, Tooltip, Modal, Select, Badge, Avatar, List
 } from "antd";
 import {
     UserOutlined, PhoneOutlined, MailOutlined, IdcardOutlined, CarOutlined,
-    EyeOutlined, ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined
+    EyeOutlined, ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined,
+    FilePdfOutlined
 } from "@ant-design/icons";
+import { toast } from "react-hot-toast"
 import { axiosInstance } from "../../../lib/axios";
 
 const { Title, Text } = Typography;
@@ -19,6 +21,7 @@ const DriverReport = () => {
     const [selectedDriver, setSelectedDriver] = useState(null);
     const [modalVisible, setModalVisible] = useState(false);
     const [filterStatus, setFilterStatus] = useState("all");
+    const [downloading, setDownloading] = useState(false);
 
     useEffect(() => {
         fetchReport();
@@ -35,9 +38,34 @@ const DriverReport = () => {
             console.error("Error fetching driver report:", err);
             const errorMessage = err.response?.data?.message || "Failed to fetch driver report";
             setError(errorMessage);
-            message.error(errorMessage);
+            toast.error(errorMessage);
         } finally {
             setLoading(false);
+        }
+    };
+
+    // ✅ PDF download
+    const downloadPDF = async () => {
+        try {
+            setDownloading(true);
+            const response = await axiosInstance.get("/reports/drivers", {
+                params: { format: "pdf" },
+                responseType: "blob",
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "drivers_report.pdf");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            toast.success("PDF downloaded successfully");
+        } catch (err) {
+            console.error("Error downloading PDF:", err);
+            toast.error("Failed to download PDF");
+        } finally {
+            setDownloading(false);
         }
     };
 
@@ -89,11 +117,7 @@ const DriverReport = () => {
                 description={error}
                 type="error"
                 showIcon
-                action={
-                    <Button size="small" onClick={fetchReport}>
-                        Try Again
-                    </Button>
-                }
+                action={<Button size="small" onClick={fetchReport}>Try Again</Button>}
             />
         );
     }
@@ -109,7 +133,7 @@ const DriverReport = () => {
         );
     }
 
-    // Table Columns for Drivers
+    // Table Columns
     const columns = [
         {
             title: "Driver",
@@ -133,12 +157,7 @@ const DriverReport = () => {
             dataIndex: "phone",
             key: "phone",
             width: 140,
-            render: (phone) => (
-                <Space>
-                    <PhoneOutlined />
-                    {phone}
-                </Space>
-            ),
+            render: (phone) => <Space><PhoneOutlined />{phone}</Space>,
         },
         {
             title: "Warehouse",
@@ -163,13 +182,7 @@ const DriverReport = () => {
             key: "totalDeliveries",
             width: 120,
             render: (count) => (
-                <Badge
-                    count={count}
-                    showZero
-                    style={{
-                        backgroundColor: getDeliveryStatusColor(count),
-                    }}
-                />
+                <Badge count={count} showZero style={{ backgroundColor: getDeliveryStatusColor(count) }} />
             ),
             sorter: (a, b) => a.totalDeliveries - b.totalDeliveries,
         },
@@ -178,11 +191,7 @@ const DriverReport = () => {
             dataIndex: "completedDeliveries",
             key: "completed",
             width: 110,
-            render: (count) => (
-                <Tag color="green" icon={<CheckCircleOutlined />}>
-                    {count}
-                </Tag>
-            ),
+            render: (count) => <Tag color="green" icon={<CheckCircleOutlined />}>{count}</Tag>,
             sorter: (a, b) => a.completedDeliveries - b.completedDeliveries,
         },
         {
@@ -190,11 +199,7 @@ const DriverReport = () => {
             dataIndex: "onGoingDeliveries",
             key: "ongoing",
             width: 100,
-            render: (count) => (
-                <Tag color="blue" icon={<ClockCircleOutlined />}>
-                    {count}
-                </Tag>
-            ),
+            render: (count) => <Tag color="blue" icon={<ClockCircleOutlined />}>{count}</Tag>,
             sorter: (a, b) => a.onGoingDeliveries - b.onGoingDeliveries,
         },
         {
@@ -202,11 +207,7 @@ const DriverReport = () => {
             dataIndex: "cancelledDeliveries",
             key: "cancelled",
             width: 110,
-            render: (count) => (
-                <Tag color="red" icon={<CloseCircleOutlined />}>
-                    {count}
-                </Tag>
-            ),
+            render: (count) => <Tag color="red" icon={<CloseCircleOutlined />}>{count}</Tag>,
             sorter: (a, b) => a.cancelledDeliveries - b.cancelledDeliveries,
         },
         {
@@ -214,11 +215,7 @@ const DriverReport = () => {
             key: "actions",
             width: 100,
             render: (_, record) => (
-                <Button
-                    type="link"
-                    icon={<EyeOutlined />}
-                    onClick={() => showDriverDetails(record)}
-                >
+                <Button type="link" icon={<EyeOutlined />} onClick={() => showDriverDetails(record)}>
                     View
                 </Button>
             ),
@@ -227,9 +224,30 @@ const DriverReport = () => {
 
     return (
         <div style={{ padding: "20px" }}>
-            <Title level={2} style={{ color: "#fff", marginBottom: 20 }}>
-                <CarOutlined /> Driver Report
-            </Title>
+            <Row justify="space-between" align="middle" style={{ marginBottom: 20 }}>
+                <Col>
+                    <Title level={2} style={{ color: "#fff", marginBottom: 0 }}>
+                        <CarOutlined /> Driver Report
+                    </Title>
+                </Col>
+                <Col>
+                    <Button
+                        type="primary"
+                        icon={<ReloadOutlined />}
+                        onClick={fetchReport}
+                        style={{ marginRight: 8 }}  >
+                        Refresh
+                    </Button>
+                    <Button
+                        type="default"
+                        icon={<FilePdfOutlined />}
+                        loading={downloading}
+                        onClick={downloadPDF}
+                    >
+                        Download PDF
+                    </Button>
+                </Col>
+            </Row>
 
             {/* Filter Section */}
             <Card style={{ marginBottom: 20 }}>
@@ -246,15 +264,6 @@ const DriverReport = () => {
                                 <Option value="active">Active Only</Option>
                                 <Option value="inactive">Inactive Only</Option>
                             </Select>
-                        </Col>
-                        <Col>
-                            <Button
-                                icon={<ReloadOutlined />}
-                                onClick={fetchReport}
-                                loading={loading}
-                            >
-                                Refresh
-                            </Button>
                         </Col>
                     </Row>
                 </Space>

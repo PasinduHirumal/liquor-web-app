@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import {
     Card, Table, Spin, Alert, Statistic, Row, Col, Typography,
-    Tag, Button, Modal, Tabs, Badge, message
+    Tag, Button, Modal, Tabs, Badge
 } from "antd";
 import {
     ShoppingOutlined, EyeOutlined, ShopOutlined,
