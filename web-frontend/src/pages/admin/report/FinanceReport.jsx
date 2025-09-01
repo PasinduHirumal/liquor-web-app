@@ -30,7 +30,7 @@ const FinanceReport = () => {
 
       const response = await axiosInstance.get("/reports/finance", {
         params: {
-          status: "out_for_delivery",
+          // status: "out_for_delivery",
         },
       });
 
