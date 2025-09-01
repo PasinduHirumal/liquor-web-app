@@ -118,7 +118,7 @@ const getOrdersReportWithPDF = async (req, res) => {
 
 const getOrdersReport = async (req, res) => {
 	try {
-        const { status = ORDER_STATUS.DELIVERED, start_date, end_date } = req.query;
+        const { status = ORDER_STATUS.DELIVERED, format, start_date, end_date } = req.query;
 
         const filters = {};
         const filterDescription = [];
@@ -199,21 +199,58 @@ const getOrdersReport = async (req, res) => {
                 orders_count: orderCount
             };
         }));
+
+        // Report data structure
+        const reportData = {
+            warehouse_report: {
+                count: warehouseReportData.length,
+                data: warehouseReportData
+            },
+            supermarket_report: {
+                count: supermarketReportData.length,
+                data: supermarketReportData
+            }
+        };
+
+        // Handle PDF generation for both warehouses and supermarkets
+        if (format !== undefined && (format === 'warehouses-pdf' || format === 'supermarkets-pdf' || format === 'pdf')) {
+            try {
+                let pdfData;
+                let filename;
+                
+                if (format === 'warehouses-pdf') { // Generate PDF with only warehouse data
+                    pdfData = {
+                        warehouse_report: reportData.warehouse_report,
+                        supermarket_report: { count: 0, data: [] }
+                    };
+                    filename = 'warehouses-orders-report.pdf';
+                } else if (format === 'supermarkets-pdf') { // Generate PDF with only supermarket data
+                    pdfData = {
+                        warehouse_report: { count: 0, data: [] },
+                        supermarket_report: reportData.supermarket_report
+                    };
+                    filename = 'supermarkets-orders-report.pdf';
+                } else { // Generate PDF with both warehouse and supermarket data
+                    pdfData = reportData;
+                    filename = 'complete-orders-report.pdf';
+                }
+
+                const pdfBuffer = await generateOrdersPDF(pdfData, filters);
+
+                res.setHeader('Content-Type', 'application/pdf');
+                res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
+                return res.send(pdfBuffer);
+            } catch (pdfError) {
+                console.error("PDF generation error:", pdfError);
+                return res.status(500).json({ success: false, message: "Failed to generate PDF" });
+            }
+        }
         
         return res.status(200).json({ 
             success: true, 
             message: "Orders report fetched successfully",
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
-            data: {
-                warehouse_report: {
-                    count: warehouseReportData.length,
-                    data: warehouseReportData
-                },
-                supermarket_report: {
-                    count: supermarketReportData.length,
-                    data: supermarketReportData
-                }
-            }
+            data: reportData
         });
     } catch (error) {
         console.error("Get orders report error:", error.message);

@@ -1,39 +1,25 @@
-
-// Generate order rows HTML
-const generateOrderRows = (orders) => {
-    return orders.map(order => `
-        <tr>
-            <td>${order.id || order._id}</td>
-            <td>${order.user?.name || 'N/A'}</td>
-            <td>
-                <span class="status status-${order.status}">
-                    ${order.status}
-                </span>
-            </td>
-            <td>$${Number(order.total_amount || 0).toFixed(2)}</td>
-            <td>${new Date(order.created_at).toLocaleDateString()}</td>
-            <td>${order.driver?.name || 'Unassigned'}</td>
-        </tr>
-    `).join('');
-};
-
-// Replace template placeholders with actual data
-const replaceTemplatePlaceholders = (template, data) => {
-    return template
-        .replace('{{GENERATION_DATE}}', data.generationDate)
-        .replace('{{FILTERS}}', data.filters)
-        .replace('{{ORDER_ROWS}}', data.orderRows)
-        .replace('{{TOTAL_ORDERS}}', data.totalOrders)
-        .replace('{{TOTAL_AMOUNT}}', data.totalAmount || '0.00');
-};
-
-// Calculate total amount from orders
-const calculateTotalAmount = (orders) => {
-    const total = orders.reduce((sum, order) => {
-        return sum + (parseFloat(order.total_amount) || 0);
-    }, 0);
+// Helper function to format filters for display
+const formatFilters = (filters) => {
+    const filterStrings = [];
     
-    return total.toFixed(2);
+    if (filters.status) {
+        filterStrings.push(`Status: ${filters.status.replace(/_/g, ' ').toUpperCase()}`);
+    }
+    
+    if (filters.dateRange) {
+        const startDate = filters.dateRange.start.toLocaleDateString();
+        const endDate = filters.dateRange.end.toLocaleDateString();
+        filterStrings.push(`Date Range: ${startDate} - ${endDate}`);
+    }
+    
+    return filterStrings.length > 0 ? filterStrings.join(' | ') : 'No filters applied';
 };
 
-export { generateOrderRows, replaceTemplatePlaceholders, calculateTotalAmount };
+// Helper function to calculate total orders
+const calculateTotalOrders = (data) => {
+    const warehouseTotal = data.warehouse_report?.data?.reduce((sum, warehouse) => sum + warehouse.order_count, 0) || 0;
+    const supermarketTotal = data.supermarket_report?.data?.reduce((sum, supermarket) => sum + supermarket.orders_count, 0) || 0;
+    return warehouseTotal + supermarketTotal;
+};
+
+export { formatFilters, calculateTotalOrders };
