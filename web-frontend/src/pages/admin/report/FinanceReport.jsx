@@ -6,7 +6,7 @@ import {
 import {
   DollarOutlined, ShoppingOutlined, EyeOutlined
 } from "@ant-design/icons";
-import { axiosInstance } from "../../lib/axios";
+import { axiosInstance } from "../../../lib/axios";
 import moment from "moment";
 
 const { Title, Text } = Typography;
@@ -30,7 +30,7 @@ const FinanceReport = () => {
 
       const response = await axiosInstance.get("/reports/finance", {
         params: {
-          status: "out_for_delivery",
+          // status: "out_for_delivery",
         },
       });
 
@@ -142,7 +142,7 @@ const FinanceReport = () => {
       key: "unit_profit_of_product",
       render: (value) => (
         <Tag color={value >= 0 ? "green" : "red"}>
-          {value >= 0 ? "+" : ""}Rs: {value.toFixed(2)}
+          Rs: {value >= 0 ? "+" : ""}{value.toFixed(2)}
         </Tag>
       ),
     },
@@ -152,7 +152,7 @@ const FinanceReport = () => {
       key: "total_profit_for_products",
       render: (value) => (
         <Text strong type={value >= 0 ? "success" : "danger"}>
-          {value >= 0 ? "+" : ""}Rs: {value.toFixed(2)}
+          Rs: {value >= 0 ? "+" : ""}{value.toFixed(2)}
         </Text>
       ),
     },
@@ -182,7 +182,7 @@ const FinanceReport = () => {
           <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
             <Statistic
               title="Total Income"
-              value={reportData.income?.total_income}
+              value={reportData.income.total_income}
               precision={2}
               prefix="Rs: "
               valueStyle={{ color: "#3f8600" }}
@@ -236,7 +236,7 @@ const FinanceReport = () => {
             <Col xs={24} sm={12} md={6}>
               <Statistic
                 title="Total Income"
-                value={reportData.income?.total_income}
+                value={reportData.income.total_income}
                 precision={2}
                 prefix="Rs: "
                 valueStyle={{ color: "#3f8600" }}
@@ -249,11 +249,6 @@ const FinanceReport = () => {
       {/* Orders Table */}
       <Card
         title={`Orders (${reportData.count})`}
-        extra={
-          <Text>
-            Generated: {new Date().toLocaleString()}
-          </Text>
-        }
       >
         <Table
           columns={columns}

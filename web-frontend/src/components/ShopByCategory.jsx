@@ -119,19 +119,6 @@ const ShopByCategory = () => {
                     </p>
                 )}
             </div>
-
-            {/* Optional: Hide scrollbar in webkit browsers */}
-            <style>
-                {`
-                .category-scroll::-webkit-scrollbar {
-                    height: 6px;
-                }
-                .category-scroll::-webkit-scrollbar-thumb {
-                    background: rgba(255,255,255,0.3);
-                    border-radius: 3px;
-                }
-                `}
-            </style>
         </section>
     );
 };
