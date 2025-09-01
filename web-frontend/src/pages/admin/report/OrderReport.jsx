@@ -203,16 +203,6 @@ const OrderReport = () => {
                         />
                     </Card>
                 </Col>
-                <Col xs={24} sm={12} md={8} lg={6}>
-                    <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
-                        <Statistic
-                            title="Total Orders"
-                            value={warehouse_report?.data?.reduce((sum, wh) => sum + (wh.order_count || 0), 0) || 0}
-                            prefix={<ShoppingOutlined />}
-                            valueStyle={{ color: "#faad14" }}
-                        />
-                    </Card>
-                </Col>
             </Row>
 
             {/* Reports Tabs */}
