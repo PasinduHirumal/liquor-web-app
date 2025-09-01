@@ -216,7 +216,23 @@ const OrderReport = () => {
             </Row>
 
             {/* Reports Tabs */}
-            <Tabs defaultActiveKey="warehouses">
+            <Tabs
+                defaultActiveKey="warehouses"
+                renderTabBar={(props, DefaultTabBar) => (
+                    <DefaultTabBar {...props}>
+                        {(node) => {
+                            const isActive = props.activeKey === node.key;
+                            return React.cloneElement(node, {
+                                style: {
+                                    color: isActive ? "" : "#ffffffff",
+                                    borderRadius: "6px",
+                                    transition: "all 0.3s ease",
+                                },
+                            });
+                        }}
+                    </DefaultTabBar>
+                )}
+            >
                 <TabPane tab="Warehouses Report" key="warehouses">
                     <Card title={`Warehouses (${warehouse_report?.count || 0})`}>
                         <Table
@@ -241,6 +257,7 @@ const OrderReport = () => {
                     </Card>
                 </TabPane>
             </Tabs>
+
 
             {/* Warehouse Details Modal */}
             <Modal
