@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import {
     Card, Table, Spin, Alert, Statistic, Row, Col, Typography,
-    Tag, Button, Modal, Tabs, Badge
+    Tag, Button, Modal, Tabs, Badge, message
 } from "antd";
 import {
     ShoppingOutlined, EyeOutlined, ShopOutlined,
-    HomeOutlined, CheckCircleOutlined, CloseCircleOutlined
+    HomeOutlined, CheckCircleOutlined, CloseCircleOutlined,
+    FilePdfOutlined, ReloadOutlined
 } from "@ant-design/icons";
+import { toast } from "react-hot-toast"
 import { axiosInstance } from "../../../lib/axios";
 
 const { Title, Text } = Typography;
@@ -20,6 +22,7 @@ const OrderReport = () => {
     const [selectedSupermarket, setSelectedSupermarket] = useState(null);
     const [warehouseModalVisible, setWarehouseModalVisible] = useState(false);
     const [supermarketModalVisible, setSupermarketModalVisible] = useState(false);
+    const [downloading, setDownloading] = useState(false);
 
     useEffect(() => {
         fetchReport();
@@ -43,6 +46,34 @@ const OrderReport = () => {
             setError(err.response?.data?.message || "Failed to fetch order report");
         } finally {
             setLoading(false);
+        }
+    };
+
+    // download PDF
+    const downloadPDF = async () => {
+        try {
+            setDownloading(true);
+            const response = await axiosInstance.get("/reports/orders", {
+                params: {
+                    status: "out_for_delivery",
+                    format: "pdf",
+                },
+                responseType: "blob",
+            });
+
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const link = document.createElement("a");
+            link.href = url;
+            link.setAttribute("download", "orders_report.pdf");
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            toast.success("PDF downloaded successfully");
+        } catch (err) {
+            console.error("Error downloading PDF:", err);
+            toast.error("Failed to download PDF");
+        } finally {
+            setDownloading(false);
         }
     };
 
@@ -177,9 +208,32 @@ const OrderReport = () => {
 
     return (
         <div style={{ padding: "20px" }}>
-            <Title level={2} style={{ color: "#fff" }}>
-                <ShoppingOutlined /> Order Report
-            </Title>
+            <Row justify="space-between" align="middle" style={{ marginBottom: "20px" }}>
+                <Col>
+                    <Title level={2} style={{ color: "#fff", marginBottom: 0 }}>
+                        <ShoppingOutlined /> Order Report
+                    </Title>
+                </Col>
+                <Col>
+                    <Button
+                        type="primary"
+                        icon={<ReloadOutlined />}
+                        onClick={fetchReport}
+                        style={{ marginRight: 8 }}
+                    >
+                        Refresh
+                    </Button>
+                    {/* ✅ Added Download PDF button */}
+                    <Button
+                        type="default"
+                        icon={<FilePdfOutlined />}
+                        loading={downloading}
+                        onClick={downloadPDF}
+                    >
+                        Download PDF
+                    </Button>
+                </Col>
+            </Row>
 
             {/* Summary Statistics */}
             <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
