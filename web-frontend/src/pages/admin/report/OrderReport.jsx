@@ -35,7 +35,7 @@ const OrderReport = () => {
 
             const response = await axiosInstance.get("/reports/orders", {
                 params: {
-                    status: "out_for_delivery",
+                    // status: "out_for_delivery",
                 },
             });
 
@@ -55,7 +55,7 @@ const OrderReport = () => {
             setDownloading(true);
             const response = await axiosInstance.get("/reports/orders", {
                 params: {
-                    status: "out_for_delivery",
+                    // status: "out_for_delivery",
                     format: "pdf",
                 },
                 responseType: "blob",
