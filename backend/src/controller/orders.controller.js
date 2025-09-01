@@ -138,6 +138,58 @@ const updateOrder = async (req, res) => {
             order = updatedOrderWithIsDriverAccepted;
         }
 
+        if (order.superMarket_ids.length === 0) {
+            try {
+                const product_ids = [];
+                const Super_Market_ids = [];
+
+                if (order.items && order.items.length > 0) {
+                    order.items.forEach(item => {
+                        if (item.product_id) {
+                            product_ids.push(item.product_id);
+                        } 
+                    });
+                }
+
+                if (product_ids.length > 0) {
+                    for (const product_id of product_ids) {
+                        try {
+                            let tempProduct = await liquorService.findById(product_id);
+                            if (!tempProduct) {
+                                tempProduct = await groceryService.findById(product_id);
+                            }
+
+                            const product = tempProduct;
+
+                            if (product && product.superMarket_id) {
+                                if (!Super_Market_ids.includes(product.superMarket_id)) {
+                                    Super_Market_ids.push(product.superMarket_id);
+                                }
+                            }
+                        } catch (productError) {
+                            console.error(`Error fetching product ${product_id}:`, productError);
+                        }
+                    }
+                }
+
+                if (Super_Market_ids.length > 0) {
+                    const updateData = {
+                        superMarket_ids: Super_Market_ids
+                    };
+
+                    const updatedOrderWithSuperMarketIds = await orderService.updateById(orderId, updateData);
+                    if (!updatedOrderWithSuperMarketIds) {
+                        return res.status(500).json({ success: true, message: "Failed to update order with supermarket ids"});
+                    }
+
+                    order = updatedOrderWithSuperMarketIds;
+                }
+            } catch (error) {
+                console.error("Error updating supermarket ids:", error);
+                return res.status(500).json({ success: false, message: "Failed to update supermarket ids" });
+            }
+        }
+
         let driver_duty = null;
         const isAssigningDriver = assigned_driver_id !== undefined;
         const isUpdatingStatus = status !== undefined;

@@ -202,20 +202,55 @@ class OrdersService extends BaseService {
 
     async getOrdersCountForSuperMarket(supermarket_id, additionalFilters = {}) {
         try {
+            // Handle date range filtering separately
+            if (additionalFilters.dateRange) {
+                const { start, end } = additionalFilters.dateRange;
+                
+                // Base query for supermarket
+                let timestampQuery = this.collection.where('superMarket_ids', 'array-contains', supermarket_id);
+                let isoQuery = this.collection.where('superMarket_ids', 'array-contains', supermarket_id);
+                
+                // Apply date filters
+                timestampQuery = timestampQuery
+                    .where('created_at', '>=', start)
+                    .where('created_at', '<=', end);
+                    
+                isoQuery = isoQuery
+                    .where('created_at', '>=', start.toISOString())
+                    .where('created_at', '<=', end.toISOString());
+                
+                // Apply other filters to both queries
+                Object.entries(additionalFilters).forEach(([field, value]) => {
+                    if (field !== 'dateRange' && value !== undefined && value !== null) {
+                        timestampQuery = timestampQuery.where(field, '==', value);
+                        isoQuery = isoQuery.where(field, '==', value);
+                    }
+                });
+                
+                // Execute both queries
+                const [timestampResults, isoResults] = await Promise.all([
+                    timestampQuery.get().catch(() => ({ docs: [] })),
+                    isoQuery.get().catch(() => ({ docs: [] }))
+                ]);
+                
+                // Combine results and remove duplicates
+                const allDocs = [...timestampResults.docs, ...isoResults.docs];
+                const uniqueDocs = allDocs.filter((doc, index, self) => 
+                    index === self.findIndex(d => d.id === doc.id)
+                );
+                
+                return uniqueDocs.length;
+            }
+            
+            // Handle non-date range filtering
             let query = this.collection.where('superMarket_ids', 'array-contains', supermarket_id);
 
-            // Apply additional filters (except date range which needs special handling)
+            // Apply additional filters
             Object.entries(additionalFilters).forEach(([field, value]) => {
                 if (field !== 'dateRange' && value !== undefined && value !== null) {
                     query = query.where(field, '==', value);
                 }
             });
-
-            // Handle date range separately if needed
-            if (additionalFilters.dateRange) {
-                const { start, end } = additionalFilters.dateRange;
-                query = query.where('created_at', '>=', start).where('created_at', '<=', end);
-            }
 
             const ordersRef = await query.get();
             return ordersRef.size;

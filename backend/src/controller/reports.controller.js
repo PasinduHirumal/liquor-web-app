@@ -185,6 +185,8 @@ const getOrdersReport = async (req, res) => {
             };
         }));
 
+        delete filters.warehouse_id;
+
         const supermarkets = await superMarketService.findAll();
         const supermarketReportData = await Promise.all(supermarkets.map(async (supermarket) => {
             const orderCount = await orderService.getOrdersCountForSuperMarket(supermarket.id, filters);
