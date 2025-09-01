@@ -202,6 +202,7 @@ const getOrdersReport = async (req, res) => {
         return res.status(200).json({ 
             success: true, 
             message: "Orders report fetched successfully",
+            filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
             data: {
                 warehouse_report: {
                     count: warehouseReportData.length,
@@ -447,6 +448,7 @@ const getDriversReport = async (req, res) => {
             success: true, 
             message: "Drivers report fetched successfully", 
             count: driversReportData.length,
+            filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
             data: populatedDrivers
         });
     } catch (error) {
