@@ -223,22 +223,25 @@ const LiquorProductDetail = () => {
                             </div>
 
 
-                            <div className="row m-0 gap-2">
-                                <div className="col-12 col-md-5 gap-2 profit">
-                                    <span className="detail-label">Profit Status</span>
-                                    <span
-                                        className={`detail-value ${product.isProfit ? "text-success" : "text-danger"}`}
-                                        style={{ fontWeight: "bold"}}
-                                    >
-                                        {product.isProfit ? "Profit" : "No Profit"}
-                                    </span>
+                            <div className="row m-0 g-2">
+                                <div className="col-12 col-md-6">
+                                    <div className="profit-box d-flex justify-content-between align-items-center">
+                                        <span className="detail-label">Profit Status</span>
+                                        <span
+                                            className={`detail-value ${product.isProfit ? "text-success" : "text-danger"}`}
+                                        >
+                                            {product.isProfit ? "Profit" : "No Profit"}
+                                        </span>
+                                    </div>
                                 </div>
 
-                                <div className="col-12 col-md-5 gap-2 profit">
-                                    <span className="detail-label">Profit Value</span>
-                                    <span className="detail-value" style={{ color: "#ffb703", fontWeight: "bold" }}>
-                                        Rs: {Number(product.profit_value || 0).toFixed(2)}
-                                    </span>
+                                <div className="col-12 col-md-6">
+                                    <div className="profit-box d-flex justify-content-between align-items-center">
+                                        <span className="detail-label">Profit Value</span>
+                                        <span className="detail-value text-warning">
+                                            Rs: {Number(product.profit_value || 0).toFixed(2)}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
 
