@@ -6,10 +6,10 @@ import toast from 'react-hot-toast';
 import DeleteDriverButton from '../../components/admin/buttons/DeleteDriverButton';
 import {
     Table, Button, Space, Tag, Switch,
-    Card, Row, Col, Typography, Select, Badge, Input, Tooltip
+    Card, Row, Col, Typography, Select, Badge, Tooltip
 } from 'antd';
 import {
-    EditOutlined, PlusOutlined, ReloadOutlined, FilterOutlined, SearchOutlined, RightOutlined
+    PlusOutlined, ReloadOutlined, FilterOutlined, RightOutlined
 } from '@ant-design/icons';
 
 const { Title, Text } = Typography;
@@ -38,6 +38,7 @@ const DriverList = () => {
 
     const navigate = useNavigate();
 
+    // Fetch warehouses
     const fetchWarehouses = useCallback(async () => {
         try {
             const response = await axiosInstance.get('/system/details');
@@ -48,40 +49,40 @@ const DriverList = () => {
         }
     }, []);
 
+    // Fetch drivers
     const fetchDrivers = useCallback(async () => {
         setLoading(true);
         try {
-            // Convert filters to query parameters
             const params = {
-                isActive: filters.isActive,
-                isAvailable: filters.isAvailable,
-                isOnline: filters.isOnline,
-                isDocumentVerified: filters.isDocumentVerified,
-                search: filters.search,
+                ...filters,
                 page: pagination.current,
                 limit: pagination.pageSize
             };
 
-            // Remove undefined parameters
+            // convert string "true"/"false" to actual boolean
             Object.keys(params).forEach(key => {
                 if (params[key] === undefined || params[key] === '') {
                     delete params[key];
+                } else if (params[key] === 'true') {
+                    params[key] = true;
+                } else if (params[key] === 'false') {
+                    params[key] = false;
                 }
             });
 
             const response = await axiosInstance.get('/drivers/allDrivers', { params });
 
-            // Enhance driver data with warehouse names
-            const enhancedDrivers = response.data.data.map(driver => {
-                const warehouse = warehouses.find(w => w.id === driver.where_house_id);
+            const enhancedDrivers = (response.data.data || []).map(driver => {
+                const warehouse = driver.where_house_id || {};
                 return {
                     ...driver,
-                    warehouseName: warehouse?.where_house_name || 'Unassigned',
-                    warehouseCode: warehouse?.where_house_code || ''
+                    warehouseName: warehouse.name || 'Unassigned',
+                    warehouseCode: warehouse.code || '',
+                    warehouseId: warehouse.id || null
                 };
             });
 
-            setDrivers(enhancedDrivers || []);
+            setDrivers(enhancedDrivers);
             setPagination(prev => ({
                 ...prev,
                 total: response.data.count || 0,
@@ -92,7 +93,7 @@ const DriverList = () => {
         } finally {
             setLoading(false);
         }
-    }, [filters, pagination.current, pagination.pageSize, warehouses]);
+    }, [filters, pagination.current, pagination.pageSize]);
 
     useEffect(() => {
         fetchWarehouses();
@@ -136,7 +137,6 @@ const DriverList = () => {
     const columns = [
         {
             title: 'Driver',
-            dataIndex: 'firstName',
             key: 'driver',
             render: (_, record) => (
                 <Space direction="vertical" size={0}>
@@ -149,7 +149,7 @@ const DriverList = () => {
                     {record.nic_number && <Text type="secondary">NIC: {record.nic_number}</Text>}
                 </Space>
             ),
-            width: 150,
+            width: 180,
             fixed: 'left',
         },
         {
@@ -159,10 +159,10 @@ const DriverList = () => {
                 <Space direction="vertical" size={0}>
                     <Text>{record.email}</Text>
                     <Text>{record.phone}</Text>
-                    <Text type="secondary">{record.city}</Text>
+                    {record.city && <Text type="secondary">{record.city}</Text>}
                 </Space>
             ),
-            width: 200,
+            width: 220,
         },
         {
             title: 'Vehicle',
@@ -171,25 +171,20 @@ const DriverList = () => {
                 <Space direction="vertical" size={0}>
                     {record.vehicleType && <Text strong>{record.vehicleType}</Text>}
                     {record.vehicleModel && <Text>{record.vehicleModel}</Text>}
-                    {record.vehicleNumber && (
-                        <Tag color="blue">{record.vehicleNumber}</Tag>
-                    )}
+                    {record.vehicleNumber && <Tag color="blue">{record.vehicleNumber}</Tag>}
                 </Space>
             ),
-            width: 150,
+            width: 180,
         },
         {
             title: 'Warehouse',
             key: 'warehouse',
             render: (_, record) => (
-                <Tooltip
-                    title={`Code: ${record.warehouseCode}`}
-                    placement="topLeft"
-                >
+                <Tooltip title={`Code: ${record.warehouseCode}`} placement="topLeft">
                     <Space direction="vertical" size={0}>
                         <Text strong>{record.warehouseName}</Text>
-                        {record.where_house_id && (
-                            <Text type="secondary">ID: {record.where_house_id}</Text>
+                        {record.warehouseId && (
+                            <Text type="secondary">ID: {record.warehouseId}</Text>
                         )}
                     </Space>
                 </Tooltip>
@@ -199,7 +194,7 @@ const DriverList = () => {
                 text: w.where_house_name,
                 value: w.id,
             })),
-            onFilter: (value, record) => record.where_house_id === value,
+            onFilter: (value, record) => record.warehouseId === value,
         },
         {
             title: 'Status',
@@ -217,7 +212,7 @@ const DriverList = () => {
                     </Tag>
                 </Space>
             ),
-            width: 120,
+            width: 140,
         },
         {
             title: 'Documents',
@@ -229,15 +224,18 @@ const DriverList = () => {
                     </Tag>
                     {record.backgroundCheckStatus && (
                         <Tag color={
-                            record.backgroundCheckStatus === 'approved' ? 'green' :
-                                record.backgroundCheckStatus === 'pending' ? 'orange' : 'red'
+                            record.backgroundCheckStatus === 'approved'
+                                ? 'green'
+                                : record.backgroundCheckStatus === 'pending'
+                                    ? 'orange'
+                                    : 'red'
                         }>
                             {record.backgroundCheckStatus}
                         </Tag>
                     )}
                 </Space>
             ),
-            width: 120,
+            width: 140,
         },
         {
             title: 'Actions',
@@ -255,7 +253,7 @@ const DriverList = () => {
                     />
                 </Space>
             ),
-            width: 100,
+            width: 120,
             fixed: 'right',
         },
     ];
