@@ -71,6 +71,7 @@ const createProduct = async (req, res) => {
         // calculate price
         const markedPrice = marked_price ?? 0;
         const discountPercentage = discount_percentage ?? 0;
+        const costPrice = cost_price ?? 0;
 
         const updatedPrices = validatePriceOperation(markedPrice, discountPercentage);
         if (!updatedPrices.isValid) {
@@ -82,7 +83,7 @@ const createProduct = async (req, res) => {
             if (req.body.discount_amount) delete req.body.discount_amount;
         }
 
-        const profit = updatedPrices.newPrice - cost_price || 0;
+        const profit = updatedPrices.newPrice - costPrice || 0;
 
         Object.assign(productData, {
             selling_price: updatedPrices.newPrice,
