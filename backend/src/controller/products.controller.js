@@ -12,7 +12,6 @@ import { deleteImages, uploadImages, uploadSingleImage } from '../utils/firebase
 import { validateStockOperation } from '../utils/stockCalculator.js';
 import { validatePriceOperation } from '../utils/priceCalculator.js';
 import { createStockHistory } from './stockHistory.controller.js';
-import WORKSPACE from '../enums/workspace.js';
 
 
 const productService = new ProductService();
@@ -20,11 +19,11 @@ const categoryService = new CategoryService();
 const stockHistoryService = new StockHistoryService();
 const marketService = new SuperMarketService();
 const appInfoService = new AppInfoService();
-const ordersService = new OrdersService
+const ordersService = new OrdersService();
 
 const createProduct = async (req, res) => {
 	try {
-        const { marked_price, discount_percentage, category_id, main_image, images, superMarket_id } = req.body;
+        const { cost_price, marked_price, discount_percentage, category_id, main_image, images, superMarket_id } = req.body;
 
         const category = await categoryService.findById(category_id);
         if (!category) {
@@ -92,10 +91,14 @@ const createProduct = async (req, res) => {
             if (req.body.discount_amount) delete req.body.discount_amount;
         }
 
+        const profit = updatedPrices.newPrice - cost_price || 0;
+
         Object.assign(productData, { 
             price: updatedPrices.newPrice,
             selling_price: updatedPrices.newPrice,
             discount_amount: updatedPrices.discount,
+            profit_value: profit,
+            isProfit: profit > 0,
             ...req.body 
         });
 
@@ -236,7 +239,7 @@ const getProductById = async (req, res) => {
 const updateProduct = async (req, res) => {
 	try {
         const productId = req.params.id;
-        const { marked_price, discount_percentage, add_quantity, withdraw_quantity, category_id, images, main_image, superMarket_id } = req.body;
+        const { cost_price, marked_price, discount_percentage, add_quantity, withdraw_quantity, category_id, images, main_image, superMarket_id } = req.body;
 
         const product = await productService.findById(productId);
         if (!product) {
@@ -296,6 +299,7 @@ const updateProduct = async (req, res) => {
         // update price
         const markedPrice = marked_price ?? product.marked_price;
         const discountPercentage = discount_percentage ?? product.discount_percentage;
+        const costPrice = cost_price ?? product.cost_price;
 
         const updatedPrices = validatePriceOperation(markedPrice, discountPercentage);
         if (!updatedPrices.isValid) {
@@ -334,10 +338,14 @@ const updateProduct = async (req, res) => {
             if (req.body.discount_amount) delete req.body.discount_amount;
         }
 
+        const profit = updatedPrices.newPrice - costPrice || 0;
+
         Object.assign(updateData, { 
             price: updatedPrices.newPrice,
             selling_price: updatedPrices.newPrice,
             discount_amount: updatedPrices.discount,
+            profit_value: profit,
+            isProfit: profit > 0,
             stock_quantity: stockValidation.newStock,
             ...req.body 
         });
