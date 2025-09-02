@@ -237,6 +237,26 @@ const OtherProductDetail = () => {
                             {renderPriceSection()}
 
                             <div className="product-status-section">
+
+                                <div className="row m-0 gap-2">
+                                    <div className="col-12 col-md-5 gap-2 profit">
+                                        <span className="detail-label">Profit Status</span>
+                                        <span
+                                            className={`detail-value ${product.isProfit ? "text-success" : "text-danger"}`}
+                                            style={{ fontWeight: "bold" }}
+                                        >
+                                            {product.isProfit ? "Profit" : "No Profit"}
+                                        </span>
+                                    </div>
+
+                                    <div className="col-12 col-md-5 gap-2 profit">
+                                        <span className="detail-label">Profit Value</span>
+                                        <span className="detail-value" style={{ color: "#ffb703", fontWeight: "bold" }}>
+                                            Rs: {Number(product.profit_value || 0).toFixed(2)}
+                                        </span>
+                                    </div>
+                                </div>
+
                                 <div className={`stock-status ${product.is_in_stock ? 'in-stock' : 'out-of-stock'}`}>
                                     {product.is_in_stock ? (
                                         <>
