@@ -236,10 +236,10 @@ const getProductById = async (req, res) => {
     }
 };
 
-const updateProduct = async (req, res) => {
+const updateProductById = async (req, res) => {
 	try {
         const productId = req.params.id;
-        const { cost_price, marked_price, discount_percentage, add_quantity, withdraw_quantity, category_id, images, main_image, superMarket_id } = req.body;
+        const { category_id, images, main_image } = req.body;
 
         const product = await productService.findById(productId);
         if (!product) {
@@ -251,21 +251,6 @@ const updateProduct = async (req, res) => {
             if (!category) {
                 return res.status(400).json({ success: false, message: "Invalid category"});
             }
-        }
-
-        const updateData = {};
-
-        if (superMarket_id !== undefined) {
-            const superMarket = await marketService.findById(superMarket_id);
-            if (!superMarket) {
-                return res.status(404).json({ success: false, message: "Super market not found"});
-            }
-
-            if (!superMarket.isActive) {
-                return res.status(400).json({ success: false, message: "Super market not in active"});
-            }
-            
-            updateData.product_from = `${superMarket.superMarket_Name} - ${superMarket.city}`;
         }
 
         if (images !== undefined) {
@@ -296,70 +281,7 @@ const updateProduct = async (req, res) => {
             }
         }
 
-        // update price
-        const markedPrice = marked_price ?? product.marked_price;
-        const discountPercentage = discount_percentage ?? product.discount_percentage;
-        const costPrice = cost_price ?? product.cost_price;
-
-        const updatedPrices = validatePriceOperation(markedPrice, discountPercentage);
-        if (!updatedPrices.isValid) {
-            return res.status(400).json({ success: false, message: stockValidation.error });
-        }
-
-        // quantity update
-        const stockValidation = validateStockOperation(
-            product.stock_quantity, 
-            add_quantity, 
-            withdraw_quantity
-        );
-
-        if (!stockValidation.isValid) {
-            return res.status(400).json({ success: false, message: stockValidation.error });
-        }
-
-        // update history 
-        let historyId = '';
-        if (add_quantity !== undefined || withdraw_quantity !== undefined) {
-            const stockUpdateResult  = await createStockHistory({ 
-                addQuantity: add_quantity,
-                withdrawQuantity: withdraw_quantity,
-                productId: productId,
-                userId: req.user.id
-            });
-
-            if (!stockUpdateResult.shouldCreateHistory) {
-                return res.status(400).json({ success: false, message: stockUpdateResult.error });
-            }
-            historyId = stockUpdateResult.historyId;
-        }
-
-        if (req.body.selling_price || req.body.discount_amount) {
-            if (req.body.selling_price) delete req.body.selling_price;
-            if (req.body.discount_amount) delete req.body.discount_amount;
-        }
-
-        const profit = updatedPrices.newPrice - costPrice || 0;
-
-        Object.assign(updateData, { 
-            price: updatedPrices.newPrice,
-            selling_price: updatedPrices.newPrice,
-            discount_amount: updatedPrices.discount,
-            profit_value: profit,
-            isProfit: profit > 0,
-            stock_quantity: stockValidation.newStock,
-            ...req.body 
-        });
-
-        if (updateData.stock_quantity <= 0) {
-            updateData.is_in_stock = false;
-        }
-
-        if (historyId !== '') {
-            const currentStockHistory = product.stockHistory || [];
-            const updatedStockHistory = [...currentStockHistory, historyId];
-
-            updateData.stockHistory = updatedStockHistory;
-        }
+        const updateData = {  ...req.body };
         
         const updatedProduct = await productService.updateById(productId, updateData);
         if (!updatedProduct) {
@@ -377,7 +299,130 @@ const updateProduct = async (req, res) => {
     }
 };
 
-const deleteProduct = async (req, res) => {
+const updatePriceById = async (req, res) => {
+	try {
+        const productId = req.params.id;
+        const { cost_price, marked_price, discount_percentage, superMarket_id } = req.body;
+
+        const product = await productService.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found"});
+        }
+
+        const updateData = {};
+
+        if (superMarket_id !== undefined) {
+            const superMarket = await marketService.findById(superMarket_id);
+            if (!superMarket) {
+                return res.status(404).json({ success: false, message: "Super market not found"});
+            }
+
+            if (!superMarket.isActive) {
+                return res.status(400).json({ success: false, message: "Super market not in active"});
+            }
+            
+            updateData.product_from = `${superMarket.superMarket_Name} - ${superMarket.city}`;
+        }
+
+        const markedPrice = marked_price ?? product.marked_price;
+        const discountPercentage = discount_percentage ?? product.discount_percentage;
+        const costPrice = cost_price ?? product.cost_price;
+
+        const updatedPrices = validatePriceOperation(markedPrice, discountPercentage);
+        if (!updatedPrices.isValid) {
+            return res.status(400).json({ success: false, message: stockValidation.error });
+        }
+
+        const profit = updatedPrices.newPrice - costPrice || 0;
+
+        Object.assign(updateData, {
+            price: updatedPrices.newPrice,
+            selling_price: updatedPrices.newPrice,
+            discount_amount: updatedPrices.discount,
+            profit_value: profit,
+            isProfit: profit > 0,
+            ...req.body
+        });
+
+        const updatedProduct = await productService.updateById(productId, updateData);
+        if (!updatedProduct) {
+            return res.status(400).json({ success: false, message: "Failed to update product"});
+        }
+
+        const populatedProduct = await populateCategory(updatedProduct);
+
+        const { searchTokens, ...productWithoutSearchTokens } = populatedProduct;
+
+        return res.status(200).json({ success: true, message: "Price updated successfully", data: productWithoutSearchTokens});
+    } catch (error) {
+        console.error("Update Price error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+const updateStockById = async (req, res) => {
+	try {
+        const productId = req.params.id;
+        const { add_quantity, withdraw_quantity } = req.body;
+
+        const product = await productService.findById(productId);
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found"});
+        }
+
+        const stockQuantity = product.stock_quantity;
+        const addQuantity = add_quantity ?? 0;
+        const removeQuantity = withdraw_quantity ?? 0;
+
+        const stockValidation = validateStockOperation(
+            stockQuantity, 
+            addQuantity, 
+            removeQuantity
+        );
+
+        if (!stockValidation.isValid) {
+            return res.status(400).json({ success: false, message: stockValidation.error });
+        }
+
+        const stockUpdateResult  = await createStockHistory({ 
+            addQuantity: add_quantity,
+            withdrawQuantity: withdraw_quantity,
+            productId: productId,
+            userId: req.user.id
+        });
+
+        if (!stockUpdateResult.shouldCreateHistory) {
+            return res.status(400).json({ success: false, message: stockUpdateResult.error });
+        }
+
+        const updateData = {
+            stock_quantity: stockValidation.newStock,
+            is_in_stock: stockValidation.newStock <= 0,
+            ...req.body 
+        }
+
+        const currentStockHistory = product.stockHistory || [];
+        const updatedStockHistory = [...currentStockHistory, stockUpdateResult.historyId];
+
+        updateData.stockHistory = updatedStockHistory;
+
+        const updatedProduct = await productService.updateById(productId, updateData);
+        if (!updatedProduct) {
+            return res.status(400).json({ success: false, message: "Failed to update product"});
+        }
+
+        const populatedProduct = await populateCategory(updatedProduct);
+
+        const { searchTokens, ...productWithoutSearchTokens } = populatedProduct;
+        
+        return res.status(200).json({ success: true, message: "Product stock updated successfully", data: productWithoutSearchTokens});
+    } catch (error) {
+        console.error("Product stock update error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+const deleteProductById = async (req, res) => {
 	try {
         const productId = req.params.id;
 
@@ -465,4 +510,14 @@ const migrateSearchTokens = async (req, res) => {
 };
 
 
-export { getAllProducts, getProductById, createProduct, updateProduct, deleteProduct, updateActiveToggle, migrateSearchTokens };
+export { 
+    getAllProducts, 
+    getProductById, 
+    createProduct, 
+    updateProductById,
+    updateStockById,
+    updatePriceById,
+    deleteProductById, 
+    updateActiveToggle, 
+    migrateSearchTokens 
+};
