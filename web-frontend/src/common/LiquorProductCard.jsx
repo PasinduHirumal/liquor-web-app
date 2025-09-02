@@ -38,6 +38,33 @@ const LiquorProductCard = ({ product, adminOnly = false, userOnly = true }) => {
         onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
         onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
       >
+        {adminOnly && (
+          <div
+            className="header d-flex justify-content-between align-items-center px-2 py-1"
+            style={{
+              backgroundColor: "#141722",
+              borderBottom: "1px solid #1c1f2b",
+              fontSize: "0.85rem",
+              fontWeight: "bold",
+              color: "#fff",
+            }}
+          >
+            <span>
+              {product.isProfit ? (
+                <span style={{ color: "#22c55e" }}>Profit</span>
+              ) : (
+                <span style={{ color: "#ef4444" }}>No Profit</span>
+              )}
+            </span>
+            <span>
+              Profit Value:{" "}
+              <span style={{ color: "#ffb703" }}>
+                Rs: {Number(product.profit_value || 0).toFixed(2)}
+              </span>
+            </span>
+          </div>
+        )}
+
         <div style={{ position: "relative" }}>
           {activeImage ? (
             <img
