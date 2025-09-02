@@ -19,6 +19,8 @@ class OtherProducts {
         this.selling_price = data.selling_price; 
         this.discount_percentage = data.discount_percentage;
         this.discount_amount = data.discount_amount;
+        this.profit_value = data.profit_value;
+        this.isProfit = data.isProfit;
 
         this.add_quantity = data.add_quantity;
         this.withdraw_quantity = data.withdraw_quantity;

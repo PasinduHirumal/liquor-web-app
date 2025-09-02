@@ -1,14 +1,14 @@
 
 // Run this script once to add search tokens to existing documents
-import ProductService from '../services/product.service.js';
+import OtherProductService from '../services/otherProduct.service.js';
 
-const liquorService = new ProductService();
+const groceryService = new OtherProductService();
 
-async function migrateLiquorProfits() {
+async function migrateGroceryProfits() {
     try {
         console.log('🚀 Starting liquor items profit migration...');
         
-        const result = await liquorService.addProfitValueToExistingDocuments();
+        const result = await groceryService.addProfitValueToExistingDocuments();
         
         console.log('✅ Migration Results:');
         console.log(`   📝 Total documents: ${result.total}`);
@@ -29,7 +29,7 @@ async function migrateLiquorProfits() {
 }
 
 // Run migration
-migrateLiquorProfits();
+migrateGroceryProfits();
 
 // Alternative: Export for use in routes
-export { migrateLiquorProfits };
+export { migrateGroceryProfits };
