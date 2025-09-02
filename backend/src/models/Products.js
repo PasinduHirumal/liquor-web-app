@@ -23,6 +23,8 @@ class Products {
         this.selling_price = data.selling_price; // calculated from backend
         this.discount_percentage = data.discount_percentage; // if you give any discount
         this.discount_amount = data.discount_amount; // calculated from backend
+        this.profit_value = data.profit_value;
+        this.isProfit = data.isProfit;
         
         this.add_quantity = data.add_quantity;
         this.withdraw_quantity = data.withdraw_quantity;

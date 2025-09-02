@@ -1,4 +1,5 @@
-// migration.js - Run this script once to add search tokens to existing documents
+
+// Run this script once to add search tokens to existing documents
 import SuperMarketService from '../services/superMarket.service.js';
 
 const marketService = new SuperMarketService();

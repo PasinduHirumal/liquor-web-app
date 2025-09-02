@@ -79,6 +79,46 @@ class ProductService extends BaseService {
         }
     }
 
+    async addProfitValueToExistingDocuments() {
+        try {
+            console.log(`Starting Profit Value migration for ${this.collection.id}...`);
+            
+            const allDocs = await this.findAll();
+            let processed = 0;
+            let errors = 0;
+            
+            for (const doc of allDocs) {
+                try {
+                    const doc_id = doc.id != null ? doc.id : doc[this.idField];
+
+                    const profit = doc.selling_price - doc.cost_price;
+                    const isProfit = profit > 0;
+
+                    const updateData = {
+                        profit_value: profit,
+                        isProfit: isProfit
+                    };
+
+                    await this.updateById(doc_id, updateData);
+                    processed++;
+                    
+                    if (processed % 10 === 0) {
+                        console.log(`Processed ${processed}/${allDocs.length} documents...`);
+                    }
+                } catch (error) {
+                    console.error(`Error updating document ${doc.id}:`, error.message);
+                    errors++;
+                }
+            }
+            
+            console.log(`Migration complete! Processed: ${processed}, Errors: ${errors}`);
+            return { processed, errors, total: allDocs.length };
+        } catch (error) {
+            console.error('Migration failed:', error.message);
+            throw error;
+        }
+    }
+
 }
 
 export default ProductService;
