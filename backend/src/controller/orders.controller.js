@@ -125,6 +125,7 @@ const updateOrder = async (req, res) => {
             return res.status(404).json({ success: false, message: "Order not found"});
         }
 
+        // update order with if it is driver accepted or not
         if (order.is_driver_accepted === undefined){
             const updateOrderData = {
                 is_driver_accepted: false
@@ -138,6 +139,7 @@ const updateOrder = async (req, res) => {
             order = updatedOrderWithIsDriverAccepted;
         }
 
+        // updater order with supermarket id's of products
         if (!order.superMarket_ids || order.superMarket_ids.length === 0) {
             try {
                 const product_ids = [];
@@ -201,6 +203,7 @@ const updateOrder = async (req, res) => {
 
         const SuperMarket_ids_for_order_table = [];
 
+        // assign driver & create driver duty
         if (isAssigningDriver && !order.is_driver_accepted) {
             const driver = await driverService.findById(assigned_driver_id);
             if (!driver) {
@@ -282,8 +285,8 @@ const updateOrder = async (req, res) => {
         }
 
         const updateData = { ...req.body };
-        updateData.superMarket_ids = SuperMarket_ids_for_order_table;
 
+        if (SuperMarket_ids_for_order_table > 0) updateData.superMarket_ids = SuperMarket_ids_for_order_table;
         if (isAssigningDriver) updateData.status = ORDER_STATUS.PROCESSING;
 
         const updatedOrder = await orderService.updateById(orderId, updateData);
