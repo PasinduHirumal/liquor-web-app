@@ -138,12 +138,12 @@ const updateOrder = async (req, res) => {
             order = updatedOrderWithIsDriverAccepted;
         }
 
-        if (order.superMarket_ids.length === 0) {
+        if (!order.superMarket_ids || order.superMarket_ids.length === 0) {
             try {
                 const product_ids = [];
                 const Super_Market_ids = [];
 
-                if (order.items && order.items.length > 0) {
+                if (order.items && Array.isArray(order.items) && order.items.length > 0) {
                     order.items.forEach(item => {
                         if (item.product_id) {
                             product_ids.push(item.product_id);
@@ -229,7 +229,7 @@ const updateOrder = async (req, res) => {
                 const product_ids = [];
                 const Super_Market_ids = [];
 
-                if (order.items && order.items.length > 0) {
+                if (order.items && Array.isArray(order.items) && order.items.length > 0) {
                     order.items.forEach(item => {
                        if (item.product_id) {
                         product_ids.push(item.product_id);
@@ -283,7 +283,7 @@ const updateOrder = async (req, res) => {
 
         // get product id's and quantity
         const orderItemsToCreate = [];
-        if (order.items && order.items.length > 0) {
+        if (order.items && Array.isArray(order.items) && order.items.length > 0) {
             order.items.forEach(item => {
                 if (item.product_id && item.quantity) {
                     orderItemsToCreate.push({
@@ -302,6 +302,8 @@ const updateOrder = async (req, res) => {
                     const result = await createOrderItem({
                         order_id: order.order_id,
                         product_id: itemData.product_id,
+                        cost_price: itemData.unitCostPrice ?? 0,
+                        unit_price: itemData.unit_price ?? 0,
                         quantity: itemData.quantity
                     });
                     

@@ -6,7 +6,16 @@ class Orders {
         this.order_number = data.order_number;
         this.order_date = data.order_date;
         this.user_id = data.user_id;
-        this.items = data.items;
+        this.items = data.items?.map(item => ({
+            product_id: item.product_id,
+            product_name: item.product_name,
+            product_image: item.product_image,
+            unitCostPrice: item.unitCostPrice,
+            unit_price: item.unit_price,
+            quantity: item.quantity,
+            total_cost_price: item.total_cost_price,
+            total_price: item.total_price
+        })) || [];
         
         this.delivery_address_id = data.delivery_address_id;
         this.distance = data.distance;

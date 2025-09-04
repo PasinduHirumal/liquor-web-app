@@ -10,7 +10,7 @@ const userService = new UserService();
 const liquorService = new ProductService();
 const groceryService = new OtherProductService();
 
-const createOrderItem = async ({ order_id, product_id, quantity }) => {
+const createOrderItem = async ({ order_id, product_id, cost_price, unit_price, quantity }) => {
 	try {
         const filters = {};
 
@@ -32,8 +32,11 @@ const createOrderItem = async ({ order_id, product_id, quantity }) => {
             }
 
             const product = product_temp;
-            const profitValue = parseFloat((product.selling_price - product.cost_price).toFixed(2));
-            const total_price = parseFloat((product.selling_price * quantity).toFixed(2));
+            const cost__price = cost_price;
+            const selling__price = unit_price;
+
+            const profitValue = parseFloat((selling__price - cost__price).toFixed(2));
+            const total_price = parseFloat((selling__price * quantity).toFixed(2));
 
             const orderItemData = {
                 order_id: order_id,
@@ -46,10 +49,10 @@ const createOrderItem = async ({ order_id, product_id, quantity }) => {
                 product_name: product.name,
                 product_image: product.main_image,
                 product_quantity: quantity,
-                unit_cost_price: product.cost_price,
+                unit_cost_price: cost__price,
                 unit_marked_price: product.marked_price,
                 unit_discount_value: product.discount_amount,
-                unit_selling_price: product.selling_price,
+                unit_selling_price: selling__price,
                 unit_profit_value: profitValue,
                 isProfit: profitValue > 0,
                 total_price: total_price

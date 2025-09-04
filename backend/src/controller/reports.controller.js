@@ -17,7 +17,7 @@ const superMarketService = new SuperMarketService();
 
 const getOrdersReport = async (req, res) => {
 	try {
-        const { status = ORDER_STATUS.DELIVERED, format, start_date, end_date } = req.query;
+        const { status = ORDER_STATUS.PROCESSING, format, start_date, end_date } = req.query;
 
         const filters = {};
         const filterDescription = [];
@@ -159,7 +159,7 @@ const getOrdersReport = async (req, res) => {
 
 const getFinanceReport = async (req, res) => {
     try {
-        const { status = ORDER_STATUS.DELIVERED, where_house_id, format, start_date, end_date } = req.query;
+        const { status = ORDER_STATUS.PROCESSING, where_house_id, format, start_date, end_date } = req.query;
 
         const filters = {};
         const filterDescription = [];
