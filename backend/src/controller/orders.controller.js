@@ -4,14 +4,12 @@ import CompanyService from "../services/company.service.js";
 import DriverDutyService from '../services/driverDuty.service.js';
 import ProductService from '../services/product.service.js';
 import OtherProductService from '../services/otherProduct.service.js';
-import OrderItemsService from '../services/orderItems.service.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
 import populateUser from '../utils/populateUser.js';
 import populateDriver from '../utils/populateDriver.js';
 import populateWhereHouse from "../utils/populateWhere_House.js";
 import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
 import { populateAddressWithUserIdInData } from '../utils/populateAddress.js';
-import { createOrderItem } from './orderItems.controller.js';
 
 
 const orderService = new OrdersService();
@@ -20,7 +18,6 @@ const dutyService = new DriverDutyService();
 const companyService = new CompanyService();
 const liquorService = new ProductService();
 const groceryService = new OtherProductService();
-const orderItemsService = new OrderItemsService();
 
 
 const getAllOrders = async (req, res) => {
@@ -125,18 +122,11 @@ const updateOrder = async (req, res) => {
             return res.status(404).json({ success: false, message: "Order not found"});
         }
 
+        const updateOrderData = {};
+
         // update order with if it is driver accepted or not
         if (order.is_driver_accepted === undefined){
-            const updateOrderData = {
-                is_driver_accepted: false
-            };
-
-            const updatedOrderWithIsDriverAccepted = await orderService.updateById(orderId, updateOrderData);
-            if (!updatedOrderWithIsDriverAccepted) {
-                return res.status(500).json({ success: true, message: "Failed to update is_driver_accepted in order"});
-            }
-
-            order = updatedOrderWithIsDriverAccepted;
+            updateOrderData.is_driver_accepted = false;
         }
 
         // updater order with supermarket id's of products
@@ -175,21 +165,17 @@ const updateOrder = async (req, res) => {
                 }
 
                 if (Super_Market_ids.length > 0) {
-                    const updateData = {
-                        superMarket_ids: Super_Market_ids
-                    };
-
-                    const updatedOrderWithSuperMarketIds = await orderService.updateById(orderId, updateData);
-                    if (!updatedOrderWithSuperMarketIds) {
-                        return res.status(500).json({ success: true, message: "Failed to update order with supermarket ids"});
-                    }
-
-                    order = updatedOrderWithSuperMarketIds;
+                    updateOrderData.superMarket_ids = Super_Market_ids;
                 }
             } catch (error) {
                 console.error("Error updating supermarket ids:", error);
                 return res.status(500).json({ success: false, message: "Failed to update supermarket ids" });
             }
+        }
+
+        if (Object.keys(updateOrderData).length > 0) {
+            const updatedOrderWithSupermarketIdsAndIsDriverAccepted = await orderService.updateById(orderId, updateOrderData);
+            order = updatedOrderWithSupermarketIdsAndIsDriverAccepted;
         }
 
         let driver_duty = null;
@@ -286,12 +272,12 @@ const updateOrder = async (req, res) => {
 
         const updateData = { ...req.body };
 
-        if (SuperMarket_ids_for_order_table > 0) updateData.superMarket_ids = SuperMarket_ids_for_order_table;
+        if (SuperMarket_ids_for_order_table.length > 0) updateData.superMarket_ids = SuperMarket_ids_for_order_table;
         if (isAssigningDriver) updateData.status = ORDER_STATUS.PROCESSING;
 
         const updatedOrder = await orderService.updateById(orderId, updateData);
         if (!updatedOrder) {
-            return res.status(500).json({ success: true, message: "Failed to update order"});
+            return res.status(500).json({ success: false, message: "Failed to update order"});
         }
 
         let successMessage = "Order updated successfully";
