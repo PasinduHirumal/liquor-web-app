@@ -281,43 +281,6 @@ const updateOrder = async (req, res) => {
             }
         }
 
-        // get product id's and quantity
-        const orderItemsToCreate = [];
-        if (order.items && Array.isArray(order.items) && order.items.length > 0) {
-            order.items.forEach(item => {
-                if (item.product_id && item.quantity) {
-                    orderItemsToCreate.push({
-                        product_id: item.product_id,
-                        quantity: item.quantity
-                    });
-                }
-            });
-        }
-
-        // call createOrderItem
-        const orderItemResults = [];
-        if (orderItemsToCreate.length > 0) {
-            for (const itemData of orderItemsToCreate) {
-                try {
-                    const result = await createOrderItem({
-                        order_id: order.order_id,
-                        product_id: itemData.product_id,
-                        cost_price: itemData.unitCostPrice ?? 0,
-                        unit_price: itemData.unit_price ?? 0,
-                        quantity: itemData.quantity
-                    });
-                    
-                    if (result.success) {
-                        orderItemResults.push(result.result);
-                    } else {
-                        console.error(`Failed to create order item for product ${itemData.product_id}:`, result.error);
-                    }
-                } catch (error) {
-                    console.error(`Error creating order item for product ${itemData.product_id}:`, error);
-                }
-            }
-        }
-
         const updateData = { ...req.body };
         updateData.superMarket_ids = SuperMarket_ids_for_order_table;
 
@@ -341,7 +304,6 @@ const updateOrder = async (req, res) => {
             success: true, 
             message: successMessage, 
             data: {
-                order_items: orderItemResults,
                 duty: driver_duty,
                 order: updatedOrder
             }

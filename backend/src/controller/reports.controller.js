@@ -221,62 +221,30 @@ const getFinanceReport = async (req, res) => {
             return new Date(a.created_at) - new Date(b.created_at);
         });
 
-        // Get order IDs for order items fetching
-        const orderIds = sortedOrders.map(order => order.order_id);
-
-        let orderItemsMapping = {};
-
-        try {
-            orderItemsMapping = await orderItemsService.getOrderItemsMapping(orderIds);
-        } catch (error) {
-            console.error('Error fetching order items mapping:', error);
-            // Continue with empty mapping as fallback
-        }
-
         let Total_Profit_From_Products = 0
 
         // Filter orders to include only specific fields
         const filteredOrderData = sortedOrders.map(order => {
             const processedItems = order.items?.map(item => {
-                const orderItemData = orderItemsMapping[order.order_id]?.[item.product_id];
+
+                const quantity = item.quantity;
+                const unitSellingPrice = item.unit_price;
+                const unitCostPrice = item.unitCostPrice;
+                const unitProfitValue = unitSellingPrice - unitCostPrice;
+
+                return {
+                    product_id: item.product_id,
+                    product_name: item.product_name,
+                    unit_price_of_product_selling: parseFloat(unitSellingPrice.toFixed(2)),
+                    unit_price_of_product_cost: parseFloat(unitCostPrice.toFixed(2)),
+                    unit_profit_of_product: parseFloat(unitProfitValue.toFixed(2)),
+                    quantity: quantity,
+                    is_profit: unitProfitValue > 0,
+                    total_price_for_products_selling: parseFloat((unitSellingPrice * quantity).toFixed(2)),
+                    total_price_for_products_cost: parseFloat((unitCostPrice * quantity).toFixed(2)),
+                    total_profit_for_products: parseFloat((unitProfitValue * quantity).toFixed(2)),
+                };
                 
-                if (orderItemData) {
-                    // Use data directly from OrderItems table
-                    const quantity = orderItemData.product_quantity || item.quantity;
-                    const unitSellingPrice = orderItemData.unit_selling_price;
-                    const unitCostPrice = orderItemData.unit_cost_price;
-                    const unitProfitValue = orderItemData.unit_profit_value;
-                    
-                    return {
-                        product_id: item.product_id,
-                        product_name: orderItemData.product_name,
-                        unit_price_of_product_selling: parseFloat(unitSellingPrice.toFixed(2)),
-                        unit_price_of_product_cost: parseFloat(unitCostPrice.toFixed(2)),
-                        unit_profit_of_product: parseFloat(unitProfitValue.toFixed(2)),
-                        quantity: quantity,
-                        is_profit: unitProfitValue > 0,
-                        total_price_for_products_selling: parseFloat((unitSellingPrice * quantity).toFixed(2)),
-                        total_price_for_products_cost: parseFloat((unitCostPrice * quantity).toFixed(2)),
-                        total_profit_for_products: parseFloat((unitProfitValue * quantity).toFixed(2)),
-                    };
-                } else {
-                    // Fallback to original logic if order item not found
-                    const unitPrice = parseFloat(item.unit_price || 0);
-                    const unitProfit = 0; // Default to 0 if no order item data
-                    
-                    return {
-                        product_id: item.product_id,
-                        product_name: item.product_name,
-                        unit_price_of_product_selling: unitPrice,
-                        unit_price_of_product_cost: unitPrice - unitProfit,
-                        unit_profit_of_product: parseFloat(unitProfit.toFixed(2)),
-                        quantity: item.quantity,
-                        is_profit: unitProfit > 0,
-                        total_price_for_products_selling: parseFloat((unitPrice * item.quantity).toFixed(2)),
-                        total_price_for_products_cost: parseFloat(((unitPrice - unitProfit) * item.quantity).toFixed(2)),
-                        total_profit_for_products: parseFloat((unitProfit * item.quantity).toFixed(2)),
-                    };
-                }
             }) || [];
 
             // Calculate total profit from all products in this order
