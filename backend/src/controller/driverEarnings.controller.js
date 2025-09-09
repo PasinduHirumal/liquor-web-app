@@ -9,6 +9,14 @@ const appInfoService = new AppInfoService();
 
 const createDriverEarning = async (driver_id, order_id) => {
     try {
+        const existingDriverEarning = await driverEarningService.findByOrderId(order_id);
+        if (existingDriverEarning) {
+            return { 
+                shouldCreateEarning: false, 
+                error: "Driver earning for this order already created" 
+            };
+        }
+
         const order = await orderService.findById(order_id);
         if (!order) {
             return { 
