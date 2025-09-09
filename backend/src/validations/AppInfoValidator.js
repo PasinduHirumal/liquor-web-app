@@ -10,7 +10,7 @@ const validateAppInfoUpdate = (req, res, next) => {
     description: Joi.string().min(1).max(100).optional(),
     app_version: Joi.number().positive().precision(6).optional(),
     is_liquor_show: Joi.boolean().optional(),
-    commissionRate_drivers: Joi.number().min(0).max(100).optional(),
+    //commissionRate_drivers: Joi.number().min(0).max(100).optional(),
   })
   .min(1) // Require at least one field to update
   .options({ stripUnknown: true });; 

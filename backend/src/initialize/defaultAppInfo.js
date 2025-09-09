@@ -13,7 +13,8 @@ const createDefaultAppInfo = async () => {
             const appInfoData = { 
                 description: APP_INFO.DESCRIPTION,
                 app_version: APP_INFO.APP_VERSION,
-                is_liquor_show: APP_INFO.IS_LIQUOR_SHOW
+                is_liquor_show: APP_INFO.IS_LIQUOR_SHOW,
+                commissionRate_drivers: APP_INFO.COMMISSION_RATE_FOR_DRIVERS
             };
 
             await appInfoService.create(appInfoData);

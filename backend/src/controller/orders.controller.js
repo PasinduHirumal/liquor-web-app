@@ -4,12 +4,14 @@ import CompanyService from "../services/company.service.js";
 import DriverDutyService from '../services/driverDuty.service.js';
 import ProductService from '../services/product.service.js';
 import OtherProductService from '../services/otherProduct.service.js';
+import DriverEarningsService from '../services/driverEarnings.service.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
 import populateUser from '../utils/populateUser.js';
 import populateDriver from '../utils/populateDriver.js';
 import populateWhereHouse from "../utils/populateWhere_House.js";
 import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
 import { populateAddressWithUserIdInData } from '../utils/populateAddress.js';
+import { createDriverEarning, updateDriverEarning } from './driverEarnings.controller.js';
 
 
 const orderService = new OrdersService();
@@ -18,6 +20,7 @@ const dutyService = new DriverDutyService();
 const companyService = new CompanyService();
 const liquorService = new ProductService();
 const groceryService = new OtherProductService();
+const driverEarningService = new DriverEarningsService();
 
 
 const getAllOrders = async (req, res) => {
@@ -179,6 +182,7 @@ const updateOrder = async (req, res) => {
         }
 
         let driver_duty = null;
+        let driver_earning = null;
         const isAssigningDriver = assigned_driver_id !== undefined;
         const isUpdatingStatus = status !== undefined;
 
@@ -268,12 +272,34 @@ const updateOrder = async (req, res) => {
                 console.error("Error creating driver duty:", error);
                 return res.status(500).json({ success: false, message: "Failed to creating driver duty" });
             }
+
+            // create driver earning
+            const existingDriverEarning = await driverEarningService.findByOrderId(orderId);
+            if (!existingDriverEarning) {
+                const created_earning = await createDriverEarning(assigned_driver_id, orderId);
+
+                if (!created_earning.shouldCreateEarning) {
+                    return res.status(400).json({ success: false, message: created_earning.error });
+                }
+
+                driver_earning = created_earning.data;
+            } else {
+                const earning_id = existingDriverEarning.earning_id;
+                const updated_earning = await updateDriverEarning(assigned_driver_id, earning_id);
+
+                if (!updated_earning.shouldUpdateEarning) {
+                    return res.status(400).json({ success: false, message: updated_earning.error });
+                }
+
+                driver_earning = updated_earning.data;
+            }
         }
 
         const updateData = { ...req.body };
 
         if (SuperMarket_ids_for_order_table.length > 0) updateData.superMarket_ids = SuperMarket_ids_for_order_table;
         if (isAssigningDriver) updateData.status = ORDER_STATUS.PROCESSING;
+        if (driver_earning !== null) updateData.driver_earning_id = driver_earning.earning_id;
 
         const updatedOrder = await orderService.updateById(orderId, updateData);
         if (!updatedOrder) {
@@ -294,6 +320,7 @@ const updateOrder = async (req, res) => {
             message: successMessage, 
             data: {
                 duty: driver_duty,
+                earning: driver_earning,
                 order: updatedOrder
             }
         });

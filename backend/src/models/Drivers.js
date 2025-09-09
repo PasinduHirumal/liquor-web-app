@@ -60,6 +60,7 @@ class Drivers {
         this.taxId = data.taxId;
         this.commissionRate = data.commissionRate; 
         this.totalEarnings = data.totalEarnings;
+        this.totalWithdraws = data.totalWithdraws;
         this.currentBalance = data.currentBalance;
         this.paymentMethod = data.paymentMethod;
 

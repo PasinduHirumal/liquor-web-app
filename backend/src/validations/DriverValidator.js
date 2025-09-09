@@ -118,6 +118,7 @@ const validateDriver = (req, res, next) => {
     taxId: Joi.string().max(50).allow('').default(null),
     commissionRate: Joi.number().min(0).max(1).default(0.15), // percentage
     totalEarnings: Joi.number().min(0).default(0),
+    totalWithdraws: Joi.number().min(0).default(0),
     currentBalance: Joi.number().min(0).default(0),
     paymentMethod: Joi.string().valid('bank_transfer', 'mobile_money', 'cash', 'digital_wallet').default('bank_transfer'),
 
