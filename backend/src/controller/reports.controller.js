@@ -2,6 +2,8 @@ import OrdersService from '../services/orders.service.js';
 import DriverService from "../services/driver.service.js";
 import CompanyService from '../services/company.service.js';
 import SuperMarketService from '../services/superMarket.service.js';
+import DriverEarningsService from '../services/driverEarnings.service.js';
+import DriverPaymentService from '../services/driverPayment.service.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
 import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
 import populateWhereHouse from '../utils/populateWhere_House.js';
@@ -11,6 +13,8 @@ const orderService = new OrdersService();
 const driverService = new DriverService();
 const warehouseService = new CompanyService();
 const superMarketService = new SuperMarketService();
+const driverEarningsService = new DriverEarningsService();
+const driverPaymentService = new DriverPaymentService();
 
 
 const getOrdersReport = async (req, res) => {
@@ -325,6 +329,8 @@ const getDriversReport = async (req, res) => {
 
         const driversReportData = await Promise.all(sortedDrivers.map(async (driver) => {
             const deliveryOverviewResult = await orderService.getDeliveryStats(driver.id);
+            const Total_Earnings = await driverEarningsService.getTotalEarningForDriver(driver.id);
+            const Total_Withdraws = await driverPaymentService.getTotalPaymentsForDriver(driver.id);
 
             return {
                 driver_id: driver.id,
@@ -342,6 +348,9 @@ const getDriversReport = async (req, res) => {
                 completedDeliveries: deliveryOverviewResult.completed,
                 cancelledDeliveries: deliveryOverviewResult.cancelled,
                 totalDeliveries: deliveryOverviewResult.total,
+                totalEarnings: Total_Earnings,
+                totalWithdraws: Total_Withdraws,
+                currentBalance: Total_Earnings - Total_Withdraws
             };
         }));
 
