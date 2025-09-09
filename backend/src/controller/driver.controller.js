@@ -1,5 +1,6 @@
 import DriverService from "../services/driver.service.js";
 import CompanyService from "../services/company.service.js";
+import AppInfoService from "../services/appInfo.service.js";
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import BACKGROUND_STATUS from "../enums/driverBackgroundStatus.js";
 import populateWhereHouse from "../utils/populateWhere_House.js";
@@ -7,6 +8,7 @@ import { deleteImages, uploadImages, uploadSingleImage } from '../utils/firebase
 
 const driverService = new DriverService();
 const companyService = new CompanyService();
+const appInfoService = new AppInfoService()
 
 const createDriver = async (req, res) => {
 	try {
@@ -49,7 +51,13 @@ const createDriver = async (req, res) => {
             req.body.profileImage = randomAvatar;
         }
 
-        const driverData = { ...req.body };
+        const appInfo_Result = await appInfoService.getCommissionRateForDrivers();
+        const commissionRate = appInfo_Result.success ? appInfo_Result.commissionRate : 0;
+
+        const driverData = { 
+            commissionRate: commissionRate,
+            ...req.body 
+        };
 
         // random password
         const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');

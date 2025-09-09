@@ -57,6 +57,44 @@ class DriverService extends BaseService {
         return await bcrypt.compare(plainPassword, hashedPassword);
     }
 
+    async updateCommissionRateForAllDrivers(commission_rate) {
+        try {
+            // Fetch all drivers
+            const drivers = await this.findAll();
+            if (drivers.length === 0) {
+                throw new Error("No drivers found")
+            }
+
+            // Update each driver's commission rate
+            const updatePromises = drivers.map(async (driver) => {
+                const updateData = {
+                    commissionRate: commission_rate
+                }
+
+                return await this.updateById(driver.id, updateData);
+            });
+
+            // Wait for all updates to complete
+            const updateResults = await Promise.all(updatePromises);
+
+            // Check if all updates were successful
+            const failedUpdates = updateResults.filter(result => !result || result.error);
+            if (failedUpdates.length > 0) {
+                throw new Error(`Failed to update ${failedUpdates.length} drivers`);
+            }
+
+            return {
+                success: true,
+                message: `Successfully updated commission rate to ${commission_rate} for all drivers`, 
+                before_count: drivers.length,
+                updated_count: drivers.length,
+                successful_updates: updateResults.length
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default DriverService;

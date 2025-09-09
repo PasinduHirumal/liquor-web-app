@@ -1,8 +1,10 @@
 import APP_INFO from "../data/AppInfo.js";
 import AppInfoService from "../services/appInfo.service.js";
+import DriverService from "../services/driver.service.js";
 import updateLiquorProductsActiveStatus from "../utils/updateActiveToggleForLiquor.js";
 
 const appInfoService = new AppInfoService();
+const driverService = new DriverService();
 
 const getAllAppData = async (req, res) => {
 	try {
@@ -122,10 +124,13 @@ const updateActiveToggle = async (req, res) => {
 
         return res.status(200).json({ 
             success: true, 
-            message: "Successfully updated liquor settings",
+            message: result.message,
             data: {
-                app_liquor_show: toggleValue,
-                products_updated: result.successful_updates
+                appInfo : updatedApp,
+                products: {
+                    app_liquor_show: toggleValue,
+                    products_updated: result.successful_updates
+                }
             }
         });
     } catch (error) {
@@ -134,4 +139,43 @@ const updateActiveToggle = async (req, res) => {
     }
 };
 
-export { getAllAppData, getMainAppInfo, updateAppInfoById, updateActiveToggle };
+const updateCommissionRate = async (req, res) => {
+	try {
+        const AppRegNumber = APP_INFO.REG_NUMBER;
+        const { commissionRate_drivers } = req.body;
+
+        const app = await appInfoService.findByRegNumber(AppRegNumber);
+        if (!app) {
+            return res.status(404).json({ success: false, message: "App not found"});
+        }
+
+        const updateData = { 
+            commissionRate_drivers: commissionRate_drivers
+        };
+
+        // update app-info
+        const updatedApp = await appInfoService.updateById(app.id, updateData);
+
+        // update all drivers, commission value
+        const commissionRate = commissionRate_drivers;
+        const result = await driverService.updateCommissionRateForAllDrivers(commissionRate);
+
+        return res.status(200).json({ 
+            success: true, 
+            message: result.message,
+            data: {
+                appInfo : updatedApp,
+                drivers: {
+                    commissionRate_drivers: commissionRate_drivers,
+                    before_count: result.before_count,
+                    drivers_updated: result.successful_updates
+                }
+            }
+        });
+    } catch (error) {
+        console.error("Update commission rate error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+export { getAllAppData, getMainAppInfo, updateAppInfoById, updateActiveToggle, updateCommissionRate };

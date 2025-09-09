@@ -1,6 +1,5 @@
 import OrdersService from '../services/orders.service.js';
 import DriverService from "../services/driver.service.js";
-import OrderItemsService from '../services/orderItems.service.js';
 import CompanyService from '../services/company.service.js';
 import SuperMarketService from '../services/superMarket.service.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
@@ -10,7 +9,6 @@ import { generateOrdersPDF, generateDriversPDF } from '../utils/generatePDF.js';
 
 const orderService = new OrdersService();
 const driverService = new DriverService();
-const orderItemsService = new OrderItemsService();
 const warehouseService = new CompanyService();
 const superMarketService = new SuperMarketService();
 

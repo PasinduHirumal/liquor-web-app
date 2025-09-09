@@ -1,8 +1,8 @@
 import express from 'express';
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import { authenticateUser, authorizeRoles } from '../middleware/authMiddleware.js';
-import { validateAppInfoUpdate, validateLiquorActiveToggleUpdate } from '../validations/AppInfoValidator.js';
-import { getAllAppData, getMainAppInfo, updateActiveToggle, updateAppInfoById } from '../controller/appInfo.controller.js';
+import { validateAppInfoUpdate, validateCommissionRateUpdate, validateLiquorActiveToggleUpdate } from '../validations/AppInfoValidator.js';
+import { getAllAppData, getMainAppInfo, updateActiveToggle, updateAppInfoById, updateCommissionRate } from '../controller/appInfo.controller.js';
 
 const router = express.Router();
 
@@ -14,6 +14,7 @@ const super_admin = ADMIN_ROLES.SUPER_ADMIN;
 router.get('/getAll', authenticateUser, authorizeRoles(super_admin), getAllAppData);
 router.get('/getMainAppInfo', authenticateUser, authorizeRoles(super_admin), getMainAppInfo);
 router.patch('/update/toggle', authenticateUser, authorizeRoles(super_admin), validateLiquorActiveToggleUpdate, updateActiveToggle);
+router.patch('/update/commissionRate', authenticateUser, authorizeRoles(super_admin), validateCommissionRateUpdate, updateCommissionRate);
 router.patch('/update/:id', authenticateUser, authorizeRoles(super_admin), validateAppInfoUpdate, updateAppInfoById);
 
 

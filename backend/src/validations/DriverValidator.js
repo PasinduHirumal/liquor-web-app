@@ -442,9 +442,9 @@ const validateFinancialUpdate = (req, res, next) => {
     bankName: Joi.string().max(100).allow('').optional(),
     bankBranch: Joi.string().max(100).allow('').optional(),
     taxId: Joi.string().max(50).allow('').optional(),
-    commissionRate: Joi.number().min(0).max(1).optional(),
-    totalEarnings: Joi.number().min(0).optional(),
-    currentBalance: Joi.number().min(0).optional(),
+    //commissionRate: Joi.number().min(0).max(1).optional(),
+    //totalEarnings: Joi.number().min(0).optional(),
+    //currentBalance: Joi.number().min(0).optional(),
     paymentMethod: Joi.string().valid('bank_transfer', 'mobile_money', 'cash', 'digital_wallet').optional(),
   })
   .min(1) // Require at least one field to update
