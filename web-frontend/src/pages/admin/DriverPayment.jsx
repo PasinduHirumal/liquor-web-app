@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { Table, Typography, Spin } from "antd";
+import { Table, Typography, Spin, Button, Tooltip } from "antd";
+import { HistoryOutlined, DollarOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
 
@@ -30,6 +31,16 @@ function DriverPayment() {
         fetchDrivers();
     }, []);
 
+    const handleHistory = (driver) => {
+        toast.success(`Viewing history for ${driver.firstName} ${driver.lastName}`);
+        // 👉 Add your navigation or modal logic here
+    };
+
+    const handlePayment = (driver) => {
+        toast.success(`Processing payment for ${driver.firstName} ${driver.lastName}`);
+        // 👉 Add your navigation or modal logic here
+    };
+
     const columns = [
         {
             title: "Full Name",
@@ -42,7 +53,6 @@ function DriverPayment() {
                 </div>
             ),
         },
-
         {
             title: "Email",
             dataIndex: "email",
@@ -88,6 +98,29 @@ function DriverPayment() {
             width: 150,
             render: (value) => `Rs: ${value || 0}`,
         },
+        {
+            title: "Actions",
+            key: "actions",
+            width: 120,
+            render: (_, record) => (
+                <div style={{ display: "flex", gap: "8px" }}>
+                    <Tooltip title="View History">
+                        <Button
+                            type="primary"
+                            icon={<HistoryOutlined />}
+                            onClick={() => handleHistory(record)}
+                        />
+                    </Tooltip>
+                    <Tooltip title="Make Payment">
+                        <Button
+                            type="default"
+                            icon={<DollarOutlined />}
+                            onClick={() => handlePayment(record)}
+                        />
+                    </Tooltip>
+                </div>
+            ),
+        },
     ];
 
     return (
@@ -102,7 +135,7 @@ function DriverPayment() {
                     rowKey="id"
                     bordered
                     pagination={{ pageSize: 10 }}
-                    scroll={{ x: 1500 }} // 👈 horizontal scroll enabled
+                    scroll={{ x: 1600 }}
                 />
             )}
         </div>
