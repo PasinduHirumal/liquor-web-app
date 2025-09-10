@@ -471,6 +471,12 @@ const DriverDetailPage = () => {
                                     Rs: {driver.currentBalance?.toFixed(2) || '0.00'}
                                 </span>
                             </div>
+                            <div className="driver-detail-grid-item">
+                                <span className="driver-detail-info-label">Total Withdraws</span>
+                                <span className="driver-detail-info-value">
+                                    Rs: {driver.totalWithdraws?.toFixed(2) || '0.00'}
+                                </span>
+                            </div>
                         </div>
                     </div>
 
