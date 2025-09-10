@@ -1,16 +1,25 @@
 import React, { useEffect, useState } from "react";
-import { Table, Typography, Spin, Button, Tooltip } from "antd";
+import {
+    Table,
+    Typography,
+    Spin,
+    Button,
+    Tooltip,
+} from "antd";
 import { HistoryOutlined, DollarOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
 import DriverHistoryModal from "../../components/admin/DriverHistoryModal.jsx";
+import DriverPaymentModal from "../../components/admin/DriverPaymentModal.jsx";
 
 const { Title } = Typography;
 
 function DriverPayment() {
     const [drivers, setDrivers] = useState([]);
     const [loading, setLoading] = useState(false);
+
     const [historyModalVisible, setHistoryModalVisible] = useState(false);
+    const [paymentModalVisible, setPaymentModalVisible] = useState(false);
     const [selectedDriver, setSelectedDriver] = useState(null);
 
     useEffect(() => {
@@ -40,12 +49,17 @@ function DriverPayment() {
     };
 
     const handlePayment = (driver) => {
-        toast.success(`Processing payment for ${driver.firstName} ${driver.lastName}`);
-        // 👉 Add your payment logic here
+        setSelectedDriver(driver);
+        setPaymentModalVisible(true);
     };
 
-    const handleCloseModal = () => {
+    const handleCloseHistoryModal = () => {
         setHistoryModalVisible(false);
+        setSelectedDriver(null);
+    };
+
+    const handleClosePaymentModal = () => {
+        setPaymentModalVisible(false);
         setSelectedDriver(null);
     };
 
@@ -61,24 +75,9 @@ function DriverPayment() {
                 </div>
             ),
         },
-        {
-            title: "Email",
-            dataIndex: "email",
-            key: "email",
-            width: 200,
-        },
-        {
-            title: "NIC Number",
-            dataIndex: "nic_number",
-            key: "nic_number",
-            width: 160,
-        },
-        {
-            title: "License Number",
-            dataIndex: "license_number",
-            key: "license_number",
-            width: 160,
-        },
+        { title: "Email", dataIndex: "email", key: "email", width: 200 },
+        { title: "NIC Number", dataIndex: "nic_number", key: "nic_number", width: 160 },
+        { title: "License Number", dataIndex: "license_number", key: "license_number", width: 160 },
         {
             title: "Warehouse ID",
             key: "where_house_id",
@@ -147,10 +146,17 @@ function DriverPayment() {
                 />
             )}
 
-            {/* History Modal */}
+            {/* Driver History Modal */}
             <DriverHistoryModal
                 visible={historyModalVisible}
-                onClose={handleCloseModal}
+                onClose={handleCloseHistoryModal}
+                driver={selectedDriver}
+            />
+
+            {/* Payment Modal (moved to new component) */}
+            <DriverPaymentModal
+                visible={paymentModalVisible}
+                onClose={handleClosePaymentModal}
                 driver={selectedDriver}
             />
         </div>
