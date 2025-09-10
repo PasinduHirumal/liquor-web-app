@@ -32,46 +32,60 @@ function DriverPayment() {
 
     const columns = [
         {
+            title: "Full Name",
+            key: "fullName",
+            width: 220,
+            render: (_, record) => (
+                <div>
+                    <div className="font-bold">{`${record.firstName || ""} ${record.lastName || ""}`}</div>
+                    <div style={{ fontSize: 12, color: "#888" }}>{record.id?.toLowerCase()}</div>
+                </div>
+            ),
+        },
+
+        {
             title: "Email",
             dataIndex: "email",
             key: "email",
-        },
-        {
-            title: "Full Name",
-            key: "fullName",
-            render: (_, record) => `${record.firstName || ""} ${record.lastName || ""}`,
+            width: 200,
         },
         {
             title: "NIC Number",
             dataIndex: "nic_number",
             key: "nic_number",
+            width: 160,
         },
         {
             title: "License Number",
             dataIndex: "license_number",
             key: "license_number",
+            width: 160,
         },
         {
             title: "Warehouse ID",
             key: "where_house_id",
-            render: (_, record) => `${record.where_house_id.name || ""}`,
+            width: 180,
+            render: (_, record) => `${record.where_house_id?.name || ""}`,
         },
         {
             title: "Total Earnings",
             dataIndex: "totalEarnings",
             key: "totalEarnings",
+            width: 150,
             render: (value) => `Rs: ${value || 0}`,
         },
         {
             title: "Total Withdraws",
             dataIndex: "totalWithdraws",
             key: "totalWithdraws",
+            width: 150,
             render: (value) => `Rs: ${value || 0}`,
         },
         {
             title: "Current Balance",
             dataIndex: "currentBalance",
             key: "currentBalance",
+            width: 150,
             render: (value) => `Rs: ${value || 0}`,
         },
     ];
@@ -88,6 +102,7 @@ function DriverPayment() {
                     rowKey="id"
                     bordered
                     pagination={{ pageSize: 10 }}
+                    scroll={{ x: 1500 }} // 👈 horizontal scroll enabled
                 />
             )}
         </div>
