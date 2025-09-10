@@ -3,56 +3,48 @@ import CompanyService from '../services/company.service.js';
 
 const warehouseService = new CompanyService();
 
-// Helper function to build and validate filters
-async function buildFiltersForFinanceReport({ status, where_house_id, start_date, end_date }) {
-    const filters = {};
-    const filterDescription = [];
-    let validationError = null;
-
-    // Status validation
+function validateStatus(status, filters, filterDescription) {
     if (status !== undefined) {
         if (status && !Object.values(ORDER_STATUS).includes(status)) {
-            validationError = "Invalid status value";
-            return { filters, filterDescription, validationError };
+            return "Invalid status value";
         }
         filters.status = status;
         filterDescription.push(`status: ${status}`);
     }
+    return null;
+}
 
-    // Warehouse validation
+async function validateWarehouse(where_house_id, filters, filterDescription) {
     if (where_house_id !== undefined) {
         try {
             const where_house = await warehouseService.findById(where_house_id);
             if (!where_house) {
-                validationError = "Invalid warehouse id";
-                return { filters, filterDescription, validationError };
+                return "Invalid warehouse id";
             }
             filters.where_house_id = where_house_id;
             filterDescription.push(`warehouse_id: ${where_house_id}`);
         } catch (error) {
-            validationError = "Error validating warehouse id";
-            return { filters, filterDescription, validationError };
+            return "Error validating warehouse id";
         }
     }
+    return null;
+}
 
-    // Date range validation
+function validateDateRange(start_date, end_date, filters, filterDescription) {
     if (start_date !== undefined || end_date !== undefined) {
         if (!start_date || !end_date) {
-            validationError = "Both start_date and end_date are required for date filtering";
-            return { filters, filterDescription, validationError };
+            return "Both start_date and end_date are required for date filtering";
         }
 
         const startDate = new Date(start_date);
         const endDate = new Date(end_date);
         
         if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-            validationError = "Invalid date format. Use YYYY-MM-DD or MM/DD/YYYY";
-            return { filters, filterDescription, validationError };
+            return "Invalid date format. Use YYYY-MM-DD or MM/DD/YYYY";
         }
         
         if (startDate > endDate) {
-            validationError = "Start date must be before or equal to end date";
-            return { filters, filterDescription, validationError };
+            return "Start date must be before or equal to end date";
         }
         
         // Set time to beginning and end of day
@@ -62,8 +54,54 @@ async function buildFiltersForFinanceReport({ status, where_house_id, start_date
         filters.dateRange = { start: startDate, end: endDate };
         filterDescription.push(`date range: ${start_date} to ${end_date}`);
     }
+    return null;
+}
+
+// Helper function to build and validate filters for finance report
+async function buildFiltersForFinanceReport({ status, where_house_id, start_date, end_date }) {
+    const filters = {};
+    const filterDescription = [];
+    let validationError = null;
+
+    // Status validation
+    validationError = validateStatus(status, filters, filterDescription);
+    if (validationError) {
+        return { filters, filterDescription, validationError };
+    }
+
+    // Warehouse validation - now using the extracted function
+    validationError = await validateWarehouse(where_house_id, filters, filterDescription);
+    if (validationError) {
+        return { filters, filterDescription, validationError };
+    }
+
+    // Date range validation
+    validationError = validateDateRange(start_date, end_date, filters, filterDescription);
+    if (validationError) {
+        return { filters, filterDescription, validationError };
+    }
 
     return { filters, filterDescription, validationError };
 }
 
-export { buildFiltersForFinanceReport };
+async function buildFiltersForOrdersReport({ status, start_date, end_date }) {
+    const filters = {};
+    const filterDescription = [];
+    let validationError = null;
+
+    // Status validation
+    validationError = validateStatus(status, filters, filterDescription);
+    if (validationError) {
+        return { filters, filterDescription, validationError };
+    }
+
+    // Date range validation
+    validationError = validateDateRange(start_date, end_date, filters, filterDescription);
+    if (validationError) {
+        return { filters, filterDescription, validationError };
+    }
+
+    return { filters, filterDescription, validationError };
+}
+
+export { buildFiltersForFinanceReport, buildFiltersForOrdersReport };
