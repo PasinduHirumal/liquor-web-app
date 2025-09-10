@@ -8,6 +8,11 @@ const DriverPaymentModal = ({ visible, onClose, driver, refreshDriverData }) => 
     const [processingPayment, setProcessingPayment] = useState(false);
     const [paymentValue, setPaymentValue] = useState(null);
 
+    const handleClose = () => {
+        setPaymentValue(null); // reset input
+        onClose();
+    };
+
     const confirmPayment = async () => {
         if (!driver || !paymentValue) {
             toast.error("Please enter a payment amount");
@@ -28,7 +33,7 @@ const DriverPaymentModal = ({ visible, onClose, driver, refreshDriverData }) => 
                     await refreshDriverData(driver.id);
                 }
 
-                onClose();
+                handleClose();
             } else {
                 toast.error(response.data.message || "Payment failed");
             }
@@ -46,10 +51,10 @@ const DriverPaymentModal = ({ visible, onClose, driver, refreshDriverData }) => 
             open={visible}
             onOk={confirmPayment}
             confirmLoading={processingPayment}
-            onCancel={onClose}
+            onCancel={handleClose}
             okText="Confirm"
             cancelText="Cancel"
-            icon={<ExclamationCircleOutlined />}
+            maskClosable={false}
         >
             {driver && (
                 <Descriptions column={1} bordered size="small">

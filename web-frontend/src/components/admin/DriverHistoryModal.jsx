@@ -73,6 +73,7 @@ const DriverHistoryModal = ({ visible, onClose, driver }) => {
       title={<span className="text-xl font-bold">Driver Payment History</span>}
       open={visible}
       onCancel={onClose}
+      maskClosable={false}
       width={800}
       footer={[
         <Button key="close" onClick={onClose}>
