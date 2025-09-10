@@ -359,6 +359,15 @@ const AdminNavbar = () => {
                                 Reports
                             </StyledNavLink>
                         )}
+
+                        {isSuperAdmin && (
+                            <StyledNavLink
+                                to={`/driver-payments`}
+                                onClick={closeMobileMenu}
+                            >
+                                Driver payments
+                            </StyledNavLink>
+                        )}
                         
                         <StyledNavLink
                             to={`/profile/${user?._id || user?.id}`}
@@ -566,6 +575,17 @@ const AdminNavbar = () => {
                                     App Info
                                 </StyledNavLink>
                             )}
+                            
+                            {isSuperAdmin && (
+                                <StyledNavLink
+                                    to={`/driver-payments`}
+                                    onClick={closeMobileMenu}
+                                    sx={{ mb: 2 }}
+                                >
+                                    Driver payments
+                                </StyledNavLink>
+                            )}
+
                             <Button
                                 variant="contained"
                                 color="error"
