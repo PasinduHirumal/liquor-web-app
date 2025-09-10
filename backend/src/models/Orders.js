@@ -25,6 +25,7 @@ class Orders {
         this.delivery_fee = data.delivery_fee;
         this.subtotal = data.subtotal;
         this.tax_amount = data.tax_amount;
+        this.total_cost_price = data.total_cost_price;
         this.total_amount = data.total_amount;
 
         this.payment_method = data.payment_method;

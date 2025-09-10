@@ -23,9 +23,14 @@ class DriverEarningsService extends BaseService {
         }
     }
 
-    async findByDriverId(driver_id) {
+    async findByDriverAndOrderId(driver_id, order_id) {
         try {
-            const docs = await this.findByFilter('driver_id', '==', driver_id);
+            const filters = {
+                driver_id: driver_id,
+                order_id: order_id
+            };
+            
+            const docs = await this.findWithFilters(filters);
             if (docs.length === 0) {
                 return null;
             }

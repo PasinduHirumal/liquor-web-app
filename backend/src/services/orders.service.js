@@ -259,6 +259,18 @@ class OrdersService extends BaseService {
         }
     }
 
+    async getTotalCostForAllOrders(status) {
+        try {
+            const orders = await this.findByFilter('status', '==', status);
+
+            return orders.reduce((total, order) => {
+                return total + (order.total_cost_price || 0);
+            }, 0);
+        } catch (error) {
+            throw error;
+        }
+    }
+
 }
 
 export default OrdersService;

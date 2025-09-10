@@ -4,10 +4,13 @@ import CompanyService from '../services/company.service.js';
 import SuperMarketService from '../services/superMarket.service.js';
 import DriverEarningsService from '../services/driverEarnings.service.js';
 import DriverPaymentService from '../services/driverPayment.service.js';
-import ORDER_STATUS from '../enums/orderStatus.js';
+import ORDER_STATUS from "../enums/orderStatus.js";
+import ORDER_STATUS_FOR_REPORT from '../data/OrderStatus.js';
 import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
 import populateWhereHouse from '../utils/populateWhere_House.js';
 import { generateOrdersPDF, generateDriversPDF } from '../utils/generatePDF.js';
+import { buildFiltersForFinanceReport } from '../functions/BuildFilters.js';
+
 
 const orderService = new OrdersService();
 const driverService = new DriverService();
@@ -19,7 +22,7 @@ const driverPaymentService = new DriverPaymentService();
 
 const getOrdersReport = async (req, res) => {
 	try {
-        const { status = ORDER_STATUS.PROCESSING, format, start_date, end_date } = req.query;
+        const { status = ORDER_STATUS_FOR_REPORT, format, start_date, end_date } = req.query;
 
         const filters = {};
         const filterDescription = [];
@@ -161,62 +164,22 @@ const getOrdersReport = async (req, res) => {
 
 const getFinanceReport = async (req, res) => {
     try {
-        const { status = ORDER_STATUS.PROCESSING, where_house_id, format, start_date, end_date } = req.query;
+        const { status = ORDER_STATUS_FOR_REPORT, where_house_id, format, start_date, end_date } = req.query;
 
-        const filters = {};
-        const filterDescription = [];
+        const { filters, filterDescription, validationError } = await buildFiltersForFinanceReport({
+            status,
+            where_house_id,
+            start_date,
+            end_date
+        });
 
-        if (status !== undefined){
-            if (status && !Object.values(ORDER_STATUS).includes(status)) {
-                return res.status(400).json({ success: false, message: "Invalid status value" });
-            }
-            
-            filters.status = status;
-            filterDescription.push(`status: ${status}`);
-        }
-        if (where_house_id !== undefined) {
-            const where_house = await companyService.findById(where_house_id);
-            if (!where_house) {
-                return res.status(400).json({ success: false, message: "Invalid where house id" });
-            }
-            
-            filters.where_house_id = where_house_id;
-            filterDescription.push(`where_house_id: ${where_house_id}`);
-        }
-        if (start_date !== undefined || end_date !== undefined) {
-            if (start_date && end_date) {
-                const startDate = new Date(start_date);
-                const endDate = new Date(end_date);
-                
-                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                    return res.status(400).json({ 
-                        success: false, 
-                        message: "Invalid date format. Use YYYY-MM-DD or MM/DD/YYYY" 
-                    });
-                }
-                
-                if (startDate > endDate) {
-                    return res.status(400).json({ 
-                        success: false, 
-                        message: "Start date must be before or equal to end date" 
-                    });
-                }
-                
-                // Set time to beginning and end of day
-                startDate.setHours(0, 0, 0, 0);
-                endDate.setHours(23, 59, 59, 999);
-                
-                filters.dateRange = { start: startDate, end: endDate };
-                filterDescription.push(`date range: ${start_date} to ${end_date}`);
-            } else {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: "Both start_date and end_date are required for date filtering" 
-                });
-            }
+        if (validationError) {
+            return res.status(400).json({ success: false, message: validationError });
         }
         
-        const completedOrders = await orderService.findWithFilters(filters);
+        const completedOrders = Object.keys(filters).length > 0
+            ? await orderService.findWithFilters(filters)
+            : await orderService.findAll();
 
         // Sort by created_at in ascending order (oldest first)
         const sortedOrders = completedOrders.sort((a, b) => {
@@ -257,6 +220,7 @@ const getFinanceReport = async (req, res) => {
             const taxAmount = parseFloat(order.tax_amount || 0);
             const subtotal = parseFloat(order.subtotal || 0);
             const totalAmount = parseFloat(order.total_amount || 0);
+            const total_income = totalProfitFromProducts + deliveryFee + taxAmount;
 
             return {
                 order_id: order.order_id,
@@ -268,17 +232,29 @@ const getFinanceReport = async (req, res) => {
                     profit_from_products: parseFloat(totalProfitFromProducts.toFixed(2)),
                     delivery_fee: parseFloat(deliveryFee.toFixed(2)),
                     service_charge: parseFloat(taxAmount.toFixed(2)),
-                    total_income: parseFloat((totalProfitFromProducts + deliveryFee + taxAmount).toFixed(2))
+                    total_income: parseFloat(total_income.toFixed(2)),
                 },
                 total_cost: parseFloat((subtotal - totalProfitFromProducts).toFixed(2)),
-                total_income: parseFloat((totalProfitFromProducts + deliveryFee + taxAmount).toFixed(2)),
+                total_income: parseFloat(total_income.toFixed(2)),
                 total_amount: parseFloat(totalAmount.toFixed(2)),
             };
         });
 
+        // calculate income
         const Income_Result = await orderService.getTotalIncomeValues(sortedOrders);
 
-        const Total_Income = (Income_Result.Total_TAX + Income_Result.Total_Delivery_Fee + Total_Profit_From_Products) || 0;
+        const Total_Delivery_Charges = parseFloat(Income_Result.Total_Delivery_Fee || 0);
+        const Total_Tax_Charges = parseFloat(Income_Result.Total_TAX || 0);
+        const Total_Profits_From_Products = parseFloat(Total_Profit_From_Products.toFixed(2));
+        const Total_Income = parseFloat((Total_Tax_Charges + Total_Delivery_Charges + Total_Profits_From_Products).toFixed(2));
+
+        const Total_Payments_For_Drivers = await driverPaymentService.getTotalPaymentForAllDrivers();
+        const Total_Income_balance = parseFloat((Total_Income - Total_Payments_For_Drivers).toFixed(2));
+        
+        const Total_Cost_Value = await orderService.getTotalCostForAllOrders(ORDER_STATUS_FOR_REPORT);
+        const Total_Cost = parseFloat(Total_Cost_Value.toFixed(2));
+        //const Total_Balance = parseFloat((Income_Result.Total_Balance - Total_Payments_For_Drivers).toFixed(2));
+        const Total_Balance = parseFloat((Total_Income_balance + Total_Cost).toFixed(2));
 
         const message = "Orders report fetched successfully";
         return res.status(200).json({ 
@@ -287,12 +263,16 @@ const getFinanceReport = async (req, res) => {
             count: completedOrders.length,
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
             income : {
-                total_delivery_charges: parseFloat(Income_Result.Total_Delivery_Fee || 0),
-                total_tax_charges: parseFloat(Income_Result.Total_TAX || 0),
-                total_profits_from_products: parseFloat(Total_Profit_From_Products.toFixed(2)),
-                total_income: parseFloat(Total_Income.toFixed(2)),
+                total_delivery_charges: Total_Delivery_Charges,
+                total_tax_charges: Total_Tax_Charges,
+                total_profits_from_products: Total_Profits_From_Products,
+                total_income: Total_Income,
+                total_payments_for_drivers: Total_Payments_For_Drivers,
+                total_income_balance: Total_Income_balance,
             },
-            total_balance: Income_Result.Total_Balance,
+            total_income_balance: Total_Income_balance,
+            total_cost: Total_Cost,
+            total_balance: Total_Balance,
             data: filteredOrderData
         });
     } catch (error) {
@@ -331,6 +311,7 @@ const getDriversReport = async (req, res) => {
             const deliveryOverviewResult = await orderService.getDeliveryStats(driver.id);
             const Total_Earnings = await driverEarningsService.getTotalEarningForDriver(driver.id);
             const Total_Withdraws = await driverPaymentService.getTotalPaymentsForDriver(driver.id);
+            const Current_Balance = Total_Earnings - Total_Withdraws;
 
             return {
                 driver_id: driver.id,
@@ -350,7 +331,7 @@ const getDriversReport = async (req, res) => {
                 totalDeliveries: deliveryOverviewResult.total,
                 totalEarnings: Total_Earnings,
                 totalWithdraws: Total_Withdraws,
-                currentBalance: Total_Earnings - Total_Withdraws
+                currentBalance: Current_Balance,
             };
         }));
 

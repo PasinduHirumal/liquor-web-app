@@ -22,6 +22,18 @@ class DriverPaymentService extends BaseService {
         }
     }
 
+    async getTotalPaymentForAllDrivers() {
+        try {
+            const payments = await this.findAll();
+
+            return payments.reduce((total, payment) => {
+                return total + (payment.payment_value || 0);
+            }, 0);
+        } catch (error) {
+            throw error;
+        }
+    }
+
     async findAllByDriverId(driver_id) {
         try {
             const docs = await this.findByFilter('driver_id', '==', driver_id);
