@@ -6,7 +6,7 @@ import {
     Button,
     Tooltip,
 } from "antd";
-import { HistoryOutlined, DollarOutlined } from "@ant-design/icons";
+import { HistoryOutlined, DollarOutlined, ReloadOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
 import DriverHistoryModal from "../../components/admin/DriverHistoryModal.jsx";
@@ -17,31 +17,32 @@ const { Title } = Typography;
 function DriverPayment() {
     const [drivers, setDrivers] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     const [historyModalVisible, setHistoryModalVisible] = useState(false);
     const [paymentModalVisible, setPaymentModalVisible] = useState(false);
     const [selectedDriver, setSelectedDriver] = useState(null);
 
-    useEffect(() => {
-        const fetchDrivers = async () => {
-            try {
-                setLoading(true);
-                const response = await axiosInstance.get("/drivers/allDrivers");
-                if (response.data.success) {
-                    setDrivers(response.data.data || []);
-                } else {
-                    toast.error("Failed to fetch drivers");
-                }
-            } catch (error) {
-                console.error("Error fetching drivers:", error);
-                toast.error("Error fetching drivers");
-            } finally {
-                setLoading(false);
+    const fetchDrivers = async () => {
+        try {
+            setLoading(true);
+            const response = await axiosInstance.get("/drivers/allDrivers");
+            if (response.data.success) {
+                setDrivers(response.data.data || []);
+            } else {
+                toast.error("Failed to fetch drivers");
             }
-        };
+        } catch (error) {
+            console.error("Error fetching drivers:", error);
+            toast.error("Error fetching drivers");
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchDrivers();
-    }, []);
+    }, [refreshTrigger]);
 
     const handleHistory = (driver) => {
         setSelectedDriver(driver);
@@ -61,6 +62,10 @@ function DriverPayment() {
     const handleClosePaymentModal = () => {
         setPaymentModalVisible(false);
         setSelectedDriver(null);
+    };
+
+    const refreshDriverData = () => {
+        setRefreshTrigger(prev => prev + 1);
     };
 
     const columns = [
@@ -132,7 +137,18 @@ function DriverPayment() {
 
     return (
         <div style={{ padding: 24 }} className="bg-white">
-            <Title level={2}>Driver Payments</Title>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
+                <Title level={2}>Driver Payments</Title>
+                <Button
+                    type="primary"
+                    icon={<ReloadOutlined />}
+                    onClick={refreshDriverData}
+                    loading={loading}
+                >
+                    Refresh
+                </Button>
+            </div>
+
             {loading ? (
                 <Spin size="large" style={{ display: "block", margin: "50px auto" }} />
             ) : (
@@ -153,11 +169,12 @@ function DriverPayment() {
                 driver={selectedDriver}
             />
 
-            {/* Payment Modal (moved to new component) */}
+            {/* Payment Modal */}
             <DriverPaymentModal
                 visible={paymentModalVisible}
                 onClose={handleClosePaymentModal}
                 driver={selectedDriver}
+                refreshDriverData={refreshDriverData}
             />
         </div>
     );

@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import { Modal, Descriptions, InputNumber } from "antd";
-import { ExclamationCircleOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
 
@@ -9,7 +8,7 @@ const DriverPaymentModal = ({ visible, onClose, driver, refreshDriverData }) => 
     const [paymentValue, setPaymentValue] = useState(null);
 
     const handleClose = () => {
-        setPaymentValue(null); // reset input
+        setPaymentValue(null);
         onClose();
     };
 
@@ -30,7 +29,7 @@ const DriverPaymentModal = ({ visible, onClose, driver, refreshDriverData }) => 
                 toast.success(response.data.message);
 
                 if (refreshDriverData) {
-                    await refreshDriverData(driver.id);
+                    refreshDriverData();
                 }
 
                 handleClose();

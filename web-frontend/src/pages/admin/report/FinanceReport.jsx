@@ -33,7 +33,6 @@ const FinanceReport = () => {
           // status: "out_for_delivery",
         },
       });
-
       setReportData(response.data);
     } catch (err) {
       console.error("Error fetching report:", err);
@@ -51,7 +50,7 @@ const FinanceReport = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[200px] bg-white">
-        <Spin size="large" tip="Loading driver report..." />
+        <Spin size="large" tip="Loading finance report..." />
       </div>
     );
   }
@@ -168,7 +167,7 @@ const FinanceReport = () => {
 
       {/* Summary Section */}
       <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
-        <Col xs={24} sm={12} md={8} lg={6}>
+        <Col xs={24} sm={12} md={6}>
           <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
             <Statistic
               title="Total Orders"
@@ -178,7 +177,7 @@ const FinanceReport = () => {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
+        <Col xs={24} sm={12} md={6}>
           <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
             <Statistic
               title="Total Income"
@@ -189,7 +188,18 @@ const FinanceReport = () => {
             />
           </Card>
         </Col>
-        <Col xs={24} sm={12} md={8} lg={6}>
+        <Col xs={24} sm={12} md={6}>
+          <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
+            <Statistic
+              title="Total Cost"
+              value={reportData.total_cost}
+              precision={2}
+              prefix="Rs: "
+              valueStyle={{ color: "#cf1322" }}
+            />
+          </Card>
+        </Col>
+        <Col xs={24} sm={12} md={6}>
           <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
             <Statistic
               title="Total Balance"
@@ -216,7 +226,7 @@ const FinanceReport = () => {
             </Col>
             <Col xs={24} sm={12} md={6}>
               <Statistic
-                title="Tax Charges"
+                title="Service Charges"
                 value={reportData.income.total_tax_charges}
                 precision={2}
                 prefix="Rs: "
@@ -235,8 +245,17 @@ const FinanceReport = () => {
             </Col>
             <Col xs={24} sm={12} md={6}>
               <Statistic
-                title="Total Income"
-                value={reportData.income.total_income}
+                title="Driver Payments"
+                value={reportData.income.total_payments_for_drivers}
+                precision={2}
+                prefix="Rs: "
+                valueStyle={{ color: "#cf1322" }}
+              />
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Statistic
+                title="Income Balance"
+                value={reportData.income.total_income_balance}
                 precision={2}
                 prefix="Rs: "
                 valueStyle={{ color: "#3f8600" }}
@@ -247,9 +266,7 @@ const FinanceReport = () => {
       </Collapse>
 
       {/* Orders Table */}
-      <Card
-        title={`Orders (${reportData.count})`}
-      >
+      <Card title={`Orders (${reportData.count})`}>
         <Table
           columns={columns}
           dataSource={reportData.data || []}
@@ -294,7 +311,7 @@ const FinanceReport = () => {
             <Divider />
 
             <Row gutter={[16, 16]}>
-              <Col xs={24} md={12}>
+              <Col xs={24} md={8}>
                 <Statistic
                   title="Total Cost"
                   value={selectedOrder.total_cost}
@@ -302,10 +319,19 @@ const FinanceReport = () => {
                   prefix="Rs: "
                 />
               </Col>
-              <Col xs={24} md={12}>
+              <Col xs={24} md={8}>
                 <Statistic
                   title="Total Income"
                   value={selectedOrder.total_income}
+                  precision={2}
+                  prefix="Rs: "
+                  valueStyle={{ color: "#3f8600" }}
+                />
+              </Col>
+              <Col xs={24} md={8}>
+                <Statistic
+                  title="Total Amount"
+                  value={selectedOrder.total_amount}
                   precision={2}
                   prefix="Rs: "
                 />
