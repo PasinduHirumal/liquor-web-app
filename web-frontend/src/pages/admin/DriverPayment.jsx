@@ -3,12 +3,15 @@ import { Table, Typography, Spin, Button, Tooltip } from "antd";
 import { HistoryOutlined, DollarOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
+import DriverHistoryModal from "../../components/admin/DriverHistoryModal.jsx";
 
 const { Title } = Typography;
 
 function DriverPayment() {
     const [drivers, setDrivers] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [historyModalVisible, setHistoryModalVisible] = useState(false);
+    const [selectedDriver, setSelectedDriver] = useState(null);
 
     useEffect(() => {
         const fetchDrivers = async () => {
@@ -32,13 +35,18 @@ function DriverPayment() {
     }, []);
 
     const handleHistory = (driver) => {
-        toast.success(`Viewing history for ${driver.firstName} ${driver.lastName}`);
-        // 👉 Add your navigation or modal logic here
+        setSelectedDriver(driver);
+        setHistoryModalVisible(true);
     };
 
     const handlePayment = (driver) => {
         toast.success(`Processing payment for ${driver.firstName} ${driver.lastName}`);
-        // 👉 Add your navigation or modal logic here
+        // 👉 Add your payment logic here
+    };
+
+    const handleCloseModal = () => {
+        setHistoryModalVisible(false);
+        setSelectedDriver(null);
     };
 
     const columns = [
@@ -138,6 +146,13 @@ function DriverPayment() {
                     scroll={{ x: 1600 }}
                 />
             )}
+
+            {/* History Modal */}
+            <DriverHistoryModal
+                visible={historyModalVisible}
+                onClose={handleCloseModal}
+                driver={selectedDriver}
+            />
         </div>
     );
 }
