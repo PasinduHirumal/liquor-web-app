@@ -53,8 +53,8 @@ function DriverPayment() {
         },
         {
             title: "Warehouse ID",
-            dataIndex: "where_house_id",
             key: "where_house_id",
+            render: (_, record) => `${record.where_house_id.name || ""}`,
         },
         {
             title: "Total Earnings",
@@ -78,7 +78,7 @@ function DriverPayment() {
 
     return (
         <div style={{ padding: 24 }} className="bg-white">
-            <Title level={2}>Driver Payment Report</Title>
+            <Title level={2}>Driver Payments</Title>
             {loading ? (
                 <Spin size="large" style={{ display: "block", margin: "50px auto" }} />
             ) : (
