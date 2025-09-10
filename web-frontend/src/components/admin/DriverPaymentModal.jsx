@@ -29,7 +29,7 @@ const DriverPaymentModal = ({ visible, onClose, driver, refreshDriverData }) => 
                 toast.success(response.data.message);
 
                 if (refreshDriverData) {
-                    await refreshDriverData(driver.id);
+                    refreshDriverData();
                 }
 
                 handleClose();

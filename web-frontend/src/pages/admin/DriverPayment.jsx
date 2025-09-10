@@ -17,6 +17,7 @@ const { Title } = Typography;
 function DriverPayment() {
     const [drivers, setDrivers] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [refreshTrigger, setRefreshTrigger] = useState(0);
 
     const [historyModalVisible, setHistoryModalVisible] = useState(false);
     const [paymentModalVisible, setPaymentModalVisible] = useState(false);
@@ -41,7 +42,7 @@ function DriverPayment() {
 
     useEffect(() => {
         fetchDrivers();
-    }, []);
+    }, [refreshTrigger]);
 
     const handleHistory = (driver) => {
         setSelectedDriver(driver);
@@ -61,6 +62,10 @@ function DriverPayment() {
     const handleClosePaymentModal = () => {
         setPaymentModalVisible(false);
         setSelectedDriver(null);
+    };
+
+    const refreshDriverData = () => {
+        setRefreshTrigger(prev => prev + 1);
     };
 
     const columns = [
@@ -132,12 +137,13 @@ function DriverPayment() {
 
     return (
         <div style={{ padding: 24 }} className="bg-white">
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <Title level={2}>Driver Payments</Title>
                 <Button
                     type="primary"
                     icon={<ReloadOutlined />}
-                    onClick={fetchDrivers}
+                    onClick={refreshDriverData}
+                    loading={loading}
                 >
                     Refresh
                 </Button>
@@ -168,6 +174,7 @@ function DriverPayment() {
                 visible={paymentModalVisible}
                 onClose={handleClosePaymentModal}
                 driver={selectedDriver}
+                refreshDriverData={refreshDriverData}
             />
         </div>
     );
