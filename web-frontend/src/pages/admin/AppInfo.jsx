@@ -1,17 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { axiosInstance } from "../../lib/axios";
 import {
-    Table,
-    Tabs,
-    Typography,
-    Spin,
-    Alert,
-    Card,
-    Switch,
-    Tag,
-    Button
+    Table, Tabs, Typography, Spin, Alert, Card, Switch, Tag, Button, InputNumber,
 } from "antd";
-import { EditOutlined } from "@ant-design/icons";
+import { EditOutlined, SaveOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 
 // Components
@@ -30,6 +22,10 @@ function AppInfo() {
     const [error, setError] = useState(null);
     const [updatingId, setUpdatingId] = useState(null);
 
+    // Commission Rate
+    const [commissionRate, setCommissionRate] = useState(null);
+    const [commissionLoading, setCommissionLoading] = useState(false);
+
     // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState(null);
@@ -44,6 +40,7 @@ function AppInfo() {
                 ]);
                 setMainAppData(mainRes.data.data || null);
                 setAllAppData(allRes.data.data || []);
+                setCommissionRate(mainRes.data.data?.commissionRate_drivers || 0);
             } catch (err) {
                 setError(err.response?.data?.message || "Failed to fetch app info");
             } finally {
@@ -53,23 +50,23 @@ function AppInfo() {
         fetchData();
     }, []);
 
-    const handleToggle = async (record) => {
+    const handleToggle = async (record, field) => {
         try {
             setUpdatingId(record.id);
-            const newValue = !record.is_liquor_show;
+            const newValue = !record[field];
             const res = await axiosInstance.patch("/appInfo/update/toggle", {
-                is_liquor_show: newValue,
+                [field]: newValue,
             });
 
             toast.success(res.data.message || "Updated successfully");
 
             const updateState = (data) =>
                 data.map((item) =>
-                    item.id === record.id ? { ...item, is_liquor_show: newValue } : item
+                    item.id === record.id ? { ...item, [field]: newValue } : item
                 );
 
             setMainAppData((prev) =>
-                prev?.id === record.id ? { ...prev, is_liquor_show: newValue } : prev
+                prev?.id === record.id ? { ...prev, [field]: newValue } : prev
             );
             setAllAppData((prev) => updateState(prev));
         } catch (err) {
@@ -82,6 +79,25 @@ function AppInfo() {
     const handleEdit = (record) => {
         setSelectedRecord(record);
         setIsModalOpen(true);
+    };
+
+    const handleCommissionUpdate = async () => {
+        if (commissionRate == null) return;
+        try {
+            setCommissionLoading(true);
+            const res = await axiosInstance.patch("/appInfo/update/commissionRate", {
+                commissionRate_drivers: commissionRate,
+            });
+
+            toast.success(res.data.message || "Commission updated");
+
+            // Update state with backend response
+            setMainAppData(res.data.data.appInfo);
+        } catch (err) {
+            toast.error(err.response?.data?.message || "Failed to update commission");
+        } finally {
+            setCommissionLoading(false);
+        }
     };
 
     const columns = [
@@ -100,11 +116,18 @@ function AppInfo() {
                         checked={value}
                         className="mx-2"
                         loading={updatingId === record.id}
-                        onChange={() => handleToggle(record)}
+                        onChange={() => handleToggle(record, "is_liquor_show")}
                     />
                     <Tag color={value ? "green" : "red"}>{value ? "Yes" : "No"}</Tag>
                 </div>
             ),
+        },
+        {
+            title: "Commission Rate (Drivers)",
+            dataIndex: "commissionRate_drivers",
+            key: "commissionRate_drivers",
+            width: 200,
+            render: (value) => <Tag color="blue">{value}%</Tag>,
         },
         {
             title: "Created At",
@@ -163,6 +186,27 @@ function AppInfo() {
                 </div>
             </div>
 
+            {/* Commission Update */}
+            <div className="flex items-center gap-3 mb-6">
+                <Title level={5}>Update Commission Rate (Drivers):</Title>
+                <InputNumber
+                    min={0}
+                    max={100}
+                    value={commissionRate}
+                    onChange={setCommissionRate}
+                    formatter={(value) => `${value}%`}
+                    parser={(value) => value.replace("%", "")}
+                />
+                <Button
+                    type="primary"
+                    icon={<SaveOutlined />}
+                    loading={commissionLoading}
+                    onClick={handleCommissionUpdate}
+                >
+                    Save
+                </Button>
+            </div>
+
             <Tabs defaultActiveKey="main">
                 <TabPane tab="Main App Info" key="main">
                     <Title level={4}>Main Application Information</Title>
@@ -175,7 +219,7 @@ function AppInfo() {
                             rowKey="id"
                             pagination={false}
                             bordered
-                            scroll={{ x: 1200 }}
+                            scroll={{ x: 1400 }}
                         />
                     )}
                 </TabPane>
@@ -190,7 +234,7 @@ function AppInfo() {
                             dataSource={allAppData}
                             rowKey="id"
                             bordered
-                            scroll={{ x: 1200 }}
+                            scroll={{ x: 1400 }}
                         />
                     )}
                 </TabPane>
