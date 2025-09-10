@@ -50,8 +50,8 @@ const FinanceReport = () => {
 
   if (loading) {
     return (
-      <div className="flex pt-5 text-center bg-white">
-        <Spin size="large" />
+      <div className="flex items-center justify-center min-h-[200px] bg-white">
+        <Spin size="large" tip="Loading driver report..." />
       </div>
     );
   }

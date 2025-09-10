@@ -6,9 +6,9 @@ import {
 import {
     UserOutlined, PhoneOutlined, MailOutlined, IdcardOutlined, CarOutlined,
     EyeOutlined, ReloadOutlined, CheckCircleOutlined, CloseCircleOutlined, ClockCircleOutlined,
-    FilePdfOutlined
+    FilePdfOutlined, DollarOutlined, WalletOutlined, ArrowDownOutlined
 } from "@ant-design/icons";
-import { toast } from "react-hot-toast"
+import { toast } from "react-hot-toast";
 import { axiosInstance } from "../../../lib/axios";
 
 const { Title, Text } = Typography;
@@ -104,7 +104,7 @@ const DriverReport = () => {
 
     if (loading) {
         return (
-            <div className="flex pt-5 text-center bg-white">
+            <div className="flex items-center justify-center min-h-[200px] bg-white">
                 <Spin size="large" tip="Loading driver report..." />
             </div>
         );
@@ -211,6 +211,22 @@ const DriverReport = () => {
             sorter: (a, b) => a.cancelledDeliveries - b.cancelledDeliveries,
         },
         {
+            title: "Earnings",
+            dataIndex: "totalEarnings",
+            key: "earnings",
+            width: 120,
+            render: (amount) => <Text strong>${amount?.toFixed(2) || 0}</Text>,
+            sorter: (a, b) => a.totalEarnings - b.totalEarnings,
+        },
+        {
+            title: "Balance",
+            dataIndex: "currentBalance",
+            key: "balance",
+            width: 120,
+            render: (amount) => <Text>${amount?.toFixed(2) || 0}</Text>,
+            sorter: (a, b) => a.currentBalance - b.currentBalance,
+        },
+        {
             title: "Actions",
             key: "actions",
             width: 100,
@@ -293,20 +309,32 @@ const DriverReport = () => {
                 <Col xs={24} sm={12} md={8} lg={6}>
                     <Card hoverable style={{ borderRadius: 8 }}>
                         <Statistic
-                            title="Total Deliveries"
-                            value={reportData.data.reduce((sum, driver) => sum + driver.totalDeliveries, 0)}
-                            prefix={<CarOutlined />}
+                            title="Total Earnings"
+                            value={reportData.data.reduce((sum, d) => sum + (d.totalEarnings || 0), 0)}
+                            prefix={<DollarOutlined />}
+                            precision={2}
+                            valueStyle={{ color: "#1890ff" }}
                         />
                     </Card>
                 </Col>
                 <Col xs={24} sm={12} md={8} lg={6}>
                     <Card hoverable style={{ borderRadius: 8 }}>
                         <Statistic
-                            title="Completion Rate"
-                            value={reportData.data.reduce((sum, driver) => sum + driver.completedDeliveries, 0) /
-                                (reportData.data.reduce((sum, driver) => sum + driver.totalDeliveries, 0) || 1) * 100}
+                            title="Total Withdraws"
+                            value={reportData.data.reduce((sum, d) => sum + (d.totalWithdraws || 0), 0)}
+                            prefix={<ArrowDownOutlined />}
                             precision={2}
-                            suffix="%"
+                            valueStyle={{ color: "#f5222d" }}
+                        />
+                    </Card>
+                </Col>
+                <Col xs={24} sm={12} md={8} lg={6}>
+                    <Card hoverable style={{ borderRadius: 8 }}>
+                        <Statistic
+                            title="Total Balance"
+                            value={reportData.data.reduce((sum, d) => sum + (d.currentBalance || 0), 0)}
+                            prefix={<WalletOutlined />}
+                            precision={2}
                             valueStyle={{ color: "#52c41a" }}
                         />
                     </Card>
@@ -314,9 +342,7 @@ const DriverReport = () => {
             </Row>
 
             {/* Drivers Table */}
-            <Card
-                title={`Drivers (${filteredDrivers.length})`}
-            >
+            <Card title={`Drivers (${filteredDrivers.length})`}>
                 <Table
                     columns={columns}
                     dataSource={filteredDrivers}
@@ -427,35 +453,33 @@ const DriverReport = () => {
 
                         <Divider />
 
-                        <Card title="Delivery Performance" size="small">
+                        <Card title="Delivery Performance" size="small" style={{ marginBottom: 20 }}>
                             <Row gutter={[16, 16]}>
                                 <Col xs={24} sm={12} md={6}>
-                                    <Statistic
-                                        title="Total Deliveries"
-                                        value={selectedDriver.totalDeliveries}
-                                        prefix={<CarOutlined />}
-                                    />
+                                    <Statistic title="Total Deliveries" value={selectedDriver.totalDeliveries} prefix={<CarOutlined />} />
                                 </Col>
                                 <Col xs={24} sm={12} md={6}>
-                                    <Statistic
-                                        title="Completed"
-                                        value={selectedDriver.completedDeliveries}
-                                        valueStyle={{ color: "#52c41a" }}
-                                    />
+                                    <Statistic title="Completed" value={selectedDriver.completedDeliveries} valueStyle={{ color: "#52c41a" }} />
                                 </Col>
                                 <Col xs={24} sm={12} md={6}>
-                                    <Statistic
-                                        title="Ongoing"
-                                        value={selectedDriver.onGoingDeliveries}
-                                        valueStyle={{ color: "#1890ff" }}
-                                    />
+                                    <Statistic title="Ongoing" value={selectedDriver.onGoingDeliveries} valueStyle={{ color: "#1890ff" }} />
                                 </Col>
                                 <Col xs={24} sm={12} md={6}>
-                                    <Statistic
-                                        title="Cancelled"
-                                        value={selectedDriver.cancelledDeliveries}
-                                        valueStyle={{ color: "#f5222d" }}
-                                    />
+                                    <Statistic title="Cancelled" value={selectedDriver.cancelledDeliveries} valueStyle={{ color: "#f5222d" }} />
+                                </Col>
+                            </Row>
+                        </Card>
+
+                        <Card title="Financial Summary" size="small">
+                            <Row gutter={[16, 16]}>
+                                <Col xs={24} sm={12} md={8}>
+                                    <Statistic title="Total Earnings" value={selectedDriver.totalEarnings} prefix={<DollarOutlined />} precision={2} />
+                                </Col>
+                                <Col xs={24} sm={12} md={8}>
+                                    <Statistic title="Total Withdraws" value={selectedDriver.totalWithdraws} prefix={<ArrowDownOutlined />} precision={2} />
+                                </Col>
+                                <Col xs={24} sm={12} md={8}>
+                                    <Statistic title="Current Balance" value={selectedDriver.currentBalance} prefix={<WalletOutlined />} precision={2} />
                                 </Col>
                             </Row>
                         </Card>
