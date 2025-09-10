@@ -36,29 +36,34 @@ const DriverHistoryModal = ({ visible, onClose, driver }) => {
       title: "Payment ID",
       dataIndex: "payment_id",
       key: "payment_id",
+      width: 120,
     },
     {
       title: "Before Balance",
       dataIndex: "current_balance_before",
       key: "current_balance_before",
+      width: 150,
       render: (val) => `Rs ${val.toFixed(2)}`,
     },
     {
       title: "Payment Value",
       dataIndex: "payment_value",
       key: "payment_value",
+      width: 150,
       render: (val) => `Rs ${val.toFixed(2)}`,
     },
     {
       title: "New Balance",
       dataIndex: "current_balance_new",
       key: "current_balance_new",
+      width: 150,
       render: (val) => `Rs ${val.toFixed(2)}`,
     },
     {
       title: "Date",
       dataIndex: "created_at",
       key: "created_at",
+      width: 200,
       render: (val) => new Date(val).toLocaleString(),
     },
   ];
@@ -68,7 +73,7 @@ const DriverHistoryModal = ({ visible, onClose, driver }) => {
       title="Driver Payment History"
       open={visible}
       onCancel={onClose}
-      width={700}
+      width={800}
       footer={[
         <Button key="close" onClick={onClose}>
           Close
@@ -102,6 +107,7 @@ const DriverHistoryModal = ({ visible, onClose, driver }) => {
               columns={columns}
               dataSource={payments.map((p) => ({ ...p, key: p.payment_id }))}
               pagination={{ pageSize: 5 }}
+              scroll={{ x: 800 }}
             />
           ) : (
             <p style={{ marginTop: 16, fontStyle: "italic", color: "#888" }}>
