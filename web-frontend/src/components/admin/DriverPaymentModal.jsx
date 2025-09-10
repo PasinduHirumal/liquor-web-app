@@ -1,22 +1,40 @@
 import React, { useState } from "react";
-import { Modal, Descriptions } from "antd";
+import { Modal, Descriptions, InputNumber } from "antd";
 import { ExclamationCircleOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
+import { axiosInstance } from "../../lib/axios";
 
-const DriverPaymentModal = ({ visible, onClose, driver }) => {
+const DriverPaymentModal = ({ visible, onClose, driver, refreshDriverData }) => {
     const [processingPayment, setProcessingPayment] = useState(false);
+    const [paymentValue, setPaymentValue] = useState(null);
 
     const confirmPayment = async () => {
-        if (!driver) return;
+        if (!driver || !paymentValue) {
+            toast.error("Please enter a payment amount");
+            return;
+        }
+
         try {
             setProcessingPayment(true);
-            await new Promise((resolve) => setTimeout(resolve, 1500));
 
-            toast.success(`Payment made to ${driver.firstName} ${driver.lastName}`);
-            onClose();
+            const response = await axiosInstance.post(`/payment/driver/${driver.id}`, {
+                payment_value: paymentValue,
+            });
+
+            if (response.data.success) {
+                toast.success(response.data.message);
+
+                if (refreshDriverData) {
+                    await refreshDriverData(driver.id);
+                }
+
+                onClose();
+            } else {
+                toast.error(response.data.message || "Payment failed");
+            }
         } catch (error) {
             console.error("Payment error:", error);
-            toast.error("Failed to process payment");
+            toast.error(error.response?.data?.message || "Failed to process payment");
         } finally {
             setProcessingPayment(false);
         }
@@ -44,6 +62,15 @@ const DriverPaymentModal = ({ visible, onClose, driver }) => {
                     <Descriptions.Item label="Email">{driver.email}</Descriptions.Item>
                     <Descriptions.Item label="NIC Number">
                         {driver.nic_number}
+                    </Descriptions.Item>
+                    <Descriptions.Item label="Payment Amount">
+                        <InputNumber
+                            min={1}
+                            precision={2}
+                            style={{ width: "100%" }}
+                            value={paymentValue}
+                            onChange={setPaymentValue}
+                        />
                     </Descriptions.Item>
                 </Descriptions>
             )}
