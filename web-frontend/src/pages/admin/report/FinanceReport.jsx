@@ -28,7 +28,11 @@ const FinanceReport = () => {
       setLoading(true);
       setError(null);
 
-      const response = await axiosInstance.get("/reports/finance");
+      const response = await axiosInstance.get("/reports/finance", {
+        params: {
+          // status: "out_for_delivery",
+        },
+      });
       setReportData(response.data);
     } catch (err) {
       console.error("Error fetching report:", err);
