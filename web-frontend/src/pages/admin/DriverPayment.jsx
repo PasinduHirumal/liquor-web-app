@@ -37,14 +37,9 @@ function DriverPayment() {
             key: "email",
         },
         {
-            title: "First Name",
-            dataIndex: "firstName",
-            key: "firstName",
-        },
-        {
-            title: "Last Name",
-            dataIndex: "lastName",
-            key: "lastName",
+            title: "Full Name",
+            key: "fullName",
+            render: (_, record) => `${record.firstName || ""} ${record.lastName || ""}`,
         },
         {
             title: "NIC Number",
