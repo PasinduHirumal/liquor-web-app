@@ -17,6 +17,7 @@
     "@mui/lab": "^7.0.0-beta.14",
     "@mui/material": "^7.3.1",
     "@mui/x-date-pickers": "^8.9.0",
+    "@tailwindcss/vite": "^4.1.13",
     "antd": "^5.26.6",
     "axios": "^1.11.0",
     "bootstrap": "^5.3.7",
@@ -42,6 +43,7 @@
     "slick-carousel": "^1.8.1",
     "sweetalert2": "^11.22.2",
     "sweetalert2-react-content": "^5.1.0",
+    "tailwindcss": "^4.1.13",
     "yup": "^1.6.1",
     "zustand": "^5.0.6"
   },

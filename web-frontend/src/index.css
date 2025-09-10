@@ -1,5 +1,6 @@
-/* Register */
+@import "tailwindcss";
 
+/* Register */
 .register-container {
     min-height: 100vh;
     background: linear-gradient(to right, #f8f9fa, #e9ecef);

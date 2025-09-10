@@ -168,36 +168,32 @@ const OtherProductList = () => {
                 </Row>
 
                 {/* Categories */}
-                <div className="mt-3 d-flex gap-2 overflow-auto pb-2" style={{ whiteSpace: "nowrap" }}>
+                <div className="mt-3 flex gap-2 overflow-x-auto pb-2">
                     <div
-                        className={`category-pill ${!filters.category_id ? "active" : ""}`}
                         onClick={() => handleCategoryClick("")}
-                        style={{
-                            cursor: "pointer",
-                            padding: "8px 16px",
-                            borderRadius: "20px",
-                            backgroundColor: !filters.category_id ? "#1976d2" : "#f0f0f0",
-                            color: !filters.category_id ? "white" : "inherit",
-                            flexShrink: 0,
-                        }}
+                        className={`flex items-center px-4 py-2 rounded-full cursor-pointer whitespace-nowrap transition-colors duration-200 ${!filters.category_id
+                                ? "bg-blue-600 text-white"
+                                : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                            }`}
                     >
                         All
                     </div>
                     {categories.map((category) => (
                         <div
                             key={category.category_id}
-                            className={`category-pill ${filters.category_id === category.category_id ? "active" : ""}`}
                             onClick={() => handleCategoryClick(category.category_id)}
-                            style={{
-                                cursor: "pointer",
-                                padding: "8px 16px",
-                                borderRadius: "20px",
-                                backgroundColor: filters.category_id === category.category_id ? "#1976d2" : "#f0f0f0",
-                                color: filters.category_id === category.category_id ? "white" : "inherit",
-                                flexShrink: 0,
-                            }}
+                            className={`flex items-center px-4 py-2 rounded-full cursor-pointer whitespace-nowrap transition-colors duration-200 ${filters.category_id === category.category_id
+                                    ? "bg-blue-600 text-white"
+                                    : "bg-gray-200 text-gray-800 hover:bg-gray-300"
+                                }`}
                         >
-                            {category.icon && <img src={category.icon} alt={category.name} style={{ width: "20px", height: "20px", borderRadius: "50%", marginRight: "8px" }} />}
+                            {category.icon && (
+                                <img
+                                    src={category.icon}
+                                    alt={category.name}
+                                    className="w-5 h-5 rounded-full mr-2"
+                                />
+                            )}
                             {category.name}
                         </div>
                     ))}

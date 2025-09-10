@@ -4,6 +4,7 @@
     background: #fafafa;
 }
 .rating-stars .star {
+    display: inline;
     color: #ccc;
 }
 .rating-stars .star.filled {
