@@ -17,7 +17,15 @@ const payToDriverByDriverId = async (req, res) => {
         }
 
         const Total_Earnings = await driverEarningsService.getTotalEarningForDriver(driver_id);
+        if (Total_Earnings === null || Total_Earnings === undefined) {
+            return res.status(404).json({ success: false, message: "Failed to get total earnings"});
+        }
+
         const Total_Payments = await driverPaymentService.getTotalPaymentsForDriver(driver_id);
+        if (Total_Payments === null || Total_Payments === undefined) {
+            return res.status(404).json({ success: false, message: "Failed to get total payments"});
+        }
+
         const Current_Balance = parseFloat((Total_Earnings - Total_Payments).toFixed(2));
 
         // calculate new balance
@@ -55,7 +63,7 @@ const payToDriverByDriverId = async (req, res) => {
             currentBalance: updatedFinanceResult.currentBalance,
         };
 
-        return res.status(200).json({ 
+        return res.status(201).json({ 
             success: true, 
             message: `Pay ${payment_value} /= to driver: ${driver_name} was successful`,
             data: {
@@ -69,4 +77,29 @@ const payToDriverByDriverId = async (req, res) => {
     }
 };
 
-export { payToDriverByDriverId };
+const getPaymentHistoryForDriver = async (req, res) => {
+	try {
+        const driver_id = req.params.id;
+
+        const driver = await driverService.findById(driver_id);
+        if (!driver) {
+            return res.status(404).json({ success: false, message: "Driver not found"});
+        }
+
+        const payments = await driverPaymentService.findAllByDriverId(driver_id);
+
+        const driver_name = `${driver.firstName} ${driver.lastName}`;
+
+        return res.status(200).json({ 
+            success: true, 
+            message: `Payment history for driver: ${driver_name} fetched successfully`,
+            count: payments.length,
+            data: payments
+        });
+    } catch (error) {
+        console.error("Get payment history for driver error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+export { payToDriverByDriverId, getPaymentHistoryForDriver };
