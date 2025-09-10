@@ -169,7 +169,7 @@ function AppInfo() {
 
     if (loading) {
         return (
-            <div className="flex justify-center items-center min-h-screen bg-white">
+            <div className="flex justify-center items-center min-h-[200px] bg-white">
                 <Spin tip="Loading app info..." size="large" />
             </div>
         );
