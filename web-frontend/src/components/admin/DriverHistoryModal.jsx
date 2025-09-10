@@ -70,7 +70,7 @@ const DriverHistoryModal = ({ visible, onClose, driver }) => {
 
   return (
     <Modal
-      title="Driver Payment History"
+      title={<span className="text-xl font-bold">Driver Payment History</span>}
       open={visible}
       onCancel={onClose}
       width={800}
@@ -82,41 +82,45 @@ const DriverHistoryModal = ({ visible, onClose, driver }) => {
     >
       {driver ? (
         <div>
-          <p>
-            <strong>Name:</strong> {driver.firstName} {driver.lastName}
-          </p>
-          <p>
-            <strong>Email:</strong> {driver.email}
-          </p>
-          <p>
-            <strong>Total Earnings:</strong> Rs {driver.totalEarnings || 0}
-          </p>
-          <p>
-            <strong>Total Withdraws:</strong> Rs {driver.totalWithdraws || 0}
-          </p>
-          <p>
-            <strong>Current Balance:</strong> Rs {driver.currentBalance || 0}
-          </p>
+          {/* Driver details */}
+          <div className="flex flex-wrap gap-6 mb-5">
+            <div>
+              <span className="font-semibold">Name:</span> {driver.firstName} {driver.lastName}
+            </div>
+            <div>
+              <span className="font-semibold">Email:</span> {driver.email}
+            </div>
+            <div>
+              <span className="font-semibold">Total Earnings:</span> Rs {driver.totalEarnings || 0}
+            </div>
+            <div>
+              <span className="font-semibold">Total Withdraws:</span> Rs {driver.totalWithdraws || 0}
+            </div>
+            <div>
+              <span className="font-semibold">Current Balance:</span> Rs {driver.currentBalance || 0}
+            </div>
+          </div>
 
-          <h3 style={{ marginTop: 20 }}>Payment History</h3>
+          <h3 className="text-lg font-semibold mb-3">Payment History</h3>
 
           {loading ? (
-            <Spin tip="Loading payment history..." />
+            <div className="flex justify-center items-center py-10">
+              <Spin tip="Loading payment history..." />
+            </div>
           ) : payments.length > 0 ? (
             <Table
               columns={columns}
               dataSource={payments.map((p) => ({ ...p, key: p.payment_id }))}
               pagination={{ pageSize: 5 }}
               scroll={{ x: 800 }}
+              className="overflow-x-auto"
             />
           ) : (
-            <p style={{ marginTop: 16, fontStyle: "italic", color: "#888" }}>
-              No payment history found.
-            </p>
+            <p className="mt-4 italic text-gray-500">No payment history found.</p>
           )}
         </div>
       ) : (
-        <p>No driver selected.</p>
+        <p className="text-gray-500">No driver selected.</p>
       )}
     </Modal>
   );
