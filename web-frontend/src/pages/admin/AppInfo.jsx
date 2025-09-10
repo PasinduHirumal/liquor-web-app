@@ -101,10 +101,31 @@ function AppInfo() {
     };
 
     const columns = [
-        { title: "ID", dataIndex: "id", key: "id", width: 80 },
-        { title: "Reg Number", dataIndex: "reg_number", key: "reg_number", width: 150 },
-        { title: "Description", dataIndex: "description", key: "description", width: 250 },
-        { title: "App Version", dataIndex: "app_version", key: "app_version", width: 120 },
+        {
+            title: "ID",
+            dataIndex: "id",
+            key: "id",
+            width: 180,
+        },
+        {
+            title: "Reg Number",
+            dataIndex: "reg_number",
+            key: "reg_number",
+            width: 150,
+        },
+        {
+            title: "Description",
+            dataIndex: "description",
+            key: "description",
+            width: 120,
+            ellipsis: true
+        },
+        {
+            title: "App Version",
+            dataIndex: "app_version",
+            key: "app_version",
+            width: 120
+        },
         {
             title: "Liquor Show",
             dataIndex: "is_liquor_show",
@@ -130,20 +151,6 @@ function AppInfo() {
             render: (value) => <Tag color="blue">{value}%</Tag>,
         },
         {
-            title: "Created At",
-            dataIndex: "createdAt",
-            key: "createdAt",
-            width: 200,
-            render: (value) => (value ? new Date(value).toLocaleString() : "N/A"),
-        },
-        {
-            title: "Updated At",
-            dataIndex: "updatedAt",
-            key: "updatedAt",
-            width: 200,
-            render: (value) => (value ? new Date(value).toLocaleString() : "N/A"),
-        },
-        {
             title: "Action",
             key: "action",
             width: 100,
@@ -152,8 +159,9 @@ function AppInfo() {
                     type="link"
                     icon={<EditOutlined />}
                     onClick={() => handleEdit(record)}
+                    className="p-0"
                 >
-                    Edit
+                    <span className="hidden md:inline">Edit</span>
                 </Button>
             ),
         },
@@ -161,7 +169,7 @@ function AppInfo() {
 
     if (loading) {
         return (
-            <div className="pt-5 flex text-center bg-white">
+            <div className="flex justify-center items-center min-h-screen bg-white">
                 <Spin tip="Loading app info..." size="large" />
             </div>
         );
@@ -169,87 +177,103 @@ function AppInfo() {
 
     if (error) {
         return (
-            <div className="p-5 bg-white">
+            <div className="p-4 bg-white">
                 <Alert message="Error" description={error} type="error" showIcon />
             </div>
         );
     }
 
     return (
-        <Card className="p-4" style={{ borderRadius: 0 }}>
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <Title level={3}>App Info</Title>
-                <div className="d-flex gap-2">
-                    <SuperMarketMigrate />
-                    <LiquorMigrate />
-                    <GroceryMigrate />
+        <div className="p-2 md:p-4 bg-gray-50 min-h-screen">
+            <Card className="w-full rounded-lg shadow-sm">
+                {/* Header Section */}
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <Title level={3} className="m-0 text-xl md:text-2xl">App Info</Title>
+                    <div className="flex flex-wrap gap-2">
+                        <SuperMarketMigrate className="text-xs md:text-sm" />
+                        <LiquorMigrate className="text-xs md:text-sm" />
+                        <GroceryMigrate className="text-xs md:text-sm" />
+                    </div>
                 </div>
-            </div>
 
-            {/* Commission Update */}
-            <div className="flex items-center gap-3 mb-6">
-                <Title level={5}>Update Commission Rate (Drivers):</Title>
-                <InputNumber
-                    min={0}
-                    max={100}
-                    value={commissionRate}
-                    onChange={setCommissionRate}
-                    formatter={(value) => `${value}%`}
-                    parser={(value) => value.replace("%", "")}
+                {/* Commission Update Section */}
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-3 mb-6 p-4 bg-gray-100 rounded-lg">
+                    <Title level={5} className="m-0 text-sm md:text-base whitespace-nowrap">
+                        Update Commission Rate (Drivers):
+                    </Title>
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-3 w-full md:w-auto">
+                        <InputNumber
+                            min={0}
+                            max={100}
+                            value={commissionRate}
+                            onChange={setCommissionRate}
+                            formatter={(value) => `${value}%`}
+                            parser={(value) => value.replace("%", "")}
+                            className="w-full md:w-32"
+                        />
+                        <Button
+                            type="primary"
+                            icon={<SaveOutlined />}
+                            loading={commissionLoading}
+                            onClick={handleCommissionUpdate}
+                            className="w-full md:w-auto"
+                        >
+                            <span className="hidden md:inline">Save</span>
+                            <span className="md:hidden">Save Commission</span>
+                        </Button>
+                    </div>
+                </div>
+
+                <Tabs defaultActiveKey="main" className="w-full">
+                    <TabPane tab="Main App Info" key="main">
+                        <Title level={4} className="text-lg md:text-xl mb-4">Main Application Information</Title>
+                        {!mainAppData ? (
+                            <Alert message="No main app info available" type="info" />
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <Table
+                                    columns={columns}
+                                    dataSource={[mainAppData]}
+                                    rowKey="id"
+                                    pagination={false}
+                                    bordered
+                                    scroll={{ x: 1000 }}
+                                    size="middle"
+                                />
+                            </div>
+                        )}
+                    </TabPane>
+
+                    <TabPane tab={`All App Data (${allAppData.length})`} key="all">
+                        <Title level={4} className="text-lg md:text-xl mb-4">All Application Data</Title>
+                        {allAppData.length === 0 ? (
+                            <Alert message="No app info available" type="info" />
+                        ) : (
+                            <div className="overflow-x-auto">
+                                <Table
+                                    columns={columns}
+                                    dataSource={allAppData}
+                                    rowKey="id"
+                                    bordered
+                                    scroll={{ x: 1000 }}
+                                    size="middle"
+                                />
+                            </div>
+                        )}
+                    </TabPane>
+                </Tabs>
+
+                <AppInfoEditModal
+                    isModalOpen={isModalOpen}
+                    setIsModalOpen={setIsModalOpen}
+                    selectedRecord={selectedRecord}
+                    setSelectedRecord={setSelectedRecord}
+                    setAllAppData={setAllAppData}
+                    setMainAppData={setMainAppData}
+                    mainAppData={mainAppData}
                 />
-                <Button
-                    type="primary"
-                    icon={<SaveOutlined />}
-                    loading={commissionLoading}
-                    onClick={handleCommissionUpdate}
-                >
-                    Save
-                </Button>
-            </div>
-
-            <Tabs defaultActiveKey="main">
-                <TabPane tab="Main App Info" key="main">
-                    <Title level={4}>Main Application Information</Title>
-                    {!mainAppData ? (
-                        <Alert message="No main app info available" type="info" />
-                    ) : (
-                        <Table
-                            columns={columns}
-                            dataSource={[mainAppData]}
-                            rowKey="id"
-                            pagination={false}
-                            bordered
-                            scroll={{ x: 1400 }}
-                        />
-                    )}
-                </TabPane>
-
-                <TabPane tab={`All App Data (${allAppData.length})`} key="all">
-                    <Title level={4}>All Application Data</Title>
-                    {allAppData.length === 0 ? (
-                        <Alert message="No app info available" type="info" />
-                    ) : (
-                        <Table
-                            columns={columns}
-                            dataSource={allAppData}
-                            rowKey="id"
-                            bordered
-                            scroll={{ x: 1400 }}
-                        />
-                    )}
-                </TabPane>
-            </Tabs>
-
-            <AppInfoEditModal
-                isModalOpen={isModalOpen}
-                setIsModalOpen={setIsModalOpen}
-                selectedRecord={selectedRecord}
-                setSelectedRecord={setSelectedRecord}
-                setAllAppData={setAllAppData}
-                setMainAppData={setMainAppData}
-                mainAppData={mainAppData}
-            />
-        </Card>
+            </Card>
+        </div>
     );
 }
 
