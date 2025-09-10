@@ -306,6 +306,7 @@ const DriverReport = () => {
                         />
                     </Card>
                 </Col>
+                {/* 
                 <Col xs={24} sm={12} md={8} lg={6}>
                     <Card hoverable style={{ borderRadius: 8 }}>
                         <Statistic
@@ -331,7 +332,7 @@ const DriverReport = () => {
                 <Col xs={24} sm={12} md={8} lg={6}>
                     <Card hoverable style={{ borderRadius: 8 }}>
                         <Statistic
-                            title="Current Balance"
+                            title="Total Balance"
                             value={reportData.data.reduce((sum, d) => sum + (d.currentBalance || 0), 0)}
                             prefix={<WalletOutlined />}
                             precision={2}
@@ -339,6 +340,7 @@ const DriverReport = () => {
                         />
                     </Card>
                 </Col>
+                */}
             </Row>
 
             {/* Drivers Table */}
