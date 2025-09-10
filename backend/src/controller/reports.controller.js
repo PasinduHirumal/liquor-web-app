@@ -256,7 +256,7 @@ const getFinanceReport = async (req, res) => {
         //const Total_Balance = parseFloat((Income_Result.Total_Balance - Total_Payments_For_Drivers).toFixed(2));
         const Total_Balance = parseFloat((Total_Income_balance + Total_Cost).toFixed(2));
 
-        const message = "Orders report fetched successfully";
+        const message = "Finance report fetched successfully";
         return res.status(200).json({ 
             success: true, 
             message: format === 'pdf'? `PDF created successfully & ${message}` : message,
