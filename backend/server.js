@@ -39,6 +39,7 @@ import appInfoRoutes from "./src/routes/appInfo.routes.js";
 import ratingsRoutes from "./src/routes/ratings.routes.js";
 import searchRoutes from "./src/routes/search.routes.js";
 import orderItemsRoutes from "./src/routes/orderItems.routes.js";
+import paymentsRoutes from "./src/routes/payments.routes.js";
 
 
 
@@ -85,6 +86,7 @@ app.use("/api/appInfo", appInfoRoutes);
 app.use("/api/ratings", ratingsRoutes);
 app.use("/api/search", searchRoutes);
 app.use("/api/orderItems", orderItemsRoutes);
+app.use("/api/payment", paymentsRoutes);
 
 
 //  Route handler for the root path
