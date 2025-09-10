@@ -151,8 +151,6 @@ const getFinanceReport = async (req, res) => {
             return new Date(a.created_at) - new Date(b.created_at);
         });
 
-        let Total_Profit_From_Products = 0
-
         // Filter orders to include only specific fields
         const filteredOrderData = sortedOrders.map(order => {
             const processedItems = order.items?.map(item => {
@@ -179,7 +177,6 @@ const getFinanceReport = async (req, res) => {
 
             // Calculate total profit from all products in this order
             const totalProfitFromProducts = processedItems.reduce((sum, item) => sum + item.total_profit_for_products, 0);
-            Total_Profit_From_Products += totalProfitFromProducts;
 
             const deliveryFee = parseFloat(order.delivery_fee || 0);
             const taxAmount = parseFloat(order.tax_amount || 0);
@@ -210,7 +207,7 @@ const getFinanceReport = async (req, res) => {
 
         const Total_Delivery_Charges = parseFloat(Income_Result.Total_Delivery_Fee || 0);
         const Total_Tax_Charges = parseFloat(Income_Result.Total_TAX || 0);
-        const Total_Profits_From_Products = parseFloat(Total_Profit_From_Products.toFixed(2));
+        const Total_Profits_From_Products = parseFloat(Income_Result.Total_Profit_From_Products || 0);
         const Total_Income = parseFloat((Total_Tax_Charges + Total_Delivery_Charges + Total_Profits_From_Products).toFixed(2));
 
         const Total_Payments_For_Drivers = await driverPaymentService.getTotalPaymentForAllDrivers();

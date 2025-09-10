@@ -104,4 +104,18 @@ async function buildFiltersForOrdersReport({ status, start_date, end_date }) {
     return { filters, filterDescription, validationError };
 }
 
-export { buildFiltersForFinanceReport, buildFiltersForOrdersReport };
+async function buildFiltersForWithdrawCash({ status }) {
+    const filters = {};
+    const filterDescription = [];
+    let validationError = null;
+
+    // Status validation
+    validationError = validateStatus(status, filters, filterDescription);
+    if (validationError) {
+        return { filters, filterDescription, validationError };
+    }
+
+    return { filters, filterDescription, validationError };
+}
+
+export { buildFiltersForFinanceReport, buildFiltersForOrdersReport, buildFiltersForWithdrawCash };

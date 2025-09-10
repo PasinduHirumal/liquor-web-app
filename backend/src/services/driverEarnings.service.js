@@ -49,6 +49,50 @@ class DriverEarningsService extends BaseService {
             throw error;
         }
     }
+
+    async getTotalEarningForAllDrivers(is_delivery_completed = IS_DELIVERY_COMPLETED) {
+        try {
+            const docs = await this.findByFilter('is_delivery_completed', '==', is_delivery_completed);
+
+            if (docs.length ===0) {
+                return { 
+                    Total_Value: 0
+                }
+            }
+
+            const totalCompanyEarning = docs.reduce((total, doc) => {
+                return total + (doc.earning_amount || 0);
+            }, 0);
+
+            return { 
+                Total_Value: parseFloat(totalCompanyEarning.toFixed(2)) 
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getTotalEarningForCompany(is_delivery_completed = IS_DELIVERY_COMPLETED) {
+        try {
+            const docs = await this.findByFilter('is_delivery_completed', '==', is_delivery_completed);
+            if (docs.length ===0) {
+                return { 
+                    Total_Value: 0
+                }
+            }
+
+            const totalCompanyEarning = docs.reduce((total, doc) => {
+                const companyEarning = doc.delivery_fee - doc.earning_amount;
+                return total + (companyEarning || 0);
+            }, 0);
+
+            return { 
+                Total_Value: parseFloat(totalCompanyEarning.toFixed(2)) 
+            }
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default DriverEarningsService;
