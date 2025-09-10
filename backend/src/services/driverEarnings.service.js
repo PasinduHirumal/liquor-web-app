@@ -1,5 +1,6 @@
 import BaseService from "./BaseService.js";
 import DriverEarnings from "../models/DriverEarnings.js";
+import { IS_DELIVERY_COMPLETED } from "../data/OrderStatus.js";
 
 class DriverEarningsService extends BaseService {
     constructor() {
@@ -41,7 +42,7 @@ class DriverEarningsService extends BaseService {
         }
     }
 
-    async getTotalEarningForDriver(driver_id, is_delivery_completed = false) {
+    async getTotalEarningForDriver(driver_id, is_delivery_completed = IS_DELIVERY_COMPLETED) {
         try {
             const filters = {
                 driver_id: driver_id,
