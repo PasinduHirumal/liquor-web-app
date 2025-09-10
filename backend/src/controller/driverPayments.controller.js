@@ -88,13 +88,18 @@ const getPaymentHistoryForDriver = async (req, res) => {
 
         const payments = await driverPaymentService.findAllByDriverId(driver_id);
 
+        // Sort by created_at in descending order (newest first)
+        const sortedPayments = payments.sort((a, b) => {
+            return new Date(b.created_at) - new Date(a.created_at);
+        });
+
         const driver_name = `${driver.firstName} ${driver.lastName}`;
 
         return res.status(200).json({ 
             success: true, 
             message: `Payment history for driver: ${driver_name} fetched successfully`,
             count: payments.length,
-            data: payments
+            data: sortedPayments
         });
     } catch (error) {
         console.error("Get payment history for driver error:", error.message);

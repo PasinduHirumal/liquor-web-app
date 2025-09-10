@@ -4,11 +4,10 @@ import CompanyService from '../services/company.service.js';
 import SuperMarketService from '../services/superMarket.service.js';
 import DriverEarningsService from '../services/driverEarnings.service.js';
 import DriverPaymentService from '../services/driverPayment.service.js';
-import ORDER_STATUS from "../enums/orderStatus.js";
 import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
 import populateWhereHouse from '../utils/populateWhere_House.js';
 import { generateOrdersPDF, generateDriversPDF } from '../utils/generatePDF.js';
-import { buildFiltersForFinanceReport } from '../functions/BuildFilters.js';
+import { buildFiltersForFinanceReport, buildFiltersForOrdersReport } from '../functions/BuildFilters.js';
 import { ORDER_STATUS_FOR_REPORT } from '../data/OrderStatus.js';
 
 
@@ -24,48 +23,14 @@ const getOrdersReport = async (req, res) => {
 	try {
         const { status = ORDER_STATUS_FOR_REPORT, format, start_date, end_date } = req.query;
 
-        const filters = {};
-        const filterDescription = [];
+        const { filters, filterDescription, validationError } = await buildFiltersForOrdersReport({
+            status,
+            start_date,
+            end_date
+        });
 
-        if (status !== undefined){
-            if (status && !Object.values(ORDER_STATUS).includes(status)) {
-                return res.status(400).json({ success: false, message: "Invalid status value" });
-            }
-            
-            filters.status = status;
-            filterDescription.push(`status: ${status}`);
-        }
-        if (start_date !== undefined || end_date !== undefined) {
-            if (start_date && end_date) {
-                const startDate = new Date(start_date);
-                const endDate = new Date(end_date);
-                
-                if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-                    return res.status(400).json({ 
-                        success: false, 
-                        message: "Invalid date format. Use YYYY-MM-DD or MM/DD/YYYY" 
-                    });
-                }
-                
-                if (startDate > endDate) {
-                    return res.status(400).json({ 
-                        success: false, 
-                        message: "Start date must be before or equal to end date" 
-                    });
-                }
-                
-                // Set time to beginning and end of day
-                startDate.setHours(0, 0, 0, 0);
-                endDate.setHours(23, 59, 59, 999);
-                
-                filters.dateRange = { start: startDate, end: endDate };
-                filterDescription.push(`date range: ${start_date} to ${end_date}`);
-            } else {
-                return res.status(400).json({ 
-                    success: false, 
-                    message: "Both start_date and end_date are required for date filtering" 
-                });
-            }
+        if (validationError) {
+            return res.status(400).json({ success: false, message: validationError });
         }
 
         const warehouses = await warehouseService.findAll();
