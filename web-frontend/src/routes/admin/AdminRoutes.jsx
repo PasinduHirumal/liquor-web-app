@@ -28,7 +28,7 @@ import Report from "../../pages/admin/report/Report";
 import ManageBanner from "../../pages/admin/ManageBanner";
 import SuperMarket from "../../pages/admin/SuperMarket";
 import AppInfo from "../../pages/admin/AppInfo";
-import DriverPayment from "../../pages/admin/payments/DriverPayment";
+import Payment from "../../pages/admin/payments/Payment";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -195,7 +195,7 @@ export const adminRoutes = [
     },
     {
         path: "/payments",
-        element: <DriverPayment />
+        element: <Payment />
     },
     {
         path: "/manage-banner",
