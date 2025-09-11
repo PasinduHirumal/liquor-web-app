@@ -160,7 +160,6 @@ function SuperMarket() {
             title: 'Action',
             key: 'action',
             width: 120,
-            fixed: 'right',
             render: (_, record) => (
                 <Space>
                     <Tooltip title="Edit">
