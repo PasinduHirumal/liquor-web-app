@@ -1,6 +1,7 @@
 import BaseService from "./BaseService.js";
 import Orders from "../models/Orders.js";
 import ORDER_STATUS from "../enums/orderStatus.js";
+import { ORDER_STATUS_FOR_REPORT } from "../data/OrderStatus.js";
 
 
 class OrdersService extends BaseService {
@@ -262,7 +263,7 @@ class OrdersService extends BaseService {
         }
     }
 
-    async getTotalCostForAllOrders(status) {
+    async getTotalCostForAllOrders(status = ORDER_STATUS_FOR_REPORT) {
         try {
             const orders = await this.findByFilter('status', '==', status);
 

@@ -9,7 +9,7 @@ import populateWhereHouse from '../utils/populateWhere_House.js';
 import { generateOrdersPDF, generateDriversPDF } from '../utils/generatePDF.js';
 import { buildFiltersForFinanceReport, buildFiltersForOrdersReport } from '../functions/BuildFilters.js';
 import { ORDER_STATUS_FOR_REPORT } from '../data/OrderStatus.js';
-
+import { calculateCashSummary } from '../utils/calculateCashSummary.js';
 
 const orderService = new OrdersService();
 const driverService = new DriverService();
@@ -129,11 +129,10 @@ const getOrdersReport = async (req, res) => {
 
 const getFinanceReport = async (req, res) => {
     try {
-        const { status = ORDER_STATUS_FOR_REPORT, where_house_id, format, start_date, end_date } = req.query;
+        const { status = ORDER_STATUS_FOR_REPORT, format, start_date, end_date } = req.query;
 
         const { filters, filterDescription, validationError } = await buildFiltersForFinanceReport({
             status,
-            where_house_id,
             start_date,
             end_date
         });
@@ -202,21 +201,7 @@ const getFinanceReport = async (req, res) => {
             };
         });
 
-        // calculate income
-        const Income_Result = await orderService.getTotalIncomeValues(sortedOrders);
-
-        const Total_Delivery_Charges = parseFloat(Income_Result.Total_Delivery_Fee || 0);
-        const Total_Tax_Charges = parseFloat(Income_Result.Total_TAX || 0);
-        const Total_Profits_From_Products = parseFloat(Income_Result.Total_Profit_From_Products || 0);
-        const Total_Income = parseFloat((Total_Tax_Charges + Total_Delivery_Charges + Total_Profits_From_Products).toFixed(2));
-
-        const Total_Payments_For_Drivers = await driverPaymentService.getTotalPaymentForAllDrivers();
-        const Total_Income_balance = parseFloat((Total_Income - Total_Payments_For_Drivers).toFixed(2));
-        
-        const Total_Cost_Value = await orderService.getTotalCostForAllOrders(ORDER_STATUS_FOR_REPORT);
-        const Total_Cost = parseFloat(Total_Cost_Value.toFixed(2));
-        //const Total_Balance = parseFloat((Income_Result.Total_Balance - Total_Payments_For_Drivers).toFixed(2));
-        const Total_Balance = parseFloat((Total_Income_balance + Total_Cost).toFixed(2));
+        const Cash_Summery_Result = await calculateCashSummary(sortedOrders);
 
         const message = "Finance report fetched successfully";
         return res.status(200).json({ 
@@ -225,16 +210,17 @@ const getFinanceReport = async (req, res) => {
             count: completedOrders.length,
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
             income : {
-                total_delivery_charges: Total_Delivery_Charges,
-                total_tax_charges: Total_Tax_Charges,
-                total_profits_from_products: Total_Profits_From_Products,
-                total_income: Total_Income,
-                total_payments_for_drivers: Total_Payments_For_Drivers,
-                total_income_balance: Total_Income_balance,
+                total_delivery_charges: Cash_Summery_Result.total_delivery_fee,
+                total_tax_charges: Cash_Summery_Result.total_TAX,
+                total_profits_from_products: Cash_Summery_Result.total_profit_from_products,
+                total_income: Cash_Summery_Result.total_income,
+                total_payments_for_drivers: Cash_Summery_Result.total_payment_for_drivers,
+                total_company_withdraws: Cash_Summery_Result.total_company_withdraws,
+                total_income_balance: Cash_Summery_Result.available_balance,
             },
-            total_income_balance: Total_Income_balance,
-            total_cost: Total_Cost,
-            total_balance: Total_Balance,
+            total_income_balance: Cash_Summery_Result.available_balance,
+            total_cost: Cash_Summery_Result.extra.total_cost,
+            total_balance: Cash_Summery_Result.extra.total_balance,
             data: filteredOrderData
         });
     } catch (error) {

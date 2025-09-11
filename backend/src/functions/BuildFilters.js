@@ -69,12 +69,6 @@ async function buildFiltersForFinanceReport({ status, where_house_id, start_date
         return { filters, filterDescription, validationError };
     }
 
-    // Warehouse validation - now using the extracted function
-    validationError = await validateWarehouse(where_house_id, filters, filterDescription);
-    if (validationError) {
-        return { filters, filterDescription, validationError };
-    }
-
     // Date range validation
     validationError = validateDateRange(start_date, end_date, filters, filterDescription);
     if (validationError) {
