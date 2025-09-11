@@ -180,7 +180,7 @@ const FinanceReport = () => {
         <Col xs={24} sm={12} md={6}>
           <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
             <Statistic
-              title="Total Income Balance"
+              title="Available Income Balance"
               value={reportData.income.total_income_balance}
               precision={2}
               prefix="Rs: "
@@ -191,7 +191,7 @@ const FinanceReport = () => {
         <Col xs={24} sm={12} md={6}>
           <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
             <Statistic
-              title="Total Cost"
+              title="Total Cost For Products"
               value={reportData.total_cost}
               precision={2}
               prefix="Rs: "
@@ -202,7 +202,7 @@ const FinanceReport = () => {
         <Col xs={24} sm={12} md={6}>
           <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
             <Statistic
-              title="Total Balance"
+              title="Available Balance"
               value={reportData.total_balance}
               precision={2}
               prefix="Rs: "
@@ -220,13 +220,13 @@ const FinanceReport = () => {
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 <Row justify="space-between">
                   <Text strong style={{ fontSize: 17 }}>Delivery Charges</Text>
-                  <Text style={{ fontSize: 17 }}>
+                  <Text style={{ fontSize: 17, color: "#3f8600" }}>
                     Rs: {reportData.income.total_delivery_charges.toFixed(2)}
                   </Text>
                 </Row>
                 <Row justify="space-between">
                   <Text strong style={{ fontSize: 17 }}>Service Charges</Text>
-                  <Text style={{ fontSize: 17 }}>
+                  <Text style={{ fontSize: 17, color: "#3f8600" }}>
                     Rs: {reportData.income.total_tax_charges.toFixed(2)}
                   </Text>
                 </Row>
@@ -270,7 +270,7 @@ const FinanceReport = () => {
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 <Row justify="space-between">
                   <Text strong style={{ fontSize: 17 }}>Total Income</Text>
-                  <Text style={{ fontSize: 17}}>
+                  <Text style={{ fontSize: 17 }}>
                     Rs: {reportData.income.total_income.toFixed(2)}
                   </Text>
                 </Row>
@@ -278,6 +278,12 @@ const FinanceReport = () => {
                   <Text strong style={{ fontSize: 17 }}>Driver Payments</Text>
                   <Text style={{ fontSize: 17, color: "#cf1322" }}>
                     Rs: {reportData.income.total_payments_for_drivers.toFixed(2)}
+                  </Text>
+                </Row>
+                <Row justify="space-between">
+                  <Text strong style={{ fontSize: 17 }}>Driver Payments</Text>
+                  <Text style={{ fontSize: 17, color: "#cf1322" }}>
+                    Rs: {reportData.income.total_company_withdraws.toFixed(2)}
                   </Text>
                 </Row>
 
