@@ -254,6 +254,15 @@ const FinanceReport = () => {
             </Col>
             <Col xs={24} sm={12} md={6}>
               <Statistic
+                title="Total Income"
+                value={reportData.income.total_income}
+                precision={2}
+                prefix="Rs: "
+                valueStyle={{ color: "#3f8600" }}
+              />
+            </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Statistic
                 title="Income Balance"
                 value={reportData.income.total_income_balance}
                 precision={2}
