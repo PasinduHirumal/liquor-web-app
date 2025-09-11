@@ -362,10 +362,10 @@ const AdminNavbar = () => {
 
                         {isSuperAdmin && (
                             <StyledNavLink
-                                to={`/driver-payments`}
+                                to={`/payments`}
                                 onClick={closeMobileMenu}
                             >
-                                Driver payments
+                                Payments
                             </StyledNavLink>
                         )}
                         
@@ -578,11 +578,11 @@ const AdminNavbar = () => {
                             
                             {isSuperAdmin && (
                                 <StyledNavLink
-                                    to={`/driver-payments`}
+                                    to={`/payments`}
                                     onClick={closeMobileMenu}
                                     sx={{ mb: 2 }}
                                 >
-                                    Driver payments
+                                    Payments
                                 </StyledNavLink>
                             )}
 

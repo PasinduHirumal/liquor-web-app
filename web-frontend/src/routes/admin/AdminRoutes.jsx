@@ -194,7 +194,7 @@ export const adminRoutes = [
         element: <DriverDocumentInfo />
     },
     {
-        path: "/driver-payments",
+        path: "/payments",
         element: <DriverPayment />
     },
     {
