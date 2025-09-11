@@ -260,7 +260,7 @@ const FinanceReport = () => {
                   </Text>
                 </Row>
                 <Row justify="space-between">
-                  <Text strong>Income Balance</Text>
+                  <Text strong>Total Income Balance</Text>
                   <Text style={{ color: "#3f8600" }}>
                     Rs: {reportData.income.total_income_balance.toFixed(2)}
                   </Text>
