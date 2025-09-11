@@ -150,7 +150,6 @@ const DriverList = () => {
                 </Space>
             ),
             width: 180,
-            fixed: 'left',
         },
         {
             title: 'Contact',
@@ -254,7 +253,6 @@ const DriverList = () => {
                 </Space>
             ),
             width: 120,
-            fixed: 'right',
         },
     ];
 
