@@ -28,7 +28,7 @@ import Report from "../../pages/admin/report/Report";
 import ManageBanner from "../../pages/admin/ManageBanner";
 import SuperMarket from "../../pages/admin/SuperMarket";
 import AppInfo from "../../pages/admin/AppInfo";
-import DriverPayment from "../../pages/admin/DriverPayment";
+import DriverPayment from "../../pages/admin/payments/DriverPayment";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">

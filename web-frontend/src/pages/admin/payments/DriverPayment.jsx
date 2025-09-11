@@ -8,10 +8,10 @@ import {
 } from "antd";
 import { HistoryOutlined, DollarOutlined, ReloadOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
-import { axiosInstance } from "../../lib/axios";
-import DriverEarningHistoryModal from "../../components/admin/DriverEarningHistoryModal.jsx";
-import DriverPaymentHistoryModal from "../../components/admin/DriverPaymentHistoryModal.jsx";
-import DriverPaymentModal from "../../components/admin/DriverPaymentModal.jsx";
+import { axiosInstance } from "../../../lib/axios.js";
+import DriverEarningHistoryModal from "../../../components/admin/DriverEarningHistoryModal.jsx";
+import DriverPaymentHistoryModal from "../../../components/admin/DriverPaymentHistoryModal.jsx";
+import DriverPaymentModal from "../../../components/admin/DriverPaymentModal.jsx";
 
 const { Title } = Typography;
 
