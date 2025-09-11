@@ -121,7 +121,7 @@ const AdminProfile = () => {
                     </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6">
                     <Card size="small" title="Personal Information">
                         <div className="space-y-3">
                             <div className="flex justify-between">
