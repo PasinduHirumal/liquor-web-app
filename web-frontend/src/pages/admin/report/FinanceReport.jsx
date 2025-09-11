@@ -217,44 +217,28 @@ const FinanceReport = () => {
         <Col xs={24} md={12}>
           <Collapse defaultActiveKey={['1']} style={{ background: '#fff' }}>
             <Panel header="Income" key="1">
-              <Row gutter={[16, 16]}>
-                <Col xs={24} sm={12} md={12}>
-                  <Statistic
-                    title="Delivery Charges"
-                    value={reportData.income.total_delivery_charges}
-                    precision={2}
-                    prefix="Rs: "
-                  />
-                </Col>
-                <Col xs={24} sm={12} md={12}>
-                  <Statistic
-                    title="Service Charges"
-                    value={reportData.income.total_tax_charges}
-                    precision={2}
-                    prefix="Rs: "
-                  />
-                </Col>
-                <Col xs={24} sm={12} md={12}>
-                  <Statistic
-                    title="Product Profits"
-                    value={reportData.income.total_profits_from_products}
-                    precision={2}
-                    prefix="Rs: "
-                    valueStyle={{
-                      color: reportData.income.total_profits_from_products >= 0 ? "#3f8600" : "#cf1322"
-                    }}
-                  />
-                </Col>
-                <Col xs={24} sm={12} md={12}>
-                  <Statistic
-                    title="Total Income"
-                    value={reportData.income.total_income}
-                    precision={2}
-                    prefix="Rs: "
-                    valueStyle={{ color: "#3f8600" }}
-                  />
-                </Col>
-              </Row>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <Row justify="space-between">
+                  <Text strong>Delivery Charges</Text>
+                  <Text>Rs: {reportData.income.total_delivery_charges.toFixed(2)}</Text>
+                </Row>
+                <Row justify="space-between">
+                  <Text strong>Service Charges</Text>
+                  <Text>Rs: {reportData.income.total_tax_charges.toFixed(2)}</Text>
+                </Row>
+                <Row justify="space-between">
+                  <Text strong>Product Profits</Text>
+                  <Text style={{ color: reportData.income.total_profits_from_products >= 0 ? "#3f8600" : "#cf1322" }}>
+                    Rs: {reportData.income.total_profits_from_products.toFixed(2)}
+                  </Text>
+                </Row>
+                <Row justify="space-between">
+                  <Text strong>Total Income</Text>
+                  <Text style={{ color: "#3f8600" }}>
+                    Rs: {reportData.income.total_income.toFixed(2)}
+                  </Text>
+                </Row>
+              </div>
             </Panel>
           </Collapse>
         </Col>
@@ -262,35 +246,26 @@ const FinanceReport = () => {
         <Col xs={24} md={12}>
           <Collapse defaultActiveKey={['1']} style={{ background: '#fff' }}>
             <Panel header="Income Breakdown" key="1">
-              <Row gutter={[16, 16]}>
-                <Col xs={24} sm={12} md={12}>
-                  <Statistic
-                    title="Total Income"
-                    value={reportData.income.total_income}
-                    precision={2}
-                    prefix="Rs: "
-                    valueStyle={{ color: "#3f8600" }}
-                  />
-                </Col>
-                <Col xs={24} sm={12} md={12}>
-                  <Statistic
-                    title="Driver Payments"
-                    value={reportData.income.total_payments_for_drivers}
-                    precision={2}
-                    prefix="Rs: "
-                    valueStyle={{ color: "#cf1322" }}
-                  />
-                </Col>
-                <Col xs={24} sm={12} md={12}>
-                  <Statistic
-                    title="Income Balance"
-                    value={reportData.income.total_income_balance}
-                    precision={2}
-                    prefix="Rs: "
-                    valueStyle={{ color: "#3f8600" }}
-                  />
-                </Col>
-              </Row>
+              <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                <Row justify="space-between">
+                  <Text strong>Total Income</Text>
+                  <Text style={{ color: "#3f8600" }}>
+                    Rs: {reportData.income.total_income.toFixed(2)}
+                  </Text>
+                </Row>
+                <Row justify="space-between">
+                  <Text strong>Driver Payments</Text>
+                  <Text style={{ color: "#cf1322" }}>
+                    Rs: {reportData.income.total_payments_for_drivers.toFixed(2)}
+                  </Text>
+                </Row>
+                <Row justify="space-between">
+                  <Text strong>Income Balance</Text>
+                  <Text style={{ color: "#3f8600" }}>
+                    Rs: {reportData.income.total_income_balance.toFixed(2)}
+                  </Text>
+                </Row>
+              </div>
             </Panel>
           </Collapse>
         </Col>
