@@ -3,10 +3,31 @@ import { useParams } from "react-router-dom";
 import { axiosInstance } from "../../../lib/axios";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
-import { Card, Container, Row, Col, Badge, Image, Table, Alert } from "react-bootstrap";
-import "../../../styles/OrderDetail.css";
+import {
+    Card,
+    Row,
+    Col,
+    Table,
+    Alert,
+    Tag,
+    Image,
+    Button,
+    Typography,
+} from "antd";
+import {
+    UserOutlined,
+    CarOutlined,
+    DollarOutlined,
+    InfoCircleOutlined,
+    ShoppingCartOutlined,
+    EnvironmentOutlined,
+    FileTextOutlined,
+    TeamOutlined,
+} from "@ant-design/icons";
 import AssignDriverModal from "../../../components/admin/forms/AssignDriverModal";
 import EditStatusModal from "../../../components/admin/forms/EditStatusModal";
+
+const { Title, Text } = Typography;
 
 function OrderDetail() {
     const { id } = useParams();
@@ -25,10 +46,12 @@ function OrderDetail() {
             try {
                 const [orderRes, dutiesRes] = await Promise.all([
                     axiosInstance.get(`/orders/getOrderById/${id}`),
-                    axiosInstance.get(`/driverDuties/getAllForOrder/${id}`)
+                    axiosInstance.get(`/driverDuties/getAllForOrder/${id}`),
                 ]);
 
-                const orderData = Array.isArray(orderRes.data.data) ? orderRes.data.data[0] : orderRes.data.data;
+                const orderData = Array.isArray(orderRes.data.data)
+                    ? orderRes.data.data[0]
+                    : orderRes.data.data;
                 setOrder(orderData);
 
                 setDriverDuties(dutiesRes.data?.data || []);
@@ -47,246 +70,322 @@ function OrderDetail() {
     const formatDate = (value) => {
         if (!value) return "N/A";
 
-        // Handle Firebase Timestamp
         if (value._seconds) {
             return new Date(value._seconds * 1000).toLocaleString();
         }
 
-        // Handle Firestore Timestamp with toDate()
         if (value.toDate) {
             return value.toDate().toLocaleString();
         }
 
-        // Handle ISO strings or JS Date-compatible strings
         try {
             return new Date(value).toLocaleString();
-            // eslint-disable-next-line no-unused-vars
-        } catch (err) {
+        } catch {
             return "Invalid date";
         }
     };
 
     const renderBadge = (value) => {
         if (!value) return null;
-        let variant = "secondary";
-        const val = value.toLowerCase();
         const map = {
-            delivered: "success",
-            pending: "warning",
-            cancelled: "danger",
-            processing: "info",
-            out_for_delivery: "primary",
-            paid: "success",
-            failed: "danger",
-            refunded: "info",
+            delivered: "green",
+            pending: "orange",
+            cancelled: "red",
+            processing: "blue",
+            out_for_delivery: "geekblue",
+            paid: "green",
+            failed: "red",
+            refunded: "cyan",
         };
-        variant = map[val] || "secondary";
-        return (
-            <span className="order-detail-badge ms-2">
-                <Badge bg={variant} className="text-capitalize">{value}</Badge>
-            </span>
-        );
+        return <Tag color={map[value.toLowerCase()] || "default"}>{value}</Tag>;
     };
 
     if (loading) {
         return (
-            <div
-                className="px-4 py-4"
-                style={{
-                    backgroundColor: "#fff",
-                    minHeight: "100vh"
-                }}
-            >
-                <Skeleton count={10} />
+            <div className="p-6 bg-white min-h-screen">
+                <Skeleton count={12} />
             </div>
         );
     }
 
-    if (error) return <Alert variant="danger">Error: {error}</Alert>;
-    if (!order) return <Alert variant="warning">No order found.</Alert>;
+    if (error) return <Alert type="error" message={`Error: ${error}`} />;
+    if (!order) return <Alert type="warning" message="No order found." />;
 
     return (
-        <div className="order-detail-container px-4 py-4 bg-white">
-            <Row className="justify-content-between align-items-center mb-4">
+        <div className="p-6 bg-white min-h-screen">
+            {/* Header */}
+            <Row className="items-center justify-between mb-6">
                 <Col>
-                    <h1>
-                        Order Details <small className="text-muted">#{order.order_number || order.order_id}</small>
-                    </h1>
+                    <Title level={3} className="!mb-0">
+                        Order Details{" "}
+                        <Text type="secondary">#{order.order_number || order.order_id}</Text>
+                    </Title>
                 </Col>
-                <Col className="text-end">
-                    <button className="btn btn-outline-primary me-2" onClick={() => setShowAssignDriverModal(true)}>
+                <Col className="flex justify-end gap-2">
+                    <Button
+                        type="primary"
+                        onClick={() => setShowAssignDriverModal(true)}
+                        icon={<CarOutlined />}
+                    >
                         Assign Driver
-                    </button>
-                    <button className="btn btn-outline-secondary" onClick={() => setShowEditStatusModal(true)}>
+                    </Button>
+                    <Button
+                        type="default"
+                        onClick={() => setShowEditStatusModal(true)}
+                        icon={<InfoCircleOutlined />}
+                    >
                         Edit Status
-                    </button>
+                    </Button>
                 </Col>
             </Row>
 
-            <Row className="g-4">
-
+            <Row gutter={[16, 16]}>
                 {/* Order Summary */}
-                <Col xs={12} md={6}>
-                    <Card className="order-detail-card h-100">
-                        <Card.Header as="h5">Order Summary</Card.Header>
-                        <Card.Body className="order-detail-section">
-                            <p><strong>Order Date:</strong> <span className="text-muted">{formatDate(order.order_date)}</span></p>
-                            <p><strong>Status:</strong> {renderBadge(order.status)}</p>
-                            <p><strong>Payment Method:</strong> <span className="text-muted">{order.payment_method || "N/A"}</span></p>
-                            <p><strong>Payment Status:</strong> {renderBadge(order.payment_status)}</p>
-                            <p><strong>Driver Accepted:</strong> {order.is_driver_accepted ? "Yes" : "No"}</p>
-                            <p><strong>Driver Accepted:</strong> {order.where_house_id?.name || "N/A"}</p>
-                        </Card.Body>
+                <Col xs={24} md={12}>
+                    <Card
+                        title={<span className="text-white font-bold">Order Summary</span>}
+                        bordered
+                        className="rounded-xl shadow"
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<InfoCircleOutlined className="text-white text-xl" />}
+                    >
+                        <p>
+                            <strong>Order Date:</strong> {formatDate(order.order_date)}
+                        </p>
+                        <p>
+                            <strong>Status:</strong> {renderBadge(order.status)}
+                        </p>
+                        <p>
+                            <strong>Payment Method:</strong>{" "}
+                            {order.payment_method || "N/A"}
+                        </p>
+                        <p>
+                            <strong>Payment Status:</strong> {renderBadge(order.payment_status)}
+                        </p>
+                        <p>
+                            <strong>Driver Accepted:</strong>{" "}
+                            <Tag color={order.is_driver_accepted ? "green" : "red"}>
+                                {order.is_driver_accepted ? "Yes" : "No"}
+                            </Tag>
+                        </p>
+                        <p>
+                            <strong>Warehouse:</strong>{" "}
+                            {order.where_house_id?.name || "N/A"}
+                        </p>
                     </Card>
                 </Col>
 
                 {/* Price Details */}
-                <Col xs={12} md={6}>
-                    <Card className="order-detail-card h-100">
-                        <Card.Header as="h5">Price Details</Card.Header>
-                        <Card.Body className="order-detail-section">
-                            <div className="order-detail-price-line"><span>Subtotal:</span><span>Rs: {order.subtotal?.toFixed(2)}</span></div>
-                            <div className="order-detail-price-line"><span>Delivery Fee:</span><span>Rs: {order.delivery_fee?.toFixed(2)}</span></div>
-                            <div className="order-detail-price-line"><span>Tax Amount:</span><span>Rs: {order.tax_amount?.toFixed(2)}</span></div>
-                            <hr />
-                            <div className="order-detail-price-line fw-bold"><span>Total:</span><span>Rs: {order.total_amount?.toFixed(2)}</span></div>
-                        </Card.Body>
+                <Col xs={24} md={12}>
+                    <Card
+                        title={<span className="text-white font-bold">Price Details</span>}
+                        bordered
+                        className="rounded-xl shadow"
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<DollarOutlined className="text-white text-xl" />}
+                    >
+                        <div className="flex justify-between py-1">
+                            <span>Subtotal:</span>
+                            <span>Rs: {order.subtotal?.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between py-1">
+                            <span>Delivery Fee:</span>
+                            <span>Rs: {order.delivery_fee?.toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between py-1">
+                            <span>Tax Amount:</span>
+                            <span>Rs: {order.tax_amount?.toFixed(2)}</span>
+                        </div>
+                        <hr />
+                        <div className="flex justify-between font-bold py-1">
+                            <span>Total:</span>
+                            <span>Rs: {order.total_amount?.toFixed(2)}</span>
+                        </div>
                     </Card>
                 </Col>
 
-                {/* Driver Duties Section */}
-                <Col md={12}>
-                    <Card className="order-detail-card">
-                        <Card.Header>Driver Duties</Card.Header>
-                        <Card.Body>
-                            {dutiesError ? (
-                                <Alert variant="danger">{dutiesError}</Alert>
-                            ) : driverDuties.length === 0 ? (
-                                <p>No driver duties found for this order.</p>
-                            ) : (
-                                <Table bordered responsive>
-                                    <thead>
-                                        <tr>
-                                            <th>Driver</th>
-                                            <th>Driver Email</th>
-                                            <th>Accepted</th>
-                                            <th>Completed</th>
-                                            <th>Reassigned</th>
-                                            <th>Created</th>
-                                            <th>Updated</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {driverDuties.map((duty, idx) => (
-                                            <tr key={idx}>
-                                                <td>{duty.driver_id?.username || "Unknown"}</td>
-                                                <td>{duty.driver_id?.email || "Unknown"}</td>
-                                                <td>{duty.is_driver_accepted ? "Yes" : "No"}</td>
-                                                <td>{duty.is_completed ? "Yes" : "No"}</td>
-                                                <td>{duty.is_re_assigning_driver ? "Yes" : "No"}</td>
-                                                <td>{formatDate(duty.created_at)}</td>
-                                                <td>{formatDate(duty.updated_at)}</td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </Table>
-                            )}
-                        </Card.Body>
+                {/* Driver Duties */}
+                <Col span={24}>
+                    <Card
+                        title={<span className="text-white font-bold">Driver Deties</span>}
+                        bordered
+                        className="rounded-xl shadow"
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<CarOutlined className="text-white text-xl" />}
+                    >
+                        {dutiesError ? (
+                            <Alert type="error" message={dutiesError} />
+                        ) : driverDuties.length === 0 ? (
+                            <Text>No driver duties found for this order.</Text>
+                        ) : (
+                            <Table
+                                bordered
+                                rowKey={(record, idx) => idx}
+                                dataSource={driverDuties}
+                                pagination={false}
+                                scroll={{ x: 900 }}
+                                columns={[
+                                    {
+                                        title: "Driver",
+                                        dataIndex: ["driver_id", "username"],
+                                        render: (val) => val || "Unknown",
+                                        width: 150,
+                                    },
+                                    {
+                                        title: "Driver Email",
+                                        dataIndex: ["driver_id", "email"],
+                                        render: (val) => val || "Unknown",
+                                        width: 200,
+                                    },
+                                    {
+                                        title: "Accepted",
+                                        dataIndex: "is_driver_accepted",
+                                        render: (val) => (val ? "Yes" : "No"),
+                                        width: 100,
+                                    },
+                                    {
+                                        title: "Completed",
+                                        dataIndex: "is_completed",
+                                        render: (val) => (val ? "Yes" : "No"),
+                                        width: 100,
+                                    },
+                                    {
+                                        title: "Reassigned",
+                                        dataIndex: "is_re_assigning_driver",
+                                        render: (val) => (val ? "Yes" : "No"),
+                                        width: 120,
+                                    },
+                                    {
+                                        title: "Created",
+                                        dataIndex: "created_at",
+                                        render: (val) => formatDate(val),
+                                        width: 180,
+                                    }
+                                ]}
+                            />
+                        )}
                     </Card>
                 </Col>
 
                 {/* Order Items */}
-                <Col md={12}>
-                    <Card className="order-detail-card">
-                        <Card.Header>Order Items</Card.Header>
-                        <Card.Body>
-                            {order.items?.length > 0 ? (
-                                <div className="table-responsive">
-                                    <Table striped bordered>
-                                        <thead>
-                                            <tr>
-                                                <th>Product</th>
-                                                <th>Image</th>
-                                                <th>Qty</th>
-                                                <th>Unit Price</th>
-                                                <th>Total</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {order.items.map((item, i) => (
-                                                <tr key={i}>
-                                                    <td>{item.product_name}</td>
-                                                    <td><Image src={item.product_image} width="50" rounded /></td>
-                                                    <td>{item.quantity}</td>
-                                                    <td>Rs: {item.unit_price?.toFixed(2)}</td>
-                                                    <td>Rs: {item.total_price?.toFixed(2)}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </Table>
-                                </div>
-                            ) : <p>No items found.</p>}
-                        </Card.Body>
+                <Col span={24}>
+                    <Card
+                        title={<span className="text-white font-bold">Order Items</span>}
+                        bordered
+                        className="rounded-xl shadow"
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<ShoppingCartOutlined className="text-white text-xl" />}
+                    >
+                        {order.items?.length > 0 ? (
+                            <Table
+                                rowKey={(record, idx) => idx}
+                                dataSource={order.items}
+                                pagination={false}
+                                scroll={{ x: 800 }}
+                                columns={[
+                                    { title: "Product", dataIndex: "product_name", width: 100 },
+                                    {
+                                        title: "Image",
+                                        dataIndex: "product_image",
+                                        render: (src) => <Image src={src} width={50} className="rounded" />,
+                                        width: 60,
+                                    },
+                                    { title: "Qty", dataIndex: "quantity", width: 50 },
+                                    {
+                                        title: "Unit Price",
+                                        dataIndex: "unit_price",
+                                        render: (val) => `Rs: ${val?.toFixed(2)}`,
+                                        width: 70,
+                                    },
+                                    {
+                                        title: "Total",
+                                        dataIndex: "total_price",
+                                        render: (val) => `Rs: ${val?.toFixed(2)}`,
+                                        width: 70,
+                                    },
+                                ]}
+                            />
+                        ) : (
+                            <Text>No items found.</Text>
+                        )}
                     </Card>
                 </Col>
 
                 {/* Customer Info */}
-                <Col xs={12} md={6}>
-                    <Card className="order-detail-card h-100">
-                        <Card.Header>Customer Information</Card.Header>
-                        <Card.Body>
-                            <p><strong>Name:</strong> {order.user_id?.username || "N/A"}</p>
-                            <p><strong>Email:</strong> {order.user_id?.email || "N/A"}</p>
-                            <p><strong>User ID:</strong> {order.user_id?.id || "N/A"}</p>
-                        </Card.Body>
+                <Col xs={24} md={12}>
+                    <Card
+                        title={<span className="text-white font-bold">Customer Information</span>}
+                        bordered
+                        className="rounded-xl shadow"
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<UserOutlined className="text-white text-xl" />}
+                    >
+                        <p><strong>Name:</strong> {order.user_id?.username || "N/A"}</p>
+                        <p><strong>Email:</strong> {order.user_id?.email || "N/A"}</p>
+                        <p><strong>User ID:</strong> {order.user_id?.id || "N/A"}</p>
                     </Card>
                 </Col>
 
                 {/* Driver Info */}
-                <Col xs={12} md={6}>
-                    <Card className="order-detail-card h-100">
-                        <Card.Header>Driver Information</Card.Header>
-                        <Card.Body>
-                            <p><strong>Name:</strong> {order.assigned_driver_id?.username || "N/A"}</p>
-                            <p><strong>Email:</strong> {order.assigned_driver_id?.email || "N/A"}</p>
-                            <p><strong>Driver ID:</strong> {order.assigned_driver_id?.id || "N/A"}</p>
-                        </Card.Body>
+                <Col xs={24} md={12}>
+                    <Card
+                        title={<span className="text-white font-bold">Driver Information</span>}
+                        bordered
+                        className="rounded-xl shadow"
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<TeamOutlined className="text-white text-xl" />}
+                    >
+                        <p><strong>Name:</strong> {order.assigned_driver_id?.username || "N/A"}</p>
+                        <p><strong>Email:</strong> {order.assigned_driver_id?.email || "N/A"}</p>
+                        <p><strong>Driver ID:</strong> {order.assigned_driver_id?.id || "N/A"}</p>
                     </Card>
                 </Col>
 
                 {/* Delivery Info */}
-                <Col xs={12} md={6}>
-                    <Card className="order-detail-card h-100">
-                        <Card.Header>Delivery Information</Card.Header>
-                        <Card.Body>
-                            <p><strong>Address:</strong></p>
-                            <p className="order-detail-address">{order.delivery_address_id?.streetAddress || order.delivery_address_id?.savedAddress || "N/A"}</p>
-                            <p><strong>Distance:</strong> {order.distance?.toFixed(2)} km</p>
-                            <p><strong>Estimated:</strong> {formatDate(order.estimated_delivery)}</p>
-                            <p><strong>Delivered At:</strong> {formatDate(order.delivered_at)}</p>
-                        </Card.Body>
+                <Col xs={24} md={12}>
+                    <Card
+                        title={<span className="text-white font-bold">Delivery Information</span>}
+                        bordered
+                        className="rounded-xl shadow"
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<EnvironmentOutlined className="text-white text-xl" />}
+                    >
+                        <p><strong>Address:</strong></p>
+                        <p className="bg-gray-100 border-l-4 border-blue-500 p-3 rounded">
+                            {order.delivery_address_id?.streetAddress ||
+                                order.delivery_address_id?.savedAddress ||
+                                "N/A"}
+                        </p>
+                        <p><strong>Distance:</strong> {order.distance?.toFixed(2)} km</p>
+                        <p><strong>Estimated:</strong> {formatDate(order.estimated_delivery)}</p>
+                        <p><strong>Delivered At:</strong> {formatDate(order.delivered_at)}</p>
                     </Card>
                 </Col>
 
                 {/* Notes & Timestamps */}
-                <Col xs={12} md={6}>
-                    <Card className="order-detail-card h-100">
-                        <Card.Header>Additional Info</Card.Header>
-                        <Card.Body>
-                            <p className="order-detail-notes"><strong>Notes:</strong> {order.notes || "No notes available"}</p>
-                            <p><strong>Created At:</strong> {formatDate(order.created_at)}</p>
-                            <p><strong>Updated At:</strong> {formatDate(order.updated_at)}</p>
-                        </Card.Body>
+                <Col xs={24} md={12}>
+                    <Card
+                        title={<span className="text-white font-bold">Additional Information</span>}
+                        bordered
+                        className="rounded-xl shadow"
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<FileTextOutlined className="text-white text-xl" />}
+                    >
+                        <p className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
+                            <strong>Notes:</strong> {order.notes || "No notes available"}
+                        </p>
+                        <p><strong>Created At:</strong> {formatDate(order.created_at)}</p>
+                        <p><strong>Updated At:</strong> {formatDate(order.updated_at)}</p>
                     </Card>
                 </Col>
             </Row>
 
+            {/* Modals */}
             <AssignDriverModal
                 show={showAssignDriverModal}
                 handleClose={() => setShowAssignDriverModal(false)}
                 orderId={order.order_id}
             />
-
             <EditStatusModal
                 show={showEditStatusModal}
                 handleClose={() => setShowEditStatusModal(false)}

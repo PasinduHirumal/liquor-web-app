@@ -3,6 +3,21 @@ import { axiosInstance } from "../../lib/axios";
 import CreateBannerModal from "../../components/admin/forms/CreateBannerModal";
 import EditBannerModal from "../../components/admin/forms/EditBannerModal";
 import DeleteBannerButton from "../../components/admin/buttons/DeleteBannerButton";
+import {
+    Button,
+    Select,
+    Card,
+    Spin,
+    Typography,
+    Row,
+    Col,
+    Tag,
+    Empty,
+    message,
+} from "antd";
+
+const { Title, Text } = Typography;
+const { Option } = Select;
 
 function ManageBanner() {
     const [banners, setBanners] = useState([]);
@@ -27,6 +42,7 @@ function ManageBanner() {
             setError(null);
         } catch (err) {
             setError(err.response?.data?.message || "Failed to fetch banners");
+            message.error("Failed to fetch banners");
             console.error("Error fetching banners:", err);
         } finally {
             setLoading(false);
@@ -38,151 +54,112 @@ function ManageBanner() {
     }, [isActiveFilter, isLiquorFilter]);
 
     return (
-        <div className="bg-white py-4 px-md-5 px-3">
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <h2>Manage Banners</h2>
-                <button
-                    style={{
-                        padding: "8px 16px",
-                        backgroundColor: "#007bff",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: 4,
-                        cursor: "pointer"
-                    }}
+        <div className="bg-white p-6 rounded-0 shadow-sm">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-6">
+                <Title level={3} className="!mb-0">Manage Banners</Title>
+                <Button
+                    type="primary"
                     onClick={() => setShowCreateModal(true)}
                 >
                     Create Banner
-                </button>
+                </Button>
             </div>
 
             {/* Filters */}
-            <div style={{ display: "flex", gap: "1rem", marginTop: 20, marginBottom: 20 }}>
-                <select
+            <div className="flex flex-wrap gap-4 mb-6">
+                <Select
                     value={isActiveFilter}
-                    onChange={(e) => setIsActiveFilter(e.target.value)}
-                    style={{ padding: "6px" }}
+                    onChange={(value) => setIsActiveFilter(value)}
+                    placeholder="Filter by Status"
+                    className="w-40"
+                    allowClear
                 >
-                    <option value="">All Status</option>
-                    <option value="true">Active</option>
-                    <option value="false">Inactive</option>
-                </select>
+                    <Option value="true">Active</Option>
+                    <Option value="false">Inactive</Option>
+                </Select>
 
-                <select
+                <Select
                     value={isLiquorFilter}
-                    onChange={(e) => setIsLiquorFilter(e.target.value)}
-                    style={{ padding: "6px" }}
+                    onChange={(value) => setIsLiquorFilter(value)}
+                    placeholder="Filter by Type"
+                    className="w-40"
+                    allowClear
                 >
-                    <option value="">All Types</option>
-                    <option value="true">Liquor</option>
-                    <option value="false">Regular</option>
-                </select>
+                    <Option value="true">Liquor</Option>
+                    <Option value="false">Regular</Option>
+                </Select>
 
-                <button
-                    style={{
-                        padding: "6px 12px",
-                        backgroundColor: "#6c757d",
-                        color: "#fff",
-                        border: "none",
-                        borderRadius: 4,
-                        cursor: "pointer"
-                    }}
+                <Button
                     onClick={() => {
                         setIsActiveFilter("");
                         setIsLiquorFilter("");
                     }}
                 >
                     Reset Filters
-                </button>
+                </Button>
             </div>
 
-            {loading && <p>Loading banners...</p>}
-            {error && <p style={{ color: "red" }}>Error: {error}</p>}
+            {/* Content */}
+            {loading ? (
+                <div className="flex justify-center py-12">
+                    <Spin size="large" />
+                </div>
+            ) : error ? (
+                <Text type="danger">Error: {error}</Text>
+            ) : banners.length === 0 ? (
+                <Empty description="No banners found" />
+            ) : (
+                <div>
+                    <Title level={4}>Banner List ({banners.length})</Title>
+                    <Row gutter={[16, 16]} className="mt-4">
+                        {banners.map((banner) => (
+                            <Col key={banner.banner_id} xs={24} sm={12} lg={8}>
+                                <Card
+                                    hoverable
+                                    cover={
+                                        <img
+                                            alt={banner.title}
+                                            src={banner.image}
+                                            className="h-48 w-full object-cover rounded-t-lg"
+                                        />
+                                    }
+                                >
+                                    <Card.Meta
+                                        title={banner.title}
+                                        description={banner.description}
+                                    />
 
-            {!loading && !error && (
-                <>
-                    {banners.length === 0 ? (
-                        <p>No banners found</p>
-                    ) : (
-                        <div style={{ marginTop: 20 }}>
-                            <h3>Banner List ({banners.length})</h3>
-                            <div
-                                style={{
-                                    display: "grid",
-                                    gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-                                    gap: 20
-                                }}
-                            >
-                                {banners.map((banner) => (
-                                    <div
-                                        key={banner.banner_id}
-                                        style={{
-                                            border: "1px solid #ddd",
-                                            borderRadius: 8,
-                                            padding: 16,
-                                            boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-                                            display: "flex",
-                                            flexDirection: "column",
-                                            justifyContent: "space-between"
-                                        }}
-                                    >
-                                        <div>
-                                            <img
-                                                src={banner.image}
-                                                alt={banner.title}
-                                                style={{
-                                                    width: "100%",
-                                                    height: "auto",
-                                                    borderRadius: 4,
-                                                    marginBottom: 12
-                                                }}
-                                            />
-                                            <h4>{banner.title}</h4>
-                                            <p>{banner.description}</p>
-                                            <div style={{ display: "flex", justifyContent: "space-between", marginTop: 12 }}>
-                                                <span style={{
-                                                    color: banner.isActive ? "green" : "red",
-                                                    fontWeight: "bold"
-                                                }}>
-                                                    {banner.isActive ? "Active" : "Inactive"}
-                                                </span>
-                                                <span style={{
-                                                    color: banner.isLiquor ? "blue" : "gray",
-                                                    fontWeight: "bold"
-                                                }}>
-                                                    {banner.isLiquor ? "Liquor" : "Regular"}
-                                                </span>
-                                            </div>
-                                        </div>
-
-                                        <div className="gap-2 justify-content-end" style={{ display: "flex", marginTop: 12 }}>
-                                            <button
-                                                style={{
-                                                    marginTop: 12,
-                                                    padding: "6px 12px",
-                                                    backgroundColor: "#ffc107",
-                                                    color: "#000",
-                                                    border: "none",
-                                                    borderRadius: 4,
-                                                    cursor: "pointer",
-                                                }}
-                                                onClick={() => setEditBanner(banner)}
-                                            >
-                                                Edit
-                                            </button>
-                                            <DeleteBannerButton
-                                                bannerId={banner.banner_id}
-                                                onDeleted={fetchBanners}
-                                            />
-                                        </div>
+                                    <div className="flex justify-between mt-3">
+                                        <Tag color={banner.isActive ? "green" : "red"}>
+                                            {banner.isActive ? "Active" : "Inactive"}
+                                        </Tag>
+                                        <Tag color={banner.isLiquor ? "blue" : "default"}>
+                                            {banner.isLiquor ? "Liquor" : "Regular"}
+                                        </Tag>
                                     </div>
-                                ))}
-                            </div>
-                        </div>
-                    )}
-                </>
+
+                                    {/* Buttons aligned right with gap */}
+                                    <div className="flex justify-end gap-2 mt-4">
+                                        <Button
+                                            type="primary"
+                                            onClick={() => setEditBanner(banner)}
+                                        >
+                                            Edit
+                                        </Button>
+                                        <DeleteBannerButton
+                                            bannerId={banner.banner_id}
+                                            onDeleted={fetchBanners}
+                                        />
+                                    </div>
+                                </Card>
+                            </Col>
+                        ))}
+                    </Row>
+                </div>
             )}
 
+            {/* Modals */}
             {showCreateModal && (
                 <CreateBannerModal
                     onClose={() => setShowCreateModal(false)}

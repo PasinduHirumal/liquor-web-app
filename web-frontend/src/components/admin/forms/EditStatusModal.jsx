@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { Modal, Button, Form } from "react-bootstrap";
+import { Modal, Button, Form, Select } from "antd";
 import { axiosInstance } from "../../../lib/axios";
 import toast from "react-hot-toast";
+
+const { Option } = Select;
 
 const ORDER_STATUSES = {
     PENDING: "pending",
@@ -17,9 +19,7 @@ function EditStatusModal({ show, handleClose, orderId }) {
 
         try {
             setLoading(true);
-            await axiosInstance.patch(`/orders/update-status/${orderId}`, {
-                status,
-            });
+            await axiosInstance.patch(`/orders/update-status/${orderId}`, { status });
             toast.success("Order status updated successfully");
             handleClose();
         } catch (err) {
@@ -31,28 +31,38 @@ function EditStatusModal({ show, handleClose, orderId }) {
     };
 
     return (
-        <Modal show={show} onHide={handleClose} className="mt-5 pt-5">
-            <Modal.Header closeButton>
-                <Modal.Title>Edit Order Status</Modal.Title>
-            </Modal.Header>
-            <Modal.Body>
-                <Form.Group controlId="status">
-                    <Form.Label>Status</Form.Label>
-                    <Form.Select value={status} onChange={(e) => setStatus(e.target.value)}>
-                        <option value="">Select Status</option>
-                        <option value={ORDER_STATUSES.PENDING}>Pending</option>
-                        <option value={ORDER_STATUSES.PROCESSING}>Processing</option>
-                    </Form.Select>
-                </Form.Group>
-            </Modal.Body>
-            <Modal.Footer>
-                <Button variant="secondary" onClick={handleClose} disabled={loading}>
+        <Modal
+            open={show}
+            title="Edit Order Status"
+            onCancel={handleClose}
+            footer={[
+                <Button key="cancel" onClick={handleClose} disabled={loading}>
                     Cancel
-                </Button>
-                <Button variant="primary" onClick={handleUpdate} disabled={loading}>
-                    {loading ? "Updating..." : "Update"}
-                </Button>
-            </Modal.Footer>
+                </Button>,
+                <Button
+                    key="update"
+                    type="primary"
+                    onClick={handleUpdate}
+                    loading={loading}
+                >
+                    Update
+                </Button>,
+            ]}
+            className="rounded-xl"
+        >
+            <Form layout="vertical" className="space-y-4">
+                <Form.Item label="Status" required>
+                    <Select
+                        value={status}
+                        onChange={(val) => setStatus(val)}
+                        placeholder="Select Status"
+                        className="w-full"
+                    >
+                        <Option value={ORDER_STATUSES.PENDING}>Pending</Option>
+                        <Option value={ORDER_STATUSES.PROCESSING}>Processing</Option>
+                    </Select>
+                </Form.Item>
+            </Form>
         </Modal>
     );
 }

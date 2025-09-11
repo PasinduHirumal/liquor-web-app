@@ -160,7 +160,6 @@ function SuperMarket() {
             title: 'Action',
             key: 'action',
             width: 120,
-            fixed: 'right',
             render: (_, record) => (
                 <Space>
                     <Tooltip title="Edit">
@@ -191,18 +190,25 @@ function SuperMarket() {
 
     return (
         <div className="bg-white p-4">
-            <div className="d-flex justify-content-between align-items-center mb-4">
-                <h2 className="fw-bold mb-0">Supermarket Management</h2>
-                <div style={{ display: 'flex', gap: '10px' }}>
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+                {/* Title */}
+                <h2 className="text-xl font-bold text-gray-800">Supermarket Management</h2>
+
+                {/* Actions (Search + Create Button) */}
+                <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
                     <Input
                         placeholder="Search by name or address"
                         prefix={<SearchOutlined />}
                         value={searchText}
                         onChange={(e) => handleSearch(e.target.value)}
-                        style={{ width: 250 }}
+                        className="w-full sm:w-64"
                         allowClear
                     />
-                    <Button type="primary" onClick={() => setIsCreateModalOpen(true)}>
+                    <Button
+                        type="primary"
+                        className="w-full sm:w-auto"
+                        onClick={() => setIsCreateModalOpen(true)}
+                    >
                         Create Supermarket
                     </Button>
                 </div>

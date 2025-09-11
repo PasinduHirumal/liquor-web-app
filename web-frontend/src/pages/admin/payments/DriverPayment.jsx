@@ -9,9 +9,9 @@ import {
 import { HistoryOutlined, DollarOutlined, ReloadOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../../lib/axios.js";
-import DriverEarningHistoryModal from "../../../components/admin/DriverEarningHistoryModal.jsx";
-import DriverPaymentHistoryModal from "../../../components/admin/DriverPaymentHistoryModal.jsx";
-import DriverPaymentModal from "../../../components/admin/DriverPaymentModal.jsx";
+import DriverEarningHistoryModal from "../../../components/admin/payment/DriverEarningHistoryModal.jsx";
+import DriverPaymentHistoryModal from "../../../components/admin/payment/DriverPaymentHistoryModal.jsx";
+import DriverPaymentModal from "../../../components/admin/payment/DriverPaymentModal.jsx";
 
 const { Title } = Typography;
 
@@ -164,9 +164,9 @@ function DriverPayment() {
     ];
 
     return (
-        <div style={{ padding: 24 }} className="bg-white">
+        <div style={{ padding: "0 24px 24px 24px" }} className="bg-white">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                <Title level={2}>Driver Payments</Title>
+                <Title level={3}>Driver Payments</Title>
                 <Button
                     type="primary"
                     icon={<ReloadOutlined />}

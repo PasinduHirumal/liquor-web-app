@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Modal, Descriptions, InputNumber } from "antd";
 import toast from "react-hot-toast";
-import { axiosInstance } from "../../lib/axios";
+import { axiosInstance } from "../../../lib/axios";
 
 const DriverPaymentModal = ({ visible, onClose, driver, refreshDriverData }) => {
     const [processingPayment, setProcessingPayment] = useState(false);

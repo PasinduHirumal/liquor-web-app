@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../../lib/axios";
 import ConfirmDeleteDialog from "../../../common/ConfirmDeleteDialog";
+import { Button } from "antd";
 
 export default function DeleteBannerButton({ bannerId, onDeleted }) {
     const [loading, setLoading] = useState(false);
@@ -29,22 +30,13 @@ export default function DeleteBannerButton({ bannerId, onDeleted }) {
     };
 
     return (
-        <button
-            style={{
-                marginTop: 12,
-                padding: "6px 12px",
-                backgroundColor: "#dc3545",
-                color: "#fff",
-                border: "none",
-                borderRadius: 4,
-                cursor: loading ? "not-allowed" : "pointer",
-                alignSelf: "flex-end",
-                opacity: loading ? 0.6 : 1,
-            }}
+        <Button
+            type="primary"
+            danger
+            loading={loading}
             onClick={handleDelete}
-            disabled={loading}
         >
-            {loading ? "Deleting..." : "Delete"}
-        </button>
+            Delete
+        </Button>
     );
 }

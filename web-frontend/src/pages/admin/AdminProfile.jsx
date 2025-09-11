@@ -1,9 +1,19 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
+import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { FaUserCircle } from "react-icons/fa";
+import {
+    Spin,
+    Alert,
+    Button,
+    Card,
+    Tag,
+    Typography,
+} from "antd";
+
+const { Title, Text } = Typography;
 
 const AdminProfile = () => {
     const { id } = useParams();
@@ -20,12 +30,15 @@ const AdminProfile = () => {
             if (!data?.data) {
                 throw new Error("Admin data not found in response");
             }
-
             setAdmin(data.data);
         } catch (error) {
             console.error("Error fetching admin:", error);
-            setError(error?.response?.data?.message || "Failed to fetch admin details");
-            toast.error(error?.response?.data?.message || "Failed to fetch admin details");
+            setError(
+                error?.response?.data?.message || "Failed to fetch admin details"
+            );
+            toast.error(
+                error?.response?.data?.message || "Failed to fetch admin details"
+            );
         } finally {
             setLoading(false);
         }
@@ -44,153 +57,126 @@ const AdminProfile = () => {
         }
     };
 
-    const getRoleBadgeClass = (role) => {
+    const getRoleColor = (role) => {
         switch (role) {
             case "super_admin":
-                return "bg-danger";
+                return "error";
             case "admin":
-                return "bg-primary";
+                return "blue";
             case "pending":
-                return "bg-warning text-dark";
+                return "warning";
             default:
-                return "bg-secondary";
+                return "default";
         }
     };
 
     if (loading) {
         return (
-            <div className="d-flex justify-content-center align-items-center bg-white" style={{ minHeight: "60vh" }}>
-                <div className="spinner-border text-primary" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
-                <span className="ms-2">Loading admin details...</span>
+            <div className="flex justify-center items-center min-h-[60vh] bg-white">
+                <Spin tip="Loading admin details..." size="large" />
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="container pt-5 bg-white">
-                <div className="alert alert-danger text-center">
-                    {error}
-                    <button
-                        className="btn btn-sm btn-outline-danger ms-3"
-                        onClick={fetchAdminDetails}
-                    >
-                        Retry
-                    </button>
-                </div>
+            <div className="container mx-auto py-10 bg-white">
+                <Alert
+                    message={error}
+                    type="error"
+                    showIcon
+                    action={
+                        <Button size="small" onClick={fetchAdminDetails}>
+                            Retry
+                        </Button>
+                    }
+                />
             </div>
         );
     }
 
     if (!admin) {
         return (
-            <div className="container pt-5 bg-white">
-                <div className="alert alert-warning text-center">
-                    Admin not found
-                </div>
+            <div className="container mx-auto py-10 bg-white">
+                <Alert message="Admin not found" type="warning" showIcon />
             </div>
         );
     }
 
     return (
-        <div className="container-fluid py-4 bg-white">
-            <div className="row justify-content-center">
-                <div className="col-md-10 col-lg-8">
-                    <div className="card shadow-sm border rounded-3">
-                        <div className="card-header bg-dark text-white rounded-top-3 py-3">
-                            <h3 className="mb-0 text-center">Admin Profile</h3>
-                        </div>
-                        <div className="card-body p-4">
-                            <div className="d-flex flex-column flex-md-row align-items-center mb-4">
-                                <div className="mb-3 mb-md-0 me-md-4">
-                                    <div className="bg-light rounded-circle p-3 d-flex align-items-center justify-content-center" style={{ width: "100px", height: "100px" }}>
-                                        <FaUserCircle size={60} color="#0d6efd" />
-                                    </div>
-                                </div>
-                                <div className="text-center text-md-start">
-                                    <h2 className="mb-1">{admin.firstName} {admin.lastName}</h2>
-                                    <span className={`badge ${getRoleBadgeClass(admin.role)} fs-6`}>
-                                        {admin.role?.replace(/_/g, ' ').toUpperCase()}
-                                    </span>
-                                    {admin.isActive === false && (
-                                        <span className="badge bg-dark ms-2 fs-6">INACTIVE</span>
-                                    )}
-                                </div>
-                            </div>
-
-                            <div className="row">
-                                <div className="col-md-6">
-                                    <div className="card mb-3">
-                                        <div className="card-header bg-light">Personal Information</div>
-                                        <ul className="list-group list-group-flush">
-                                            <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                <strong>Admin ID:</strong>
-                                                <span className="text-muted font-monospace">{admin.id}</span>
-                                            </li>
-                                            <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                <strong>Email:</strong>
-                                                <span>{admin.email || "N/A"}</span>
-                                            </li>
-                                            <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                <strong>Phone:</strong>
-                                                <span>{admin.phone || "N/A"}</span>
-                                            </li>
-                                            <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                <strong>Date of Birth:</strong>
-                                                <span>{formatDate(admin.dateOfBirth)}</span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-
-                                <div className="col-md-6">
-                                    <div className="card mb-3">
-                                        <div className="card-header bg-light">Account Information</div>
-                                        <ul className="list-group list-group-flush">
-                                            <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                <strong>Status:</strong>
-                                                <span>
-                                                    {admin.isActive ? (
-                                                        <span className="badge bg-success">Active</span>
-                                                    ) : (
-                                                        <span className="badge bg-secondary">Inactive</span>
-                                                    )}
-                                                </span>
-                                            </li>
-                                            <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                <strong>Admin Approval:</strong>
-                                                <span>
-                                                    {admin.isAdminAccepted ? (
-                                                        <span className="badge bg-success">Approved</span>
-                                                    ) : (
-                                                        <span className="badge bg-warning text-dark">Pending</span>
-                                                    )}
-                                                </span>
-                                            </li>
-                                            <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                <strong>Email Verified:</strong>
-                                                <span>
-                                                    {admin.isAccountVerified ? (
-                                                        <span className="badge bg-success">Verified</span>
-                                                    ) : (
-                                                        <span className="badge bg-warning text-dark">Unverified</span>
-                                                    )}
-                                                </span>
-                                            </li>
-                                            <li className="list-group-item d-flex justify-content-between align-items-center">
-                                                <strong>Warehouse:</strong>
-                                                <span>{admin.where_house_id?.name}</span>
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+        <div className="mx-auto py-6 px-4 bg-white">
+            <Card className="shadow-md rounded-2xl">
+                <div className="flex flex-col md:flex-row items-center gap-6 p-6 border-b">
+                    <div className="flex items-center justify-center w-28 h-28 rounded-full bg-gray-100">
+                        <FaUserCircle size={80} className="text-blue-600" />
+                    </div>
+                    <div className="text-center md:text-left">
+                        <Title level={3} className="mb-2">
+                            {admin.firstName} {admin.lastName}
+                        </Title>
+                        <Tag color={getRoleColor(admin.role)}>
+                            {admin.role?.replace(/_/g, " ").toUpperCase()}
+                        </Tag>
+                        {admin.isActive === false && <Tag color="default">INACTIVE</Tag>}
                     </div>
                 </div>
-            </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 py-6">
+                    <Card size="small" title="Personal Information">
+                        <div className="space-y-3">
+                            <div className="flex justify-between">
+                                <Text strong>Admin ID:</Text>
+                                <Text code>{admin.id}</Text>
+                            </div>
+                            <div className="flex justify-between">
+                                <Text strong>Email:</Text>
+                                <Text>{admin.email || "N/A"}</Text>
+                            </div>
+                            <div className="flex justify-between">
+                                <Text strong>Phone:</Text>
+                                <Text>{admin.phone || "N/A"}</Text>
+                            </div>
+                            <div className="flex justify-between">
+                                <Text strong>Date of Birth:</Text>
+                                <Text>{formatDate(admin.dateOfBirth)}</Text>
+                            </div>
+                        </div>
+                    </Card>
+
+                    <Card size="small" title="Account Information">
+                        <div className="space-y-3">
+                            <div className="flex justify-between">
+                                <Text strong>Status:</Text>
+                                {admin.isActive ? (
+                                    <Tag color="success">Active</Tag>
+                                ) : (
+                                    <Tag color="default">Inactive</Tag>
+                                )}
+                            </div>
+                            <div className="flex justify-between">
+                                <Text strong>Admin Approval:</Text>
+                                {admin.isAdminAccepted ? (
+                                    <Tag color="success">Approved</Tag>
+                                ) : (
+                                    <Tag color="warning">Pending</Tag>
+                                )}
+                            </div>
+                            <div className="flex justify-between">
+                                <Text strong>Email Verified:</Text>
+                                {admin.isAccountVerified ? (
+                                    <Tag color="success">Verified</Tag>
+                                ) : (
+                                    <Tag color="warning">Unverified</Tag>
+                                )}
+                            </div>
+                            <div className="flex justify-between">
+                                <Text strong>Warehouse:</Text>
+                                <Text>{admin.where_house_id?.name || "N/A"}</Text>
+                            </div>
+                        </div>
+                    </Card>
+                </div>
+            </Card>
         </div>
     );
 };
