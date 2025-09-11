@@ -270,7 +270,7 @@ const FinanceReport = () => {
               <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                 <Row justify="space-between">
                   <Text strong style={{ fontSize: 17 }}>Total Income</Text>
-                  <Text style={{ fontSize: 17, color: "#3f8600" }}>
+                  <Text style={{ fontSize: 17}}>
                     Rs: {reportData.income.total_income.toFixed(2)}
                   </Text>
                 </Row>
