@@ -180,8 +180,8 @@ const FinanceReport = () => {
         <Col xs={24} sm={12} md={6}>
           <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
             <Statistic
-              title="Total Income"
-              value={reportData.income.total_income}
+              title="Total Income Balance"
+              value={reportData.income.total_income_balance}
               precision={2}
               prefix="Rs: "
               valueStyle={{ color: "#3f8600" }}
