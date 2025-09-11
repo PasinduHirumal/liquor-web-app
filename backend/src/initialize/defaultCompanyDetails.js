@@ -15,6 +15,7 @@ const createDefaultCompanyDetails = async () => {
                 where_house_location: MAIN_WAREHOUSE_DATA.LOCATION,
                 delivery_charge_for_1KM: MAIN_WAREHOUSE_DATA.DELIVERY_CHARGE_FOR_1KM,
                 service_charge: MAIN_WAREHOUSE_DATA.SERVICE_CHARGE,
+                tax_charge: MAIN_WAREHOUSE_DATA.TAX_CHARGE,
                 isActive: true
             };
 

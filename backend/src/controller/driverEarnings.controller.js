@@ -61,7 +61,7 @@ const createDriverEarning = async (driver_id, order_id) => {
             error: "Failed to create Driver Earning" 
         };
     }
-}
+};
 
 const updateDriverEarning = async (driver_id, earning_id) => {
     try {
@@ -96,7 +96,7 @@ const updateDriverEarning = async (driver_id, earning_id) => {
             error: "Failed to update Driver Earning" 
         };
     }
-}
+};
 
 const getAllEarningsForDriverById = async (req, res) => {
 	try {

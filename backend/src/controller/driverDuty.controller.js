@@ -1,9 +1,39 @@
 import DriverDutyService from '../services/driverDuty.service.js';
 import OrdersService from '../services/orders.service.js';
 import populateDriver from '../utils/populateDriver.js';
+import { extractSupermarketIds } from '../utils/orderHelpers.js';
 
 const dutyService = new DriverDutyService();
 const orderService = new OrdersService();
+
+const createDriverDuty = async (assigned_driver_id, order, ) => {
+    try {
+        const Super_Market_ids = await extractSupermarketIds(order.items);
+
+        const driverDutyData = {
+            driver_id: assigned_driver_id,
+            order_id: order.order_id,
+            warehouse_id: order.warehouse_id,
+            superMarket_ids: Super_Market_ids,
+            is_completed: false,
+            is_driver_accepted: false,
+            is_re_assigning_driver: order.assigned_driver_id !== undefined
+        }
+
+        const driverDuty = await dutyService.create(driverDutyData);
+
+        return { 
+            success: true, 
+            duty_data: driverDuty
+        };
+    } catch (error) {
+        console.error('Driver duty creation error:', error);
+        return { 
+            success: false, 
+            error: "Failed to create Driver Duty" 
+        };
+    }
+};
 
 const getAllDutiesForOrder = async (req, res) => {
 	try {
@@ -67,4 +97,4 @@ const getAllDutiesForOrder = async (req, res) => {
     }
 };
 
-export { getAllDutiesForOrder };
+export { createDriverDuty, getAllDutiesForOrder };

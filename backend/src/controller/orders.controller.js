@@ -1,9 +1,6 @@
 import OrdersService from '../services/orders.service.js';
 import DriverService from "../services/driver.service.js";
 import CompanyService from "../services/company.service.js";
-import DriverDutyService from '../services/driverDuty.service.js';
-import ProductService from '../services/product.service.js';
-import OtherProductService from '../services/otherProduct.service.js';
 import DriverEarningsService from '../services/driverEarnings.service.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
 import populateUser from '../utils/populateUser.js';
@@ -12,14 +9,14 @@ import populateWhereHouse from "../utils/populateWhere_House.js";
 import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
 import { populateAddressWithUserIdInData } from '../utils/populateAddress.js';
 import { createDriverEarning, updateDriverEarning } from './driverEarnings.controller.js';
+import { updateOrderMissingFields } from '../utils/orderHelpers.js';
+import { validateDriverForDuty } from '../utils/validateDriverForDelivery.js';
+import { createDriverDuty } from './driverDuty.controller.js';
 
 
 const orderService = new OrdersService();
 const driverService = new DriverService();
-const dutyService = new DriverDutyService();
 const companyService = new CompanyService();
-const liquorService = new ProductService();
-const groceryService = new OtherProductService();
 const driverEarningService = new DriverEarningsService();
 
 
@@ -115,219 +112,127 @@ const getOrderById = async (req, res) => {
     }
 };
 
-const updateOrder = async (req, res) => {
+const assignDriverForOrderById = async (req, res) => {
 	try {
         const orderId = req.params.id;
-        const { status, assigned_driver_id } = req.body;
+        const { assigned_driver_id } = req.body;
 
         let order = await orderService.findById(orderId);
         if (!order) {
             return res.status(404).json({ success: false, message: "Order not found"});
         }
 
-        const updateOrderData = {};
-
-        // update order with if it is driver accepted or not
-        if (order.is_driver_accepted === undefined){
-            updateOrderData.is_driver_accepted = false;
+        const driver = await driverService.findById(assigned_driver_id);
+        if (!driver) {
+            return res.status(404).json({ success: false, message: "Driver not found"});
         }
 
-        // updater order with supermarket id's of products
-        if (!order.superMarket_ids || order.superMarket_ids.length === 0) {
-            try {
-                const product_ids = [];
-                const Super_Market_ids = [];
-
-                if (order.items && Array.isArray(order.items) && order.items.length > 0) {
-                    order.items.forEach(item => {
-                        if (item.product_id) {
-                            product_ids.push(item.product_id);
-                        } 
-                    });
-                }
-
-                if (product_ids.length > 0) {
-                    for (const product_id of product_ids) {
-                        try {
-                            let tempProduct = await liquorService.findById(product_id);
-                            if (!tempProduct) {
-                                tempProduct = await groceryService.findById(product_id);
-                            }
-
-                            const product = tempProduct;
-
-                            if (product && product.superMarket_id) {
-                                if (!Super_Market_ids.includes(product.superMarket_id)) {
-                                    Super_Market_ids.push(product.superMarket_id);
-                                }
-                            }
-                        } catch (productError) {
-                            console.error(`Error fetching product ${product_id}:`, productError);
-                        }
-                    }
-                }
-
-                if (Super_Market_ids.length > 0) {
-                    updateOrderData.superMarket_ids = Super_Market_ids;
-                }
-            } catch (error) {
-                console.error("Error updating supermarket ids:", error);
-                return res.status(500).json({ success: false, message: "Failed to update supermarket ids" });
-            }
+        // update supermarket ids and is_driver_accepted
+        try {
+            order = await updateOrderMissingFields(order, orderId);
+        } catch (error) {
+            return res.status(500).json({ success: false, message: error.message });
         }
 
-        if (Object.keys(updateOrderData).length > 0) {
-            const updatedOrderWithSupermarketIdsAndIsDriverAccepted = await orderService.updateById(orderId, updateOrderData);
-            order = updatedOrderWithSupermarketIdsAndIsDriverAccepted;
-        }
-
-        let driver_duty = null;
-        let driver_earning = null;
-        const isAssigningDriver = assigned_driver_id !== undefined;
-        const isUpdatingStatus = status !== undefined;
-
-        if (isAssigningDriver && order.is_driver_accepted) {
+        // Check if order is already accepted by a driver
+        if (assigned_driver_id && order.is_driver_accepted) {
             const driver = await driverService.findById(order.assigned_driver_id);
             return res.status(400).json({ success: false, message: `Order is already accepted by driver: ${driver.firstName} ${driver.lastName}` });
         }
 
-        const SuperMarket_ids_for_order_table = [];
-
-        // assign driver & create driver duty
-        if (isAssigningDriver && !order.is_driver_accepted) {
-            const driver = await driverService.findById(assigned_driver_id);
-            if (!driver) {
-                return res.status(404).json({ success: false, message: "Driver not found"});
-            }
-
-            const failedChecks = [];
-            
-            if (!driver.isDocumentVerified) failedChecks.push("Documents not verified");
-            if (!driver.isAccountVerified) failedChecks.push("Account not verified");
-            if (!driver.isAvailable) failedChecks.push("Not available");
-            if (!driver.isActive) failedChecks.push("Account not active");
-            if (driver.backgroundCheckStatus !== "approved") {
-                failedChecks.push(`Background check ${driver.backgroundCheckStatus} (must be approved)`);
-            }
-            if (driver.where_house_id !== order.warehouse_id) {
-                failedChecks.push("Can't get this order (driver & order must be same where house)");
-            }
-
-            if (failedChecks.length > 0) {
-                return res.status(400).json({ success: false, message: failedChecks.join(', ') });
-            }
-
-            // create driver duty
-            try {
-                const product_ids = [];
-                const Super_Market_ids = [];
-
-                if (order.items && Array.isArray(order.items) && order.items.length > 0) {
-                    order.items.forEach(item => {
-                       if (item.product_id) {
-                        product_ids.push(item.product_id);
-                       } 
-                    });
-                }
-
-                if (product_ids.length > 0) {
-                    for (const product_id of product_ids) {
-                        try {
-                            let tempProduct = await liquorService.findById(product_id);
-                            if (!tempProduct) {
-                                tempProduct = await groceryService.findById(product_id);
-                            }
-
-                            const product = tempProduct;
-
-                            if (product && product.superMarket_id) {
-                                if (!Super_Market_ids.includes(product.superMarket_id)) {
-                                    Super_Market_ids.push(product.superMarket_id);
-                                    SuperMarket_ids_for_order_table.push(product.superMarket_id);
-                                }
-                            }
-                        } catch (productError) {
-                            console.error(`Error fetching product ${product_id}:`, productError);
-                        }
-                    }
-                }
-
-                const driverDutyData = {
-                    driver_id: assigned_driver_id,
-                    order_id: order.order_id,
-                    warehouse_id: order.warehouse_id,
-                    superMarket_ids: Super_Market_ids,
-                    is_completed: false,
-                    is_driver_accepted: false,
-                    is_re_assigning_driver: order.assigned_driver_id !== undefined
-                }
-
-                const driverDuty = await dutyService.create(driverDutyData);
-                if (!driverDuty){
-                    return res.status(500).json({ success: false, message: "Failed to creating driver duty" });
-                }
-
-                driver_duty = driverDuty;
-            } catch (error) {
-                console.error("Error creating driver duty:", error);
-                return res.status(500).json({ success: false, message: "Failed to creating driver duty" });
-            }
-
-            // create driver earning
-            const existingDriverEarning = await driverEarningService.findByOrderId(orderId);
-            if (!existingDriverEarning) {
-                const created_earning = await createDriverEarning(assigned_driver_id, orderId);
-
-                if (!created_earning.shouldCreateEarning) {
-                    return res.status(400).json({ success: false, message: created_earning.error });
-                }
-
-                driver_earning = created_earning.data;
-            } else {
-                const earning_id = existingDriverEarning.earning_id;
-                const updated_earning = await updateDriverEarning(assigned_driver_id, earning_id);
-
-                if (!updated_earning.shouldUpdateEarning) {
-                    return res.status(400).json({ success: false, message: updated_earning.error });
-                }
-
-                driver_earning = updated_earning.data;
-            }
+        // check driver validation for delivery
+        const Driver_Validation_Result = validateDriverForDuty(driver, order);
+        if (!Driver_Validation_Result.isValid) {
+            return res.status(400).json({ success: false, message: Driver_Validation_Result.errors });
         }
 
-        const updateData = { ...req.body };
+        // create driver duty
+        const Driver_Duty_Result = await createDriverDuty(assigned_driver_id, order);
+        if (!Driver_Duty_Result.success) {
+            return res.status(400).json({ success: false, message: Driver_Duty_Result.error });
+        }
 
-        if (SuperMarket_ids_for_order_table.length > 0) updateData.superMarket_ids = SuperMarket_ids_for_order_table;
-        if (isAssigningDriver) updateData.status = ORDER_STATUS.PROCESSING;
-        if (driver_earning !== null) updateData.driver_earning_id = driver_earning.earning_id;
+        // create driver earning
+        let driver_earning_temp = null;
+        const existingDriverEarning = await driverEarningService.findByOrderId(orderId);
+        if (!existingDriverEarning) {
+            const created_earning = await createDriverEarning(assigned_driver_id, orderId);
+
+            if (!created_earning.shouldCreateEarning) {
+                return res.status(400).json({ success: false, message: created_earning.error });
+            }
+
+            driver_earning_temp = created_earning.data;
+        } else {
+            const earning_id = existingDriverEarning.earning_id;
+            const updated_earning = await updateDriverEarning(assigned_driver_id, earning_id);
+
+            if (!updated_earning.shouldUpdateEarning) {
+                return res.status(400).json({ success: false, message: updated_earning.error });
+            }
+
+            driver_earning_temp = updated_earning.data;
+        }
+
+        const driver_earning = driver_earning_temp;
+
+        const updateData = { 
+            assigned_driver_id: assigned_driver_id,
+            status: ORDER_STATUS.PROCESSING,
+            driver_earning_id: driver_earning?.earning_id ?? null,
+        };
 
         const updatedOrder = await orderService.updateById(orderId, updateData);
         if (!updatedOrder) {
             return res.status(500).json({ success: false, message: "Failed to update order"});
         }
 
-        let successMessage = "Order updated successfully";
-        if (isAssigningDriver && isUpdatingStatus) {
-            successMessage = "Order status updated and Driver assigned successfully";
-        } else if (isAssigningDriver) {
-            successMessage = "Driver assigned successfully";
-        } else if (isUpdatingStatus) {
-            successMessage = "Order status updated successfully";
-        }
-
         return res.status(200).json({ 
             success: true, 
-            message: successMessage, 
+            message: "Order status updated and Driver assigned successfully", 
             data: {
-                duty: driver_duty,
+                duty: Driver_Duty_Result.duty_data,
                 earning: driver_earning,
                 order: updatedOrder
             }
         });
     } catch (error) {
-        console.error("Update Order error:", error.message);
+        console.error("Assign driver for Order error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
 
-export { getAllOrders, getOrderById, updateOrder};
+const updateOrderStatusById = async (req, res) => {
+	try {
+        const order_id = req.params.id;
+        const { status } = req.body;
+
+        const order = await orderService.findById(order_id);
+        if (!order) {
+            return res.status(404).json({ success: false, message: "Order not found"});
+        }
+
+        const immutableStatuses = [ORDER_STATUS.DELIVERED, ORDER_STATUS.OUT_FOR_DELIVERY, ORDER_STATUS.CANCELLED];
+        if (immutableStatuses.includes(order.status)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: `Can't update order status. Order is at ${order.status}`
+            });
+        }
+
+        const updateData = { status: status };
+
+        const updatedOrder = await orderService.updateById(order_id, updateData);
+
+        return res.status(200).json({ 
+            success: true, 
+            message: "Order status updated successfully", 
+            data: updatedOrder 
+        });
+    } catch (error) {
+        console.error("Method_name error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+export { getAllOrders, getOrderById, assignDriverForOrderById, updateOrderStatusById };

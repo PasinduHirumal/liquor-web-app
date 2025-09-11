@@ -23,10 +23,11 @@ class Orders {
         this.delivered_at = data.delivered_at;
         
         this.delivery_fee = data.delivery_fee;
-        this.subtotal = data.subtotal;
         this.tax_amount = data.tax_amount;
-        this.total_cost_price = data.total_cost_price;
+        this.service_charge = data.service_charge;
+        this.subtotal = data.subtotal;
         this.total_amount = data.total_amount;
+        this.total_cost_price = data.total_cost_price;
 
         this.payment_method = data.payment_method;
         this.payment_status = data.payment_status;

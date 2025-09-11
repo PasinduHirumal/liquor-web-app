@@ -12,8 +12,9 @@ const validateCompanyDetails = (req, res, next) => {
     //where_house_location: locationSchema.default({ lat: null, lng: null }),
     where_house_location: locationSchema.required(),
     address: Joi.string().min(2).max(350).required(),
-    delivery_charge_for_1KM: Joi.number().positive().precision(2).default(0.01),
-    service_charge: Joi.number().min(0).max(100).precision(2).default(0),
+    delivery_charge_for_1KM: Joi.number().positive().precision(2).required(),
+    service_charge: Joi.number().min(0).max(100).precision(2).required(),
+    tax_charge: Joi.number().min(0).max(100).precision(2).required(),
     isLiquorActive: Joi.boolean().default(true),
     isActive: Joi.boolean().default(true),
   })
@@ -57,6 +58,7 @@ const validateCompanyDetailsUpdate = (req, res, next) => {
     address: Joi.string().min(1).max(350).optional(),
     delivery_charge_for_1KM: Joi.number().positive().precision(2).optional(),
     service_charge: Joi.number().min(0).max(100).precision(2).optional(),
+    tax_charge: Joi.number().min(0).max(100).precision(2).optional(),
     isLiquorActive: Joi.boolean().optional(),
     isActive: Joi.boolean().optional(),
   })

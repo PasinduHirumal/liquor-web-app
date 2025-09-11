@@ -9,7 +9,7 @@ const validateOrderStatusUpdate = (req, res, next) => {
 
   const schema = Joi.object({
     //status: Joi.string().valid(...Object.values(ORDER_STATUS)).optional(),
-    status: Joi.string().valid(ORDER_STATUS.PENDING, ORDER_STATUS.PROCESSING).optional(),
+    status: Joi.string().valid(ORDER_STATUS.PENDING, ORDER_STATUS.PROCESSING).required(),
   })
   .min(1) // Require at least one field to update
   .options({ stripUnknown: true });; 
@@ -45,7 +45,7 @@ const validateOrderAssignedDriverUpdate = (req, res, next) => {
   }
   
   const schema = Joi.object({
-    assigned_driver_id: Joi.string().min(1).max(100).optional(),
+    assigned_driver_id: Joi.string().min(1).max(100).required(),
   })
   .min(1) // Require at least one field to update
   .options({ stripUnknown: true });; 
