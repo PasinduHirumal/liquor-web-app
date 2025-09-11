@@ -95,18 +95,17 @@ class DriverService extends BaseService {
         }
     }
 
-    async updateFinanceForDriverById(driver_id, totalEarnings, totalWithdraws, currentBalance) {
+    async updateFinanceForDriverById(driver_id, totalWithdraws, currentBalance) {
         try {
-            const updateData = {};
-            updateData.totalEarnings = totalEarnings;
-            updateData.totalWithdraws = totalWithdraws;
-            updateData.currentBalance = currentBalance;
+            const updateData = {
+                totalWithdraws: totalWithdraws,
+                currentBalance: currentBalance
+            };
 
             const result = await this.updateById(driver_id, updateData);
             if (!result) {
                 return {
                     success: false,
-                    totalEarnings: 0,
                     totalWithdraws: 0,
                     currentBalance: 0,
                 }

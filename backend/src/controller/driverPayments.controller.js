@@ -17,37 +17,29 @@ const payToDriverByDriverId = async (req, res) => {
         }
 
         const Total_Earnings = await driverEarningsService.getTotalEarningForDriver(driver_id);
-        if (Total_Earnings === null || Total_Earnings === undefined) {
-            return res.status(404).json({ success: false, message: "Failed to get total earnings"});
-        }
-
         const Total_Payments = await driverPaymentService.getTotalPaymentsForDriver(driver_id);
-        if (Total_Payments === null || Total_Payments === undefined) {
-            return res.status(404).json({ success: false, message: "Failed to get total payments"});
-        }
+        
+        const Amount_Can_Pay = parseFloat((Total_Earnings - Total_Payments).toFixed(2));
 
-        const Current_Balance = parseFloat((Total_Earnings - Total_Payments).toFixed(2));
-
-        // calculate new balance
-        const Current_Balance_New = parseFloat((Current_Balance - payment_value).toFixed(2));
-        if (Current_Balance_New < 0) {
+        if (Amount_Can_Pay < payment_value) {
             return res.status(400).json({ success: false, message: "Insufficient current balance"});
         }
 
+        const Current_Balance_New = parseFloat((Amount_Can_Pay - payment_value).toFixed(2));
+
         const paymentData = {
             driver_id: driver_id,
-            current_balance_before: Current_Balance,
+            current_balance_before: Amount_Can_Pay,
             payment_value: payment_value,
             current_balance_new: Current_Balance_New
         };
 
         const payment = await driverPaymentService.create(paymentData);
 
+        const Total_Payments_New = Total_Payments + payment_value;
+        
         // update driver
-        const Total_Withdraws = await driverPaymentService.getTotalPaymentsForDriver(driver_id);
-        const New_Current_Balance = parseFloat((Total_Earnings - Total_Withdraws).toFixed(2));
-
-        const updatedFinanceResult = await driverService.updateFinanceForDriverById(driver_id, Total_Earnings, Total_Withdraws, New_Current_Balance);
+        const updatedFinanceResult = await driverService.updateFinanceForDriverById(driver_id, Total_Payments_New, Current_Balance_New);
         if (!updatedFinanceResult.success) {
             return res.status(400).json({ success: false, message: "Failed to update finance section of driver"});
         }
