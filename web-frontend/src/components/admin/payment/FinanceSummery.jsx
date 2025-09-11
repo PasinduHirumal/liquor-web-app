@@ -45,7 +45,7 @@ function FinanceSummery() {
 
     return (
         <div style={{ padding: "0 24px 24px 24px" }}>
-            <Title level={3}>Driver Payments</Title>
+            <Title level={3}>Finance Summery</Title>
 
             <Row gutter={[16, 16]}>
                 <Col xs={24} sm={12} md={8}>
