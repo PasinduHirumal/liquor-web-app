@@ -154,7 +154,9 @@ function OrderDetail() {
                         </p>
                         <p>
                             <strong>Driver Accepted:</strong>{" "}
-                            {order.is_driver_accepted ? "Yes" : "No"}
+                            <Tag color={order.is_driver_accepted ? "green" : "red"}>
+                                {order.is_driver_accepted ? "Yes" : "No"}
+                            </Tag>
                         </p>
                         <p>
                             <strong>Warehouse:</strong>{" "}
