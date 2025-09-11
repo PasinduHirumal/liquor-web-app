@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Card, Statistic, Row, Col, Spin, Alert } from "antd";
+import { Card, Statistic, Row, Col, Spin, Alert, Typography } from "antd";
 import {
     DollarOutlined,
     ArrowUpOutlined,
@@ -8,6 +8,8 @@ import {
     WalletOutlined,
 } from "@ant-design/icons";
 import { axiosInstance } from "../../../lib/axios";
+
+const { Title } = Typography;
 
 function FinanceSummery() {
     const [summary, setSummary] = useState(null);
@@ -42,10 +44,8 @@ function FinanceSummery() {
     if (error) return <Alert type="error" message={error} className="mt-4" />;
 
     return (
-        <div style={{ padding: 24 }}>
-            <h1 style={{ fontSize: 24, fontWeight: "bold", marginBottom: 20 }}>
-                Finance Summary
-            </h1>
+        <div style={{ padding: "0 24px 24px 24px" }}>
+            <Title level={3}>Driver Payments</Title>
 
             <Row gutter={[16, 16]}>
                 <Col xs={24} sm={12} md={8}>

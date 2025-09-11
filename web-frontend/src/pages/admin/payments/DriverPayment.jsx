@@ -166,7 +166,7 @@ function DriverPayment() {
     return (
         <div style={{ padding: 24 }} className="bg-white">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
-                <Title level={2}>Driver Payments</Title>
+                <Title level={3}>Driver Payments</Title>
                 <Button
                     type="primary"
                     icon={<ReloadOutlined />}
