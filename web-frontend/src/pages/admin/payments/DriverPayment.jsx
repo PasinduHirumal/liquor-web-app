@@ -164,7 +164,7 @@ function DriverPayment() {
     ];
 
     return (
-        <div style={{ padding: 24 }} className="bg-white">
+        <div style={{ padding: "0 24px 24px 24px" }} className="bg-white">
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
                 <Title level={3}>Driver Payments</Title>
                 <Button
