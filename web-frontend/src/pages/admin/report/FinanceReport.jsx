@@ -212,84 +212,89 @@ const FinanceReport = () => {
         </Col>
       </Row>
 
-      {/* Income */}
-      <Collapse defaultActiveKey={['1']} style={{ marginBottom: "20px", background: '#fff' }}>
-        <Panel header="Income" key="1">
-          <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12} md={6}>
-              <Statistic
-                title="Delivery Charges"
-                value={reportData.income.total_delivery_charges}
-                precision={2}
-                prefix="Rs: "
-              />
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Statistic
-                title="Service Charges"
-                value={reportData.income.total_tax_charges}
-                precision={2}
-                prefix="Rs: "
-              />
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Statistic
-                title="Product Profits"
-                value={reportData.income.total_profits_from_products}
-                precision={2}
-                prefix="Rs: "
-                valueStyle={{
-                  color: reportData.income.total_profits_from_products >= 0 ? "#3f8600" : "#cf1322"
-                }}
-              />
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Statistic
-                title="Total Income"
-                value={reportData.income.total_income}
-                precision={2}
-                prefix="Rs: "
-                valueStyle={{ color: "#3f8600" }}
-              />
-            </Col>
-          </Row>
-        </Panel>
-      </Collapse>
-      
-      {/* Income Breakdown */}
-      <Collapse defaultActiveKey={['1']} style={{ marginBottom: "20px", background: '#fff' }}>
-        <Panel header="Income Breakdown" key="1">
-          <Row gutter={[16, 16]}>
-            <Col xs={24} sm={12} md={6}>
-              <Statistic
-                title="Total Income"
-                value={reportData.income.total_income}
-                precision={2}
-                prefix="Rs: "
-                valueStyle={{ color: "#3f8600" }}
-              />
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Statistic
-                title="Driver Payments"
-                value={reportData.income.total_payments_for_drivers}
-                precision={2}
-                prefix="Rs: "
-                valueStyle={{ color: "#cf1322" }}
-              />
-            </Col>
-            <Col xs={24} sm={12} md={6}>
-              <Statistic
-                title="Income Balance"
-                value={reportData.income.total_income_balance}
-                precision={2}
-                prefix="Rs: "
-                valueStyle={{ color: "#3f8600" }}
-              />
-            </Col>
-          </Row>
-        </Panel>
-      </Collapse>
+      {/* Income + Income Breakdown in same row */}
+      <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
+        <Col xs={24} md={12}>
+          <Collapse defaultActiveKey={['1']} style={{ background: '#fff' }}>
+            <Panel header="Income" key="1">
+              <Row gutter={[16, 16]}>
+                <Col xs={24} sm={12} md={12}>
+                  <Statistic
+                    title="Delivery Charges"
+                    value={reportData.income.total_delivery_charges}
+                    precision={2}
+                    prefix="Rs: "
+                  />
+                </Col>
+                <Col xs={24} sm={12} md={12}>
+                  <Statistic
+                    title="Service Charges"
+                    value={reportData.income.total_tax_charges}
+                    precision={2}
+                    prefix="Rs: "
+                  />
+                </Col>
+                <Col xs={24} sm={12} md={12}>
+                  <Statistic
+                    title="Product Profits"
+                    value={reportData.income.total_profits_from_products}
+                    precision={2}
+                    prefix="Rs: "
+                    valueStyle={{
+                      color: reportData.income.total_profits_from_products >= 0 ? "#3f8600" : "#cf1322"
+                    }}
+                  />
+                </Col>
+                <Col xs={24} sm={12} md={12}>
+                  <Statistic
+                    title="Total Income"
+                    value={reportData.income.total_income}
+                    precision={2}
+                    prefix="Rs: "
+                    valueStyle={{ color: "#3f8600" }}
+                  />
+                </Col>
+              </Row>
+            </Panel>
+          </Collapse>
+        </Col>
+
+        <Col xs={24} md={12}>
+          <Collapse defaultActiveKey={['1']} style={{ background: '#fff' }}>
+            <Panel header="Income Breakdown" key="1">
+              <Row gutter={[16, 16]}>
+                <Col xs={24} sm={12} md={12}>
+                  <Statistic
+                    title="Total Income"
+                    value={reportData.income.total_income}
+                    precision={2}
+                    prefix="Rs: "
+                    valueStyle={{ color: "#3f8600" }}
+                  />
+                </Col>
+                <Col xs={24} sm={12} md={12}>
+                  <Statistic
+                    title="Driver Payments"
+                    value={reportData.income.total_payments_for_drivers}
+                    precision={2}
+                    prefix="Rs: "
+                    valueStyle={{ color: "#cf1322" }}
+                  />
+                </Col>
+                <Col xs={24} sm={12} md={12}>
+                  <Statistic
+                    title="Income Balance"
+                    value={reportData.income.total_income_balance}
+                    precision={2}
+                    prefix="Rs: "
+                    valueStyle={{ color: "#3f8600" }}
+                  />
+                </Col>
+              </Row>
+            </Panel>
+          </Collapse>
+        </Col>
+      </Row>
 
       {/* Orders Table */}
       <Card title={`Orders (${reportData.count})`}>
