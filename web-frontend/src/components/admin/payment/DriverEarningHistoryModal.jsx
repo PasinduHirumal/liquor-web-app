@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Modal, Button, Table, Spin } from "antd";
-import { axiosInstance } from "../../lib/axios";
+import { axiosInstance } from "../../../lib/axios";
 
 const DriverEarningHistoryModal = ({ visible, onClose, driver }) => {
     const [loading, setLoading] = useState(false);
