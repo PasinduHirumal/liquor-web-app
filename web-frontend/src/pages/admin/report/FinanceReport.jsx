@@ -212,9 +212,9 @@ const FinanceReport = () => {
         </Col>
       </Row>
 
-      {/* Income Breakdown */}
+      {/* Income */}
       <Collapse defaultActiveKey={['1']} style={{ marginBottom: "20px", background: '#fff' }}>
-        <Panel header="Income Breakdown" key="1">
+        <Panel header="Income" key="1">
           <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={6}>
               <Statistic
@@ -243,6 +243,23 @@ const FinanceReport = () => {
                 }}
               />
             </Col>
+            <Col xs={24} sm={12} md={6}>
+              <Statistic
+                title="Total Income"
+                value={reportData.income.total_income}
+                precision={2}
+                prefix="Rs: "
+                valueStyle={{ color: "#3f8600" }}
+              />
+            </Col>
+          </Row>
+        </Panel>
+      </Collapse>
+      
+      {/* Income Breakdown */}
+      <Collapse defaultActiveKey={['1']} style={{ marginBottom: "20px", background: '#fff' }}>
+        <Panel header="Income Breakdown" key="1">
+          <Row gutter={[16, 16]}>
             <Col xs={24} sm={12} md={6}>
               <Statistic
                 title="Total Income"
