@@ -143,10 +143,11 @@ function OrderDetail() {
                 {/* Order Summary */}
                 <Col xs={24} md={12}>
                     <Card
-                        title="Order Summary"
+                        title={<span className="text-white font-bold">Order Summary</span>}
                         bordered
                         className="rounded-xl shadow"
-                        extra={<InfoCircleOutlined />}
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<InfoCircleOutlined className="text-white text-xl" />}
                     >
                         <p>
                             <strong>Order Date:</strong> {formatDate(order.order_date)}
@@ -177,10 +178,11 @@ function OrderDetail() {
                 {/* Price Details */}
                 <Col xs={24} md={12}>
                     <Card
-                        title="Price Details"
+                        title={<span className="text-white font-bold">Price Details</span>}
                         bordered
                         className="rounded-xl shadow"
-                        extra={<DollarOutlined />}
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<DollarOutlined className="text-white text-xl" />}
                     >
                         <div className="flex justify-between py-1">
                             <span>Subtotal:</span>
@@ -205,10 +207,11 @@ function OrderDetail() {
                 {/* Driver Duties */}
                 <Col span={24}>
                     <Card
-                        title="Driver Duties"
+                        title={<span className="text-white font-bold">Driver Deties</span>}
                         bordered
                         className="rounded-xl shadow"
-                        extra={<CarOutlined />}
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<CarOutlined className="text-white text-xl" />}
                     >
                         {dutiesError ? (
                             <Alert type="error" message={dutiesError} />
@@ -267,10 +270,11 @@ function OrderDetail() {
                 {/* Order Items */}
                 <Col span={24}>
                     <Card
-                        title="Order Items"
+                        title={<span className="text-white font-bold">Order Items</span>}
                         bordered
                         className="rounded-xl shadow"
-                        extra={<ShoppingCartOutlined />}
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<ShoppingCartOutlined className="text-white text-xl" />}
                     >
                         {order.items?.length > 0 ? (
                             <Table
@@ -310,10 +314,11 @@ function OrderDetail() {
                 {/* Customer Info */}
                 <Col xs={24} md={12}>
                     <Card
-                        title="Customer Information"
+                        title={<span className="text-white font-bold">Customer Information</span>}
                         bordered
                         className="rounded-xl shadow"
-                        extra={<UserOutlined />}
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<UserOutlined className="text-white text-xl" />}
                     >
                         <p><strong>Name:</strong> {order.user_id?.username || "N/A"}</p>
                         <p><strong>Email:</strong> {order.user_id?.email || "N/A"}</p>
@@ -324,10 +329,11 @@ function OrderDetail() {
                 {/* Driver Info */}
                 <Col xs={24} md={12}>
                     <Card
-                        title="Driver Information"
+                        title={<span className="text-white font-bold">Driver Information</span>}
                         bordered
                         className="rounded-xl shadow"
-                        extra={<TeamOutlined />}
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<TeamOutlined className="text-white text-xl" />}
                     >
                         <p><strong>Name:</strong> {order.assigned_driver_id?.username || "N/A"}</p>
                         <p><strong>Email:</strong> {order.assigned_driver_id?.email || "N/A"}</p>
@@ -335,13 +341,14 @@ function OrderDetail() {
                     </Card>
                 </Col>
 
-                {/* Location Info */}
+                {/* Delivery Info */}
                 <Col xs={24} md={12}>
                     <Card
-                        title="Delivery Information"
+                        title={<span className="text-white font-bold">Delivery Information</span>}
                         bordered
                         className="rounded-xl shadow"
-                        extra={<EnvironmentOutlined />}
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<EnvironmentOutlined className="text-white text-xl" />}
                     >
                         <p><strong>Address:</strong></p>
                         <p className="bg-gray-100 border-l-4 border-blue-500 p-3 rounded">
@@ -358,10 +365,11 @@ function OrderDetail() {
                 {/* Notes & Timestamps */}
                 <Col xs={24} md={12}>
                     <Card
-                        title="Additional Info"
+                        title={<span className="text-white font-bold">Additional Information</span>}
                         bordered
                         className="rounded-xl shadow"
-                        extra={<FileTextOutlined />}
+                        headStyle={{ backgroundColor: '#3B82F6' }}
+                        extra={<FileTextOutlined className="text-white text-xl" />}
                     >
                         <p className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
                             <strong>Notes:</strong> {order.notes || "No notes available"}
