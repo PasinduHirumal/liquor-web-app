@@ -220,42 +220,44 @@ function OrderDetail() {
                                 rowKey={(record, idx) => idx}
                                 dataSource={driverDuties}
                                 pagination={false}
+                                scroll={{ x: 900 }}
                                 columns={[
                                     {
                                         title: "Driver",
                                         dataIndex: ["driver_id", "username"],
                                         render: (val) => val || "Unknown",
+                                        width: 150,
                                     },
                                     {
                                         title: "Driver Email",
                                         dataIndex: ["driver_id", "email"],
                                         render: (val) => val || "Unknown",
+                                        width: 200,
                                     },
                                     {
                                         title: "Accepted",
                                         dataIndex: "is_driver_accepted",
                                         render: (val) => (val ? "Yes" : "No"),
+                                        width: 100,
                                     },
                                     {
                                         title: "Completed",
                                         dataIndex: "is_completed",
                                         render: (val) => (val ? "Yes" : "No"),
+                                        width: 100,
                                     },
                                     {
                                         title: "Reassigned",
                                         dataIndex: "is_re_assigning_driver",
                                         render: (val) => (val ? "Yes" : "No"),
+                                        width: 120,
                                     },
                                     {
                                         title: "Created",
                                         dataIndex: "created_at",
                                         render: (val) => formatDate(val),
-                                    },
-                                    {
-                                        title: "Updated",
-                                        dataIndex: "updated_at",
-                                        render: (val) => formatDate(val),
-                                    },
+                                        width: 180,
+                                    }
                                 ]}
                             />
                         )}
@@ -275,25 +277,27 @@ function OrderDetail() {
                                 rowKey={(record, idx) => idx}
                                 dataSource={order.items}
                                 pagination={false}
+                                scroll={{ x: 800 }}
                                 columns={[
-                                    { title: "Product", dataIndex: "product_name" },
+                                    { title: "Product", dataIndex: "product_name", width: 100 },
                                     {
                                         title: "Image",
                                         dataIndex: "product_image",
-                                        render: (src) => (
-                                            <Image src={src} width={50} className="rounded" />
-                                        ),
+                                        render: (src) => <Image src={src} width={50} className="rounded" />,
+                                        width: 60,
                                     },
-                                    { title: "Qty", dataIndex: "quantity" },
+                                    { title: "Qty", dataIndex: "quantity", width: 50 },
                                     {
                                         title: "Unit Price",
                                         dataIndex: "unit_price",
                                         render: (val) => `Rs: ${val?.toFixed(2)}`,
+                                        width: 70,
                                     },
                                     {
                                         title: "Total",
                                         dataIndex: "total_price",
                                         render: (val) => `Rs: ${val?.toFixed(2)}`,
+                                        width: 70,
                                     },
                                 ]}
                             />
