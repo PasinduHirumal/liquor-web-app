@@ -19,6 +19,10 @@ import {
     CarOutlined,
     DollarOutlined,
     InfoCircleOutlined,
+    ShoppingCartOutlined,
+    EnvironmentOutlined,
+    FileTextOutlined,
+    TeamOutlined,
 } from "@ant-design/icons";
 import AssignDriverModal from "../../../components/admin/forms/AssignDriverModal";
 import EditStatusModal from "../../../components/admin/forms/EditStatusModal";
@@ -138,7 +142,12 @@ function OrderDetail() {
             <Row gutter={[16, 16]}>
                 {/* Order Summary */}
                 <Col xs={24} md={12}>
-                    <Card title="Order Summary" bordered className="rounded-xl shadow">
+                    <Card
+                        title="Order Summary"
+                        bordered
+                        className="rounded-xl shadow"
+                        extra={<InfoCircleOutlined />}
+                    >
                         <p>
                             <strong>Order Date:</strong> {formatDate(order.order_date)}
                         </p>
@@ -195,7 +204,12 @@ function OrderDetail() {
 
                 {/* Driver Duties */}
                 <Col span={24}>
-                    <Card title="Driver Duties" bordered className="rounded-xl shadow">
+                    <Card
+                        title="Driver Duties"
+                        bordered
+                        className="rounded-xl shadow"
+                        extra={<CarOutlined />}
+                    >
                         {dutiesError ? (
                             <Alert type="error" message={dutiesError} />
                         ) : driverDuties.length === 0 ? (
@@ -250,7 +264,12 @@ function OrderDetail() {
 
                 {/* Order Items */}
                 <Col span={24}>
-                    <Card title="Order Items" bordered className="rounded-xl shadow">
+                    <Card
+                        title="Order Items"
+                        bordered
+                        className="rounded-xl shadow"
+                        extra={<ShoppingCartOutlined />}
+                    >
                         {order.items?.length > 0 ? (
                             <Table
                                 rowKey={(record, idx) => idx}
@@ -286,7 +305,12 @@ function OrderDetail() {
 
                 {/* Customer Info */}
                 <Col xs={24} md={12}>
-                    <Card title="Customer Information" bordered className="rounded-xl shadow">
+                    <Card
+                        title="Customer Information"
+                        bordered
+                        className="rounded-xl shadow"
+                        extra={<UserOutlined />}
+                    >
                         <p><strong>Name:</strong> {order.user_id?.username || "N/A"}</p>
                         <p><strong>Email:</strong> {order.user_id?.email || "N/A"}</p>
                         <p><strong>User ID:</strong> {order.user_id?.id || "N/A"}</p>
@@ -295,16 +319,26 @@ function OrderDetail() {
 
                 {/* Driver Info */}
                 <Col xs={24} md={12}>
-                    <Card title="Driver Information" bordered className="rounded-xl shadow">
+                    <Card
+                        title="Driver Information"
+                        bordered
+                        className="rounded-xl shadow"
+                        extra={<TeamOutlined />}
+                    >
                         <p><strong>Name:</strong> {order.assigned_driver_id?.username || "N/A"}</p>
                         <p><strong>Email:</strong> {order.assigned_driver_id?.email || "N/A"}</p>
                         <p><strong>Driver ID:</strong> {order.assigned_driver_id?.id || "N/A"}</p>
                     </Card>
                 </Col>
 
-                {/* Delivery Info */}
+                {/* Location Info */}
                 <Col xs={24} md={12}>
-                    <Card title="Delivery Information" bordered className="rounded-xl shadow">
+                    <Card
+                        title="Delivery Information"
+                        bordered
+                        className="rounded-xl shadow"
+                        extra={<EnvironmentOutlined />}
+                    >
                         <p><strong>Address:</strong></p>
                         <p className="bg-gray-100 border-l-4 border-blue-500 p-3 rounded">
                             {order.delivery_address_id?.streetAddress ||
@@ -319,7 +353,12 @@ function OrderDetail() {
 
                 {/* Notes & Timestamps */}
                 <Col xs={24} md={12}>
-                    <Card title="Additional Info" bordered className="rounded-xl shadow">
+                    <Card
+                        title="Additional Info"
+                        bordered
+                        className="rounded-xl shadow"
+                        extra={<FileTextOutlined />}
+                    >
                         <p className="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
                             <strong>Notes:</strong> {order.notes || "No notes available"}
                         </p>
