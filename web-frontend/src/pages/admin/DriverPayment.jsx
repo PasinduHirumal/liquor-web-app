@@ -9,7 +9,8 @@ import {
 import { HistoryOutlined, DollarOutlined, ReloadOutlined } from "@ant-design/icons";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
-import DriverHistoryModal from "../../components/admin/DriverHistoryModal.jsx";
+import DriverEarningHistoryModal from "../../components/admin/DriverEarningHistoryModal.jsx";
+import DriverPaymentHistoryModal from "../../components/admin/DriverPaymentHistoryModal.jsx";
 import DriverPaymentModal from "../../components/admin/DriverPaymentModal.jsx";
 
 const { Title } = Typography;
@@ -19,6 +20,7 @@ function DriverPayment() {
     const [loading, setLoading] = useState(false);
     const [refreshTrigger, setRefreshTrigger] = useState(0);
 
+    const [earningModalVisible, setEarningModalVisible] = useState(false);
     const [historyModalVisible, setHistoryModalVisible] = useState(false);
     const [paymentModalVisible, setPaymentModalVisible] = useState(false);
     const [selectedDriver, setSelectedDriver] = useState(null);
@@ -44,19 +46,29 @@ function DriverPayment() {
         fetchDrivers();
     }, [refreshTrigger]);
 
+    const handleEarnings = (driver) => {
+        setSelectedDriver(driver);
+        setEarningModalVisible(true);
+    };
+
+    const handleCloseEarningModal = () => {
+        setEarningModalVisible(false);
+        setSelectedDriver(null);
+    };
+
     const handleHistory = (driver) => {
         setSelectedDriver(driver);
         setHistoryModalVisible(true);
     };
 
-    const handlePayment = (driver) => {
-        setSelectedDriver(driver);
-        setPaymentModalVisible(true);
-    };
-
     const handleCloseHistoryModal = () => {
         setHistoryModalVisible(false);
         setSelectedDriver(null);
+    };
+
+    const handlePayment = (driver) => {
+        setSelectedDriver(driver);
+        setPaymentModalVisible(true);
     };
 
     const handleClosePaymentModal = () => {
@@ -111,8 +123,24 @@ function DriverPayment() {
             render: (value) => `Rs: ${value || 0}`,
         },
         {
-            title: "Actions",
-            key: "actions",
+            title: "Earnings",
+            key: "earnings",
+            width: 120,
+            render: (_, record) => (
+                <div style={{ display: "flex", gap: "8px" }}>
+                    <Tooltip title="View Earnings">
+                        <Button
+                            type="primary"
+                            icon={<HistoryOutlined />}
+                            onClick={() => handleEarnings(record)}
+                        />
+                    </Tooltip>
+                </div>
+            ),
+        },
+        {
+            title: "Payments",
+            key: "payments",
             width: 120,
             render: (_, record) => (
                 <div style={{ display: "flex", gap: "8px" }}>
@@ -162,8 +190,15 @@ function DriverPayment() {
                 />
             )}
 
-            {/* Driver History Modal */}
-            <DriverHistoryModal
+            {/* Driver Earning History Modal */}
+            <DriverEarningHistoryModal
+                visible={earningModalVisible}
+                onClose={handleCloseEarningModal}
+                driver={selectedDriver}
+            />
+
+            {/* Driver Payment History Modal */}
+            <DriverPaymentHistoryModal
                 visible={historyModalVisible}
                 onClose={handleCloseHistoryModal}
                 driver={selectedDriver}

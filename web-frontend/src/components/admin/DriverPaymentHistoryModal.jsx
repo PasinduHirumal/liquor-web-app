@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Modal, Button, Table, Spin } from "antd";
 import { axiosInstance } from "../../lib/axios";
 
-const DriverHistoryModal = ({ visible, onClose, driver }) => {
+const DriverPaymentHistoryModal = ({ visible, onClose, driver }) => {
   const [loading, setLoading] = useState(false);
   const [payments, setPayments] = useState([]);
 
@@ -127,4 +127,4 @@ const DriverHistoryModal = ({ visible, onClose, driver }) => {
   );
 };
 
-export default DriverHistoryModal;
+export default DriverPaymentHistoryModal;
