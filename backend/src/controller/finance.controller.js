@@ -110,6 +110,7 @@ const getAllWithdrawalHistory = async (req, res) => {
         return res.status(200).json({ 
             success: true, 
             message: "Withdrawals history fetched successfully", 
+            count: withdrawals.length,
             data: sortedWithdrawals 
         });
     } catch (error) {
