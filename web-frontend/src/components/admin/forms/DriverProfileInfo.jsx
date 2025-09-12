@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../../lib/axios";
-import { Spinner, Form, Button, Row, Col, Card, Alert, Image } from "react-bootstrap";
 import { ArrowLeft } from "react-bootstrap-icons";
 import toast from "react-hot-toast";
 
@@ -92,8 +91,15 @@ const DriverProfileInfo = () => {
             toast.success("Driver profile updated successfully");
             navigate(-1);
         } catch (error) {
-            const msg = error?.response?.data?.message || "Failed to update driver";
-            toast.error(msg);
+            const response = error?.response?.data;
+
+            if (response?.errors && Array.isArray(response.errors)) {
+                response.errors.forEach((err) => {
+                    toast.error(`${err.field}: ${err.message}`);
+                });
+            } else {
+                toast.error(response?.message || "Failed to update driver");
+            }
         } finally {
             setUpdating(false);
         }
@@ -101,74 +107,72 @@ const DriverProfileInfo = () => {
 
     if (loading) {
         return (
-            <div className="d-flex justify-content-center align-items-center vh-100 bg-white">
-                <Spinner animation="border" variant="primary" />
+            <div className="flex justify-center items-center h-screen bg-white">
+                <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
             </div>
         );
     }
 
     if (!driver) {
         return (
-            <div className="d-flex justify-content-center align-items-center vh-100 bg-white">
-                <Alert variant="danger">Driver not found</Alert>
+            <div className="flex justify-center items-center h-screen bg-white">
+                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+                    Driver not found
+                </div>
             </div>
         );
     }
 
     return (
-        <div className="p-4 bg-white">
-            <Row className="align-items-center mb-4">
-                <Col xs="auto">
-                    <Button variant="outline-dark px-2 py-1" onClick={() => navigate(-1)} className="p-0">
-                        <ArrowLeft /> Back
-                    </Button>
-                </Col>
-                <Col>
-                    <h2 className="text-black fw-bold mb-0 text-start">Driver Profile Management</h2>
-                </Col>
-            </Row>
+        <div className="p-6 bg-white">
+            <div className="flex items-center mb-6">
+                <button
+                    onClick={() => navigate(-1)}
+                    className="flex items-center text-gray-700 hover:text-gray-900 mr-4 border border-gray-300 px-3 py-1 rounded hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-400"
+                >
+                    <ArrowLeft className="mr-1" /> Back
+                </button>
+                <h2 className="text-2xl font-bold text-gray-800">Driver Profile Management</h2>
+            </div>
 
-            <Row>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {/* Left - Avatar and Basic Info */}
-                <Col md={4}>
-                    <Card className="mb-4">
-                        <Card.Body className="text-center">
-                            <Image
+                <div className="md:col-span-1">
+                    <div className="bg-white rounded-lg shadow p-6 mb-6">
+                        <div className="text-center">
+                            <img
                                 src={formData.profileImage}
-                                rounded
-                                fluid
-                                width={150}
-                                height={150}
-                                className="mb-3"
+                                alt="Driver profile"
+                                className="rounded-full w-36 h-36 object-cover mx-auto mb-4"
                             />
-                            <Form.Group controlId="formFile" className="mb-3">
-                                <Form.Label className="btn btn-outline-primary w-100">
-                                    Upload New Image
-                                    <Form.Control
-                                        type="file"
-                                        accept="image/*"
-                                        hidden
-                                        onChange={handleImageUpload}
-                                    />
-                                </Form.Label>
-                            </Form.Group>
-                            <h5 className="fw-bold">{formData.firstName} {formData.lastName}</h5>
-                            <hr />
-                            <Form.Group className="mb-2">
-                                <Form.Label>License Number</Form.Label>
-                                <Form.Control
+                            <label className="block w-full bg-white border border-blue-500 text-blue-500 rounded py-2 px-4 text-center cursor-pointer hover:bg-blue-50 mb-4">
+                                Upload New Image
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden"
+                                    onChange={handleImageUpload}
+                                />
+                            </label>
+                            <h5 className="font-bold text-lg mb-2">{formData.firstName} {formData.lastName}</h5>
+                            <hr className="my-4" />
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">License Number</label>
+                                <input
                                     type="text"
                                     name="license_number"
                                     value={formData.license_number}
                                     onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
-                            </Form.Group>
-                            <Form.Group className="mb-2">
-                                <Form.Label>Assigned Warehouse</Form.Label>
-                                <Form.Select
+                            </div>
+                            <div className="mb-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Assigned Warehouse</label>
+                                <select
                                     name="where_house_id"
                                     value={formData.where_house_id}
                                     onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 >
                                     <option value="">Select Warehouse</option>
                                     {warehouses.map((warehouse) => (
@@ -176,136 +180,127 @@ const DriverProfileInfo = () => {
                                             {warehouse.where_house_name} ({warehouse.where_house_code})
                                         </option>
                                     ))}
-                                </Form.Select>
-                            </Form.Group>
-                        </Card.Body>
-                    </Card>
-                </Col>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
 
                 {/* Right - Full Form */}
-                <Col md={8}>
-                    <Card>
-                        <Card.Body>
-                            <h5 className="mb-3 fw-bold">Personal Information</h5>
-                            <Row>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>First Name</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="firstName"
-                                            value={formData.firstName}
-                                            onChange={handleChange}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Last Name</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="lastName"
-                                            value={formData.lastName}
-                                            onChange={handleChange}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Email</Form.Label>
-                                        <Form.Control
-                                            type="email"
-                                            name="email"
-                                            value={formData.email}
-                                            onChange={handleChange}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Phone</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="phone"
-                                            value={formData.phone}
-                                            onChange={handleChange}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Date of Birth</Form.Label>
-                                        <Form.Control
-                                            type="date"
-                                            name="dateOfBirth"
-                                            value={formData.dateOfBirth}
-                                            onChange={handleChange}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={6}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>NIC Number</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="nic_number"
-                                            value={formData.nic_number}
-                                            onChange={handleChange}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-
-                            <h5 className="mt-2 mb-3 fw-bold">Address Information</h5>
-                            <Row>
-                                <Col md={8}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>Address</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="address"
-                                            value={formData.address}
-                                            onChange={handleChange}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                                <Col md={4}>
-                                    <Form.Group className="mb-3">
-                                        <Form.Label>City</Form.Label>
-                                        <Form.Control
-                                            type="text"
-                                            name="city"
-                                            value={formData.city}
-                                            onChange={handleChange}
-                                        />
-                                    </Form.Group>
-                                </Col>
-                            </Row>
-
-                            <h5 className="mt-2 mb-3 fw-bold">Emergency Contact</h5>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Emergency Contact</Form.Label>
-                                <Form.Control
+                <div className="md:col-span-3">
+                    <div className="bg-white rounded-lg shadow p-6">
+                        <h5 className="text-lg font-bold mb-4">Personal Information</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                                <input
                                     type="text"
-                                    name="emergencyContact"
-                                    value={formData.emergencyContact}
+                                    name="firstName"
+                                    value={formData.firstName}
                                     onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
                                 />
-                            </Form.Group>
-
-                            <div className="d-flex justify-content-end">
-                                <Button
-                                    variant="primary"
-                                    onClick={handleUpdate}
-                                    disabled={updating}
-                                >
-                                    {updating ? "Updating..." : "Update Profile"}
-                                </Button>
                             </div>
-                        </Card.Body>
-                    </Card>
-                </Col>
-            </Row>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                                <input
+                                    type="text"
+                                    name="lastName"
+                                    value={formData.lastName}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={formData.email}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Phone</label>
+                                <input
+                                    type="text"
+                                    name="phone"
+                                    value={formData.phone}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Date of Birth</label>
+                                <input
+                                    type="date"
+                                    name="dateOfBirth"
+                                    value={formData.dateOfBirth}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">NIC Number</label>
+                                <input
+                                    type="text"
+                                    name="nic_number"
+                                    value={formData.nic_number}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
+
+                        <h5 className="text-lg font-bold mb-4 mt-6">Address Information</h5>
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            <div className="md:col-span-2">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                                <input
+                                    type="text"
+                                    name="address"
+                                    value={formData.address}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">City</label>
+                                <input
+                                    type="text"
+                                    name="city"
+                                    value={formData.city}
+                                    onChange={handleChange}
+                                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                />
+                            </div>
+                        </div>
+
+                        <h5 className="text-lg font-bold mb-4 mt-6">Emergency Contact</h5>
+                        <div className="mb-6">
+                            <label className="block text-sm font-medium text-gray-700 mb-1">Emergency Contact</label>
+                            <input
+                                type="text"
+                                name="emergencyContact"
+                                value={formData.emergencyContact}
+                                onChange={handleChange}
+                                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            />
+                        </div>
+
+                        <div className="flex justify-end">
+                            <button
+                                onClick={handleUpdate}
+                                disabled={updating}
+                                className={`px-4 py-2 rounded text-white ${updating ? 'bg-blue-400' : 'bg-blue-600 hover:bg-blue-700'} focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+                            >
+                                {updating ? "Updating..." : "Update Profile"}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 };

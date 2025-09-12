@@ -58,8 +58,15 @@ function DriverVehicleInfo() {
             toast.success("Vehicle info updated successfully!");
             navigate(-1);
         } catch (err) {
-            const message = err.response?.data?.error || "Update failed";
-            toast.error(message);
+            const response = err.response?.data;
+
+            if (response?.errors && Array.isArray(response.errors)) {
+                response.errors.forEach((error) => {
+                    toast.error(`${error.field}: ${error.message}`);
+                });
+            } else {
+                toast.error(response?.message || "Update failed");
+            }
         } finally {
             setSaving(false);
         }
