@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Button, Modal, Input, Typography, Spin } from "antd";
+import { Card, Table, Button, Typography, Spin } from "antd";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../../lib/axios";
 import { DollarOutlined } from "@ant-design/icons";
+import CashWithdrawModel from "../../../components/admin/payment/CashWithdrawModel";
 
 const { Title, Text } = Typography;
 
@@ -10,9 +11,6 @@ function CashWithdraws() {
     const [withdrawals, setWithdrawals] = useState([]);
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
-    const [withdrawing, setWithdrawing] = useState(false)
-    const [withdrawAmount, setWithdrawAmount] = useState("");
-    const [description, setDescription] = useState("");
 
     const fetchWithdrawals = async () => {
         setLoading(true);
@@ -34,38 +32,6 @@ function CashWithdraws() {
     useEffect(() => {
         fetchWithdrawals();
     }, []);
-
-    const handleWithdraw = async () => {
-        if (!withdrawAmount || Number(withdrawAmount) <= 0) {
-            return toast.error("Amount cannot be empty or zero");
-        }
-        if (!description || description.trim() === "") {
-            return toast.error("Description cannot be empty");
-        }
-
-        setWithdrawing(true);
-        try {
-            const res = await axiosInstance.post("/finance/withdraw_cash", {
-                withdraw_amount: Number(withdrawAmount),
-                description,
-            });
-
-            if (res.data.success) {
-                toast.success(res.data.message);
-                setModalVisible(false);
-                setWithdrawAmount("");
-                setDescription("");
-                fetchWithdrawals();
-            } else {
-                toast.error(res.data.message);
-            }
-        } catch (error) {
-            console.error("Withdraw error:", error);
-            toast.error("Cash withdrawal failed");
-        } finally {
-            setWithdrawing(false);
-        }
-    };
 
     const columns = [
         {
@@ -137,53 +103,11 @@ function CashWithdraws() {
                 )}
             </Card>
 
-            <Modal
-                title="Withdraw Cash"
-                open={modalVisible}
-                onOk={handleWithdraw}
-                onCancel={() => setModalVisible(false)}
-                okText="Withdraw"
-                okButtonProps={{ loading: withdrawing }}
-            >
-                <div className="flex flex-col gap-4">
-                    <Input
-                        className="w-full"
-                        placeholder="Amount"
-                        type="text"
-                        value={withdrawAmount}
-                        onKeyDown={(e) => {
-                            // Allow only digits, dot, backspace, arrow keys, delete
-                            const allowedKeys = [
-                                "Backspace",
-                                "ArrowLeft",
-                                "ArrowRight",
-                                "Delete",
-                                "Tab",
-                            ];
-                            if (
-                                !/[0-9.]/.test(e.key) &&
-                                !allowedKeys.includes(e.key)
-                            ) {
-                                e.preventDefault();
-                            }
-                        }}
-                        onChange={(e) => {
-                            // Allow only numbers with optional single dot
-                            const val = e.target.value;
-                            if (/^\d*\.?\d*$/.test(val)) {
-                                setWithdrawAmount(val);
-                            }
-                        }}
-                    />
-                    <Input.TextArea
-                        className="w-full"
-                        placeholder="Description"
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        rows={3}
-                    />
-                </div>
-            </Modal>
+            <CashWithdrawModel
+                visible={modalVisible}
+                onClose={() => setModalVisible(false)}
+                onSuccess={fetchWithdrawals}
+            />
         </div>
     );
 }
