@@ -246,16 +246,15 @@ const AdminNavbar = () => {
                 {isMobile && (
                     <IconButton
                         color="inherit"
-                        edge="end"
+                        edge="start"
                         onClick={() => setMobileMenuOpen((p) => !p)}
                         aria-label="menu"
                     >
-                        <Fade in={!mobileMenuOpen}>
-                            <MenuIcon className="text-white text-2xl" />
-                        </Fade>
-                        <Fade in={mobileMenuOpen}>
+                        {mobileMenuOpen ? (
                             <CloseIcon className="text-white text-2xl" />
-                        </Fade>
+                        ) : (
+                            <MenuIcon className="text-white text-2xl" />
+                        )}
                     </IconButton>
                 )}
             </Toolbar>
