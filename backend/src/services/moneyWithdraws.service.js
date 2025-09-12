@@ -20,7 +20,7 @@ class MoneyWithdrawService extends BaseService {
             }, 0);
 
             return { 
-                Total_Value: parseFloat(totalWithdrawalsAmount.toFixed(2)) 
+                Total_Value: totalWithdrawalsAmount 
             }
         } catch (error) {
             throw error;

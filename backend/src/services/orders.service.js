@@ -127,42 +127,6 @@ class OrdersService extends BaseService {
         }
     }
 
-    async getTotalIncomeValues(orders) {
-        try {
-            const totalTAX = orders.reduce((sum, order) => {
-                const taxValue = order.tax_amount;
-                return sum + taxValue;
-            }, 0);
-
-            const totalServiceCharge = orders.reduce((sum, order) => {
-                const serviceChargeValue = order.service_charge;
-                return sum + serviceChargeValue;
-            }, 0);
-
-            const totalDeliveries = orders.reduce((sum, order) => {
-                const deliveryValue = order.delivery_fee;
-                return sum + deliveryValue;
-            }, 0);
-
-            const totalProfitFromProducts = orders.reduce((sum, order) => {
-                const orderProfit = order.items.reduce((itemSum, item) => {
-                    const itemProfit = item.total_price - item.total_cost_price;
-                    return itemSum + itemProfit;
-                }, 0);
-                return sum + orderProfit;
-            }, 0);
-
-            return {
-                Total_TAX: parseFloat(totalTAX.toFixed(2)),
-                Total_Service_Charge: parseFloat(totalServiceCharge.toFixed(2)),
-                Total_Delivery_Fee: parseFloat(totalDeliveries.toFixed(2)),
-                Total_Profit_From_Products: parseFloat(totalProfitFromProducts.toFixed(2))
-            };
-        } catch (error) {
-            throw error;
-        }
-    }
-
     async getDeliveryStats(driver_id) {
         try {
             const docs_total = await this.findByFilter('assigned_driver_id', '==', driver_id);
@@ -269,10 +233,44 @@ class OrdersService extends BaseService {
         }
     }
 
-    async getTotalCostForAllOrders(status = ORDER_STATUS_FOR_REPORT) {
+    async getTotalIncomeValues(orders) {
         try {
-            const orders = await this.findByFilter('status', '==', status);
+            const totalTAX = orders.reduce((sum, order) => {
+                const taxValue = order.tax_amount;
+                return sum + taxValue;
+            }, 0);
 
+            const totalServiceCharge = orders.reduce((sum, order) => {
+                const serviceChargeValue = order.service_charge;
+                return sum + serviceChargeValue;
+            }, 0);
+
+            const totalDeliveries = orders.reduce((sum, order) => {
+                const deliveryValue = order.delivery_fee;
+                return sum + deliveryValue;
+            }, 0);
+
+            const totalProfitFromProducts = orders.reduce((sum, order) => {
+                const orderProfit = order.items.reduce((itemSum, item) => {
+                    const itemProfit = item.total_price - item.total_cost_price;
+                    return itemSum + itemProfit;
+                }, 0);
+                return sum + orderProfit;
+            }, 0);
+
+            return {
+                Total_TAX: parseFloat(totalTAX.toFixed(2)),
+                Total_Service_Charge: parseFloat(totalServiceCharge.toFixed(2)),
+                Total_Delivery_Fee: parseFloat(totalDeliveries.toFixed(2)),
+                Total_Profit_From_Products: parseFloat(totalProfitFromProducts.toFixed(2))
+            };
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async getTotalCostForAllOrders(orders) {
+        try {
             return orders.reduce((total, order) => {
                 return total + (order.total_cost_price || 0);
             }, 0);
