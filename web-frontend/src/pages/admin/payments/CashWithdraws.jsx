@@ -102,7 +102,7 @@ function CashWithdraws() {
     ];
 
     return (
-        <div className="p-6 bg-gray-50 min-h-screen">
+        <div style={{ padding: "0 24px 24px 24px" }} className="bg-white">
             <div className="flex justify-between items-center mb-6">
                 <Title level={3}>Cash Withdraws</Title>
                 <Button
