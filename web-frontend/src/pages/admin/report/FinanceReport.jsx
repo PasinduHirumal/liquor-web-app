@@ -281,7 +281,7 @@ const FinanceReport = () => {
                   </Text>
                 </Row>
                 <Row justify="space-between">
-                  <Text strong style={{ fontSize: 17 }}>Driver Payments</Text>
+                  <Text strong style={{ fontSize: 17 }}>Company Withdraws</Text>
                   <Text style={{ fontSize: 17, color: "#cf1322" }}>
                     Rs: {reportData.income.total_company_withdraws.toFixed(2)}
                   </Text>
