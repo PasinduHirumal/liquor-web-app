@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Modal, Input } from "antd";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../../lib/axios";
@@ -7,6 +7,13 @@ function CashWithdrawModel({ visible, onClose, onSuccess }) {
     const [withdrawAmount, setWithdrawAmount] = useState("");
     const [description, setDescription] = useState("");
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        if (!visible) {
+            setWithdrawAmount("");
+            setDescription("");
+        }
+    }, [visible]);
 
     const handleWithdraw = async () => {
         if (!withdrawAmount || Number(withdrawAmount) <= 0) {
@@ -25,8 +32,6 @@ function CashWithdrawModel({ visible, onClose, onSuccess }) {
 
             if (res.data.success) {
                 toast.success(res.data.message);
-                setWithdrawAmount("");
-                setDescription("");
                 onSuccess();
                 onClose();
             } else {
@@ -48,6 +53,7 @@ function CashWithdrawModel({ visible, onClose, onSuccess }) {
             onCancel={onClose}
             okText="Withdraw"
             okButtonProps={{ loading }}
+            maskClosable={false}
         >
             <div className="flex flex-col gap-4">
                 <Input
