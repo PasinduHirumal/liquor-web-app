@@ -212,7 +212,7 @@ const FinanceReport = () => {
         </Col>
       </Row>
 
-      {/* Income + Income Breakdown*/}
+      {/* Income + Income Breakdown */}
       <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
         <Col xs={24} md={12}>
           <Collapse defaultActiveKey={['1']} style={{ background: '#fff' }}>
@@ -225,9 +225,15 @@ const FinanceReport = () => {
                   </Text>
                 </Row>
                 <Row justify="space-between">
-                  <Text strong style={{ fontSize: 17 }}>Service Charges</Text>
+                  <Text strong style={{ fontSize: 17 }}>Tax Charges</Text>
                   <Text style={{ fontSize: 17, color: "#3f8600" }}>
                     Rs: {reportData.income.total_tax_charges.toFixed(2)}
+                  </Text>
+                </Row>
+                <Row justify="space-between">
+                  <Text strong style={{ fontSize: 17 }}>Service Charges</Text>
+                  <Text style={{ fontSize: 17, color: "#3f8600" }}>
+                    Rs: {reportData.income.total_service_charges.toFixed(2)}
                   </Text>
                 </Row>
                 <Row justify="space-between">
@@ -235,23 +241,14 @@ const FinanceReport = () => {
                   <Text
                     style={{
                       fontSize: 17,
-                      color:
-                        reportData.income.total_profits_from_products >= 0
-                          ? "#3f8600"
-                          : "#cf1322",
+                      color: reportData.income.total_profits_from_products >= 0 ? "#3f8600" : "#cf1322",
                     }}
                   >
                     Rs: {reportData.income.total_profits_from_products.toFixed(2)}
                   </Text>
                 </Row>
 
-                {/* Divider before total */}
-                <Divider
-                  style={{
-                    margin: "0",
-                    borderTop: "2px solid #000",
-                  }}
-                />
+                <Divider style={{ margin: "0", borderTop: "2px solid #000" }} />
 
                 <Row justify="space-between">
                   <Text strong style={{ fontSize: 17 }}>Total Income</Text>
@@ -287,13 +284,7 @@ const FinanceReport = () => {
                   </Text>
                 </Row>
 
-                {/* Divider before total */}
-                <Divider
-                  style={{
-                    margin: "0",
-                    borderTop: "2px solid #000",
-                  }}
-                />
+                <Divider style={{ margin: "0", borderTop: "2px solid #000" }} />
 
                 <Row justify="space-between">
                   <Text strong style={{ fontSize: 17 }}>Total Income Balance</Text>
@@ -401,6 +392,14 @@ const FinanceReport = () => {
                     <Statistic
                       title="Delivery Fee"
                       value={selectedOrder.income.delivery_fee}
+                      precision={2}
+                      prefix="Rs: "
+                    />
+                  </Col>
+                  <Col xs={24} sm={12} md={6}>
+                    <Statistic
+                      title="Tax Amount"
+                      value={selectedOrder.income.tax_amount}
                       precision={2}
                       prefix="Rs: "
                     />
