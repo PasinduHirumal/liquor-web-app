@@ -170,7 +170,7 @@ function OrderDetail() {
                         </p>
                         <p>
                             <strong>Warehouse:</strong>{" "}
-                            {order.where_house_id?.name || "N/A"}
+                            {order.warehouse_id?.name || "N/A"}
                         </p>
                     </Card>
                 </Col>
@@ -186,21 +186,26 @@ function OrderDetail() {
                     >
                         <div className="flex justify-between py-1">
                             <span>Subtotal:</span>
-                            <span>Rs: {order.subtotal?.toFixed(2)}</span>
+                            <span>Rs: {Number(order.subtotal ?? 0).toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between py-1">
                             <span>Delivery Fee:</span>
-                            <span>Rs: {order.delivery_fee?.toFixed(2)}</span>
+                            <span>Rs: {Number(order.delivery_fee ?? 0).toFixed(2)}</span>
                         </div>
                         <div className="flex justify-between py-1">
                             <span>Tax Amount:</span>
-                            <span>Rs: {order.tax_amount?.toFixed(2)}</span>
+                            <span>Rs: {Number(order.tax_amount ?? 0).toFixed(2)}</span>
+                        </div>
+                        <div className="flex justify-between py-1">
+                            <span>Service Charge:</span>
+                            <span>Rs: {Number(order.service_charge ?? 0).toFixed(2)}</span>
                         </div>
                         <hr />
                         <div className="flex justify-between font-bold py-1">
                             <span>Total:</span>
-                            <span>Rs: {order.total_amount?.toFixed(2)}</span>
+                            <span>Rs: {Number(order.total_amount ?? 0).toFixed(2)}</span>
                         </div>
+
                     </Card>
                 </Col>
 
@@ -283,25 +288,37 @@ function OrderDetail() {
                                 pagination={false}
                                 scroll={{ x: 800 }}
                                 columns={[
-                                    { title: "Product", dataIndex: "product_name", width: 100 },
+                                    { title: "Product", dataIndex: "product_name", width: 120 },
                                     {
                                         title: "Image",
                                         dataIndex: "product_image",
                                         render: (src) => <Image src={src} width={50} className="rounded" />,
-                                        width: 60,
+                                        width: 70,
                                     },
-                                    { title: "Qty", dataIndex: "quantity", width: 50 },
+                                    { title: "Qty", dataIndex: "quantity", width: 60 },
+                                    {
+                                        title: "Unit Cost",
+                                        dataIndex: "unitCostPrice",
+                                        render: (val) => `Rs: ${Number(val ?? 0).toFixed(2)}`,
+                                        width: 90,
+                                    },
                                     {
                                         title: "Unit Price",
                                         dataIndex: "unit_price",
-                                        render: (val) => `Rs: ${val?.toFixed(2)}`,
-                                        width: 70,
+                                        render: (val) => `Rs: ${Number(val ?? 0).toFixed(2)}`,
+                                        width: 90,
                                     },
                                     {
-                                        title: "Total",
+                                        title: "Total Cost",
+                                        dataIndex: "total_cost_price",
+                                        render: (val) => `Rs: ${Number(val ?? 0).toFixed(2)}`,
+                                        width: 100,
+                                    },
+                                    {
+                                        title: "Total Price",
                                         dataIndex: "total_price",
-                                        render: (val) => `Rs: ${val?.toFixed(2)}`,
-                                        width: 70,
+                                        render: (val) => `Rs: ${Number(val ?? 0).toFixed(2)}`,
+                                        width: 100,
                                     },
                                 ]}
                             />
