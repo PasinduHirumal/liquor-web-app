@@ -128,14 +128,12 @@ function DriverLocationInfo() {
                 .map(zone => zone.trim())
                 .filter(zone => zone.length > 0);
 
-            const preferredTypes = formData.preferredDeliveryTypes.filter(t => deliveryTypes.includes(t));
+            const preferredTypes = formData.preferredDeliveryTypes.filter(t =>
+                deliveryTypes.includes(t)
+            );
 
             const payload = {
-                currentLocation: {
-                    lat,
-                    lng,
-                    timestamp: new Date().toISOString()
-                },
+                currentLocation: { lat, lng, timestamp: new Date().toISOString() },
                 deliveryZones: deliveryZonesArray,
                 maxDeliveryRadius: Number(formData.maxDeliveryRadius),
                 preferredDeliveryTypes: preferredTypes,
@@ -148,12 +146,14 @@ function DriverLocationInfo() {
             navigate(-1);
         } catch (error) {
             const res = error.response;
-            if (res?.data?.errors) {
-                const parsed = res.data.errors.reduce((acc, curr) => {
-                    acc[curr.field] = curr.message;
-                    return acc;
-                }, {});
-                setErrors(parsed);
+
+            if (res?.data?.errors && Array.isArray(res.data.errors)) {
+                const fieldErrors = {};
+                res.data.errors.forEach(err => {
+                    fieldErrors[err.field] = err.message;
+                    toast.error(`${err.field}: ${err.message}`);
+                });
+                setErrors(fieldErrors);
             } else {
                 toast.error(res?.data?.message || 'Update failed');
             }
