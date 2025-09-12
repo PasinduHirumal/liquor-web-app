@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Card, Table, Button, Modal, Input, message, Typography, Spin } from "antd";
+import { Card, Table, Button, Modal, Input, Typography, Spin } from "antd";
+import toast from "react-hot-toast";
 import { axiosInstance } from "../../../lib/axios";
-import { DollarOutlined, ReloadOutlined } from "@ant-design/icons";
+import { DollarOutlined } from "@ant-design/icons";
 
 const { Title, Text } = Typography;
 
@@ -12,7 +13,6 @@ function CashWithdraws() {
     const [withdrawAmount, setWithdrawAmount] = useState("");
     const [description, setDescription] = useState("");
 
-    // Fetch withdrawal history
     const fetchWithdrawals = async () => {
         setLoading(true);
         try {
@@ -20,11 +20,11 @@ function CashWithdraws() {
             if (res.data.success) {
                 setWithdrawals(res.data.data);
             } else {
-                message.error(res.data.message);
+                toast.error(res.data.message);
             }
         } catch (error) {
             console.error("Fetch withdrawals error:", error);
-            message.error("Failed to fetch withdrawals");
+            toast.error("Failed to fetch withdrawals");
         } finally {
             setLoading(false);
         }
@@ -34,10 +34,9 @@ function CashWithdraws() {
         fetchWithdrawals();
     }, []);
 
-    // Handle cash withdraw
     const handleWithdraw = async () => {
         if (!withdrawAmount || Number(withdrawAmount) <= 0) {
-            return message.warning("Enter a valid amount");
+            return toast.warning("Enter a valid amount");
         }
 
         try {
@@ -47,25 +46,25 @@ function CashWithdraws() {
             });
 
             if (res.data.success) {
-                message.success(res.data.message);
+                toast.success(res.data.message);
                 setModalVisible(false);
                 setWithdrawAmount("");
                 setDescription("");
                 fetchWithdrawals();
             } else {
-                message.error(res.data.message);
+                toast.error(res.data.message);
             }
         } catch (error) {
             console.error("Withdraw error:", error);
-            message.error("Cash withdrawal failed");
+            toast.error("Cash withdrawal failed");
         }
     };
 
-    // Table columns
     const columns = [
         {
             title: "Admin",
             key: "admin",
+            width: 180,
             render: (record) => (
                 <div>
                     <Text strong>{record.admin_email}</Text>
@@ -78,22 +77,26 @@ function CashWithdraws() {
             title: "Role",
             dataIndex: "admin_role",
             key: "role",
+            width: 100,
         },
         {
             title: "Amount",
             dataIndex: "withdraw_amount",
             key: "amount",
+            width: 100,
             render: (text) => <Text>Rs. {text.toFixed(2)}</Text>,
         },
         {
             title: "Description",
             dataIndex: "description",
             key: "description",
+            width: 270,
         },
         {
             title: "Date",
             dataIndex: "created_at",
             key: "date",
+            width: 150,
             render: (text) => <Text>{new Date(text).toLocaleString()}</Text>,
         },
     ];
@@ -122,11 +125,11 @@ function CashWithdraws() {
                         columns={columns}
                         rowKey={(record) => record.id}
                         pagination={{ pageSize: 5 }}
+                        scroll={{ x: 1000 }} // enables horizontal scroll
                     />
                 )}
             </Card>
 
-            {/* Withdraw Modal */}
             <Modal
                 title="Withdraw Cash"
                 open={modalVisible}
@@ -134,14 +137,16 @@ function CashWithdraws() {
                 onCancel={() => setModalVisible(false)}
                 okText="Withdraw"
             >
-                <div className="space-y-4">
+                <div className="flex flex-col gap-4">
                     <Input
+                        className="w-full"
                         placeholder="Amount"
                         type="number"
                         value={withdrawAmount}
                         onChange={(e) => setWithdrawAmount(e.target.value)}
                     />
                     <Input.TextArea
+                        className="w-full"
                         placeholder="Description"
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
