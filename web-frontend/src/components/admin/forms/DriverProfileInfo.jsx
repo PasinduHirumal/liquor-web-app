@@ -94,13 +94,11 @@ const DriverProfileInfo = () => {
         } catch (error) {
             const response = error?.response?.data;
 
-            // If the API returned validation errors
             if (response?.errors && Array.isArray(response.errors)) {
                 response.errors.forEach((err) => {
                     toast.error(`${err.field}: ${err.message}`);
                 });
             } else {
-                // Fallback message
                 toast.error(response?.message || "Failed to update driver");
             }
         } finally {
