@@ -10,6 +10,7 @@ function CashWithdraws() {
     const [withdrawals, setWithdrawals] = useState([]);
     const [loading, setLoading] = useState(false);
     const [modalVisible, setModalVisible] = useState(false);
+    const [withdrawing, setWithdrawing] = useState(false)
     const [withdrawAmount, setWithdrawAmount] = useState("");
     const [description, setDescription] = useState("");
 
@@ -36,9 +37,13 @@ function CashWithdraws() {
 
     const handleWithdraw = async () => {
         if (!withdrawAmount || Number(withdrawAmount) <= 0) {
-            return toast.warning("Enter a valid amount");
+            return toast.error("Amount cannot be empty or zero");
+        }
+        if (!description || description.trim() === "") {
+            return toast.error("Description cannot be empty");
         }
 
+        setWithdrawing(true);
         try {
             const res = await axiosInstance.post("/finance/withdraw_cash", {
                 withdraw_amount: Number(withdrawAmount),
@@ -57,6 +62,8 @@ function CashWithdraws() {
         } catch (error) {
             console.error("Withdraw error:", error);
             toast.error("Cash withdrawal failed");
+        } finally {
+            setWithdrawing(false);
         }
     };
 
@@ -125,7 +132,7 @@ function CashWithdraws() {
                         columns={columns}
                         rowKey={(record) => record.id}
                         pagination={{ pageSize: 5 }}
-                        scroll={{ x: 1000 }} // enables horizontal scroll
+                        scroll={{ x: 1000 }}
                     />
                 )}
             </Card>
@@ -136,14 +143,37 @@ function CashWithdraws() {
                 onOk={handleWithdraw}
                 onCancel={() => setModalVisible(false)}
                 okText="Withdraw"
+                okButtonProps={{ loading: withdrawing }}
             >
                 <div className="flex flex-col gap-4">
                     <Input
                         className="w-full"
                         placeholder="Amount"
-                        type="number"
+                        type="text"
                         value={withdrawAmount}
-                        onChange={(e) => setWithdrawAmount(e.target.value)}
+                        onKeyDown={(e) => {
+                            // Allow only digits, dot, backspace, arrow keys, delete
+                            const allowedKeys = [
+                                "Backspace",
+                                "ArrowLeft",
+                                "ArrowRight",
+                                "Delete",
+                                "Tab",
+                            ];
+                            if (
+                                !/[0-9.]/.test(e.key) &&
+                                !allowedKeys.includes(e.key)
+                            ) {
+                                e.preventDefault();
+                            }
+                        }}
+                        onChange={(e) => {
+                            // Allow only numbers with optional single dot
+                            const val = e.target.value;
+                            if (/^\d*\.?\d*$/.test(val)) {
+                                setWithdrawAmount(val);
+                            }
+                        }}
                     />
                     <Input.TextArea
                         className="w-full"
