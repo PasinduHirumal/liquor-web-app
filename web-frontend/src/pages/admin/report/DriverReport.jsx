@@ -187,28 +187,25 @@ const DriverReport = () => {
             sorter: (a, b) => a.totalDeliveries - b.totalDeliveries,
         },
         {
-            title: "Completed",
-            dataIndex: "completedDeliveries",
-            key: "completed",
-            width: 110,
-            render: (count) => <Tag color="green" icon={<CheckCircleOutlined />}>{count}</Tag>,
-            sorter: (a, b) => a.completedDeliveries - b.completedDeliveries,
-        },
-        {
-            title: "Ongoing",
-            dataIndex: "onGoingDeliveries",
-            key: "ongoing",
-            width: 100,
-            render: (count) => <Tag color="blue" icon={<ClockCircleOutlined />}>{count}</Tag>,
-            sorter: (a, b) => a.onGoingDeliveries - b.onGoingDeliveries,
-        },
-        {
-            title: "Cancelled",
-            dataIndex: "cancelledDeliveries",
-            key: "cancelled",
-            width: 110,
-            render: (count) => <Tag color="red" icon={<CloseCircleOutlined />}>{count}</Tag>,
-            sorter: (a, b) => a.cancelledDeliveries - b.cancelledDeliveries,
+            title: "Order Types",
+            key: "orderTypes",
+            width: 220,
+            render: (_, record) => (
+                <Space size={[4, 4]} wrap>
+                    <Tag color="green" icon={<CheckCircleOutlined />}>
+                        Completed: {record.completedDeliveries}
+                    </Tag>
+                    <Tag color="blue" icon={<ClockCircleOutlined />}>
+                        Ongoing: {record.onGoingDeliveries}
+                    </Tag>
+                    <Tag color="red" icon={<CloseCircleOutlined />}>
+                        Cancelled: {record.cancelledDeliveries}
+                    </Tag>
+                </Space>
+            ),
+            sorter: (a, b) =>
+                (a.completedDeliveries + a.onGoingDeliveries + a.cancelledDeliveries) -
+                (b.completedDeliveries + b.onGoingDeliveries + b.cancelledDeliveries),
         },
         {
             title: "Earnings",
@@ -219,11 +216,19 @@ const DriverReport = () => {
             sorter: (a, b) => a.totalEarnings - b.totalEarnings,
         },
         {
+            title: "Withdraws",
+            dataIndex: "totalWithdraws",
+            key: "withdraws",
+            width: 120,
+            render: (amount) => <Text strong style={{color:"red"}}>${amount?.toFixed(2) || 0}</Text>,
+            sorter: (a, b) => a.totalWithdraws - b.totalWithdraws,
+        },
+        {
             title: "Balance",
             dataIndex: "currentBalance",
             key: "balance",
             width: 120,
-            render: (amount) => <Text>${amount?.toFixed(2) || 0}</Text>,
+            render: (amount) => <Text strong>${amount?.toFixed(2) || 0}</Text>,
             sorter: (a, b) => a.currentBalance - b.currentBalance,
         },
         {
@@ -306,41 +311,6 @@ const DriverReport = () => {
                         />
                     </Card>
                 </Col>
-                {/* 
-                <Col xs={24} sm={12} md={8} lg={6}>
-                    <Card hoverable style={{ borderRadius: 8 }}>
-                        <Statistic
-                            title="Total Earnings"
-                            value={reportData.data.reduce((sum, d) => sum + (d.totalEarnings || 0), 0)}
-                            prefix={<DollarOutlined />}
-                            precision={2}
-                            valueStyle={{ color: "#1890ff" }}
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={12} md={8} lg={6}>
-                    <Card hoverable style={{ borderRadius: 8 }}>
-                        <Statistic
-                            title="Total Withdraws"
-                            value={reportData.data.reduce((sum, d) => sum + (d.totalWithdraws || 0), 0)}
-                            prefix={<ArrowDownOutlined />}
-                            precision={2}
-                            valueStyle={{ color: "#f5222d" }}
-                        />
-                    </Card>
-                </Col>
-                <Col xs={24} sm={12} md={8} lg={6}>
-                    <Card hoverable style={{ borderRadius: 8 }}>
-                        <Statistic
-                            title="Total Balance"
-                            value={reportData.data.reduce((sum, d) => sum + (d.currentBalance || 0), 0)}
-                            prefix={<WalletOutlined />}
-                            precision={2}
-                            valueStyle={{ color: "#52c41a" }}
-                        />
-                    </Card>
-                </Col>
-                */}
             </Row>
 
             {/* Drivers Table */}
