@@ -129,13 +129,9 @@ const getOrdersReport = async (req, res) => {
 
 const getFinanceReport = async (req, res) => {
     try {
-        const { status = ORDER_STATUS_FOR_REPORT, format, start_date, end_date } = req.query;
+        const { status = ORDER_STATUS_FOR_REPORT, format } = req.query;
 
-        const { filters, filterDescription, validationError } = await buildFiltersForFinanceReport({
-            status,
-            start_date,
-            end_date
-        });
+        const { filters, filterDescription, validationError } = await buildFiltersForFinanceReport({ status });
 
         if (validationError) {
             return res.status(400).json({ success: false, message: validationError });
@@ -205,10 +201,9 @@ const getFinanceReport = async (req, res) => {
 
         const Cash_Summery_Result = await calculateCashSummary(sortedOrders);
 
-        const message = "Finance report fetched successfully";
         return res.status(200).json({ 
             success: true, 
-            message: format === 'pdf'? `PDF created successfully & ${message}` : message,
+            message: "Finance report fetched successfully",
             count: completedOrders.length,
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
             income : {

@@ -58,19 +58,13 @@ function validateDateRange(start_date, end_date, filters, filterDescription) {
 }
 
 // Helper function to build and validate filters for finance report
-async function buildFiltersForFinanceReport({ status, where_house_id, start_date, end_date }) {
+async function buildFiltersForFinanceReport({ status }) {
     const filters = {};
     const filterDescription = [];
     let validationError = null;
 
     // Status validation
     validationError = validateStatus(status, filters, filterDescription);
-    if (validationError) {
-        return { filters, filterDescription, validationError };
-    }
-
-    // Date range validation
-    validationError = validateDateRange(start_date, end_date, filters, filterDescription);
     if (validationError) {
         return { filters, filterDescription, validationError };
     }

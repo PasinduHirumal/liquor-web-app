@@ -292,6 +292,40 @@ const generateDriverReportHTML = (data) => {
         .delivery-stat.cancelled .delivery-stat-number { color: #dc2626; }
         .delivery-stat.total .delivery-stat-number { color: #7c3aed; }
 
+        .earnings-section {
+            margin-top: 5px;
+            background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #0891b2;
+        }
+
+        .earnings-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            text-align: center;
+        }
+
+        .earnings-item {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .earnings-amount {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0891b2;
+        }
+
+        .earnings-label {
+            font-size: 0.75rem;
+            color: #64748b;
+            margin-top: 0.25rem;
+        }
+
         .warehouse-distribution {
             background: white;
             border-radius: 8px;
@@ -520,6 +554,23 @@ const generateDriverReportHTML = (data) => {
                                     <div class="delivery-stat total">
                                         <div class="delivery-stat-number">${driver.totalDeliveries}</div>
                                         <div class="delivery-stat-label">Total</div>
+                                    </div>
+                                </div>
+
+                                <div class="earnings-section">
+                                    <div class="earnings-grid">
+                                        <div class="earnings-item">
+                                            <div class="earnings-amount">${driver.totalEarnings}</div>
+                                            <div class="earnings-label">Total Earnings</div>
+                                        </div>
+                                        <div class="earnings-item">
+                                            <div class="earnings-amount">${driver.totalWithdraws}</div>
+                                            <div class="earnings-label">Total Withdraws</div>
+                                        </div>
+                                        <div class="earnings-item">
+                                            <div class="earnings-amount">${driver.currentBalance}</div>
+                                            <div class="earnings-label">Current Balance</div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
