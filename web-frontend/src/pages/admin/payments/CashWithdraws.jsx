@@ -64,6 +64,22 @@ function CashWithdraws() {
     // Table columns
     const columns = [
         {
+            title: "Admin",
+            key: "admin",
+            render: (record) => (
+                <div>
+                    <Text strong>{record.admin_email}</Text>
+                    <br />
+                    <Text type="secondary">ID: {record.admin_id}</Text>
+                </div>
+            ),
+        },
+        {
+            title: "Role",
+            dataIndex: "admin_role",
+            key: "role",
+        },
+        {
             title: "Amount",
             dataIndex: "withdraw_amount",
             key: "amount",
@@ -73,16 +89,6 @@ function CashWithdraws() {
             title: "Description",
             dataIndex: "description",
             key: "description",
-        },
-        {
-            title: "Admin",
-            dataIndex: "admin_email",
-            key: "admin",
-        },
-        {
-            title: "Role",
-            dataIndex: "admin_role",
-            key: "role",
         },
         {
             title: "Date",
