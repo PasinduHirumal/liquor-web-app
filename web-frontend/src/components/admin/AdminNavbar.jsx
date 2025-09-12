@@ -28,18 +28,17 @@ import { getPendingOrdersCount } from "../../lib/orderApi";
 import ConfirmLogoutDialog from "../../common/ConfirmLogoutDialog";
 
 const StyledNavLink = ({ to, children, onClick, className = "" }) => (
-  <NavLink
-    to={to}
-    onClick={onClick}
-    style={{ textDecoration: "none" }}
-    className={({ isActive }) =>
-      `px-3 py-2 rounded transition font-medium text-white ${
-        isActive ? "bg-[#490101] font-bold" : "hover:bg-[#5f0404]"
-      } ${className}`
-    }
-  >
-    {children}
-  </NavLink>
+    <NavLink
+        to={to}
+        onClick={onClick}
+        style={{ textDecoration: "none" }}
+        className={({ isActive }) =>
+            `px-3 py-2 rounded transition font-medium text-white ${isActive ? "bg-[#490101] font-bold" : "hover:bg-[#5f0404]"
+            } ${className}`
+        }
+    >
+        {children}
+    </NavLink>
 );
 
 
@@ -285,24 +284,29 @@ const AdminNavbar = () => {
                             </ListItemButton>
                             <Collapse in={manageDropDownOpen}>
                                 <div className="pl-3">
-                                    <ListSubheader className="text-gray-400 bg-transparent px-0">
+                                    <ListSubheader className="bg-transparent p-0 m-0" style={{ color: "#d1d5dc" }}>
                                         Manage Products
                                     </ListSubheader>
-                                    <StyledNavLink to="/liquor-list">Liquor</StyledNavLink>
+                                    <StyledNavLink to="/liquor-list">
+                                        Liquor
+                                    </StyledNavLink>
                                     <StyledNavLink to="/other-product-list">
                                         Other Product
                                     </StyledNavLink>
 
-                                    <ListSubheader className="text-gray-400 bg-transparent px-0">
+                                    <ListSubheader className="bg-transparent p-0 m-0" style={{ color: "#d1d5dc" }}>
                                         Manage Members
                                     </ListSubheader>
+
                                     {isSuperAdmin && <StyledNavLink to="/users-list">Users</StyledNavLink>}
+                                    
                                     <StyledNavLink to="/driver-list">Drivers</StyledNavLink>
+
                                     {isSuperAdmin && (
                                         <StyledNavLink to="/admin-users-list">Admin Users</StyledNavLink>
                                     )}
 
-                                    <ListSubheader className="text-gray-400 bg-transparent px-0">
+                                    <ListSubheader className="bg-transparent p-0 m-0" style={{ color: "#d1d5dc" }}>
                                         Manage Others
                                     </ListSubheader>
                                     <StyledNavLink to="/category">Category</StyledNavLink>
