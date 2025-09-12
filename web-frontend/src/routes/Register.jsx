@@ -25,7 +25,7 @@ const Register = () => {
         </h3>
 
         <div
-          className="card border-0 p-4 border-0"
+          className="card border-0 p-4"
           style={{ minWidth: '350px', maxWidth: '500px', width: '100%' }}
         >
           {/* Toggle Buttons */}

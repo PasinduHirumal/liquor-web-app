@@ -1,54 +1,53 @@
 import React, { useState, useRef, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
-    AppBar, Toolbar, IconButton, Button, Box, useMediaQuery, useTheme, styled, Slide, Fade,
-    Collapse, List, ListItemButton, ListItemText, Typography, ListSubheader, Paper
+    AppBar,
+    Toolbar,
+    IconButton,
+    Button,
+    useMediaQuery,
+    useTheme,
+    Collapse,
+    List,
+    ListItemButton,
+    ListItemText,
+    ListSubheader,
+    Badge,
+    Slide,
+    Fade,
 } from "@mui/material";
-import { Menu as MenuIcon, Close as CloseIcon, Logout as LogoutIcon, ExpandMore, ExpandLess } from "@mui/icons-material";
-import Badge from "@mui/material/Badge";
+import {
+    Menu as MenuIcon,
+    Close as CloseIcon,
+    Logout as LogoutIcon,
+    ExpandMore,
+    ExpandLess,
+} from "@mui/icons-material";
 import useAdminAuthStore from "../../stores/adminAuthStore";
 import { getPendingOrdersCount } from "../../lib/orderApi";
 import ConfirmLogoutDialog from "../../common/ConfirmLogoutDialog";
 
-const StyledNavLink = styled(NavLink)(({ theme }) => ({
-    color: theme.palette.common.white,
-    textDecoration: "none",
-    padding: theme.spacing(1, 2),
-    borderRadius: theme.shape.borderRadius,
-    transition: "background-color 0.3s ease",
-    "&.active": {
-        backgroundColor: "#490101ff",
-        fontWeight: "bold",
-    },
-    "&:hover": {
-        backgroundColor: "#5f0404ff",
-    },
-}));
+const StyledNavLink = ({ to, children, onClick, className = "" }) => (
+    <NavLink
+        to={to}
+        onClick={onClick}
+        style={{ textDecoration: "none" }}
+        className={({ isActive }) =>
+            `px-3 py-2 rounded transition font-medium text-white ${isActive ? "bg-[#490101] font-bold" : "hover:bg-[#5f0404]"
+            } ${className}`
+        }
+    >
+        {children}
+    </NavLink>
+);
 
-const DropdownMenu = styled(Paper)(({ theme }) => ({
-    position: "absolute",
-    top: "100%",
-    left: 0,
-    backgroundColor: "#8b0505ff",
-    borderRadius: theme.shape.borderRadius,
-    boxShadow: theme.shadows[5],
-    zIndex: theme.zIndex.tooltip,
-    minWidth: 200,
-    overflow: "hidden",
-}));
-
-const DropdownItem = styled(Box)(({ theme }) => ({
-    padding: theme.spacing(1, 2),
-    "&:hover": {
-        backgroundColor: "#5f0404ff",
-    },
-}));
 
 const AdminNavbar = () => {
     const navigate = useNavigate();
-    const logout = useAdminAuthStore((state) => state.logout);
-    const user = useAdminAuthStore((state) => state.user);
-    const isSuperAdmin = user?.role === 'super_admin' || user?.roles?.includes('super_admin');
+    const logout = useAdminAuthStore((s) => s.logout);
+    const user = useAdminAuthStore((s) => s.user);
+    const isSuperAdmin =
+        user?.role === "super_admin" || user?.roles?.includes("super_admin");
 
     const theme = useTheme();
     const isMobile = useMediaQuery("(max-width:1150px)");
@@ -56,550 +55,344 @@ const AdminNavbar = () => {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [manageDropDownOpen, setManageDropDownOpen] = useState(false);
     const [storeDropDownOpen, setStoreDropDownOpen] = useState(false);
+    const [pendingCount, setPendingCount] = useState(0);
 
     const manageDropdownRef = useRef(null);
     const storeDropdownRef = useRef(null);
     const mobileMenuRef = useRef(null);
 
-    const [pendingCount, setPendingCount] = useState(0);
-
     useEffect(() => {
-        const fetchPendingCount = async () => {
+        const fetchPending = async () => {
             try {
-                const count = await getPendingOrdersCount();
-                setPendingCount(count);
-            } catch (error) {
-                console.error("Failed to fetch pending orders count:", error);
+                setPendingCount(await getPendingOrdersCount());
+            } catch (err) {
+                console.error("Failed to fetch pending orders count:", err);
             }
         };
-
-        fetchPendingCount();
-
-        const interval = setInterval(fetchPendingCount, 60000);
+        fetchPending();
+        const interval = setInterval(fetchPending, 60000);
         return () => clearInterval(interval);
     }, []);
 
     useEffect(() => {
-        const handleClickOutside = (event) => {
-            if (manageDropdownRef.current && !manageDropdownRef.current.contains(event.target)) {
+        const handleClickOutside = (e) => {
+            if (
+                manageDropdownRef.current &&
+                !manageDropdownRef.current.contains(e.target)
+            )
                 setManageDropDownOpen(false);
-            }
-
-            if (storeDropdownRef.current && !storeDropdownRef.current.contains(event.target)) {
+            if (
+                storeDropdownRef.current &&
+                !storeDropdownRef.current.contains(e.target)
+            )
                 setStoreDropDownOpen(false);
-            }
-
             if (
                 mobileMenuRef.current &&
-                !mobileMenuRef.current.contains(event.target) &&
-                !event.target.closest('[aria-label="menu"]')
-            ) {
+                !mobileMenuRef.current.contains(e.target) &&
+                !e.target.closest('[aria-label="menu"]')
+            )
                 setMobileMenuOpen(false);
-            }
         };
-
         document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
+        return () => document.removeEventListener("mousedown", handleClickOutside);
     }, []);
 
     const handleLogout = async () => {
         const confirmed = await ConfirmLogoutDialog({
             title: "Confirm Logout",
             html: "Are you sure you want to log out?",
-            icon: "warning"
+            icon: "warning",
         });
-
         if (!confirmed) return;
-
         await logout();
         navigate("/");
         setMobileMenuOpen(false);
     };
 
-    const toggleMobileMenu = () => setMobileMenuOpen((prev) => !prev);
-    const closeMobileMenu = () => {
-        setMobileMenuOpen(false);
-        setManageDropDownOpen(false);
-        setStoreDropDownOpen(false);
-    };
-
-    const toggleManageDropdown = (e) => {
-        e.stopPropagation();
-        setManageDropDownOpen((prev) => !prev);
-        setStoreDropDownOpen(false);
-    };
-
-    const toggleStoreDropdown = (e) => {
-        e.stopPropagation();
-        setStoreDropDownOpen((prev) => !prev);
-        setManageDropDownOpen(false);
-    };
-
-    const DesktopDropdownButton = ({ open, onClick, children }) => (
+    const DropdownButton = ({ open, onClick, children }) => (
         <Button
             onClick={onClick}
-            sx={{
-                color: "white",
-                textTransform: "none",
-                fontWeight: open ? "bold" : "normal",
-                bgcolor: open ? "#490101ff" : "transparent",
-                "&:hover": {
-                    bgcolor: "#5f0404ff",
-                },
-            }}
+            className={`text-white normal-case ${open ? "font-bold bg-[#490101]" : ""
+                } hover:bg-[#5f0404]`}
             endIcon={open ? <ExpandLess /> : <ExpandMore />}
         >
             {children}
         </Button>
     );
 
-    const DesktopDropdownMenu = ({ open, children }) => {
-        if (!open) return null;
-
-        return (
-            <DropdownMenu>
+    const DropdownMenu = ({ open, children }) =>
+        open && (
+            <div className="absolute top-full left-0 bg-[#8b0505] rounded shadow-lg z-50 min-w-[200px]">
                 {children}
-            </DropdownMenu>
+            </div>
         );
-    };
 
-    const DesktopDropdownLink = ({ to, onClick, children }) => (
-        <DropdownItem>
-            <StyledNavLink
-                to={to}
-                onClick={onClick}
-                style={{ display: "block", width: "100%" }}
-            >
-                {children}
-            </StyledNavLink>
-        </DropdownItem>
-    );
-
-    const DesktopDropdownHeader = ({ children }) => (
-        <Typography
-            variant="subtitle2"
-            sx={{
-                px: 2,
-                py: 1,
-                color: "gray",
-                fontSize: "0.75rem",
-                borderBottom: "1px solid rgba(255, 255, 255, 0.12)",
-                borderTop: "1px solid rgba(255, 255, 255, 0.12)",
-            }}
+    const DropdownLink = ({ to, onClick, children }) => (
+        <StyledNavLink
+            to={to}
+            onClick={onClick}
+            className="block w-full px-4 py-2 hover:bg-[#5f0404]"
         >
             {children}
-        </Typography>
+        </StyledNavLink>
+    );
+
+    const DropdownHeader = ({ children }) => (
+        <div className="px-4 py-1 text-xs text-gray-300 border-y border-white/20">
+            {children}
+        </div>
     );
 
     return (
-        <>
-            <AppBar position="fixed" elevation={4} sx={{ backgroundColor: "#a30000ff" }}>
-                <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2 } }}>
-                    {/* Brand */}
-                    <Box
-                        component={NavLink}
-                        to="/"
-                        onClick={closeMobileMenu}
-                        sx={{
-                            display: "flex",
-                            alignItems: "center",
-                            fontSize: "1.3rem",
-                            fontWeight: "bold",
-                            color: "white",
-                            textDecoration: "none",
-                        }}
-                    >
-                        🍷 Liquor Web App
-                    </Box>
+        <AppBar position="fixed" className="shadow-md" style={{ backgroundColor: "#7e0303" }}>
+            <Toolbar className="justify-between px-2">
+                {/* Brand */}
+                <NavLink
+                    to="/"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center text-lg font-bold text-white"
+                    style={{ textDecoration: "none" }}
+                >
+                    🍷 Liquor Web App
+                </NavLink>
 
-                    {/* Desktop Navigation */}
-                    <Box sx={{ display: isMobile ? "none" : "flex", alignItems: "center", gap: 1 }}>
-                        <StyledNavLink to="/admin" onClick={closeMobileMenu}>
-                            Home
-                        </StyledNavLink>
+                {/* Desktop Menu */}
+                {!isMobile && (
+                    <div className="flex items-center gap-2">
+                        <StyledNavLink to="/admin">Home</StyledNavLink>
 
-                        {/* Management Panels Dropdown */}
-                        <Box sx={{ position: "relative" }} ref={manageDropdownRef}>
-                            <DesktopDropdownButton open={manageDropDownOpen} onClick={toggleManageDropdown}>
+                        {/* Management Panels */}
+                        <div className="relative" ref={manageDropdownRef}>
+                            <DropdownButton
+                                open={manageDropDownOpen}
+                                onClick={() => {
+                                    setManageDropDownOpen((p) => !p);
+                                    setStoreDropDownOpen(false);
+                                }}
+                            >
                                 Management Panels
-                            </DesktopDropdownButton>
+                            </DropdownButton>
+                            <DropdownMenu open={manageDropDownOpen}>
+                                <DropdownHeader>Manage Products</DropdownHeader>
+                                <DropdownLink to="/liquor-list">Liquors</DropdownLink>
+                                <DropdownLink to="/other-product-list">Groceries</DropdownLink>
 
-                            <DesktopDropdownMenu open={manageDropDownOpen}>
-                                <DesktopDropdownHeader>Manage Products</DesktopDropdownHeader>
-                                <DesktopDropdownLink
-                                    to="/liquor-list"
-                                    onClick={() => {
-                                        closeMobileMenu();
-                                        setManageDropDownOpen(false);
-                                    }}
-                                >
-                                    Liquors
-                                </DesktopDropdownLink>
-                                <DesktopDropdownLink
-                                    to="/other-product-list"
-                                    onClick={() => {
-                                        closeMobileMenu();
-                                        setManageDropDownOpen(false);
-                                    }}
-                                >
-                                    Groceries
-                                </DesktopDropdownLink>
-
-                                <DesktopDropdownHeader>Manage Members</DesktopDropdownHeader>
+                                <DropdownHeader>Manage Members</DropdownHeader>
                                 {isSuperAdmin && (
-                                    <DesktopDropdownLink
-                                        to="/users-list"
-                                        onClick={() => {
-                                            closeMobileMenu();
-                                            setManageDropDownOpen(false);
-                                        }}
-                                    >
-                                        Users
-                                    </DesktopDropdownLink>
+                                    <DropdownLink to="/users-list">Users</DropdownLink>
                                 )}
-                                <DesktopDropdownLink
-                                    to="/driver-list"
-                                    onClick={() => {
-                                        closeMobileMenu();
-                                        setManageDropDownOpen(false);
-                                    }}
-                                >
-                                    Drivers
-                                </DesktopDropdownLink>
+                                <DropdownLink to="/driver-list">Drivers</DropdownLink>
                                 {isSuperAdmin && (
-                                    <DesktopDropdownLink
-                                        to="/admin-users-list"
-                                        onClick={() => {
-                                            closeMobileMenu();
-                                            setManageDropDownOpen(false);
-                                        }}
-                                    >
-                                        Admin Users
-                                    </DesktopDropdownLink>
+                                    <DropdownLink to="/admin-users-list">Admin Users</DropdownLink>
                                 )}
 
-                                <DesktopDropdownHeader>Manage Others</DesktopDropdownHeader>
-                                <DesktopDropdownLink
-                                    to="/category"
-                                    onClick={() => {
-                                        closeMobileMenu();
-                                        setManageDropDownOpen(false);
-                                    }}
-                                >
-                                    Category
-                                </DesktopDropdownLink>
-                                <DesktopDropdownLink
-                                    to="/manage-banner"
-                                    onClick={() => {
-                                        closeMobileMenu();
-                                        setManageDropDownOpen(false);
-                                    }}
-                                >
-                                    Banner
-                                </DesktopDropdownLink>
-                            </DesktopDropdownMenu>
-                        </Box>
+                                <DropdownHeader>Manage Others</DropdownHeader>
+                                <DropdownLink to="/category">Category</DropdownLink>
+                                <DropdownLink to="/manage-banner">Banner</DropdownLink>
+                            </DropdownMenu>
+                        </div>
 
-                        {/* Manage Store Dropdown */}
-                        <Box sx={{ position: "relative" }} ref={storeDropdownRef}>
-                            <DesktopDropdownButton open={storeDropDownOpen} onClick={toggleStoreDropdown}>
+                        {/* Manage Store */}
+                        <div className="relative" ref={storeDropdownRef}>
+                            <DropdownButton
+                                open={storeDropDownOpen}
+                                onClick={() => {
+                                    setStoreDropDownOpen((p) => !p);
+                                    setManageDropDownOpen(false);
+                                }}
+                            >
                                 Manage Store
-                            </DesktopDropdownButton>
+                            </DropdownButton>
+                            <DropdownMenu open={storeDropDownOpen}>
+                                <DropdownLink to="/wharehouse">Warehouse</DropdownLink>
+                                <DropdownLink to="/supermarket">Supermarket</DropdownLink>
+                            </DropdownMenu>
+                        </div>
 
-                            <DesktopDropdownMenu open={storeDropDownOpen}>
-                                <DesktopDropdownLink
-                                    to="/wharehouse"
-                                    onClick={() => {
-                                        closeMobileMenu();
-                                        setStoreDropDownOpen(false);
-                                    }}
-                                >
-                                    Warehouse
-                                </DesktopDropdownLink>
-                                <DesktopDropdownLink
-                                    to="/supermarket"
-                                    onClick={() => {
-                                        closeMobileMenu();
-                                        setStoreDropDownOpen(false);
-                                    }}
-                                >
-                                    Supermarket
-                                </DesktopDropdownLink>
-                            </DesktopDropdownMenu>
-                        </Box>
-
-                        <StyledNavLink to="/order-list" onClick={closeMobileMenu}>
+                        <StyledNavLink to="/order-list">
                             <Badge
                                 badgeContent={pendingCount}
                                 color="error"
-                                sx={{ "& .MuiBadge-badge": { right: -10, top: 6, color: "#000000ff", bgcolor: "#fffb00ff" } }}
+                                classes={{ badge: "bg-yellow-400 text-black right-[-10px] top-[6px]" }}
                             >
-                                <Box component="span" sx={{ pr: 1 }}>
-                                    Orders
-                                </Box>
+                                Orders
                             </Badge>
                         </StyledNavLink>
 
                         {isSuperAdmin && (
-                            <StyledNavLink
-                                to={`/app-info`}
-                                onClick={closeMobileMenu}
-                            >
-                                App Info
-                            </StyledNavLink>
+                            <>
+                                <StyledNavLink to="/payments">Payments</StyledNavLink>
+                                <StyledNavLink to="/reports">Reports</StyledNavLink>
+                                <StyledNavLink to="/app-info">App Info</StyledNavLink>
+                            </>
                         )}
 
-                        {isSuperAdmin && (
-                            <StyledNavLink
-                                to={`/reports`}
-                                onClick={closeMobileMenu}
-                            >
-                                Reports
-                            </StyledNavLink>
-                        )}
-
-                        {isSuperAdmin && (
-                            <StyledNavLink
-                                to={`/payments`}
-                                onClick={closeMobileMenu}
-                            >
-                                Payments
-                            </StyledNavLink>
-                        )}
-                        
-                        <StyledNavLink
-                            to={`/profile/${user?._id || user?.id}`}
-                            onClick={closeMobileMenu}
-                            sx={{ mr: 2 }}
-                        >
+                        <StyledNavLink to={`/profile/${user?._id || user?.id}`}>
                             Profile
                         </StyledNavLink>
 
-
-                        <Button variant="contained" color="error" startIcon={<LogoutIcon />} onClick={handleLogout}>
+                        <Button
+                            variant="contained"
+                            color="error"
+                            startIcon={<LogoutIcon />}
+                            onClick={handleLogout}
+                        >
                             Logout
                         </Button>
-                    </Box>
-
-                    {/* Mobile Menu Icon */}
-                    {isMobile && (
-                        <IconButton
-                            color="inherit"
-                            edge="end"
-                            onClick={toggleMobileMenu}
-                            aria-label="menu"
-                            sx={{ ml: "auto" }}
-                        >
-                            <Fade in={!mobileMenuOpen} unmountOnExit>
-                                <MenuIcon sx={{ color: "white", fontSize: 28 }} />
-                            </Fade>
-                            <Fade in={mobileMenuOpen} unmountOnExit>
-                                <CloseIcon sx={{ color: "white", fontSize: 28 }} />
-                            </Fade>
-                        </IconButton>
-                    )}
-                </Toolbar>
-
-                {/* Mobile Slide-down Menu */}
-                {isMobile && (
-                    <Slide direction="left" in={mobileMenuOpen} mountOnEnter unmountOnExit>
-                        <Box
-                            ref={mobileMenuRef}
-                            sx={{
-                                position: "fixed",
-                                top: { xs: 56, sm: 64 },
-                                height: { xs: "calc(100vh - 56px)", sm: "calc(100vh - 64px)" },
-                                right: 0,
-                                width: "75vw",
-                                maxWidth: 300,
-                                bgcolor: "#7e0303ff",
-                                zIndex: theme.zIndex.drawer + 1,
-                                p: 3,
-                                display: "flex",
-                                flexDirection: "column",
-                                overflowY: "auto",
-                            }}
-                        >
-                            <StyledNavLink to="/admin" onClick={closeMobileMenu} sx={{ mb: 2 }}>
-                                Home
-                            </StyledNavLink>
-
-                            {/* Mobile Management Panels section */}
-                            <List disablePadding sx={{ mb: 2, bgcolor: "transparent" }}>
-                                <ListItemButton
-                                    onClick={() => setManageDropDownOpen((prev) => !prev)}
-                                    sx={{
-                                        color: "white",
-                                        px: 0,
-                                        "&.Mui-expanded": {
-                                            fontWeight: "bold",
-                                        },
-                                    }}
-                                >
-                                    <ListItemText primary="Management panels" />
-                                    {manageDropDownOpen ? <ExpandLess sx={{ color: "white" }} /> : <ExpandMore sx={{ color: "white" }} />}
-                                </ListItemButton>
-                                <Collapse in={manageDropDownOpen} timeout="auto" unmountOnExit>
-                                    <Box sx={{ pl: 2 }}>
-                                        <ListSubheader disableSticky sx={{ color: "gray", bgcolor: "transparent", pl: 0 }}>
-                                            Manage Products
-                                        </ListSubheader>
-                                        <StyledNavLink
-                                            to="/liquor-list"
-                                            onClick={closeMobileMenu}
-                                            sx={{ display: "block", mb: 1 }}
-                                        >
-                                            Liquor
-                                        </StyledNavLink>
-                                        <StyledNavLink
-                                            to="/other-product-list"
-                                            onClick={closeMobileMenu}
-                                            sx={{ display: "block", mb: 1 }}
-                                        >
-                                            Other Product
-                                        </StyledNavLink>
-
-                                        <ListSubheader disableSticky sx={{ color: "gray", bgcolor: "transparent", pl: 0 }}>
-                                            Manage Members
-                                        </ListSubheader>
-                                        {isSuperAdmin && (
-                                            <StyledNavLink
-                                                to="/users-list"
-                                                onClick={closeMobileMenu}
-                                                sx={{ display: "block", mb: 1 }}
-                                            >
-                                                Users
-                                            </StyledNavLink>
-                                        )}
-                                        <StyledNavLink
-                                            to="/driver-list"
-                                            onClick={closeMobileMenu}
-                                            sx={{ display: "block", mb: 1 }}
-                                        >
-                                            Drivers
-                                        </StyledNavLink>
-                                        {isSuperAdmin && (
-                                            <StyledNavLink
-                                                to="/admin-users-list"
-                                                onClick={closeMobileMenu}
-                                                sx={{ display: "block", mb: 1 }}
-                                            >
-                                                Admin Users
-                                            </StyledNavLink>
-                                        )}
-
-                                        <ListSubheader disableSticky sx={{ color: "gray", bgcolor: "transparent", pl: 0 }}>
-                                            Manage Others
-                                        </ListSubheader>
-                                        <StyledNavLink
-                                            to="/category"
-                                            onClick={closeMobileMenu}
-                                            sx={{ display: "block" }}
-                                        >
-                                            Category
-                                        </StyledNavLink>
-                                        <StyledNavLink
-                                            to="/manage-banner"
-                                            onClick={closeMobileMenu}
-                                            sx={{ display: "block" }}
-                                        >
-                                            Banner
-                                        </StyledNavLink>
-                                    </Box>
-                                </Collapse>
-                            </List>
-
-                            {/* Mobile Manage Store section */}
-                            <List disablePadding sx={{ mb: 2, bgcolor: "transparent" }}>
-                                <ListItemButton
-                                    onClick={() => setStoreDropDownOpen((prev) => !prev)}
-                                    sx={{
-                                        color: "white",
-                                        px: 0,
-                                        "&.Mui-expanded": {
-                                            fontWeight: "bold",
-                                        },
-                                    }}
-                                >
-                                    <ListItemText primary="Manage Store" />
-                                    {storeDropDownOpen ? <ExpandLess sx={{ color: "white" }} /> : <ExpandMore sx={{ color: "white" }} />}
-                                </ListItemButton>
-                                <Collapse in={storeDropDownOpen} timeout="auto" unmountOnExit>
-                                    <Box sx={{ pl: 2 }}>
-                                        <StyledNavLink
-                                            to="/wharehouse"
-                                            onClick={closeMobileMenu}
-                                            sx={{ display: "block", mb: 1 }}
-                                        >
-                                            Warehouse
-                                        </StyledNavLink>
-                                        <StyledNavLink
-                                            to="/supermarket"
-                                            onClick={closeMobileMenu}
-                                            sx={{ display: "block", mb: 1 }}
-                                        >
-                                            Supermarket
-                                        </StyledNavLink>
-                                    </Box>
-                                </Collapse>
-                            </List>
-
-                            <StyledNavLink to="/order-list" onClick={closeMobileMenu} sx={{ px: 3, mb: 2 }}>
-                                <Badge
-                                    badgeContent={pendingCount}
-                                    color="error"
-                                    sx={{ "& .MuiBadge-badge": { right: -10, top: 6, color: "#000000ff", bgcolor: "#fffb00ff" } }}
-                                >
-                                    <Box component="span" sx={{ pr: 1 }}>
-                                        Orders
-                                    </Box>
-                                </Badge>
-                            </StyledNavLink>
-
-                            <StyledNavLink
-                                to={`/profile/${user?._id || user?.id}`}
-                                onClick={closeMobileMenu}
-                                sx={{ mb: 2 }}
-                            >
-                                Profile
-                            </StyledNavLink>
-
-                            {isSuperAdmin && (
-                                <StyledNavLink
-                                    to={`/app-info`}
-                                    onClick={closeMobileMenu}
-                                    sx={{ mb: 2 }}
-                                >
-                                    App Info
-                                </StyledNavLink>
-                            )}
-                            
-                            {isSuperAdmin && (
-                                <StyledNavLink
-                                    to={`/payments`}
-                                    onClick={closeMobileMenu}
-                                    sx={{ mb: 2 }}
-                                >
-                                    Payments
-                                </StyledNavLink>
-                            )}
-
-                            <Button
-                                variant="contained"
-                                color="error"
-                                fullWidth
-                                onClick={handleLogout}
-                                startIcon={<LogoutIcon />}
-                            >
-                                Logout
-                            </Button>
-                        </Box>
-                    </Slide>
+                    </div>
                 )}
-            </AppBar>
-        </>
+
+                {/* Mobile Toggle */}
+                {isMobile && (
+                    <IconButton
+                        color="inherit"
+                        edge="start"
+                        onClick={() => setMobileMenuOpen((p) => !p)}
+                        aria-label="menu"
+                    >
+                        {mobileMenuOpen ? (
+                            <CloseIcon className="text-white text-2xl" />
+                        ) : (
+                            <MenuIcon className="text-white text-2xl" />
+                        )}
+                    </IconButton>
+                )}
+            </Toolbar>
+
+            {/* Mobile Slide-down */}
+            {isMobile && (
+                <Slide direction="left" in={mobileMenuOpen} mountOnEnter unmountOnExit>
+                    <div
+                        ref={mobileMenuRef}
+                        className="fixed right-0 top-[56px] sm:top-[64px] h-[calc(100vh-56px)] sm:h-[calc(100vh-64px)] w-[75vw] max-w-[300px] bg-[#7e0303] z-50 p-4 flex flex-col overflow-y-auto"
+                    >
+                        <StyledNavLink to="/admin">Home</StyledNavLink>
+
+                        {/* Management Panels */}
+                        <List disablePadding>
+                            <ListItemButton
+                                onClick={() => setManageDropDownOpen((p) => !p)}
+                                className="text-white px-0"
+                            >
+                                <ListItemText primary="Management Panels" />
+                                {manageDropDownOpen ? (
+                                    <ExpandLess className="text-white" />
+                                ) : (
+                                    <ExpandMore className="text-white" />
+                                )}
+                            </ListItemButton>
+                            <Collapse in={manageDropDownOpen}>
+                                <div className="pl-3 flex flex-col">
+                                    <ListSubheader
+                                        className="bg-transparent p-0 m-0"
+                                        style={{ color: "#d1d5dc" }}
+                                    >
+                                        Manage Products
+                                    </ListSubheader>
+                                    <StyledNavLink className="block w-full py-2" to="/liquor-list">
+                                        Liquor
+                                    </StyledNavLink>
+                                    <StyledNavLink className="block w-full py-2" to="/other-product-list">
+                                        Other Product
+                                    </StyledNavLink>
+
+                                    <ListSubheader
+                                        className="bg-transparent p-0 m-0"
+                                        style={{ color: "#d1d5dc" }}
+                                    >
+                                        Manage Members
+                                    </ListSubheader>
+
+                                    {isSuperAdmin && (
+                                        <StyledNavLink className="block w-full py-2" to="/users-list">
+                                            Users
+                                        </StyledNavLink>
+                                    )}
+                                    <StyledNavLink className="block w-full py-2" to="/driver-list">
+                                        Drivers
+                                    </StyledNavLink>
+                                    {isSuperAdmin && (
+                                        <StyledNavLink className="block w-full py-2" to="/admin-users-list">
+                                            Admin Users
+                                        </StyledNavLink>
+                                    )}
+
+                                    <ListSubheader
+                                        className="bg-transparent p-0 m-0"
+                                        style={{ color: "#d1d5dc" }}
+                                    >
+                                        Manage Others
+                                    </ListSubheader>
+                                    <StyledNavLink className="block w-full py-2" to="/category">
+                                        Category
+                                    </StyledNavLink>
+                                    <StyledNavLink className="block w-full py-2" to="/manage-banner">
+                                        Banner
+                                    </StyledNavLink>
+                                </div>
+                            </Collapse>
+                        </List>
+
+                        {/* Manage Store */}
+                        <List disablePadding>
+                            <ListItemButton
+                                onClick={() => setStoreDropDownOpen((p) => !p)}
+                                className="text-white px-0"
+                            >
+                                <ListItemText primary="Manage Store" />
+                                {storeDropDownOpen ? (
+                                    <ExpandLess className="text-white" />
+                                ) : (
+                                    <ExpandMore className="text-white" />
+                                )}
+                            </ListItemButton>
+                            <Collapse in={storeDropDownOpen}>
+                                <div className="pl-3 flex flex-col">
+                                    <StyledNavLink className="block w-full py-2" to="/wharehouse">
+                                        Warehouse
+                                    </StyledNavLink>
+                                    <StyledNavLink className="block w-full py-2" to="/supermarket">
+                                        Supermarket
+                                    </StyledNavLink>
+                                </div>
+                            </Collapse>
+                        </List>
+
+                        <StyledNavLink to="/order-list">
+                            <Badge
+                                badgeContent={pendingCount}
+                                color="error"
+                                classes={{ badge: "bg-yellow-400 text-black right-[-10px] top-[6px]" }}
+                            >
+                                Orders
+                            </Badge>
+                        </StyledNavLink>
+
+                        {isSuperAdmin && (
+                            <>
+                                <StyledNavLink to="/payments">Payments</StyledNavLink>
+                                <StyledNavLink to="/reports">Reports</StyledNavLink>
+                                <StyledNavLink to="/app-info">App Info</StyledNavLink>
+                            </>
+                        )}
+
+                        <StyledNavLink to={`/profile/${user?._id || user?.id}`}>
+                            Profile
+                        </StyledNavLink>
+
+                        <Button
+                            variant="contained"
+                            color="error"
+                            fullWidth
+                            onClick={handleLogout}
+                            startIcon={<LogoutIcon />}
+                        >
+                            Logout
+                        </Button>
+                    </div>
+                </Slide>
+            )}
+        </AppBar>
     );
 };
 

@@ -36,6 +36,7 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                     address: recordToEdit.address || "",
                     delivery_charge_for_1KM: recordToEdit.delivery_charge_for_1KM ?? "",
                     service_charge: recordToEdit.service_charge ?? "",
+                    tax_charge: recordToEdit.tax_charge ?? "",
                     isActive: recordToEdit.isActive ?? false,
                     isLiquorActive: recordToEdit.isLiquorActive ?? false,
                 });
@@ -68,6 +69,7 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                 address: values.address,
                 delivery_charge_for_1KM: Number(values.delivery_charge_for_1KM),
                 service_charge: Number(values.service_charge),
+                tax_charge: Number(values.tax_charge),
                 isActive: values.isActive,
                 isLiquorActive: values.isLiquorActive,
             };
@@ -227,6 +229,29 @@ const EditSystemModal = ({ show, onHide, companyDetailId, onUpdateSuccess }) => 
                                         min: 0,
                                         max: 100,
                                         message: "Service charge must be between 0% and 100%",
+                                    },
+                                ]}
+                            >
+                                <InputNumber
+                                    min={0}
+                                    step={0.1}
+                                    style={{ width: "100%" }}
+                                    formatter={(value) => (value !== undefined ? `${value}%` : "")}
+                                    parser={(value) => value.replace("%", "")}
+                                />
+                            </Form.Item>
+                        </Col>
+                        <Col span={12}>
+                            <Form.Item
+                                name="tax_charge"
+                                label="Tax Charge (%)"
+                                rules={[
+                                    { required: true, message: "Please input tax charge!" },
+                                    {
+                                        type: "number",
+                                        min: 0,
+                                        max: 100,
+                                        message: "Tax charge must be between 0% and 100%",
                                     },
                                 ]}
                             >

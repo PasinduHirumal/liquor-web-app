@@ -145,6 +145,30 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                             />
                         </Form.Item>
                     </Col>
+                    <Col span={12}>
+                        <Form.Item
+                            name="tax_charge"
+                            label="tax Charge (%)"
+                            initialValue={0}
+                            rules={[
+                                { required: true, message: 'Please input tax charge!' },
+                                {
+                                    type: 'number',
+                                    min: 0,
+                                    max: 100,
+                                    message: 'Tax charge must be between 0% and 100%',
+                                },
+                            ]}
+                        >
+                            <InputNumber
+                                min={0}
+                                step={0.1}
+                                style={{ width: '100%' }}
+                                formatter={(value) => `${value}%`}
+                                parser={(value) => value.replace('%', '')}
+                            />
+                        </Form.Item>
+                    </Col>
                 </Row>
 
                 {/* Status */}
