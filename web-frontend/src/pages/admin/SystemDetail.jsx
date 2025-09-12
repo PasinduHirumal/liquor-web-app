@@ -143,6 +143,13 @@ const SystemDetail = () => {
                 value !== null && value !== undefined ? `${value}%` : 'N/A',
         },
         {
+            title: 'Tax Charge (%)',
+            dataIndex: 'tax_charge',
+            key: 'tax_charge',
+            render: (value) =>
+                value !== null && value !== undefined ? `${value}%` : 'N/A',
+        },
+        {
             title: 'System Status',
             dataIndex: 'isActive',
             key: 'isActive',
