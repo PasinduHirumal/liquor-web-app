@@ -11,7 +11,7 @@ const withdrawService = new MoneyWithdrawService();
 const calculateCashSummary = async (orders) => {
     // Fetch all required data
     const Income_Result = await orderService.getTotalIncomeValues(orders);
-    const Total_Cost_Value = await orderService.getTotalCostForAllOrders();
+    const Total_Cost_Value = await orderService.getTotalCostForAllOrders(orders);
     const Delivery_Fee_Earning_Result = await driverEarningsService.getTotalEarningForCompany();
     const Total_Earnings_For_All_Drivers_Result = await driverEarningsService.getTotalEarningForAllDrivers();
     const Total_Payments_For_All_Drivers = await driverPaymentService.getTotalPaymentForAllDrivers();
