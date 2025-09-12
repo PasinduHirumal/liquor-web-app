@@ -71,6 +71,7 @@ const ShopByCategory = () => {
                                     <Link
                                         to={`/category/${cat.category_id}`}
                                         className="bg-white text-black text-[10px] sm:text-xs md:text-sm px-2 py-1 rounded hover:bg-gray-200 transition"
+                                        style={{ textDecoration: "none" }}
                                     >
                                         Shop Now
                                     </Link>
