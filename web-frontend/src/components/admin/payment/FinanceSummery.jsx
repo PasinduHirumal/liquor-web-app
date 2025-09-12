@@ -1,14 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-    Card,
-    Statistic,
-    Row,
-    Col,
-    Spin,
-    Alert,
-    Typography,
-    Collapse,
-} from "antd";
+import { Card, Spin, Alert, Statistic, Row, Col, Typography, Divider, Collapse } from "antd";
 import {
     DollarOutlined,
     ArrowUpOutlined,
@@ -67,123 +58,114 @@ function FinanceSummary() {
                 </Text>
             )}
 
-            {/* --- Always Visible Top 3 --- */}
-            <Row gutter={[16, 16]} className="mb-4">
-                <Col xs={24} sm={12} md={8}>
-                    <Card className="shadow rounded-2xl">
-                        <Statistic
-                            title="Total Income"
-                            value={data.total_income}
-                            prefix={<DollarOutlined />}
-                            precision={2}
-                            valueStyle={{ color: "#3f8600" }}
-                        />
-                    </Card>
+            {/* Income + Income Breakdown */}
+            <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
+                <Col xs={24} md={12}>
+                    <Collapse defaultActiveKey={['1']} style={{ background: '#fff' }}>
+                        <Panel header="Income" key="1">
+                            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                                <Row justify="space-between">
+                                    <Text strong style={{ fontSize: 14 }}>Total Tax</Text>
+                                    <Text style={{ fontSize: 14, color: "#3f8600" }}>
+                                        Rs: {data.total_tax.toFixed(2)}
+                                    </Text>
+                                </Row>
+                                <Row justify="space-between">
+                                    <Text strong style={{ fontSize: 14 }}>Total Service Charges</Text>
+                                    <Text style={{ fontSize: 14, color: "#3f8600" }}>
+                                        Rs: {data.total_service_charge.toFixed(2)}
+                                    </Text>
+                                </Row>
+                                <Row justify="space-between">
+                                    <Text strong style={{ fontSize: 14 }}>Total Profit From Product</Text>
+                                    <Text style={{ fontSize: 14, color: "#3f8600" }}>
+                                        Rs: {data.total_profit_from_products.toFixed(2)}
+                                    </Text>
+                                </Row>
+                                <Row justify="space-between">
+                                    <Text strong style={{ fontSize: 14 }}>Total Delivery Fee</Text>
+                                    <Text style={{ fontSize: 14, color: "#3f8600" }}>
+                                        Rs: {data.total_delivery_fee.toFixed(2)}
+                                    </Text>
+                                </Row>
+
+                                <Divider style={{ margin: "0", borderTop: "2px solid #000" }} />
+
+                                <Row justify="space-between">
+                                    <Text strong style={{ fontSize: 14 }}>Total Income</Text>
+                                    <Text style={{ fontSize: 14, color: "#3f8600", fontWeight: "bold" }}>
+                                        Rs: {data.total_income.toFixed(2)}
+                                    </Text>
+                                </Row>
+                            </div>
+                        </Panel>
+                    </Collapse>
                 </Col>
 
-                <Col xs={24} sm={12} md={8}>
-                    <Card className="shadow rounded-2xl">
-                        <Statistic
-                            title="Total Tax"
-                            value={data.total_tax}
-                            prefix={<PercentageOutlined />}
-                            precision={2}
-                        />
-                    </Card>
+                <Col xs={24} md={12}>
+                    <Collapse defaultActiveKey={['1']} style={{ background: '#fff' }}>
+                        <Panel header="Available" key="1">
+                            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                                <Row justify="space-between">
+                                    <Text strong style={{ fontSize: 14 }}>Total Income</Text>
+                                    <Text style={{ fontSize: 14 }}>
+                                        Rs: {data.total_income.toFixed(2)}
+                                    </Text>
+                                </Row>
+                                <Row justify="space-between">
+                                    <Text strong style={{ fontSize: 14 }}>Total Payment For Drivers</Text>
+                                    <Text style={{ fontSize: 14, color: "#cf1322" }}>
+                                        Rs: {data.total_payment_for_drivers.toFixed(2)}
+                                    </Text>
+                                </Row>
+                                <Row justify="space-between">
+                                    <Text strong style={{ fontSize: 14 }}>Total Company Withdraws</Text>
+                                    <Text style={{ fontSize: 14, color: "#cf1322" }}>
+                                        Rs: {data.total_company_withdraws.toFixed(2)}
+                                    </Text>
+                                </Row>
+
+                                <Divider style={{ margin: "0", borderTop: "2px solid #000" }} />
+
+                                <Row justify="space-between">
+                                    <Text strong style={{ fontSize: 14 }}>Available Balance</Text>
+                                    <Text style={{ fontSize: 14, color: "#3f8600", fontWeight: "bold" }}>
+                                        Rs: {data.available_balance.toFixed(2)}
+                                    </Text>
+                                </Row>
+                            </div>
+                        </Panel>
+                    </Collapse>
                 </Col>
 
-                <Col xs={24} sm={12} md={8}>
-                    <Card className="shadow rounded-2xl">
-                        <Statistic
-                            title="Service Charges"
-                            value={data.total_service_charge}
-                            prefix={<BankOutlined />}
-                            precision={2}
-                        />
-                    </Card>
-                </Col>
+                <Col xs={24} md={12}>
+                    <Collapse defaultActiveKey={['1']} style={{ background: '#fff' }}>
+                        <Panel header="Withdrawable" key="1">
+                            <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
+                                <Row justify="space-between">
+                                    <Text strong style={{ fontSize: 14 }}>Available Balance</Text>
+                                    <Text style={{ fontSize: 14 }}>
+                                        Rs: {data.available_balance.toFixed(2)}
+                                    </Text>
+                                </Row>
+                                <Row justify="space-between">
+                                    <Text strong style={{ fontSize: 14 }}>Amount To be Paid To Drivers</Text>
+                                    <Text style={{ fontSize: 14, color: "#cf1322" }}>
+                                        Rs: {data.amount_to_be_paid_to_drivers.toFixed(2)}
+                                    </Text>
+                                </Row>
 
-                <Col xs={24} sm={12} md={8}>
-                    <Card className="shadow rounded-2xl">
-                        <Statistic
-                            title="Profit from Products"
-                            value={data.total_profit_from_products}
-                            prefix={<ShoppingCartOutlined />}
-                            precision={2}
-                        />
-                    </Card>
-                </Col>
+                                <Divider style={{ margin: "0", borderTop: "2px solid #000" }} />
 
-                <Col xs={24} sm={12} md={8}>
-                    <Card className="shadow rounded-2xl">
-                        <Statistic
-                            title="Delivery Fees"
-                            value={data.total_delivery_fee}
-                            prefix={<CarOutlined />}
-                            precision={2}
-                        />
-                    </Card>
-                </Col>
-
-                <Col xs={24} sm={12} md={8}>
-                    <Card className="shadow rounded-2xl">
-                        <Statistic
-                            title="Payment for Drivers"
-                            value={data.total_payment_for_drivers}
-                            prefix={<ArrowDownOutlined />}
-                            precision={2}
-                            valueStyle={{ color: "#cf1322" }}
-                        />
-                    </Card>
-                </Col>
-
-                <Col xs={24} sm={12} md={8}>
-                    <Card className="shadow rounded-2xl">
-                        <Statistic
-                            title="Company Withdrawals"
-                            value={data.total_company_withdraws}
-                            prefix={<BankOutlined />}
-                            precision={2}
-                        />
-                    </Card>
-                </Col>
-
-                <Col xs={24} sm={12} md={8}>
-                    <Card className="shadow rounded-2xl">
-                        <Statistic
-                            title="Available Balance"
-                            value={data.available_balance}
-                            prefix={<WalletOutlined />}
-                            precision={2}
-                            valueStyle={{
-                                color: data.available_balance >= 0 ? "#3f8600" : "#cf1322",
-                            }}
-                        />
-                    </Card>
-                </Col>
-
-                <Col xs={24} sm={12} md={8}>
-                    <Card className="shadow rounded-2xl">
-                        <Statistic
-                            title="Amount to be Paid to Drivers"
-                            value={data.amount_to_be_paid_to_drivers}
-                            prefix={<ArrowDownOutlined />}
-                            precision={2}
-                            valueStyle={{ color: "#cf1322" }}
-                        />
-                    </Card>
-                </Col>
-
-                <Col xs={24} sm={12} md={8}>
-                    <Card className="shadow rounded-2xl">
-                        <Statistic
-                            title="Amount Can Withdraw"
-                            value={data.amount_can_withdraw}
-                            prefix={<ArrowUpOutlined />}
-                            precision={2}
-                            valueStyle={{ color: "#3f8600" }}
-                        />
-                    </Card>
+                                <Row justify="space-between">
+                                    <Text strong style={{ fontSize: 14 }}>Amount Can Withdraw</Text>
+                                    <Text style={{ fontSize: 14, color: "#3f8600", fontWeight: "bold" }}>
+                                        Rs: {data.amount_can_withdraw.toFixed(2)}
+                                    </Text>
+                                </Row>
+                            </div>
+                        </Panel>
+                    </Collapse>
                 </Col>
             </Row>
         </div>
