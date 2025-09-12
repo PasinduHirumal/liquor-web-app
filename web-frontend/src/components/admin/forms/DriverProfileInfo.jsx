@@ -92,8 +92,17 @@ const DriverProfileInfo = () => {
             toast.success("Driver profile updated successfully");
             navigate(-1);
         } catch (error) {
-            const msg = error?.response?.data?.message || "Failed to update driver";
-            toast.error(msg);
+            const response = error?.response?.data;
+
+            // If the API returned validation errors
+            if (response?.errors && Array.isArray(response.errors)) {
+                response.errors.forEach((err) => {
+                    toast.error(`${err.field}: ${err.message}`);
+                });
+            } else {
+                // Fallback message
+                toast.error(response?.message || "Failed to update driver");
+            }
         } finally {
             setUpdating(false);
         }
