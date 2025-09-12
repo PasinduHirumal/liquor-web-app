@@ -158,14 +158,14 @@ const getFinanceReport = async (req, res) => {
                 return {
                     product_id: item.product_id,
                     product_name: item.product_name,
-                    unit_price_of_product_selling: parseFloat(unitSellingPrice.toFixed(2)),
-                    unit_price_of_product_cost: parseFloat(unitCostPrice.toFixed(2)),
-                    unit_profit_of_product: parseFloat(unitProfitValue.toFixed(2)),
+                    unit_price_of_product_selling: unitSellingPrice,
+                    unit_price_of_product_cost: unitCostPrice,
+                    unit_profit_of_product: unitProfitValue,
                     quantity: quantity,
                     is_profit: unitProfitValue > 0,
-                    total_price_for_products_selling: parseFloat((unitSellingPrice * quantity).toFixed(2)),
-                    total_price_for_products_cost: parseFloat((unitCostPrice * quantity).toFixed(2)),
-                    total_profit_for_products: parseFloat((unitProfitValue * quantity).toFixed(2)),
+                    total_price_for_products_selling: unitSellingPrice * quantity,
+                    total_price_for_products_cost: unitCostPrice * quantity,
+                    total_profit_for_products: unitProfitValue * quantity,
                 };
                 
             }) || [];
@@ -173,11 +173,11 @@ const getFinanceReport = async (req, res) => {
             // Calculate total profit from all products in this order
             const totalProfitFromProducts = processedItems.reduce((sum, item) => sum + item.total_profit_for_products, 0);
 
-            const deliveryFee = parseFloat(order.delivery_fee || 0);
-            const taxAmount = parseFloat(order.tax_amount || 0);
-            const serviceCharge = parseFloat(order.service_charge || 0);
-            const subtotal = parseFloat(order.subtotal || 0);
-            const totalAmount = parseFloat(order.total_amount || 0);
+            const deliveryFee = order.delivery_fee || 0;
+            const taxAmount = order.tax_amount || 0;
+            const serviceCharge = order.service_charge || 0;
+            const subtotal = order.subtotal || 0;
+            const totalAmount = order.total_amount || 0;
             const total_income = totalProfitFromProducts + deliveryFee + taxAmount + serviceCharge;
 
             return {
@@ -187,15 +187,15 @@ const getFinanceReport = async (req, res) => {
                 warehouse_id: order.warehouse_id,
                 items: processedItems,
                 income: {
-                    profit_from_products: parseFloat(totalProfitFromProducts.toFixed(2)),
-                    delivery_fee: parseFloat(deliveryFee.toFixed(2)),
-                    tax_amount: parseFloat(taxAmount.toFixed(2)),
-                    service_charge: parseFloat(serviceCharge.toFixed(2)),
-                    total_income: parseFloat(total_income.toFixed(2)),
+                    profit_from_products: totalProfitFromProducts,
+                    delivery_fee: deliveryFee,
+                    tax_amount: taxAmount,
+                    service_charge: serviceCharge,
+                    total_income: total_income,
                 },
-                total_cost: parseFloat((subtotal - totalProfitFromProducts).toFixed(2)),
-                total_income: parseFloat(total_income.toFixed(2)),
-                total_amount: parseFloat(totalAmount.toFixed(2)),
+                total_cost: subtotal - totalProfitFromProducts,
+                total_income: total_income,
+                total_amount: totalAmount,
             };
         });
 
