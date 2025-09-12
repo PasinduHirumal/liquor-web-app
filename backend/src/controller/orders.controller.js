@@ -9,7 +9,7 @@ import populateWhereHouse from "../utils/populateWhere_House.js";
 import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
 import { populateAddressWithUserIdInData } from '../utils/populateAddress.js';
 import { createDriverEarning, updateDriverEarning } from './driverEarnings.controller.js';
-import { updateOrderMissingFields } from '../utils/orderHelpers.js';
+import { extractSupermarketIds, updateOrderMissingFields } from '../utils/orderHelpers.js';
 import { validateDriverForDuty } from '../utils/validateDriverForDelivery.js';
 import { createDriverDuty } from './driverDuty.controller.js';
 
@@ -221,6 +221,12 @@ const updateOrderStatusById = async (req, res) => {
         }
 
         const updateData = { status: status };
+
+        if (order.is_driver_accepted === undefined) updateData.is_driver_accepted = false;
+        if (!order.superMarket_ids || order.superMarket_ids.length === 0) {
+            const superMarketIds = await extractSupermarketIds(order.items);
+            if (superMarketIds.length > 0) updateData.superMarket_ids = superMarketIds;
+        }
 
         const updatedOrder = await orderService.updateById(order_id, updateData);
 
