@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import DriverPayment from './DriverPayment';
-import Office from './office';
+import OfficeWithdraws from './OfficeWithdraws';
 import FinanceSummery from '../../../components/admin/payment/FinanceSummery';
 
 const Payment = () => {
@@ -10,8 +10,8 @@ const Payment = () => {
         switch (activeComponent) {
             case 'DriverPayment':
                 return <DriverPayment />;
-            case 'Office':
-                return <Office />;
+            case 'OfficeWithdraws':
+                return <OfficeWithdraws />;
             default:
                 return <DriverPayment />;
         }
@@ -31,11 +31,11 @@ const Payment = () => {
                     </button>
 
                     <button
-                        className={`btn rounded-pill ${activeComponent === 'Office' ? 'btn-primary' : 'btn-outline-dark'}`}
+                        className={`btn rounded-pill ${activeComponent === 'OfficeWithdraws' ? 'btn-primary' : 'btn-outline-dark'}`}
                         style={{ minWidth: '130px', flex: '0 0 auto' }}
-                        onClick={() => setActiveComponent('Office')}
+                        onClick={() => setActiveComponent('OfficeWithdraws')}
                     >
-                        Office
+                        Office Withdraws
                     </button>
                 </div>
             </div>

@@ -1,4 +1,4 @@
-function Office() {
+function OfficeWithdraws() {
     return (
         <div>
             <h1>
@@ -7,4 +7,4 @@ function Office() {
         </div>
     )
 }
-export default Office;
+export default OfficeWithdraws;
