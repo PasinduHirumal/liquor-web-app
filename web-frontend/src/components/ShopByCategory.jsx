@@ -32,7 +32,7 @@ const ShopByCategory = () => {
 
     if (loading) {
         return (
-            <section className="container py-5 text-center text-white">
+            <section className="container mx-auto py-10 text-center text-white">
                 <p>Loading categories...</p>
             </section>
         );
@@ -40,72 +40,37 @@ const ShopByCategory = () => {
 
     if (error) {
         return (
-            <section className="container py-5 text-center">
-                <p className="text-danger">{error}</p>
+            <section className="container mx-auto py-10 text-center">
+                <p className="text-red-500">{error}</p>
             </section>
         );
     }
 
     return (
-        <section className="container-fluid py-4 bg-black">
-            <h2 className="text-center text-white fw-bold mb-4">
+        <section className="w-full bg-black py-3">
+            <h2 className="text-center text-white font-bold text-2xl md:text-3xl mb-6">
                 SHOP BY CATEGORY
             </h2>
 
-            <div
-                style={{
-                    display: "flex",
-                    overflowX: "auto",
-                    gap: "1rem",
-                    padding: "0 1rem",
-                    scrollbarWidth: "thin",
-                }}
-                className="category-scroll"
-            >
+            <div className="flex overflow-x-auto space-x-4 px-4 scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-transparent">
                 {categories.length > 0 ? (
                     categories.map((cat) => (
                         <div
                             key={cat.category_id}
-                            style={{
-                                flex: "0 0 auto",
-                                width: "150px",
-                            }}
+                            className="flex-shrink-0 w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 max-w-32 max-h-32"
                         >
                             <div
-                                className="category-card position-relative text-center rounded shadow-sm text-white"
-                                style={{
-                                    backgroundImage: `url(${cat.icon})`,
-                                    backgroundSize: "contain",
-                                    backgroundRepeat: "no-repeat",
-                                    backgroundPosition: "center",
-                                    height: "150px",
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    borderRadius: "10px",
-                                    overflow: "hidden",
-                                }}
+                                className="relative rounded-lg shadow-md overflow-hidden w-full h-full flex items-center justify-center bg-center bg-contain bg-no-repeat"
+                                style={{ backgroundImage: `url(${cat.icon})` }}
                             >
                                 {/* Overlay */}
-                                <div
-                                    style={{
-                                        position: "absolute",
-                                        top: 0,
-                                        left: 0,
-                                        width: "100%",
-                                        height: "100%",
-                                        background: "rgba(0, 0, 0, 0.5)",
-                                        display: "flex",
-                                        flexDirection: "column",
-                                        justifyContent: "center",
-                                        alignItems: "center",
-                                        padding: "10px",
-                                    }}
-                                >
-                                    <h5 className="mb-2">{cat.name}</h5>
+                                <div className="absolute inset-0 bg-black/60 flex flex-col items-center justify-center text-center px-2">
+                                    <h5 className="text-white text-xs sm:text-sm md:text-base font-semibold mb-2 line-clamp-2">
+                                        {cat.name}
+                                    </h5>
                                     <Link
                                         to={`/category/${cat.category_id}`}
-                                        className="btn btn-light btn-sm"
+                                        className="bg-white text-black text-[10px] sm:text-xs md:text-sm px-2 py-1 rounded hover:bg-gray-200 transition"
                                     >
                                         Shop Now
                                     </Link>
@@ -114,9 +79,7 @@ const ShopByCategory = () => {
                         </div>
                     ))
                 ) : (
-                    <p className="text-center text-white">
-                        No categories found
-                    </p>
+                    <p className="text-center text-white">No categories found</p>
                 )}
             </div>
         </section>
