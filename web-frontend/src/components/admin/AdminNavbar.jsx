@@ -368,16 +368,17 @@ const AdminNavbar = () => {
                             </Badge>
                         </StyledNavLink>
 
+                        {isSuperAdmin && (
+                            <>
+                                <StyledNavLink to="/payments">Payments</StyledNavLink>
+                                <StyledNavLink to="/reports">Reports</StyledNavLink>
+                                <StyledNavLink to="/app-info">App Info</StyledNavLink>
+                            </>
+                        )}
+
                         <StyledNavLink to={`/profile/${user?._id || user?.id}`}>
                             Profile
                         </StyledNavLink>
-
-                        {isSuperAdmin && (
-                            <>
-                                <StyledNavLink to="/app-info">App Info</StyledNavLink>
-                                <StyledNavLink to="/payments">Payments</StyledNavLink>
-                            </>
-                        )}
 
                         <Button
                             variant="contained"
