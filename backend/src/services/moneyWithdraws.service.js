@@ -13,19 +13,14 @@ class MoneyWithdrawService extends BaseService {
     async getTotalWithdrawsAmount() {
         try {
             const docs = await this.findAll();
-            if (docs.length === 0) {
-                return { 
-                    Total_Value: 0 
-                } 
-            }
 
-            const totalCompanyEarning = docs.reduce((total, doc) => {
-                const companyEarning = doc.delivery_fee - doc.earning_amount;
-                return total + (companyEarning || 0);
+            const totalWithdrawalsAmount = docs.reduce((total, doc) => {
+                const withdrawalsAmount= doc.withdraw_amount;
+                return total + (withdrawalsAmount || 0);
             }, 0);
 
             return { 
-                Total_Value: parseFloat(totalCompanyEarning.toFixed(2)) 
+                Total_Value: parseFloat(totalWithdrawalsAmount.toFixed(2)) 
             }
         } catch (error) {
             throw error;
