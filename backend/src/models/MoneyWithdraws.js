@@ -7,7 +7,6 @@ class MoneyWithdraws {
         this.description = data.description;
         this.admin_id = data.admin_id;
         this.admin_email = data.admin_email;
-        this.admin_phone = data.admin_phone;
         this.admin_role = data.admin_role;
 
         this.created_at = data.created_at;
