@@ -283,34 +283,53 @@ const AdminNavbar = () => {
                                 )}
                             </ListItemButton>
                             <Collapse in={manageDropDownOpen}>
-                                <div className="pl-3">
-                                    <ListSubheader className="bg-transparent p-0 m-0" style={{ color: "#d1d5dc" }}>
+                                <div className="pl-3 flex flex-col">
+                                    <ListSubheader
+                                        className="bg-transparent p-0 m-0"
+                                        style={{ color: "#d1d5dc" }}
+                                    >
                                         Manage Products
                                     </ListSubheader>
-                                    <StyledNavLink to="/liquor-list">
+                                    <StyledNavLink className="block w-full py-2" to="/liquor-list">
                                         Liquor
                                     </StyledNavLink>
-                                    <StyledNavLink to="/other-product-list">
+                                    <StyledNavLink className="block w-full py-2" to="/other-product-list">
                                         Other Product
                                     </StyledNavLink>
 
-                                    <ListSubheader className="bg-transparent p-0 m-0" style={{ color: "#d1d5dc" }}>
+                                    <ListSubheader
+                                        className="bg-transparent p-0 m-0"
+                                        style={{ color: "#d1d5dc" }}
+                                    >
                                         Manage Members
                                     </ListSubheader>
 
-                                    {isSuperAdmin && <StyledNavLink to="/users-list">Users</StyledNavLink>}
-                                    
-                                    <StyledNavLink to="/driver-list">Drivers</StyledNavLink>
-
                                     {isSuperAdmin && (
-                                        <StyledNavLink to="/admin-users-list">Admin Users</StyledNavLink>
+                                        <StyledNavLink className="block w-full py-2" to="/users-list">
+                                            Users
+                                        </StyledNavLink>
+                                    )}
+                                    <StyledNavLink className="block w-full py-2" to="/driver-list">
+                                        Drivers
+                                    </StyledNavLink>
+                                    {isSuperAdmin && (
+                                        <StyledNavLink className="block w-full py-2" to="/admin-users-list">
+                                            Admin Users
+                                        </StyledNavLink>
                                     )}
 
-                                    <ListSubheader className="bg-transparent p-0 m-0" style={{ color: "#d1d5dc" }}>
+                                    <ListSubheader
+                                        className="bg-transparent p-0 m-0"
+                                        style={{ color: "#d1d5dc" }}
+                                    >
                                         Manage Others
                                     </ListSubheader>
-                                    <StyledNavLink to="/category">Category</StyledNavLink>
-                                    <StyledNavLink to="/manage-banner">Banner</StyledNavLink>
+                                    <StyledNavLink className="block w-full py-2" to="/category">
+                                        Category
+                                    </StyledNavLink>
+                                    <StyledNavLink className="block w-full py-2" to="/manage-banner">
+                                        Banner
+                                    </StyledNavLink>
                                 </div>
                             </Collapse>
                         </List>
@@ -329,9 +348,13 @@ const AdminNavbar = () => {
                                 )}
                             </ListItemButton>
                             <Collapse in={storeDropDownOpen}>
-                                <div className="pl-3">
-                                    <StyledNavLink to="/wharehouse">Warehouse</StyledNavLink>
-                                    <StyledNavLink to="/supermarket">Supermarket</StyledNavLink>
+                                <div className="pl-3 flex flex-col">
+                                    <StyledNavLink className="block w-full py-2" to="/wharehouse">
+                                        Warehouse
+                                    </StyledNavLink>
+                                    <StyledNavLink className="block w-full py-2" to="/supermarket">
+                                        Supermarket
+                                    </StyledNavLink>
                                 </div>
                             </Collapse>
                         </List>
