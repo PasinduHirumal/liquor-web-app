@@ -18,7 +18,7 @@ const calculateCashSummary = async (orders) => {
     const Total_Withdraw_Result = await withdrawService.getTotalWithdrawsAmount();
 
     // Perform calculations
-    const Tax_And_Profits = Income_Result.Total_TAX + Income_Result.Total_Profit_From_Products;
+    const Tax_And_Profits = Income_Result.Total_TAX + Income_Result.Total_Service_Charge + Income_Result.Total_Profit_From_Products;
     const Total_Income = Tax_And_Profits + Income_Result.Total_Delivery_Fee;
     const Total_Payment_For_All_Drivers = parseFloat(Total_Payments_For_All_Drivers.toFixed(2));
     const Total_Withdraws = Total_Withdraw_Result.Total_Value;
@@ -30,14 +30,15 @@ const calculateCashSummary = async (orders) => {
     // Return summary object
     return {
         total_TAX: Income_Result.Total_TAX,
+        total_service_charge: Income_Result.Total_Service_Charge,
         total_profit_from_products: Income_Result.Total_Profit_From_Products,
         total_delivery_fee: Income_Result.Total_Delivery_Fee,
-        total_income: Total_Income,
+        total_income: parseFloat(Total_Income.toFixed(2)),
         total_payment_for_drivers: Total_Payment_For_All_Drivers,
         total_company_withdraws: Total_Withdraws,
-        available_balance: Available_Balance,
+        available_balance: parseFloat(Available_Balance.toFixed(2)),
         amount_to_be_paid_to_drivers: Amount_To_Be_Paid_To_Drivers,
-        amount_can_withdraw: Amount_Can_Withdraw,
+        amount_can_withdraw: parseFloat(Amount_Can_Withdraw.toFixed(2)),
         extra: {
             total_cost: parseFloat(Total_Cost_Value.toFixed(2)),
             total_balance: Available_Total_Balance

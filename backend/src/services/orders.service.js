@@ -134,6 +134,11 @@ class OrdersService extends BaseService {
                 return sum + taxValue;
             }, 0);
 
+            const totalServiceCharge = orders.reduce((sum, order) => {
+                const serviceChargeValue = order.service_charge;
+                return sum + serviceChargeValue;
+            }, 0);
+
             const totalDeliveries = orders.reduce((sum, order) => {
                 const deliveryValue = order.delivery_fee;
                 return sum + deliveryValue;
@@ -149,6 +154,7 @@ class OrdersService extends BaseService {
 
             return {
                 Total_TAX: parseFloat(totalTAX.toFixed(2)),
+                Total_Service_Charge: parseFloat(totalServiceCharge.toFixed(2)),
                 Total_Delivery_Fee: parseFloat(totalDeliveries.toFixed(2)),
                 Total_Profit_From_Products: parseFloat(totalProfitFromProducts.toFixed(2))
             };

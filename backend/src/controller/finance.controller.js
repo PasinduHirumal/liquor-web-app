@@ -30,6 +30,10 @@ const getCashSummery = async (req, res) => {
             message: "Cash summery fetched successfully",
             filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
             data: {
+                total_tax: Cash_Summery.total_TAX,
+                total_service_charge: Cash_Summery.total_service_charge,
+                total_profit_from_products: Cash_Summery.total_profit_from_products,
+                total_delivery_fee: Cash_Summery.total_delivery_fee,
                 total_income: Cash_Summery.total_income,
                 total_payment_for_drivers: Cash_Summery.total_payment_for_drivers,
                 total_company_withdraws: Cash_Summery.total_company_withdraws,

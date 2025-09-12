@@ -179,9 +179,10 @@ const getFinanceReport = async (req, res) => {
 
             const deliveryFee = parseFloat(order.delivery_fee || 0);
             const taxAmount = parseFloat(order.tax_amount || 0);
+            const serviceCharge = parseFloat(order.service_charge || 0);
             const subtotal = parseFloat(order.subtotal || 0);
             const totalAmount = parseFloat(order.total_amount || 0);
-            const total_income = totalProfitFromProducts + deliveryFee + taxAmount;
+            const total_income = totalProfitFromProducts + deliveryFee + taxAmount + serviceCharge;
 
             return {
                 order_id: order.order_id,
@@ -192,7 +193,8 @@ const getFinanceReport = async (req, res) => {
                 income: {
                     profit_from_products: parseFloat(totalProfitFromProducts.toFixed(2)),
                     delivery_fee: parseFloat(deliveryFee.toFixed(2)),
-                    service_charge: parseFloat(taxAmount.toFixed(2)),
+                    tax_amount: parseFloat(taxAmount.toFixed(2)),
+                    service_charge: parseFloat(serviceCharge.toFixed(2)),
                     total_income: parseFloat(total_income.toFixed(2)),
                 },
                 total_cost: parseFloat((subtotal - totalProfitFromProducts).toFixed(2)),
@@ -212,6 +214,7 @@ const getFinanceReport = async (req, res) => {
             income : {
                 total_delivery_charges: Cash_Summery_Result.total_delivery_fee,
                 total_tax_charges: Cash_Summery_Result.total_TAX,
+                total_service_charges: Cash_Summery_Result.total_service_charge,
                 total_profits_from_products: Cash_Summery_Result.total_profit_from_products,
                 total_income: Cash_Summery_Result.total_income,
                 total_payments_for_drivers: Cash_Summery_Result.total_payment_for_drivers,
