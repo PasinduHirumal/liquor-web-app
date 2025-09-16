@@ -140,5 +140,123 @@ const validateAdminUserUpdate = (req, res, next) => {
   next();
 };
 
+// UPDATE VALIDATOR - NO defaults, all fields optional
+const validateReqOTPUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+  
+  const schema = Joi.object({
+    email: Joi.string().email().lowercase().required(),
+  })
+  .min(1) // Require at least one field to update
+  .options({ stripUnknown: true });; 
 
-export { validateAdminUser, validateAdminUserUpdate, validateAdminUserImportantFieldsUpdate };
+  // THE KEY CHANGE: Use the validated value with defaults applied
+  const { error, value } = schema.validate(req.body, {
+    allowUnknown: false,
+    abortEarly: false
+  });
+
+  if (error) {
+    console.log("Validation error: " + error.details[0].message)
+    return res.status(400).json({ 
+        success: false,
+        message: "Validation failed",
+        errors: error.details.map(detail => ({
+          field: detail.path.join('.'),
+          message: detail.message,
+          value: detail.context?.value
+        }))
+    });
+  }
+
+  // Replace req.body with the validated value that includes defaults
+  req.body = value;
+  next();
+};
+
+// UPDATE VALIDATOR - NO defaults, all fields optional
+const validateVerifyEmailUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+  
+  const schema = Joi.object({
+    email: Joi.string().email().lowercase().required(),
+    otp: Joi.string().pattern(/^\d{6}$/).required()
+  })
+  .min(1) // Require at least one field to update
+  .options({ stripUnknown: true });; 
+
+  // THE KEY CHANGE: Use the validated value with defaults applied
+  const { error, value } = schema.validate(req.body, {
+    allowUnknown: false,
+    abortEarly: false
+  });
+
+  if (error) {
+    console.log("Validation error: " + error.details[0].message)
+    return res.status(400).json({ 
+        success: false,
+        message: "Validation failed",
+        errors: error.details.map(detail => ({
+          field: detail.path.join('.'),
+          message: detail.message,
+          value: detail.context?.value
+        }))
+    });
+  }
+
+  // Replace req.body with the validated value that includes defaults
+  req.body = value;
+  next();
+};
+
+// UPDATE VALIDATOR - NO defaults, all fields optional
+const validatePasswordUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+  
+  const schema = Joi.object({
+    email: Joi.string().email().lowercase().required(),
+    password: Joi.string().min(6).max(128).required(),
+    otp: Joi.string().pattern(/^\d{6}$/).required()
+  })
+  .min(1) // Require at least one field to update
+  .options({ stripUnknown: true });; 
+
+  // THE KEY CHANGE: Use the validated value with defaults applied
+  const { error, value } = schema.validate(req.body, {
+    allowUnknown: false,
+    abortEarly: false
+  });
+
+  if (error) {
+    console.log("Validation error: " + error.details[0].message)
+    return res.status(400).json({ 
+        success: false,
+        message: "Validation failed",
+        errors: error.details.map(detail => ({
+          field: detail.path.join('.'),
+          message: detail.message,
+          value: detail.context?.value
+        }))
+    });
+  }
+
+  // Replace req.body with the validated value that includes defaults
+  req.body = value;
+  next();
+};
+
+
+export { 
+  validateAdminUser, 
+  validateVerifyEmailUpdate,
+  validateReqOTPUpdate,
+  validatePasswordUpdate, 
+  validateAdminUserUpdate, 
+  validateAdminUserImportantFieldsUpdate 
+};
