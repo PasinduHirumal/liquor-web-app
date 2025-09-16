@@ -10,7 +10,7 @@ const sendVerifyOtp = async (req, res) => {
 
         const user = await adminService.findByEmail(email);
         if (!user) {
-            return res.status(400).json({success: false, message: "User not found"});
+            return res.status(404).json({success: false, message: "User not found"});
         }
         
         if (user.isAccountVerified) {
@@ -44,7 +44,7 @@ const sendVerifyOtp = async (req, res) => {
             return res.status(400).json({ success: false, message: 'Verification OTP sending failed' });
         }
 
-        return res.status(200).json({success: true, message: "Verification OTP sent to email"});
+        return res.status(200).json({success: true, message: "Verification OTP has sent to your email"});
     } catch (error) {
         console.error('Send Verify OTP error:', error.message);
         return res.status(500).json({success: false, message: error.message });
@@ -57,7 +57,7 @@ const verifyEmail = async (req, res) => {
 
         const user = await adminService.findByEmail(email);
         if (!user) {
-            return res.status(400).json({success: false, message: "User not found"});
+            return res.status(404).json({success: false, message: "User not found"});
         }
 
         if (user.isAccountVerified) {
@@ -78,7 +78,7 @@ const verifyEmail = async (req, res) => {
             verifyOtpExpiredAt: new Date().toISOString(),
         };
 
-        await adminService.updateById(userId, updateUserData);
+        await adminService.updateById(user.id, updateUserData);
 
         return res.status(200).json({success: true, message: "Email verified Successfully"});
     } catch (error) {

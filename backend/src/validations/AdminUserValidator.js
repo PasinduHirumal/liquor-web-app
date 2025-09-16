@@ -221,7 +221,7 @@ const validatePasswordUpdate = (req, res, next) => {
   
   const schema = Joi.object({
     email: Joi.string().email().lowercase().required(),
-    password: Joi.string().min(6).max(128).required(),
+    newPassword: Joi.string().min(6).max(128).required(),
     otp: Joi.string().pattern(/^\d{6}$/).required()
   })
   .min(1) // Require at least one field to update
