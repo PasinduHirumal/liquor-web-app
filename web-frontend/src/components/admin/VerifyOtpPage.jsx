@@ -16,14 +16,18 @@ const VerifyOtpPage = () => {
     const [sendError, setSendError] = useState(false);
 
     const inputRef = useRef(null);
+    const hasSentOtp = useRef(false);
 
     useEffect(() => {
         if (!email) {
             navigate("/register");
             return;
         }
-        sendOtp();
-    }, []);
+        if (!hasSentOtp.current) {
+            sendOtp();
+            hasSentOtp.current = true;
+        }
+    }, [email, navigate]);
 
     useEffect(() => {
         if (!timeLeft) return;
