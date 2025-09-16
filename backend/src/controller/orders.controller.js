@@ -1,6 +1,9 @@
 import OrdersService from '../services/orders.service.js';
 import DriverService from "../services/driver.service.js";
 import CompanyService from "../services/company.service.js";
+import UserService from '../services/users.service.js';
+import AddressService from '../services/address.service.js';
+import SuperMarketService from '../services/superMarket.service.js';
 import DriverEarningsService from '../services/driverEarnings.service.js';
 import ORDER_STATUS from '../enums/orderStatus.js';
 import populateUser from '../utils/populateUser.js';
@@ -14,10 +17,13 @@ import { validateDriverForDuty } from '../utils/validateDriverForDelivery.js';
 import { createDriverDuty } from './driverDuty.controller.js';
 
 
+const addressService = new AddressService();
 const orderService = new OrdersService();
 const driverService = new DriverService();
 const companyService = new CompanyService();
 const driverEarningService = new DriverEarningsService();
+const userService = new UserService();
+const supermarketService = new SuperMarketService();
 
 
 const getAllOrders = async (req, res) => {
@@ -241,4 +247,105 @@ const updateOrderStatusById = async (req, res) => {
     }
 };
 
-export { getAllOrders, getOrderById, assignDriverForOrderById, updateOrderStatusById };
+const getOrdersHistoryForDriverById = async (req, res) => {
+	try {
+        const driver_id = req.params.id;
+
+        const driver = await driverService.findById(driver_id);
+        if (!driver) {
+            return res.status(404).json({ success: false, message: "Driver not found"});
+        }
+
+        const filters = {};
+        const filterDescription = [];
+
+        filters.is_driver_accepted = true;
+        filterDescription.push(`is_driver_accepted: ${true}`);
+
+        filters.assigned_driver_id = driver_id;
+        filterDescription.push(`assigned_driver_id: ${driver_id}`);
+
+        filters.status = ORDER_STATUS.DELIVERED;
+        filterDescription.push(`status: ${ORDER_STATUS.DELIVERED}`);
+
+        const orders = await orderService.findWithFilters(filters);
+        if (!orders) {
+            return res.status(400).json({ success: false, message: "Failed to get orders for driver"});
+        }
+
+        const sortedOrders = orders.sort((a, b) => {
+            return new Date(b.created_at) - new Date(a.created_at);
+        });
+
+        const processedOrders = await Promise.all(sortedOrders.map(async order => {
+            const orderDateISO = getDateFromTimestamp(order.order_date);
+            const estimatedTime = getDateFromTimestamp(order.estimated_delivery);
+            const deliveredAt = getDateFromTimestamp(order.delivered_at);
+            const createdAt = getDateFromTimestamp(order.created_at);
+            const updatedAt = getDateFromTimestamp(order.updated_at);
+            const customer = await userService.findById(order.user_id);
+            const address = customer ? await addressService.findById(customer.user_id, order.delivery_address_id) : null;
+            const warehouse = await companyService.findById(order.warehouse_id);
+            const driverEarning = await driverEarningService.findById(order.driver_earning_id);
+
+            // Fetch supermarket details for intermediates
+            const intermediates = await Promise.all(
+                (order.superMarket_ids || []).map(async (supermarket_id) => {
+                    const supermarket = await supermarketService.findById(supermarket_id);
+                    return supermarket ? `${supermarket.superMarket_Name} - ${supermarket.city}`: null;
+                })
+            );
+
+            // Filter out null values (in case some supermarkets weren't found)
+            const validIntermediates = intermediates.filter(item => item !== null);
+
+            const processedItems = order.items?.map(item => {
+                return {
+                    product_name: item.product_name,
+                    unit_price: item.unit_price,
+                    quantity: item.quantity,
+                    total_price: item.total_price,
+                }
+            }) || [];
+
+            return {
+                order_id: order.order_id,
+                order_number: order.order_number,
+                order_date: orderDateISO,
+                customer: customer ? `${customer.firstName} ${customer.lastName}` : "Unknown Customer",
+                items: processedItems,
+                from: warehouse ? warehouse.where_house_name : "Unknown Warehouse",
+                intermediates: validIntermediates,
+                delivery_address: address.streetAddress ?? "Unknown Address",
+                distance: order.distance,
+                delivery_fee: order.delivery_fee,
+                tax_amount: order.tax_amount,
+                service_charge: order.service_charge,
+                subtotal: order.subtotal,
+                total_amount: order.total_amount,
+                estimated_time: estimatedTime,
+                delivered_at: deliveredAt,
+                payment_method: order.payment_method,
+                payment_status: order.payment_status,
+                notes: order.notes,
+                driver_earning: driverEarning ? driverEarning.earning_amount : 0,
+                status: order.status,
+                created_at: createdAt,
+                updated_at: updatedAt,
+            }
+        }));
+        
+        return res.status(200).json({ 
+            success: true, 
+            message: `Orders history for driver: ${driver.firstName} ${driver.lastName} fetched successfully`,
+            count: orders.length, 
+            filtered: filterDescription.length > 0 ? filterDescription.join(', ') : null, 
+            data: processedOrders
+        });
+    } catch (error) {
+        console.error("Get orders history for driver by driver id error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+export { getAllOrders, getOrderById, assignDriverForOrderById, updateOrderStatusById, getOrdersHistoryForDriverById };
