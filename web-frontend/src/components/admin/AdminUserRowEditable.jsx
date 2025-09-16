@@ -82,8 +82,11 @@ const AdminUserRowEditable = ({ admin, onDeleteSuccess, onUpdateLocal, part }) =
             }
 
             const res = await axiosInstance.patch(`/admin/update/${admin.id}`, updatedData);
-            toast.success("Admin updated successfully");
-            onUpdateLocal(res.data.data);
+
+            if (res.data?.success) {
+                toast.success(res.data.message);
+                onUpdateLocal(res.data.data);
+            }
         } catch (error) {
             console.error("Update failed:", error);
 

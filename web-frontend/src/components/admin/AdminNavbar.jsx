@@ -1,27 +1,11 @@
 import React, { useState, useRef, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
-    AppBar,
-    Toolbar,
-    IconButton,
-    Button,
-    useMediaQuery,
-    useTheme,
-    Collapse,
-    List,
-    ListItemButton,
-    ListItemText,
-    ListSubheader,
-    Badge,
-    Slide,
-    Fade,
+    AppBar, Toolbar, IconButton, Button, useMediaQuery, useTheme, Collapse, 
+    List, ListItemButton, ListItemText, ListSubheader, Badge, Slide,
 } from "@mui/material";
 import {
-    Menu as MenuIcon,
-    Close as CloseIcon,
-    Logout as LogoutIcon,
-    ExpandMore,
-    ExpandLess,
+    Menu as MenuIcon, Close as CloseIcon, Logout as LogoutIcon, ExpandMore, ExpandLess,
 } from "@mui/icons-material";
 import useAdminAuthStore from "../../stores/adminAuthStore";
 import { getPendingOrdersCount } from "../../lib/orderApi";
