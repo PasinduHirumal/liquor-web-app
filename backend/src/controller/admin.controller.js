@@ -108,13 +108,12 @@ const getAllAdmins = async (req, res) => {
     }
 };
 
-const updateAdmin = async (req, res) => {
+const updateAdminImportantFieldsById = async (req, res) => {
 	try {
-        const adminIdToUpdate = req.params.id;
-        const currentUserId = req.user.id;
-        const { isActive, isAdminAccepted, isAccountVerified, where_house_id} = req.body;
+        const admin_id = req.params.id;
+        const { role, isAdminAccepted, where_house_id} = req.body;
 
-        const admin = await adminService.findById(adminIdToUpdate);
+        const admin = await adminService.findById(admin_id);
         if (!admin) {
             return res.status(404).json({ success: false, message: "Admin not found"});
         }
@@ -129,51 +128,27 @@ const updateAdmin = async (req, res) => {
             }
         }
 
-        // Authorization logic
-        const isSuperAdmin = req.user.role === ADMIN_ROLES.SUPER_ADMIN;
-        const isUpdatingSelf = currentUserId === adminIdToUpdate;
-
-        // Only allow:
-        // 1. Super admin can update anyone
-        // 2. Admin can update themselves
-        if (!isSuperAdmin && !isUpdatingSelf) {
-            return res.status(403).json({ success: false, message: "Not authorized to update" });
-        }
-        
-        // Role change restrictions
-        if (req.body.role || isAdminAccepted || isActive || isAccountVerified || where_house_id) {
-            // Only super admin can change roles
-            if (!isSuperAdmin) {
-                return res.status(403).json({ success: false, message: "Not authorized to update" });
-            }
-
-            // Validate role value
-            if (req.body.role && !Object.values(ADMIN_ROLES).includes(req.body.role)) {
-                return res.status(400).json({ success: false, message: "Invalid role value" });
-            }
+        if (isAdminAccepted !== undefined && isAdminAccepted === true) {
+            req.body.role = ADMIN_ROLES.ADMIN;
         }
 
         const updateData = { ...req.body };
-        
-        // Handle isAdminAccepted logic
-        if (updateData.isAdminAccepted === true && admin.role === ADMIN_ROLES.PENDING) {
-            // If accepting a pending admin, set their role to ADMIN
-            updateData.role = ADMIN_ROLES.ADMIN;
-        }
 
         // Update the admin
         const updatedAdmin = await adminService.updateById(admin.id, updateData);
         if (!updatedAdmin) {
             return res.status(400).json({ success: false, message: "Failed to update admin"});
         }
+
+        const username = `${updatedAdmin.firstName} ${updatedAdmin.lastName}`;
         
-        if (req.body.role && isUpdatingSelf) {
+        if (role !== undefined && admin_id === req.user.id) {
             const payload = {
                 id: updatedAdmin.id,
                 email: updatedAdmin.email,
-                username: `${updatedAdmin.firstName} ${updatedAdmin.lastName}`,
+                username: username,
                 role: updatedAdmin.role,
-                where_house: user.where_house_id || "N/A",
+                where_house: user.where_house_id || null,
             };
 
             generateToken(payload, res);
@@ -183,12 +158,41 @@ const updateAdmin = async (req, res) => {
         // remove password
         const { password, ...adminWithoutPassword } = updatedAdmin;
 
-        return res.status(200).json({ success: true, message: "Admin updated successfully", data: adminWithoutPassword});
+        return res.status(200).json({ success: true, message: `Admin ${username} updated successfully`, data: adminWithoutPassword});
     } catch (error) {
         console.error("Update admin error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 };
+
+const updateAdminById = async (req, res) => {
+    try {
+        const admin_id = req.params.id;
+
+        const admin = await adminService.findById(admin_id);
+        if (!admin) {
+            return res.status(404).json({ success: false, message: "Admin not found"});
+        }
+
+        const updateData = { ...req.body };
+
+        // Update the admin
+        const updatedAdmin = await adminService.updateById(admin.id, updateData);
+        if (!updatedAdmin) {
+            return res.status(400).json({ success: false, message: "Failed to update admin"});
+        }
+
+        // remove password
+        const { password, ...adminWithoutPassword } = updatedAdmin;
+
+        const username = `${updatedAdmin.firstName} ${updatedAdmin.lastName}`;
+
+        return res.status(200).json({ success: true, message: `${username} updated successfully`, data: adminWithoutPassword});
+    } catch (error) {
+        console.error("Update admin error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+}
 
 const deleteAdmin = async (req, res) => {
 	try {
@@ -214,4 +218,4 @@ const deleteAdmin = async (req, res) => {
     }
 };
 
-export { updateAdmin, getAllAdmins, deleteAdmin, getAdminById }
+export { updateAdminById, updateAdminImportantFieldsById, getAllAdmins, deleteAdmin, getAdminById }

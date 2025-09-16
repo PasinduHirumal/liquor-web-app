@@ -61,6 +61,46 @@ const validateAdminUser = (req, res, next) => {
 };
 
 // UPDATE VALIDATOR - NO defaults, all fields optional
+const validateAdminUserImportantFieldsUpdate = (req, res, next) => {
+  if (!req.body || Object.keys(req.body).length === 0) {
+    return res.status(400).json({ success: false, message: "Validation failed"});
+  }
+  
+  const schema = Joi.object({
+    role: Joi.string().valid(...Object.values(ADMIN_ROLES)).optional(),
+    where_house_id: Joi.string().optional(),
+    isActive: Joi.boolean().optional(),
+    isAdminAccepted: Joi.boolean().optional(),
+    isAccountVerified: Joi.boolean().optional(),
+  })
+  .min(1) // Require at least one field to update
+  .options({ stripUnknown: true });; 
+
+  // THE KEY CHANGE: Use the validated value with defaults applied
+  const { error, value } = schema.validate(req.body, {
+    allowUnknown: false,
+    abortEarly: false
+  });
+
+  if (error) {
+    console.log("Validation error: " + error.details[0].message)
+    return res.status(400).json({ 
+        success: false,
+        message: "Validation failed",
+        errors: error.details.map(detail => ({
+          field: detail.path.join('.'),
+          message: detail.message,
+          value: detail.context?.value
+        }))
+    });
+  }
+
+  // Replace req.body with the validated value that includes defaults
+  req.body = value;
+  next();
+};
+
+// UPDATE VALIDATOR - NO defaults, all fields optional
 const validateAdminUserUpdate = (req, res, next) => {
   if (!req.body || Object.keys(req.body).length === 0) {
     return res.status(400).json({ success: false, message: "Validation failed"});
@@ -71,15 +111,7 @@ const validateAdminUserUpdate = (req, res, next) => {
     password: Joi.string().min(6).max(128).optional(),
     firstName: Joi.string().min(2).max(50).optional(),
     lastName: Joi.string().min(2).max(50).optional(),
-    phone: phoneValidator.optional(),
-    
-    role: Joi.string().valid(...Object.values(ADMIN_ROLES)).optional(),
-    //googleId: Joi.string().allow('').optional(),
-    where_house_id: Joi.string().optional(),
-    isActive: Joi.boolean().optional(),
-    isAdminAccepted: Joi.boolean().optional(),
-    isAccountVerified: Joi.boolean().optional(),
-    
+    //phone: phoneValidator.optional(),
   })
   .min(1) // Require at least one field to update
   .options({ stripUnknown: true });; 
@@ -109,4 +141,4 @@ const validateAdminUserUpdate = (req, res, next) => {
 };
 
 
-export { validateAdminUser, validateAdminUserUpdate };
+export { validateAdminUser, validateAdminUserUpdate, validateAdminUserImportantFieldsUpdate };
