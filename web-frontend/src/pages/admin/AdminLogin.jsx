@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import useAdminAuthStore from "../../stores/adminAuthStore";
+import VerifyEmailEnterModel from "../../components/VerifyEmailEnterModel";
 
 const AdminLogin = () => {
     const navigate = useNavigate();
@@ -104,6 +105,19 @@ const AdminLogin = () => {
                             autoComplete="email"
                             autoFocus
                         />
+                        {/* Error Alert with Account not verified */}
+                        {error && error.includes("Your account is not verified") && (
+                            <div className="mt-2 d-flex justify-content-between align-items-center">
+                                <span className="text-danger">Account not verified</span>
+                                <button
+                                    type="button"
+                                    className="btn btn-link p-0 text-decoration-none ms-2"
+                                    onClick={() => navigate("/reset-password")}
+                                >
+                                    Click here
+                                </button>
+                            </div>
+                        )}
                     </div>
                 ) : (
                     <div className="mb-3">
@@ -120,6 +134,19 @@ const AdminLogin = () => {
                             title="Phone number must include country code"
                             autoFocus
                         />
+                        {/* Error Alert with Account not verified */}
+                        {error && error.includes("Your account is not verified") && (
+                            <div className="mt-2 d-flex justify-content-between align-items-center">
+                                <span className="text-danger">Account not verified</span>
+                                <button
+                                    type="button"
+                                    className="btn btn-link p-0 text-decoration-none ms-2"
+                                    onClick={() => navigate("/reset-password")}
+                                >
+                                    Click here
+                                </button>
+                            </div>
+                        )}
                     </div>
                 )}
 

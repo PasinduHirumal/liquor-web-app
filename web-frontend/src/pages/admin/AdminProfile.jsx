@@ -4,7 +4,7 @@ import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
 import { FaUserCircle} from "react-icons/fa";
-import { Spin, Alert, Button, Card, Tag, Typography, Skeleton } from "antd";
+import { Spin, Alert, Button, Card, Tag, Typography } from "antd";
 
 const { Title, Text } = Typography;
 
