@@ -3,6 +3,7 @@ import { axiosInstance } from '../../lib/axios';
 import toast from 'react-hot-toast';
 import AdminUserRowEditable from '../../components/admin/AdminUserRowEditable';
 import { Select, Button, Space, Spin, Typography, Table, Tag } from 'antd';
+import { ReloadOutlined } from '@ant-design/icons';
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -173,7 +174,7 @@ const AdminUserList = () => {
     <div className="container-fluid pt-3 bg-white">
       <Title level={3} className="text-center">Admin User List</Title>
 
-      {/* Filters */}
+      {/* Filters and Refresh */}
       <Space wrap size="large" className="mb-4 d-flex justify-content-center">
         <Select
           placeholder="Filter by Active Status"
@@ -202,6 +203,15 @@ const AdminUserList = () => {
             Clear Filters
           </Button>
         )}
+
+        {/* Refresh button */}
+        <Button
+          icon={<ReloadOutlined />}
+          onClick={fetchAdmins}
+          loading={loading}
+        >
+          Refresh
+        </Button>
       </Space>
 
       {/* Table */}
