@@ -17,17 +17,21 @@ const register = async (req, res) => {
             return res.status(400).json({ success: false, message: "User already exists" });
         }
 
-        if (where_house_id !== "N/A" && where_house_id !== undefined) {
-            const where_house = await companyService.findById(where_house_id);
-            if (!where_house) {
+        if (where_house_id !== undefined) {
+            const warehouse = await companyService.findById(where_house_id);
+            if (!warehouse) {
                 return res.status(400).json({ success: false, message: "Invalid warehouse id" });
             }
-            if (!where_house.isActive) {
+            if (!warehouse.isActive) {
                 return res.status(400).json({ success: false, message: "Warehouse is in Not-Active" });
             }
+        } else {
+            req.body.where_house_id = null;
         }
 
-        const admin = await adminService.create(req.body);
+        const adminData = { ...req.body };
+
+        const admin = await adminService.create(adminData);
         if (!admin) {
             return res.status(500).json({ success: false, message: "Failed to create admin" });
         }
