@@ -112,24 +112,25 @@ const updateAdmin = async (req, res) => {
 	try {
         const adminIdToUpdate = req.params.id;
         const currentUserId = req.user.id;
-        const { email, phone, isActive, isAdminAccepted, isAccountVerified, where_house_id} = req.body;
+        const { isActive, isAdminAccepted, isAccountVerified, where_house_id} = req.body;
 
         const admin = await adminService.findById(adminIdToUpdate);
         if (!admin) {
             return res.status(404).json({ success: false, message: "Admin not found"});
         }
 
-        const where_house = await companyService.findById(where_house_id);
-        if (!where_house) {
-            return res.status(400).json({ success: false, message: "Invalid Warehouse id" });
-        }
-        if (!where_house.isActive) {
-            return res.status(400).json({ success: false, message: "Warehouse is in Not-Active" });
+        if (where_house_id !== undefined) {
+            const warehouse = await companyService.findById(where_house_id);
+            if (!warehouse) {
+                return res.status(400).json({ success: false, message: "Invalid Warehouse id" });
+            }
+            if (!warehouse.isActive) {
+                return res.status(400).json({ success: false, message: "Warehouse is in Not-Active" });
+            }
         }
 
         // Authorization logic
         const isSuperAdmin = req.user.role === ADMIN_ROLES.SUPER_ADMIN;
-        const isAdmin = req.user.role === ADMIN_ROLES.ADMIN;
         const isUpdatingSelf = currentUserId === adminIdToUpdate;
 
         // Only allow:
@@ -153,10 +154,6 @@ const updateAdmin = async (req, res) => {
         }
 
         const updateData = { ...req.body };
-
-        if (email !== undefined || phone !== undefined) {
-            updateData.isAccountVerified = false;
-        }
         
         // Handle isAdminAccepted logic
         if (updateData.isAdminAccepted === true && admin.role === ADMIN_ROLES.PENDING) {

@@ -67,31 +67,19 @@ const validateAdminUserUpdate = (req, res, next) => {
   }
   
   const schema = Joi.object({
-    email: Joi.string().email().lowercase().optional(),
+    //email: Joi.string().email().lowercase().optional(),
     password: Joi.string().min(6).max(128).optional(),
     firstName: Joi.string().min(2).max(50).optional(),
     lastName: Joi.string().min(2).max(50).optional(),
     phone: phoneValidator.optional(),
     
     role: Joi.string().valid(...Object.values(ADMIN_ROLES)).optional(),
-    googleId: Joi.string().allow('').optional(),
+    //googleId: Joi.string().allow('').optional(),
     where_house_id: Joi.string().optional(),
     isActive: Joi.boolean().optional(),
     isAdminAccepted: Joi.boolean().optional(),
-    
-    verifyOtp: Joi.string().allow('').optional(),
-    verifyOtpExpiredAt: Joi.alternatives().try(
-      Joi.date(),
-      Joi.string().isoDate(),
-      Joi.valid(null)
-    ).optional(),
     isAccountVerified: Joi.boolean().optional(),
-    resetOtp: Joi.string().allow('').optional(),
-    resetOtpExpiredAt: Joi.alternatives().try(
-      Joi.date(),
-      Joi.string().isoDate(),
-      Joi.valid(null)
-    ).optional(),
+    
   })
   .min(1) // Require at least one field to update
   .options({ stripUnknown: true });; 
