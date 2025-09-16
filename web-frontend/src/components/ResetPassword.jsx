@@ -1,8 +1,11 @@
 import { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
+import { EyeOutlined, EyeInvisibleOutlined } from "@ant-design/icons"; // import icons
 
 function ResetPassword() {
+    const navigate = useNavigate();
     const [step, setStep] = useState(1);
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
@@ -10,9 +13,9 @@ function ResetPassword() {
     const [loading, setLoading] = useState(false);
     const [timer, setTimer] = useState(0);
     const [infoMessage, setInfoMessage] = useState("");
+    const [showPassword, setShowPassword] = useState(false); // password toggle
     const timerRef = useRef(null);
 
-    // Timer effect
     useEffect(() => {
         if (timer > 0) {
             timerRef.current = setTimeout(() => setTimer(timer - 1), 1000);
@@ -40,17 +43,11 @@ function ResetPassword() {
 
     const handleResetPassword = async (e) => {
         e.preventDefault();
-        if (!email || !otp || !newPassword) {
-            return toast.error("All fields are required");
-        }
+        if (!email || !otp || !newPassword) return toast.error("All fields are required");
 
         try {
             setLoading(true);
-            const res = await axiosInstance.post("/verify/resetPassword", {
-                email,
-                otp,
-                newPassword,
-            });
+            const res = await axiosInstance.post("/verify/resetPassword", { email, otp, newPassword });
             toast.success(res.data.message || "Password reset successful!");
             setStep(1);
             setEmail("");
@@ -101,6 +98,13 @@ function ResetPassword() {
                         >
                             {loading ? "Sending OTP..." : "Send OTP"}
                         </button>
+                        <button
+                            type="button"
+                            onClick={() => navigate(-1)}
+                            className="w-full mt-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded transition"
+                        >
+                            Back
+                        </button>
                     </form>
                 )}
 
@@ -136,7 +140,6 @@ function ResetPassword() {
                             </p>
                         )}
 
-                        {/* Only show Resend OTP button after timer ends */}
                         {timer === 0 && (
                             <button
                                 type="button"
@@ -148,18 +151,25 @@ function ResetPassword() {
                             </button>
                         )}
 
-                        <div>
+                        {/* Password field with toggle */}
+                        <div className="relative">
                             <label className="block text-gray-600 font-medium mb-1">
                                 New Password
                             </label>
                             <input
-                                type="password"
-                                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                type={showPassword ? "text" : "password"}
+                                className="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-indigo-500 pr-10"
                                 placeholder="Enter new password"
                                 value={newPassword}
                                 onChange={(e) => setNewPassword(e.target.value)}
                                 required
                             />
+                            <div
+                                className="absolute inset-y-12 right-3 flex items-center cursor-pointer text-gray-500"
+                                onClick={() => setShowPassword(!showPassword)}
+                            >
+                                {showPassword ? <EyeInvisibleOutlined /> : <EyeOutlined />}
+                            </div>
                         </div>
 
                         <button

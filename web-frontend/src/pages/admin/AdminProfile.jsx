@@ -118,19 +118,19 @@ const AdminProfile = () => {
                     <Card size="small" title="Personal Information" className="shadow-sm rounded-xl">
                         <div className="space-y-3">
                             <div className="flex items-center gap-2 justify-between">
-                                <Text strong><FaUserCircle /> Admin ID:</Text>
+                                <Text strong>Admin ID:</Text>
                                 <Text code>{admin.id}</Text>
                             </div>
                             <div className="flex items-center gap-2 justify-between">
-                                <Text strong><FaEnvelope /> Email:</Text>
+                                <Text strong>Email:</Text>
                                 <Text>{admin.email || "N/A"}</Text>
                             </div>
                             <div className="flex items-center gap-2 justify-between">
-                                <Text strong><FaPhone /> Phone:</Text>
+                                <Text strong>Phone:</Text>
                                 <Text>{admin.phone || "N/A"}</Text>
                             </div>
                             <div className="flex items-center gap-2 justify-between">
-                                <Text strong><FaBirthdayCake /> Date of Birth:</Text>
+                                <Text strong>Date of Birth:</Text>
                                 <Text>{formatDate(admin.dateOfBirth)}</Text>
                             </div>
                         </div>
@@ -152,7 +152,7 @@ const AdminProfile = () => {
                                 {admin.isAccountVerified ? <Tag color="success">Verified</Tag> : <Tag color="warning">Unverified</Tag>}
                             </div>
                             <div className="flex justify-between items-center">
-                                <Text strong><FaWarehouse /> Warehouse:</Text>
+                                <Text strong>Warehouse:</Text>
                                 <Text>{admin.where_house_id?.name || "N/A"}</Text>
                             </div>
                         </div>
