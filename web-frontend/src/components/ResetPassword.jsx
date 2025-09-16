@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 
@@ -8,6 +8,15 @@ function ResetPassword() {
     const [otp, setOtp] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [loading, setLoading] = useState(false);
+    const [timer, setTimer] = useState(0); // seconds remaining
+    const timerRef = useRef(null);
+
+    useEffect(() => {
+        if (timer > 0) {
+            timerRef.current = setTimeout(() => setTimer(timer - 1), 1000);
+        }
+        return () => clearTimeout(timerRef.current);
+    }, [timer]);
 
     const handleSendOtp = async (e) => {
         e.preventDefault();
@@ -18,6 +27,7 @@ function ResetPassword() {
             const res = await axiosInstance.post("/verify/sendResetOtp", { email });
             toast.success(res.data.message);
             setStep(2);
+            setTimer(150); // 2 minutes 30 seconds
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to send OTP");
         } finally {
@@ -43,11 +53,18 @@ function ResetPassword() {
             setEmail("");
             setOtp("");
             setNewPassword("");
+            setTimer(0);
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to reset password");
         } finally {
             setLoading(false);
         }
+    };
+
+    const formatTimer = (seconds) => {
+        const min = Math.floor(seconds / 60);
+        const sec = seconds % 60;
+        return `${min}:${sec < 10 ? "0" : ""}${sec}`;
     };
 
     return (
@@ -98,6 +115,21 @@ function ResetPassword() {
                                 required
                             />
                         </div>
+                        {timer > 0 && (
+                            <p className="text-sm text-gray-500">
+                                OTP expires in: <span className="font-semibold">{formatTimer(timer)}</span>
+                            </p>
+                        )}
+                        
+                        <button
+                            type="button"
+                            onClick={handleSendOtp}
+                            disabled={timer > 0}
+                            className={`w-full mb-2 ${timer > 0 ? "bg-gray-300 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
+                                } text-white font-medium py-2 rounded transition`}
+                        >
+                            {timer > 0 ? `Resend OTP (${formatTimer(timer)})` : "Resend OTP"}
+                        </button>
 
                         <div>
                             <label className="block text-gray-600 font-medium mb-1">

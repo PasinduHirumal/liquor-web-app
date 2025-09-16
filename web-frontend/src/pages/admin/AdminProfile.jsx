@@ -104,7 +104,7 @@ const AdminProfile = () => {
                             <Button
                                 type="primary"
                                 danger
-                                onClick={() => navigate(`/reset-password/${admin.id}`)}
+                                onClick={() => navigate(`/reset-password`)}
                             >
                                 Reset Password
                             </Button>
