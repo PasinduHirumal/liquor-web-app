@@ -70,7 +70,7 @@ const DriverDetailPage = () => {
 
     if (loading) {
         return (
-            <div className="driver-detail-loading text-center bg-white" style={{paddingTop:"20vh"}}>
+            <div className="driver-detail-loading text-center bg-white" style={{ paddingTop: "20vh" }}>
                 <CircularProgress />
             </div>
         );
@@ -338,6 +338,7 @@ const DriverDetailPage = () => {
                     </div>
 
                     {/* Performance & Ratings */}
+                    {/*  
                     <div className="driver-detail-section-card">
                         <div className="driver-detail-section-header" style={{
                             display: 'flex',
@@ -404,6 +405,7 @@ const DriverDetailPage = () => {
                             </div>
                         </div>
                     </div>
+                    */}
 
                     {/* Financial Information */}
                     <div className="driver-detail-section-card">
