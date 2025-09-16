@@ -86,7 +86,18 @@ const AdminUserRowEditable = ({ admin, onDeleteSuccess, onUpdateLocal, part }) =
             onUpdateLocal(res.data.data);
         } catch (error) {
             console.error("Update failed:", error);
-            toast.error(error?.response?.data?.message || "Failed to update admin");
+
+            const backendData = error?.response?.data;
+
+            if (backendData?.errors?.length) {
+                backendData.errors.forEach((err) => {
+                    toast.error(`${err.field}: ${err.message}`);
+                });
+            } else if (backendData?.message) {
+                toast.error(backendData.message);
+            } else {
+                toast.error("Failed to update admin");
+            }
 
             // Revert state on failure
             setRole(admin.role);
