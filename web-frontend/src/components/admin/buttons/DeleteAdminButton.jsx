@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { axiosInstance } from '../../../lib/axios';
 import ConfirmDeleteDialog from '../../../common/ConfirmDeleteDialog';
+import { Button } from 'antd';
+import { DeleteOutlined } from '@ant-design/icons';
 
 const DeleteAdminButton = ({ adminId, onSuccess }) => {
     const [isLoading, setIsLoading] = useState(false);
@@ -29,22 +31,14 @@ const DeleteAdminButton = ({ adminId, onSuccess }) => {
     };
 
     return (
-        <button
-            className="btn btn-sm btn-danger d-flex justify-content-center align-items-center"
+        <Button
+            danger
+            size="small"
+            className='border-0 shadow-none'
+            icon={<DeleteOutlined />}
+            loading={isLoading}
             onClick={handleDelete}
-            disabled={isLoading}
-            style={{ width: '70px', height: '32px' }}
-        >
-            {isLoading ? (
-                <span
-                    className="spinner-border spinner-border-sm text-light"
-                    role="status"
-                    aria-hidden="true"
-                ></span>
-            ) : (
-                'Delete'
-            )}
-        </button>
+        />
     );
 };
 

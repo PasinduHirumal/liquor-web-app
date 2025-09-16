@@ -1,76 +1,104 @@
-import React, { useEffect, useState } from 'react';
-import { Select, Switch } from 'antd';
-import toast from 'react-hot-toast';
-import { axiosInstance } from '../../lib/axios';
-import DeleteAdminButton from './buttons/DeleteAdminButton';
+import React, { useEffect, useState } from "react";
+import { Select, Switch } from "antd";
+import toast from "react-hot-toast";
+import { axiosInstance } from "../../lib/axios";
+import DeleteAdminButton from "./buttons/DeleteAdminButton";
 
-const ROLES = ['pending', 'admin', 'super_admin'];
+const ROLES = ["pending", "admin", "super_admin"];
 
 const AdminUserRowEditable = ({ admin, onDeleteSuccess, onUpdateLocal, part }) => {
     const [role, setRole] = useState(admin.role);
     const [isActive, setIsActive] = useState(admin.isActive);
     const [isAdminAccepted, setIsAdminAccepted] = useState(admin.isAdminAccepted);
-    const [whereHouseId, setWhereHouseId] = useState(admin.where_house_id?.id || '');
+    const [whereHouseId, setWhereHouseId] = useState(admin.where_house_id?.id || "");
     const [warehouses, setWarehouses] = useState([]);
     const [saving, setSaving] = useState(false);
 
     const fetchWarehouses = async () => {
         try {
-            const res = await axiosInstance.get('/system/details');
+            const res = await axiosInstance.get("/system/details");
             setWarehouses(res.data.data || []);
         } catch (error) {
-            console.error('Failed to fetch warehouses:', error);
-            toast.error('Failed to load warehouse list');
+            console.error("Failed to fetch warehouses:", error);
+            toast.error("Failed to load warehouse list");
         }
     };
-    
+
     useEffect(() => {
-        if (part === 'where_house_id') {
+        if (part === "where_house_id") {
             fetchWarehouses();
         }
     }, []);
 
     useEffect(() => {
         const timer = setTimeout(() => {
-            if (
-                role !== admin.role ||
-                isActive !== admin.isActive ||
-                isAdminAccepted !== admin.isAdminAccepted ||
-                whereHouseId !== admin.where_house_id?.id
-            ) {
+            let shouldUpdate = false;
+
+            switch (part) {
+                case "role":
+                    shouldUpdate = role !== admin.role;
+                    break;
+                case "isActive":
+                    shouldUpdate = isActive !== admin.isActive;
+                    break;
+                case "isAdminAccepted":
+                    shouldUpdate = isAdminAccepted !== admin.isAdminAccepted;
+                    break;
+                case "where_house_id":
+                    shouldUpdate = whereHouseId !== admin.where_house_id?.id;
+                    break;
+                default:
+                    break;
+            }
+
+            if (shouldUpdate) {
                 handleUpdate();
             }
         }, 700);
+
         return () => clearTimeout(timer);
     }, [role, isActive, isAdminAccepted, whereHouseId]);
 
     const handleUpdate = async () => {
         setSaving(true);
         try {
-            const updatedData = {
-                role,
-                isActive,
-                isAdminAccepted,
-                where_house_id: whereHouseId,
-            };
+            let updatedData = {};
+
+            switch (part) {
+                case "role":
+                    updatedData = { role };
+                    break;
+                case "isActive":
+                    updatedData = { isActive };
+                    break;
+                case "isAdminAccepted":
+                    updatedData = { isAdminAccepted };
+                    break;
+                case "where_house_id":
+                    updatedData = { where_house_id: whereHouseId };
+                    break;
+                default:
+                    return;
+            }
 
             const res = await axiosInstance.patch(`/admin/update/${admin.id}`, updatedData);
-            toast.success('Admin updated successfully');
+            toast.success("Admin updated successfully");
             onUpdateLocal(res.data.data);
         } catch (error) {
-            console.error('Update failed:', error);
-            toast.error(error?.response?.data?.message || 'Failed to update admin');
-            // Revert on failure
+            console.error("Update failed:", error);
+            toast.error(error?.response?.data?.message || "Failed to update admin");
+
+            // Revert state on failure
             setRole(admin.role);
             setIsActive(admin.isActive);
             setIsAdminAccepted(admin.isAdminAccepted);
-            setWhereHouseId(admin.where_house_id?.id || '');
+            setWhereHouseId(admin.where_house_id?.id || "");
         } finally {
             setSaving(false);
         }
     };
 
-    if (part === 'role') {
+    if (part === "role") {
         return (
             <Select
                 value={role}
@@ -88,7 +116,7 @@ const AdminUserRowEditable = ({ admin, onDeleteSuccess, onUpdateLocal, part }) =
         );
     }
 
-    if (part === 'isActive') {
+    if (part === "isActive") {
         return (
             <Switch
                 checked={isActive}
@@ -100,7 +128,7 @@ const AdminUserRowEditable = ({ admin, onDeleteSuccess, onUpdateLocal, part }) =
         );
     }
 
-    if (part === 'isAdminAccepted') {
+    if (part === "isAdminAccepted") {
         return (
             <Switch
                 checked={isAdminAccepted}
@@ -112,7 +140,7 @@ const AdminUserRowEditable = ({ admin, onDeleteSuccess, onUpdateLocal, part }) =
         );
     }
 
-    if (part === 'where_house_id') {
+    if (part === "where_house_id") {
         return (
             <Select
                 value={whereHouseId}
@@ -130,7 +158,7 @@ const AdminUserRowEditable = ({ admin, onDeleteSuccess, onUpdateLocal, part }) =
         );
     }
 
-    if (part === 'actions') {
+    if (part === "actions") {
         return (
             <div className="d-flex justify-content-center">
                 <DeleteAdminButton adminId={admin.id} onSuccess={onDeleteSuccess} />

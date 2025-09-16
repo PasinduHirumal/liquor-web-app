@@ -79,7 +79,7 @@ const AdminUserList = () => {
     {
       title: 'Email',
       dataIndex: 'email',
-      render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>,
+      render: (text) => <span className="font-medium">{text}</span>,
       width: 260,
     },
     {
@@ -139,7 +139,11 @@ const AdminUserList = () => {
     {
       title: 'Verified',
       dataIndex: 'isAccountVerified',
-      render: (val) => <Tag color={val ? 'green' : 'red'}>{val ? 'Yes' : 'No'}</Tag>,
+      render: (val) => (
+        <Tag color={val ? 'green' : 'red'}>
+          {val ? 'Yes' : 'No'}
+        </Tag>
+      ),
       width: 85,
     },
     {
@@ -171,56 +175,65 @@ const AdminUserList = () => {
   ];
 
   return (
-    <div className="container-fluid pt-3 bg-white">
-      <Title level={3} className="text-center">Admin User List</Title>
+    <div className="w-full p-4 bg-white shadow-sm">
 
-      {/* Filters and Refresh */}
-      <Space wrap size="large" className="mb-4 d-flex justify-content-center">
-        <Select
-          placeholder="Filter by Active Status"
-          style={{ width: 220 }}
-          value={filter.isActive || undefined}
-          onChange={(value) => handleFilterChange('isActive', value)}
-          allowClear
-        >
-          <Option value="true">Active</Option>
-          <Option value="false">Inactive</Option>
-        </Select>
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
+          {/* Left side - Title */}
+          <Title
+            level={3}
+            className="!mb-0 text-gray-800 font-semibold text-xl md:text-2xl"
+          >
+            Admin User List
+          </Title>
 
-        <Select
-          placeholder="Filter by Admin Accepted"
-          style={{ width: 220 }}
-          value={filter.isAdminAccepted || undefined}
-          onChange={(value) => handleFilterChange('isAdminAccepted', value)}
-          allowClear
-        >
-          <Option value="true">Accepted</Option>
-          <Option value="false">Not Accepted</Option>
-        </Select>
+          {/* Right side - Filters */}
+          <div className="flex flex-wrap items-center gap-3">
+            <Select
+              placeholder="Filter by Active Status"
+              style={{ width: 200 }}
+              value={filter.isActive || undefined}
+              onChange={(value) => handleFilterChange('isActive', value)}
+              allowClear
+            >
+              <Option value="true">Active</Option>
+              <Option value="false">Inactive</Option>
+            </Select>
 
-        {(filter.isAdminAccepted || filter.isActive) && (
-          <Button onClick={() => setFilter({ isAdminAccepted: '', isActive: '' })}>
-            Clear Filters
-          </Button>
-        )}
+            <Select
+              placeholder="Filter by Admin Accepted"
+              style={{ width: 200 }}
+              value={filter.isAdminAccepted || undefined}
+              onChange={(value) => handleFilterChange('isAdminAccepted', value)}
+              allowClear
+            >
+              <Option value="true">Accepted</Option>
+              <Option value="false">Not Accepted</Option>
+            </Select>
 
-        {/* Refresh button */}
-        <Button
-          icon={<ReloadOutlined />}
-          onClick={fetchAdmins}
-          loading={loading}
-        >
-          Refresh
-        </Button>
-      </Space>
+            {(filter.isAdminAccepted || filter.isActive) && (
+              <Button onClick={() => setFilter({ isAdminAccepted: '', isActive: '' })}>
+                Clear Filters
+              </Button>
+            )}
+
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={fetchAdmins}
+              loading={loading}
+              type="primary"
+            >
+              Refresh
+            </Button>
+          </div>
+        </div>
 
       {/* Table */}
       {loading ? (
-        <div className="d-flex justify-content-center my-5">
+        <div className="flex justify-center items-center my-10">
           <Spin size="large" />
         </div>
       ) : admins.length === 0 ? (
-        <p className="text-center fs-5 text-muted my-5">No admin users found.</p>
+        <p className="text-center text-lg text-gray-500 my-10">No admin users found.</p>
       ) : (
         <Table
           rowKey="id"
@@ -229,7 +242,7 @@ const AdminUserList = () => {
           pagination={{ pageSize: 10 }}
           scroll={{ y: 400 }}
           bordered
-          className="shadow-sm"
+          className="shadow-sm rounded-md"
         />
       )}
     </div>

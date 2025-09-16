@@ -130,7 +130,12 @@ const AdminNavbar = () => {
     const DropdownLink = ({ to, onClick, children }) => (
         <StyledNavLink
             to={to}
-            onClick={onClick}
+            onClick={(e) => {
+                if (onClick) onClick(e);
+                setManageDropDownOpen(false);
+                setStoreDropDownOpen(false);
+                setMobileMenuOpen(false);
+            }}
             className="block w-full px-4 py-2 hover:bg-[#5f0404]"
         >
             {children}
