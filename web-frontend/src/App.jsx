@@ -13,6 +13,7 @@ import ToastProvider from "./common/ToastProvider";
 import Login from "./routes/Login";
 import Register from "./routes/Register";
 import VerifyOtpPage from "./components/VerifyOtpPage";
+import ResetPassword from "./components/ResetPassword";
 import PublicHome from "./routes/PublicHome";
 import CategoryProducts from "./pages/CategoryProducts";
 
@@ -76,6 +77,7 @@ function App() {
             />
 
             <Route path="verify-otp" element={<VerifyOtpPage />} />
+            <Route path="reset-password" element={<ResetPassword />} />
 
             <Route path="/liquor-all" element={<LiquorAll />} />
             <Route path="/other-product-all" element={<OtherProductAll />} />

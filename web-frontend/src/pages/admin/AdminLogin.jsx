@@ -18,6 +18,7 @@ const AdminLogin = () => {
     const loading = useAdminAuthStore((state) => state.loading);
     const isAuthenticated = useAdminAuthStore((state) => state.isAuthenticated);
     const resetError = useAdminAuthStore((state) => state.resetError);
+    const error = useAdminAuthStore((state) => state.error); // ✅ get error from store
 
     useEffect(() => {
         setFormData({ email: "", phone: "", password: "" });
@@ -87,6 +88,7 @@ const AdminLogin = () => {
                 </div>
             </div>
 
+
             {/* Form */}
             <form onSubmit={handleSubmit}>
                 {loginMethod === "email" ? (
@@ -143,6 +145,19 @@ const AdminLogin = () => {
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </button>
                     </div>
+
+                    {/* Error Alert with Forgot Password */}
+                    {error && (
+                        <div className="d-flex justify-content-between align-items-center">
+                            <span>{error}</span>
+                            <button
+                                className="btn btn-link p-0 text-decoration-none ms-2"
+                                onClick={() => navigate("/reset-password")}
+                            >
+                                Forgot password?
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <button type="submit" className="btn btn-primary w-100" disabled={loading}>

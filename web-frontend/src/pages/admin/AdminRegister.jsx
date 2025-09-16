@@ -61,7 +61,7 @@ const AdminRegister = () => {
     return (
         <div className="card shadow p-4 register-card">
             <h3 className="mb-4 text-center text-primary">📝 Admin Registration</h3>
-
+            
             <form onSubmit={handleSubmit} autoComplete="on">
                 {/* First Name & Last Name */}
                 <div className="row mb-3">
