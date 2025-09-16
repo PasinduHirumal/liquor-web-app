@@ -6,7 +6,7 @@ import VerifyEmailEnterModel from "../../components/VerifyEmailEnterModel";
 
 const AdminLogin = () => {
     const navigate = useNavigate();
-
+    const [showVerifyModal, setShowVerifyModal] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
     const [loginMethod, setLoginMethod] = useState("email");
     const [formData, setFormData] = useState({
@@ -112,9 +112,9 @@ const AdminLogin = () => {
                                 <button
                                     type="button"
                                     className="btn btn-link p-0 text-decoration-none ms-2"
-                                    onClick={() => navigate("/reset-password")}
+                                    onClick={() => setShowVerifyModal(true)}
                                 >
-                                    Click here
+                                    Verify Now
                                 </button>
                             </div>
                         )}
@@ -141,9 +141,9 @@ const AdminLogin = () => {
                                 <button
                                     type="button"
                                     className="btn btn-link p-0 text-decoration-none ms-2"
-                                    onClick={() => navigate("/reset-password")}
+                                    onClick={() => setShowVerifyModal(true)}
                                 >
-                                    Click here
+                                    Verify Now
                                 </button>
                             </div>
                         )}
@@ -202,6 +202,11 @@ const AdminLogin = () => {
                     Register here
                 </button>
             </div>
+            {/* Render Modal */}
+            <VerifyEmailEnterModel
+                show={showVerifyModal}
+                onHide={() => setShowVerifyModal(false)}
+            />
         </div>
     );
 };
