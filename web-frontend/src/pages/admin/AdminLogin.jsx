@@ -148,7 +148,7 @@ const AdminLogin = () => {
 
                     {/* Error Alert with Forgot Password */}
                     {error && (
-                        <div className="d-flex justify-content-between align-items-center">
+                        <div className="mt-2 d-flex justify-content-between align-items-center">
                             <span>Forgot password?</span>
                             <button
                                 className="btn btn-link p-0 text-decoration-none ms-2"
