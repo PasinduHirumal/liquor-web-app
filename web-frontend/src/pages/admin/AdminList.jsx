@@ -220,6 +220,7 @@ const AdminUserList = () => {
               icon={<ReloadOutlined />}
               onClick={fetchAdmins}
               loading={loading}
+              type="primary"
             >
               Refresh
             </Button>
