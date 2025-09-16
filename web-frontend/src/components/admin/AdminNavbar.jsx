@@ -171,8 +171,10 @@ const AdminNavbar = () => {
                             <DropdownButton
                                 open={manageDropDownOpen}
                                 onClick={() => {
-                                    setManageDropDownOpen((p) => !p);
-                                    setStoreDropDownOpen(false);
+                                    setManageDropDownOpen((prev) => {
+                                        if (!prev) setStoreDropDownOpen(false);
+                                        return !prev;
+                                    });
                                 }}
                             >
                                 Management Panels
@@ -202,8 +204,10 @@ const AdminNavbar = () => {
                             <DropdownButton
                                 open={storeDropDownOpen}
                                 onClick={() => {
-                                    setStoreDropDownOpen((p) => !p);
-                                    setManageDropDownOpen(false);
+                                    setStoreDropDownOpen((prev) => {
+                                        if (!prev) setManageDropDownOpen(false);
+                                        return !prev;
+                                    });
                                 }}
                             >
                                 Manage Store
@@ -276,7 +280,12 @@ const AdminNavbar = () => {
                         {/* Management Panels */}
                         <List disablePadding>
                             <ListItemButton
-                                onClick={() => setManageDropDownOpen((p) => !p)}
+                                onClick={() => {
+                                    setManageDropDownOpen((prev) => {
+                                        if (!prev) setStoreDropDownOpen(false);
+                                        return !prev;
+                                    });
+                                }}
                                 className="text-white px-0"
                             >
                                 <ListItemText primary="Management Panels" />
@@ -341,7 +350,12 @@ const AdminNavbar = () => {
                         {/* Manage Store */}
                         <List disablePadding>
                             <ListItemButton
-                                onClick={() => setStoreDropDownOpen((p) => !p)}
+                                onClick={() => {
+                                    setStoreDropDownOpen((prev) => {
+                                        if (!prev) setManageDropDownOpen(false);
+                                        return !prev;
+                                    });
+                                }}
                                 className="text-white px-0"
                             >
                                 <ListItemText primary="Manage Store" />
