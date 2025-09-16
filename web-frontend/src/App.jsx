@@ -12,7 +12,7 @@ import AdminRegister from "./pages/admin/AdminRegister";
 import ToastProvider from "./common/ToastProvider";
 import Login from "./routes/Login";
 import Register from "./routes/Register";
-import VerifyOtpPage from "./components/admin/VerifyOtpPage";
+import VerifyOtpPage from "./components/VerifyOtpPage";
 import PublicHome from "./routes/PublicHome";
 import CategoryProducts from "./pages/CategoryProducts";
 
