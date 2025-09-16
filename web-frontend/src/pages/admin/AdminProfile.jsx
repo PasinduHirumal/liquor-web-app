@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../../lib/axios";
 import toast from "react-hot-toast";
 import { format } from "date-fns";
-import { FaUserCircle, FaEnvelope, FaPhone, FaBirthdayCake, FaWarehouse } from "react-icons/fa";
+import { FaUserCircle} from "react-icons/fa";
 import { Spin, Alert, Button, Card, Tag, Typography, Skeleton } from "antd";
 
 const { Title, Text } = Typography;
