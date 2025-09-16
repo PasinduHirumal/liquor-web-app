@@ -90,20 +90,25 @@ const AdminProfile = () => {
                     <div className="flex items-center justify-center w-28 h-28 rounded-full bg-gradient-to-tr from-blue-400 to-indigo-500 text-white">
                         <FaUserCircle size={80} />
                     </div>
-                    <div className="flex-1 text-center md:text-left">
+
+                    <div className="flex-1 flex flex-col md:flex-row md:items-center md:justify-between text-center md:text-left gap-4">
+                        {/* Name and Tags */}
                         <div className="flex flex-col md:flex-row md:items-center md:gap-4 justify-center md:justify-start">
                             <Title level={3} className="mb-2">{admin.firstName} {admin.lastName}</Title>
                             <Tag color={getRoleColor(admin.role)} className="uppercase">{admin.role?.replace(/_/g, " ")}</Tag>
                             {admin.isActive === false && <Tag color="default">Inactive</Tag>}
                         </div>
-                        <Button
-                            type="primary"
-                            danger
-                            className="mt-4 md:mt-0"
-                            onClick={() => navigate(`/reset-password/${admin.id}`)}
-                        >
-                            Reset Password
-                        </Button>
+
+                        {/* Reset Password Button */}
+                        <div className="flex justify-center md:justify-start md:mt-0">
+                            <Button
+                                type="primary"
+                                danger
+                                onClick={() => navigate(`/reset-password/${admin.id}`)}
+                            >
+                                Reset Password
+                            </Button>
+                        </div>
                     </div>
                 </div>
 
