@@ -6,7 +6,7 @@ const adminService = new AdminUserService();
 
 const sendVerifyOtp = async (req, res) => {
     try {
-        const {email} = req.body;
+        const { email } = req.body;
 
         const user = await adminService.findByEmail(email);
         if (!user) {
@@ -60,11 +60,6 @@ const verifyEmail = async (req, res) => {
             return res.status(400).json({success: false, message: "User not found"});
         }
 
-        const userId = user.id;
-        if (!userId || !otp) {
-            return res.status(400).json({success: false, message: "Missing email or OTP"});
-        }
-
         if (user.isAccountVerified) {
             return res.status(400).json({success: false, message: "Your gmail has been already verified"});
         }
@@ -95,9 +90,6 @@ const verifyEmail = async (req, res) => {
 const sendResetOtp = async (req, res) => {
     try {
         const { email } = req.body;
-        if (!email) {
-            return res.status(400).json({success: false, message: "Email is required"});
-        }
 
         const user = await adminService.findByEmail(email);
         if (!user) {
@@ -141,9 +133,6 @@ const sendResetOtp = async (req, res) => {
 const resetPassword = async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
-        if (!email || !otp || !newPassword) {
-            return res.status(400).json({success: false, message: "Email, OTP, Password are required"});
-        }
 
         const user = await adminService.findByEmail(email);
         if(!user) {
