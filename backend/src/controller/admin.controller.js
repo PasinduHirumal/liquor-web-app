@@ -169,6 +169,10 @@ const updateAdminById = async (req, res) => {
     try {
         const admin_id = req.params.id;
 
+        if (admin_id !== req.user?.id) {
+            return res.status(403).json({ success: false, message: "No Authorize to update"});
+        }
+
         const admin = await adminService.findById(admin_id);
         if (!admin) {
             return res.status(404).json({ success: false, message: "Admin not found"});
