@@ -20,6 +20,8 @@ const useAdminAuthStore = create((set) => ({
         error: null
       });
       toast.success(res.data.message);
+      
+      window.location.reload();
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Login failed';
       set({
@@ -49,7 +51,7 @@ const useAdminAuthStore = create((set) => ({
     }
   },
 
-  // CHECK AUTH (Improved)
+  // CHECK AUTH
   checkAuth: async () => {
     set({ loading: true, error: null });
     try {
