@@ -3,14 +3,16 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 
 function ResetPassword() {
-    const [step, setStep] = useState(1); // 1 = request OTP, 2 = verify + reset
+    const [step, setStep] = useState(1);
     const [email, setEmail] = useState("");
     const [otp, setOtp] = useState("");
     const [newPassword, setNewPassword] = useState("");
     const [loading, setLoading] = useState(false);
-    const [timer, setTimer] = useState(0); // seconds remaining
+    const [timer, setTimer] = useState(0);
+    const [infoMessage, setInfoMessage] = useState("");
     const timerRef = useRef(null);
 
+    // Timer effect
     useEffect(() => {
         if (timer > 0) {
             timerRef.current = setTimeout(() => setTimer(timer - 1), 1000);
@@ -19,15 +21,16 @@ function ResetPassword() {
     }, [timer]);
 
     const handleSendOtp = async (e) => {
-        e.preventDefault();
+        e?.preventDefault();
         if (!email) return toast.error("Email is required");
 
         try {
             setLoading(true);
             const res = await axiosInstance.post("/verify/sendResetOtp", { email });
-            toast.success(res.data.message);
+            toast.success(res.data.message || "OTP sent successfully!");
             setStep(2);
-            setTimer(150); // 2 minutes 30 seconds
+            setTimer(150);
+            setInfoMessage("Check your email for the OTP.");
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to send OTP");
         } finally {
@@ -48,12 +51,13 @@ function ResetPassword() {
                 otp,
                 newPassword,
             });
-            toast.success(res.data.message);
+            toast.success(res.data.message || "Password reset successful!");
             setStep(1);
             setEmail("");
             setOtp("");
             setNewPassword("");
             setTimer(0);
+            setInfoMessage("");
         } catch (error) {
             toast.error(error.response?.data?.message || "Failed to reset password");
         } finally {
@@ -102,6 +106,16 @@ function ResetPassword() {
 
                 {step === 2 && (
                     <form onSubmit={handleResetPassword} className="space-y-4">
+                        <div className="mb-4">
+                            <p className="text-gray-800 font-medium text-center">
+                                <span className="font-semibold">Email Address:</span> {email}
+                            </p>
+
+                            {infoMessage && (
+                                <p className="text-sm text-center text-blue-600 font-medium">{infoMessage}</p>
+                            )}
+                        </div>
+
                         <div>
                             <label className="block text-gray-600 font-medium mb-1">
                                 OTP Code
@@ -115,21 +129,24 @@ function ResetPassword() {
                                 required
                             />
                         </div>
+
                         {timer > 0 && (
                             <p className="text-sm text-gray-500">
                                 OTP expires in: <span className="font-semibold">{formatTimer(timer)}</span>
                             </p>
                         )}
-                        
-                        <button
-                            type="button"
-                            onClick={handleSendOtp}
-                            disabled={timer > 0}
-                            className={`w-full mb-2 ${timer > 0 ? "bg-gray-300 cursor-not-allowed" : "bg-indigo-600 hover:bg-indigo-700"
-                                } text-white font-medium py-2 rounded transition`}
-                        >
-                            {timer > 0 ? `Resend OTP (${formatTimer(timer)})` : "Resend OTP"}
-                        </button>
+
+                        {/* Only show Resend OTP button after timer ends */}
+                        {timer === 0 && (
+                            <button
+                                type="button"
+                                onClick={handleSendOtp}
+                                disabled={loading}
+                                className="w-full mb-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded transition"
+                            >
+                                Resend OTP
+                            </button>
+                        )}
 
                         <div>
                             <label className="block text-gray-600 font-medium mb-1">
