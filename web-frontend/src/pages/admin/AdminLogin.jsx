@@ -174,9 +174,8 @@ const AdminLogin = () => {
                     </div>
 
                     {/* Error Alert with Forgot Password */}
-                    {error && error.toLowerCase().includes("invalid credentials") && (
                         <div className="mt-2 d-flex justify-content-between align-items-center">
-                            <span className="text-danger">Forgot password?</span>
+                            <span className="text-secondary">Forgot password?</span>
                             <button
                                 type="button"
                                 className="btn btn-link p-0 text-decoration-none ms-2"
@@ -185,7 +184,6 @@ const AdminLogin = () => {
                                 Click here
                             </button>
                         </div>
-                    )}
                 </div>
 
                 <button type="submit" className="btn btn-primary w-100" disabled={loading}>
