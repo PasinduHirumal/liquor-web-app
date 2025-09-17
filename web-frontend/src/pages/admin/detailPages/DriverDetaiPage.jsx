@@ -136,42 +136,44 @@ const DriverDetailPage = () => {
             <Row gutter={[24, 24]}>
                 {/* Left Column */}
                 <Col xs={24} lg={8}>
-                    <Card
-                        className="rounded-2xl shadow-sm hover:shadow-md transition-all"
-                        title={
-                            <div className="flex justify-between items-center">
-                                <span className="font-medium text-gray-700">Personal Information</span>
-                                <Tooltip title="Edit Personal Details">
-                                    <Button type="text" icon={<EditOutlined />} onClick={handleEditProfile} />
-                                </Tooltip>
+                    <div className="lg:sticky lg:top-4">
+                        <Card
+                            className="rounded-2xl shadow-sm hover:shadow-md transition-all"
+                            title={
+                                <div className="flex justify-between items-center">
+                                    <span className="font-medium text-gray-700">Personal Information</span>
+                                    <Tooltip title="Edit Personal Details">
+                                        <Button type="text" icon={<EditOutlined />} onClick={handleEditProfile} />
+                                    </Tooltip>
+                                </div>
+                            }
+                        >
+                            <div className="flex flex-col items-center mb-6">
+                                <Avatar src={driver.profileImage} size={120} className="mb-4 border border-gray-200 shadow" />
+                                <Title level={4} className="mb-1">{driver.firstName} {driver.lastName}</Title>
+                                <div className="text-center text-gray-500 mb-4">
+                                    <div className="font-medium text-gray-800">Warehouse</div>
+                                    {driver.where_house_id?.name || "No Warehouse Assigned"}
+                                </div>
                             </div>
-                        }
-                    >
-                        <div className="flex flex-col items-center mb-6">
-                            <Avatar src={driver.profileImage} size={120} className="mb-4 border border-gray-200 shadow" />
-                            <Title level={4} className="mb-1">{driver.firstName} {driver.lastName}</Title>
-                            <div className="text-center text-gray-500 mb-4">
-                                <div className="font-medium text-gray-800">Warehouse</div>
-                                {driver.where_house_id?.name || "No Warehouse Assigned"}
-                            </div>
-                        </div>
 
-                        <Divider orientation="center">Contact Information</Divider>
-                        <Descriptions column={1} bordered={false} size="small" className="mb-4">
-                            <Descriptions.Item label="Email">{driver.email || "N/A"}</Descriptions.Item>
-                            <Descriptions.Item label="Phone">{driver.phone || "N/A"}</Descriptions.Item>
-                            <Descriptions.Item label="Address">{driver.address || "N/A"}</Descriptions.Item>
-                            <Descriptions.Item label="City">{driver.city || "N/A"}</Descriptions.Item>
-                            <Descriptions.Item label="Emergency Contact">{driver.emergencyContact || "N/A"}</Descriptions.Item>
-                        </Descriptions>
+                            <Divider orientation="center">Contact Information</Divider>
+                            <Descriptions column={1} bordered={false} size="small" className="mb-4">
+                                <Descriptions.Item label="Email">{driver.email || "N/A"}</Descriptions.Item>
+                                <Descriptions.Item label="Phone">{driver.phone || "N/A"}</Descriptions.Item>
+                                <Descriptions.Item label="Address">{driver.address || "N/A"}</Descriptions.Item>
+                                <Descriptions.Item label="City">{driver.city || "N/A"}</Descriptions.Item>
+                                <Descriptions.Item label="Emergency Contact">{driver.emergencyContact || "N/A"}</Descriptions.Item>
+                            </Descriptions>
 
-                        <Divider orientation="center">Identification</Divider>
-                        <Descriptions column={1} bordered={false} size="small">
-                            <Descriptions.Item label="NIC">{driver.nic_number || "N/A"}</Descriptions.Item>
-                            <Descriptions.Item label="License">{driver.license_number || "N/A"}</Descriptions.Item>
-                            <Descriptions.Item label="DOB">{driver.dateOfBirth ? new Date(driver.dateOfBirth).toLocaleDateString() : "N/A"}</Descriptions.Item>
-                        </Descriptions>
-                    </Card>
+                            <Divider orientation="center">Identification</Divider>
+                            <Descriptions column={1} bordered={false} size="small">
+                                <Descriptions.Item label="NIC">{driver.nic_number || "N/A"}</Descriptions.Item>
+                                <Descriptions.Item label="License">{driver.license_number || "N/A"}</Descriptions.Item>
+                                <Descriptions.Item label="DOB">{driver.dateOfBirth ? new Date(driver.dateOfBirth).toLocaleDateString() : "N/A"}</Descriptions.Item>
+                            </Descriptions>
+                        </Card>
+                    </div>
                 </Col>
 
                 {/* Right Column - Details Section */}
@@ -182,7 +184,7 @@ const DriverDetailPage = () => {
                             <Card
                                 title={
                                     <div className="flex justify-between items-center">
-                                        <div className="flex items-center">
+                                        <div className="flex items-center text-sm sm:text-base">
                                             <CarOutlined className="mr-2" />
                                             <span>Vehicle Information</span>
                                         </div>
@@ -191,6 +193,7 @@ const DriverDetailPage = () => {
                                                 type="text"
                                                 icon={<EditOutlined />}
                                                 onClick={handleEditVehicles}
+                                                className="text-sm"
                                             />
                                         </Tooltip>
                                     </div>
@@ -198,28 +201,59 @@ const DriverDetailPage = () => {
                             >
                                 <Row gutter={[16, 16]}>
                                     <Col xs={12} sm={8}>
-                                        <Statistic title="Type" value={driver.vehicleType || 'N/A'} />
+                                        <Statistic
+                                            title="Type"
+                                            value={driver.vehicleType || 'N/A'}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                     <Col xs={12} sm={8}>
-                                        <Statistic title="Model" value={driver.vehicleModel || 'N/A'} />
+                                        <Statistic
+                                            title="Model"
+                                            value={driver.vehicleModel || 'N/A'}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                     <Col xs={12} sm={8}>
-                                        <Statistic title="Number" value={driver.vehicleNumber || 'N/A'} />
+                                        <Statistic
+                                            title="Number"
+                                            value={driver.vehicleNumber || 'N/A'}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                     <Col xs={12} sm={8}>
-                                        <Statistic title="Color" value={driver.vehicleColor || 'N/A'} />
+                                        <Statistic
+                                            title="Color"
+                                            value={driver.vehicleColor || 'N/A'}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                     <Col xs={12} sm={8}>
-                                        <Statistic title="Year" value={driver.vehicleYear || 'N/A'} />
+                                        <Statistic
+                                            title="Year"
+                                            value={driver.vehicleYear || 'N/A'}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                     <Col xs={12} sm={8}>
-                                        <Statistic title="Registration" value={driver.vehicleRegistration || 'N/A'} />
+                                        <Statistic
+                                            title="Registration"
+                                            value={driver.vehicleRegistration || 'N/A'}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                     <Col xs={12} sm={8}>
                                         <Statistic
                                             title="Insurance"
                                             value={driver.vehicleInsurance ? 'Valid' : 'N/A'}
-                                            valueStyle={{ color: driver.vehicleInsurance ? '#3f8600' : '#cf1322' }}
+                                            valueStyle={{ color: driver.vehicleInsurance ? '#3f8600' : '#cf1322', fontSize: 14 }}
+                                            titleStyle={{ fontSize: 12 }}
                                         />
                                     </Col>
                                 </Row>
@@ -230,7 +264,7 @@ const DriverDetailPage = () => {
                         <Col span={24}>
                             <Card
                                 title={
-                                    <div className="flex justify-between items-center">
+                                    <div className="flex justify-between items-center text-sm sm:text-base">
                                         <div className="flex items-center">
                                             <EnvironmentOutlined className="mr-2" />
                                             <span>Location & Status</span>
@@ -240,67 +274,75 @@ const DriverDetailPage = () => {
                                                 type="text"
                                                 icon={<EditOutlined />}
                                                 onClick={handleEditLocation}
+                                                className="text-sm"
                                             />
                                         </Tooltip>
                                     </div>
                                 }
                             >
                                 {driver.currentLocation ? (
-                                    <>
-                                        <Row gutter={[16, 16]}>
-                                            <Col span={24}>
-                                                <Descriptions column={1}>
-                                                    <Descriptions.Item label="Current Location">
+                                    <Row gutter={[16, 16]}>
+                                        <Col span={24}>
+                                            <Descriptions column={1} size="small" className="text-sm">
+                                                <Descriptions.Item label="Current Location" labelStyle={{ fontSize: 12 }}>
+                                                    <span style={{ fontSize: 14 }}>
                                                         Lat: {driver.currentLocation.lat?.toFixed(4)}, Lng: {driver.currentLocation.lng?.toFixed(4)}
+                                                    </span>
+                                                </Descriptions.Item>
+                                                {driver.currentLocation.address && (
+                                                    <Descriptions.Item label="Address" labelStyle={{ fontSize: 12 }}>
+                                                        <span style={{ fontSize: 14 }}>{driver.currentLocation.address}</span>
                                                     </Descriptions.Item>
-                                                    {driver.currentLocation.address && (
-                                                        <Descriptions.Item label="Address">
-                                                            {driver.currentLocation.address}
-                                                        </Descriptions.Item>
-                                                    )}
-                                                    <Descriptions.Item label="Delivery Zones">
+                                                )}
+                                                <Descriptions.Item label="Delivery Zones" labelStyle={{ fontSize: 12 }}>
+                                                    <span style={{ fontSize: 14 }}>
                                                         {Array.isArray(driver.deliveryZones) && driver.deliveryZones.length > 0
                                                             ? driver.deliveryZones.join(', ')
                                                             : 'N/A'}
-                                                    </Descriptions.Item>
-                                                    <Descriptions.Item label="Delivery Types">
+                                                    </span>
+                                                </Descriptions.Item>
+                                                <Descriptions.Item label="Delivery Types" labelStyle={{ fontSize: 12 }}>
+                                                    <span style={{ fontSize: 14 }}>
                                                         {Array.isArray(driver.preferredDeliveryTypes) && driver.preferredDeliveryTypes.length > 0
                                                             ? driver.preferredDeliveryTypes.join(', ')
                                                             : 'N/A'}
-                                                    </Descriptions.Item>
-                                                </Descriptions>
-                                            </Col>
-                                            <Col xs={12} sm={8}>
-                                                <div className="mb-2 font-medium">Status</div>
-                                                <Space direction="vertical">
-                                                    <Tag color={driver.isOnline ? "green" : "default"}>
-                                                        {driver.isOnline ? 'Online' : 'Offline'}
-                                                    </Tag>
-                                                    <Tag color={driver.isAvailable ? "green" : "orange"}>
-                                                        {driver.isAvailable ? 'Available' : 'Busy'}
-                                                    </Tag>
-                                                </Space>
-                                            </Col>
-                                            <Col xs={12} sm={8}>
-                                                <Statistic
-                                                    title="Max Delivery Radius"
-                                                    value={driver.maxDeliveryRadius || 'N/A'}
-                                                    suffix="km"
-                                                />
-                                            </Col>
-                                        </Row>
-                                    </>
+                                                    </span>
+                                                </Descriptions.Item>
+                                            </Descriptions>
+                                        </Col>
+                                        <Col xs={12} sm={8}>
+                                            <div className="mb-2 font-medium text-sm">Status</div>
+                                            <Space size="small">
+                                                <Tag style={{ fontSize: 12 }} color={driver.isOnline ? "green" : "default"}>
+                                                    {driver.isOnline ? 'Online' : 'Offline'}
+                                                </Tag>
+                                                <Tag style={{ fontSize: 12 }} color={driver.isAvailable ? "green" : "orange"}>
+                                                    {driver.isAvailable ? 'Available' : 'Busy'}
+                                                </Tag>
+                                            </Space>
+                                        </Col>
+                                        <Col xs={12} sm={8}>
+                                            <Statistic
+                                                title="Max Delivery Radius"
+                                                value={driver.maxDeliveryRadius || 'N/A'}
+                                                suffix="km"
+                                                titleStyle={{ fontSize: 12 }}
+                                                valueStyle={{ fontSize: 14 }}
+                                            />
+                                        </Col>
+                                    </Row>
                                 ) : (
-                                    <Text>Location data not available</Text>
+                                    <Text style={{ fontSize: 14 }}>Location data not available</Text>
                                 )}
                             </Card>
                         </Col>
 
                         {/* Performance & Ratings */}
+                        {/*
                         <Col span={24}>
                             <Card
                                 title={
-                                    <div className="flex justify-between items-center">
+                                    <div className="flex justify-between items-center text-sm sm:text-base">
                                         <div className="flex items-center">
                                             <StarOutlined className="mr-2" />
                                             <span>Performance & Ratings</span>
@@ -310,6 +352,7 @@ const DriverDetailPage = () => {
                                                 type="text"
                                                 icon={<EditOutlined />}
                                                 onClick={handleEditPerformance}
+                                                className="text-sm"
                                             />
                                         </Tooltip>
                                     </div>
@@ -317,11 +360,13 @@ const DriverDetailPage = () => {
                             >
                                 <Row gutter={[16, 16]}>
                                     <Col xs={24}>
-                                        <Descriptions>
-                                            <Descriptions.Item label="Orders History">
-                                                {Array.isArray(driver.ordersHistory) && driver.ordersHistory.length > 0
-                                                    ? driver.ordersHistory.join(', ')
-                                                    : 'N/A'}
+                                        <Descriptions column={1} size="small" className="text-sm">
+                                            <Descriptions.Item label="Orders History" labelStyle={{ fontSize: 12 }}>
+                                                <span style={{ fontSize: 14 }}>
+                                                    {Array.isArray(driver.ordersHistory) && driver.ordersHistory.length > 0
+                                                        ? driver.ordersHistory.join(', ')
+                                                        : 'N/A'}
+                                                </span>
                                             </Descriptions.Item>
                                         </Descriptions>
                                     </Col>
@@ -331,37 +376,61 @@ const DriverDetailPage = () => {
                                             prefix={<StarOutlined className="text-yellow-400" />}
                                             value={driver.rating?.toFixed(1) || '0.0'}
                                             suffix={`(${driver.totalRatings || 0})`}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
                                         />
                                     </Col>
                                     <Col xs={12} sm={6}>
-                                        <Statistic title="Total Deliveries" value={driver.totalDeliveries || 0} />
+                                        <Statistic
+                                            title="Total Deliveries"
+                                            value={driver.totalDeliveries || 0}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                     <Col xs={12} sm={6}>
-                                        <Statistic title="Completed Deliveries" value={driver.completedDeliveries || 0} />
+                                        <Statistic
+                                            title="Completed Deliveries"
+                                            value={driver.completedDeliveries || 0}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                     <Col xs={12} sm={6}>
-                                        <Statistic title="Cancelled Deliveries" value={driver.cancelledDeliveries || 0} />
+                                        <Statistic
+                                            title="Cancelled Deliveries"
+                                            value={driver.cancelledDeliveries || 0}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                     <Col xs={12} sm={6}>
                                         <Statistic
                                             title="On Time Rate"
                                             value={driver.onTimeDeliveryRate || 0}
                                             suffix="%"
-                                            valueStyle={{ color: driver.onTimeDeliveryRate > 90 ? '#3f8600' : '#cf1322' }}
+                                            valueStyle={{ color: driver.onTimeDeliveryRate > 90 ? '#3f8600' : '#cf1322', fontSize: 14 }}
+                                            titleStyle={{ fontSize: 12 }}
                                         />
                                     </Col>
                                     <Col xs={12} sm={6}>
-                                        <Statistic title="Avg. Delivery Time" value={driver.averageDeliveryTime || 'N/A'} />
+                                        <Statistic
+                                            title="Avg. Delivery Time"
+                                            value={driver.averageDeliveryTime || 'N/A'}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                 </Row>
                             </Card>
                         </Col>
+                        */}
 
                         {/* Financial Information */}
                         <Col span={24}>
                             <Card
                                 title={
-                                    <div className="flex justify-between items-center">
+                                    <div className="flex justify-between items-center text-sm sm:text-base">
                                         <div className="flex items-center">
                                             <BankOutlined className="mr-2" />
                                             <span>Financial Information</span>
@@ -371,6 +440,7 @@ const DriverDetailPage = () => {
                                                 type="text"
                                                 icon={<EditOutlined />}
                                                 onClick={handleEditFinancial}
+                                                className="text-sm"
                                             />
                                         </Tooltip>
                                     </div>
@@ -378,31 +448,61 @@ const DriverDetailPage = () => {
                             >
                                 <Row gutter={[16, 16]}>
                                     <Col xs={12} sm={8}>
-                                        <Statistic title="Bank" value={driver.bankName || 'N/A'} />
+                                        <Statistic
+                                            title="Bank"
+                                            value={driver.bankName || 'N/A'}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                     <Col xs={12} sm={8}>
-                                        <Statistic title="Bank Branch" value={driver.bankBranch || 'N/A'} />
+                                        <Statistic
+                                            title="Bank Branch"
+                                            value={driver.bankBranch || 'N/A'}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                     <Col xs={12} sm={8}>
                                         <Statistic
                                             title="Account"
                                             value={driver.bankAccountNumber ? `••••${driver.bankAccountNumber.slice(-4)}` : 'N/A'}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
                                         />
                                     </Col>
                                     <Col xs={12} sm={8}>
-                                        <Statistic title="Tax ID" value={driver.taxId || 'N/A'} />
+                                        <Statistic
+                                            title="Tax ID"
+                                            value={driver.taxId || 'N/A'}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                     <Col xs={12} sm={8}>
-                                        <Statistic title="Commission Rate" value={driver.commissionRate || 'N/A'} suffix="%" />
+                                        <Statistic
+                                            title="Commission Rate"
+                                            value={driver.commissionRate || 'N/A'}
+                                            suffix="%"
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                     <Col xs={12} sm={8}>
-                                        <Statistic title="Payment Method" value={driver.paymentMethod || 'N/A'} />
+                                        <Statistic
+                                            title="Payment Method"
+                                            value={driver.paymentMethod || 'N/A'}
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
+                                        />
                                     </Col>
                                     <Col xs={12} sm={8}>
                                         <Statistic
                                             title="Total Earnings"
                                             value={driver.totalEarnings?.toFixed(2) || '0.00'}
                                             prefix="Rs:"
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
                                         />
                                     </Col>
                                     <Col xs={12} sm={8}>
@@ -410,6 +510,8 @@ const DriverDetailPage = () => {
                                             title="Current Balance"
                                             value={driver.currentBalance?.toFixed(2) || '0.00'}
                                             prefix="Rs:"
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
                                         />
                                     </Col>
                                     <Col xs={12} sm={8}>
@@ -417,6 +519,8 @@ const DriverDetailPage = () => {
                                             title="Total Withdraws"
                                             value={driver.totalWithdraws?.toFixed(2) || '0.00'}
                                             prefix="Rs:"
+                                            titleStyle={{ fontSize: 12 }}
+                                            valueStyle={{ fontSize: 14 }}
                                         />
                                     </Col>
                                 </Row>
