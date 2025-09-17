@@ -47,7 +47,15 @@ function FinanceSummary() {
     return (
         <div className="p-6">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 gap-2">
-                <Title level={3} className="mb-0">Finance Summary</Title>
+                <div className="flex flex-col">
+                    <Title level={3} className="mb-1">Finance Summary</Title>
+                    {summary?.filtered && (
+                        <Text type="secondary" className="text-sm">
+                            Filtered by: {summary.filtered}
+                        </Text>
+                    )}
+                </div>
+
                 <Button
                     type="primary"
                     icon={<ReloadOutlined />}
@@ -61,18 +69,23 @@ function FinanceSummary() {
                 </Button>
             </div>
 
-            {summary?.filtered && (
-                <Text type="secondary" className="block mb-4">
-                    Filtered by: {summary.filtered}
-                </Text>
-            )}
 
             {/* Income + Available + Withdrawable */}
             <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
                 {/* Income Panel */}
                 <Col xs={24} md={12}>
                     <Collapse defaultActiveKey={[]} style={{ background: '#fff' }}>
-                        <Panel header="Income" key="1">
+                        <Panel
+                            key="1"
+                            header={
+                                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                    <span>Income</span>
+                                    <span style={{ fontWeight: 'bold', color: '#3f8600' }}>
+                                        Rs: {data.total_income?.toFixed(2)}
+                                    </span>
+                                </div>
+                            }
+                        >
                             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                                 <Row justify="space-between">
                                     <Text strong style={{ fontSize: 14 }}>Total Tax</Text>
@@ -115,7 +128,18 @@ function FinanceSummary() {
                 {/* Available Panel */}
                 <Col xs={24} md={12}>
                     <Collapse defaultActiveKey={[]} style={{ background: '#fff' }}>
-                        <Panel header="Available" key="1">
+
+                        <Panel
+                            key="1"
+                            header={
+                                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                    <span>Available</span>
+                                    <span style={{ fontWeight: 'bold', color: '#3f8600' }}>
+                                        Rs: {data.available_balance?.toFixed(2)}
+                                    </span>
+                                </div>
+                            }
+                        >
                             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                                 <Row justify="space-between">
                                     <Text strong style={{ fontSize: 14 }}>Total Income</Text>
@@ -152,7 +176,17 @@ function FinanceSummary() {
                 {/* Withdrawable Panel */}
                 <Col xs={24} md={12}>
                     <Collapse defaultActiveKey={[]} style={{ background: '#fff' }}>
-                        <Panel header="Withdrawable" key="1">
+                        <Panel
+                            key="1"
+                            header={
+                                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                    <span>Withdrawable</span>
+                                    <span style={{ fontWeight: 'bold', color: '#3f8600' }}>
+                                        Rs: {data.amount_can_withdraw?.toFixed(2)}
+                                    </span>
+                                </div>
+                            }
+                        >
                             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                                 <Row justify="space-between">
                                     <Text strong style={{ fontSize: 14 }}>Available Balance</Text>
