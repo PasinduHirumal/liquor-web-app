@@ -38,7 +38,6 @@ const DriverHistory = ({ driverId }) => {
             dataIndex: "order_number",
             key: "order_number",
             width: 150,
-            fixed: "left",
         },
         {
             title: "Customer",
