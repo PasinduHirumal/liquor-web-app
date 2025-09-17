@@ -2,6 +2,7 @@ import UserService from '../services/users.service.js';
 import generateToken from '../utils/createToken.js';
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import USER_ROLES from '../enums/userRoles.js';
+import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
 
 const userService = new UserService();
 
@@ -27,26 +28,24 @@ const getUserById = async (req, res) => {
 const getAllUsers = async (req, res) => {
 	try {
         const { isAccountCompleted, isActive } = req.query;
-        let users;
-        let filterDescription = [];
 
-        if (isAccountCompleted !== undefined && isActive !== undefined) {
-            return res.status(400).json({ success: false, message: "Pass only one query parameter at a time"});
-        }
+        const filters = {}
+        const filterDescription = [];
 
         if (isAccountCompleted !== undefined){
-            // Convert string to boolean (query params are always strings)
-            const status = isAccountCompleted === 'true';
-            users = await userService.findByFilter('isAccountCompleted', '==', status);
+            const isBoolean = isAccountCompleted === 'true';
+            filters.isAccountCompleted = isBoolean;
             filterDescription.push(`isAccountCompleted: ${isAccountCompleted}`);
-        } else if (isActive !== undefined){
-            // Convert string to boolean (query params are always strings)
-            const status = isActive === 'true';
-            users = await userService.findByFilter('isActive', '==', status);
+        } 
+        if (isActive !== undefined){
+            const isBoolean = isActive === 'true';
+            filters.isActive = isBoolean;
             filterDescription.push(`isActive: ${isActive}`);
-        } else {
-            users = await userService.findAll();
-        }
+        } 
+
+        const users = Object.keys(filters).length > 0
+            ? await userService.findWithFilters(filters)
+            : await userService.findAll();
 
         const rolePriority = {
             [USER_ROLES.USER]: 1
@@ -64,10 +63,16 @@ const getAllUsers = async (req, res) => {
             return (a.firstName || '').localeCompare(b.firstName || '');
             })
             .map(user => {
-                const { password, ...adminWithoutPassword } = user;
-                return adminWithoutPassword;
+                const { password, ...userWithoutPassword } = user;
+                return userWithoutPassword;
             })
         : [];
+
+        sortedUsers.forEach(user => {
+            if (user.dateOfBirth) {
+                user.dateOfBirth = getDateFromTimestamp(user.dateOfBirth);
+            }
+        });
 
         return res.status(200).json({ 
             success: true, 
