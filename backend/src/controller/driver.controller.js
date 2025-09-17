@@ -4,8 +4,8 @@ import AppInfoService from "../services/appInfo.service.js";
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import BACKGROUND_STATUS from "../enums/driverBackgroundStatus.js";
 import populateWhereHouse from "../utils/populateWhere_House.js";
-import { deleteImages, uploadImages, uploadSingleImage } from '../utils/firebaseStorage.js';
 import getDateFromTimestamp from "../utils/convertFirestoreTimeStrapToDate.js";
+import { deleteImages, uploadImages, uploadSingleImage } from '../utils/firebaseStorage.js';
 
 const driverService = new DriverService();
 const companyService = new CompanyService();
