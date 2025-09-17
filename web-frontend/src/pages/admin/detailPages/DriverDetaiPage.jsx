@@ -1,35 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from "react-router-dom";
 import {
-    Avatar,
-    Card,
-    Tag,
-    Spin,
-    Button,
-    Divider,
-    Typography,
-    Modal,
-    Tooltip,
-    Grid,
-    Row,
-    Col,
-    Statistic,
-    Descriptions,
-    Space,
-    Image
+    Avatar, Card, Tag, Spin, Button, Divider, Typography, Modal,
+    Tooltip, Grid, Row, Col, Statistic, Descriptions, Space, Image
 } from 'antd';
 import {
-    EnvironmentOutlined,
-    CarOutlined,
-    BankOutlined,
-    StarOutlined,
-    FileTextOutlined,
-    EditOutlined,
-    SafetyCertificateOutlined,
-    PhoneOutlined,
-    MailOutlined,
-    IdcardOutlined,
-    HistoryOutlined
+    EnvironmentOutlined, CarOutlined, BankOutlined, StarOutlined,
+    FileTextOutlined, EditOutlined, SafetyCertificateOutlined, HistoryOutlined
 } from '@ant-design/icons';
 import { axiosInstance } from '../../../lib/axios';
 import DriverAccountStatus from '../../../components/admin/forms/DriverAccountStatus';
@@ -127,7 +104,7 @@ const DriverDetailPage = () => {
     return (
         <div className="p-4 sm:p-6 lg:p-8 bg-gray-50 min-h-screen">
             {/* Header Section */}
-            <div className="bg-white p-6 rounded-2xl shadow-md mb-8 sticky top-0 z-10">
+            <div className="bg-white p-6 rounded-2xl shadow-md mb-8 top-0 z-10">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                         <Title level={2} className="mb-0 !text-gray-800">Driver Profile</Title>
