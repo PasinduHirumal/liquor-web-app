@@ -6,6 +6,7 @@ import '../../../styles/DriverDetailPage.css';
 import { axiosInstance } from '../../../lib/axios';
 import DriverAccountStatus from '../../../components/admin/forms/DriverAccountStatus';
 import { Modal } from "react-bootstrap";
+import DriverHistory from '../../../components/admin/DriverHistory';
 
 const DriverDetailPage = () => {
     const { id } = useParams();
@@ -584,6 +585,10 @@ const DriverDetailPage = () => {
                                 </div>
                             )}
                         </div>
+                    </div>
+                    {/* ✅ Driver History Section */}
+                    <div className="mt-1">
+                        <DriverHistory driverId={driver.id} />
                     </div>
                 </div>
             </div>
