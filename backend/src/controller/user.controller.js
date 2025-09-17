@@ -1,6 +1,4 @@
 import UserService from '../services/users.service.js';
-import generateToken from '../utils/createToken.js';
-import ADMIN_ROLES from '../enums/adminRoles.js';
 import USER_ROLES from '../enums/userRoles.js';
 import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
 
@@ -89,62 +87,18 @@ const getAllUsers = async (req, res) => {
 
 const updateUser = async (req, res) => {
 	try {
-        const userIdToUpdate = req.params.id;
-        const currentUserId = req.user.id;
+        const userId = req.params.id;
 
-        const user = await userService.findById(userIdToUpdate);
+        const user = await userService.findById(userId);
         if (!user) {
-            return res.status(404).json({ success: false, message: "Admin not found"});
+            return res.status(404).json({ success: false, message: "User not found"});
         }
 
-        // Authorization logic
-        const isSuperAdmin = req.user.role === ADMIN_ROLES.SUPER_ADMIN;
-        const isAdmin = req.user.role === ADMIN_ROLES.ADMIN;
-        const isUpdatingSelf = currentUserId === userIdToUpdate;
+        const updateData = { ...req.body };
 
-        // Only allow:
-        // 1. Super admin can update anyone
-        // 2. Admin can update themselves
-        if (!isSuperAdmin && !isUpdatingSelf) {
-            return res.status(403).json({ success: false, message: "Not authorized to update" });
-        }
-        
-        // Role change restrictions
-        if (req.body.role) {
-            // Only super admin can change roles
-            if (!isSuperAdmin) {
-                return res.status(403).json({ success: false, message: "Not authorized to change roles" });
-            }
-
-            // Validate role value
-            if (!Object.values(USER_ROLES).includes(req.body.role)) {
-                return res.status(400).json({ success: false, message: "Invalid role value" });
-            }
-        }
-
-        let isUpdatingTokenValue = false;
-        if (req.body.role && isUpdatingSelf) {
-            isUpdatingTokenValue = true;
-        }
-
-        let updateData = { ...req.body };
-
-        // Update the admin
-        let updatedUser = await userService.updateById(userIdToUpdate, updateData);
+        const updatedUser = await userService.updateById(userId, updateData);
         if (!updatedUser) {
             return res.status(400).json({ success: false, message: "Failed to update user"});
-        }
-        
-        if (isUpdatingTokenValue) {
-            const payload = {
-                id: updatedUser.id,
-                email: updatedUser.email,
-                username: `${updatedUser.firstName} ${updatedUser.lastName}`,
-                role: updatedUser.role,
-            };
-
-            generateToken(payload, res);
-            console.log("New token created")
         }
 
         // remove password
@@ -159,22 +113,18 @@ const updateUser = async (req, res) => {
 
 const deleteUser = async (req, res) => {
 	try {
-        const userToDeleteId = req.params.id;
-        const currentAdminId = req.user.id;
+        const userId = req.params.id;
 
-        // Only allow users to delete their own profile unless admin
-        if (req.user.role !== ADMIN_ROLES.SUPER_ADMIN && currentAdminId !== userToDeleteId) {
-            return res.status(403).json({ success: false, message: "Not authorized to delete" });
-        }
-
-        const userToDelete = await userService.findById(userToDeleteId);
-        if (!userToDelete) {
+        const user = await userService.findById(userId);
+        if (!user) {
             return res.status(404).json({ success: false, message: "User not found"});
         }
 
-        await userService.deleteById(userToDeleteId);
+        const username = `${user.firstName} ${user.lastName}`;
+
+        await userService.deleteById(userId);
         
-        return res.status(200).json({ success: true, message: "User deleted successfully" });
+        return res.status(200).json({ success: true, message: `User ${username} deleted successfully` });
     } catch (error) {
         console.error("Delete user error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });

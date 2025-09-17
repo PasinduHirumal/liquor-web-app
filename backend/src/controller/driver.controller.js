@@ -4,6 +4,7 @@ import AppInfoService from "../services/appInfo.service.js";
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import BACKGROUND_STATUS from "../enums/driverBackgroundStatus.js";
 import populateWhereHouse from "../utils/populateWhere_House.js";
+import getDateFromTimestamp from "../utils/convertFirestoreTimeStrapToDate.js";
 import { deleteImages, uploadImages, uploadSingleImage } from '../utils/firebaseStorage.js';
 
 const driverService = new DriverService();
@@ -163,13 +164,11 @@ const getDriverById = async (req, res) => {
         if (!driver) {
             return res.status(404).json({ success: false, message: "Driver not found"});
         }
+        
+        const populatedDriver = await populateWhereHouse(driver);
 
-        let populatedDriver = null;
-        try {
-            populatedDriver = await populateWhereHouse(driver);
-        } catch (error) {
-            console.error("Error populating where house:", error);
-            return res.status(500).json({ success: false, message: "Failed to populate where house" });
+        if (populatedDriver.dateOfBirth) {
+            populatedDriver.dateOfBirth = getDateFromTimestamp(populatedDriver.dateOfBirth);
         }
         
         // Remove password before sending 
