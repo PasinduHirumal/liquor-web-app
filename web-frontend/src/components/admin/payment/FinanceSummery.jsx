@@ -71,7 +71,7 @@ function FinanceSummary() {
             <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
                 {/* Income Panel */}
                 <Col xs={24} md={12}>
-                    <Collapse defaultActiveKey={['1']} style={{ background: '#fff' }}>
+                    <Collapse defaultActiveKey={[]} style={{ background: '#fff' }}>
                         <Panel header="Income" key="1">
                             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                                 <Row justify="space-between">
@@ -114,7 +114,7 @@ function FinanceSummary() {
 
                 {/* Available Panel */}
                 <Col xs={24} md={12}>
-                    <Collapse defaultActiveKey={['1']} style={{ background: '#fff' }}>
+                    <Collapse defaultActiveKey={[]} style={{ background: '#fff' }}>
                         <Panel header="Available" key="1">
                             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                                 <Row justify="space-between">
@@ -151,7 +151,7 @@ function FinanceSummary() {
 
                 {/* Withdrawable Panel */}
                 <Col xs={24} md={12}>
-                    <Collapse defaultActiveKey={['1']} style={{ background: '#fff' }}>
+                    <Collapse defaultActiveKey={[]} style={{ background: '#fff' }}>
                         <Panel header="Withdrawable" key="1">
                             <div style={{ display: "flex", flexDirection: "column", gap: "12px" }}>
                                 <Row justify="space-between">
