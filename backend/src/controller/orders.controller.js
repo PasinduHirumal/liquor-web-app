@@ -265,8 +265,8 @@ const getOrdersHistoryForDriverById = async (req, res) => {
         filters.assigned_driver_id = driver_id;
         filterDescription.push(`assigned_driver_id: ${driver_id}`);
 
-        filters.status = ORDER_STATUS.DELIVERED;
-        filterDescription.push(`status: ${ORDER_STATUS.DELIVERED}`);
+        //filters.status = ORDER_STATUS.DELIVERED;
+        //filterDescription.push(`status: ${ORDER_STATUS.DELIVERED}`);
 
         const orders = await orderService.findWithFilters(filters);
         if (!orders) {
