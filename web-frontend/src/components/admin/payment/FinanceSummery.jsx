@@ -1,5 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { Card, Spin, Alert, Row, Col, Typography, Divider, Collapse, Button, message } from "antd";
+import toast from "react-hot-toast";
+import {
+    Card, Spin, Alert, Statistic, Row, Col, Typography, Divider,
+    Collapse, Button
+} from "antd";
 import { ReloadOutlined } from "@ant-design/icons";
 import { axiosInstance } from "../../../lib/axios";
 
@@ -62,13 +66,26 @@ function FinanceSummary() {
                     loading={loading}
                     onClick={() => {
                         fetchSummary();
-                        message.success("Finance summary refreshed");
+                        toast.success("Finance summary refreshed");
                     }}
                 >
                     Refresh
                 </Button>
             </div>
 
+            <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
+                <Col xs={24} sm={12} md={6}>
+                    <Card hoverable style={{ borderRadius: 8, textAlign: "center" }}>
+                        <Statistic
+                            title="Amount Can Withdraw"
+                            value={data.amount_can_withdraw}
+                            precision={2}
+                            prefix="Rs: "
+                            valueStyle={{ color: "#3f8600" }}
+                        />
+                    </Card>
+                </Col>
+            </Row>
 
             {/* Income + Available + Withdrawable */}
             <Row gutter={[16, 16]} style={{ marginBottom: "20px" }}>
