@@ -6,7 +6,7 @@ import {
 } from 'antd';
 import {
     EnvironmentOutlined, CarOutlined, BankOutlined, StarOutlined,
-    FileTextOutlined, EditOutlined, SafetyCertificateOutlined, HistoryOutlined
+    FileTextOutlined, EditOutlined, SafetyCertificateOutlined
 } from '@ant-design/icons';
 import { axiosInstance } from '../../../lib/axios';
 import DriverAccountStatus from '../../../components/admin/forms/DriverAccountStatus';
@@ -528,16 +528,7 @@ const DriverDetailPage = () => {
 
                         {/* Driver History Section */}
                         <Col span={24}>
-                            <Card
-                                title={
-                                    <div className="flex items-center">
-                                        <HistoryOutlined className="mr-2" />
-                                        <span>Driver History</span>
-                                    </div>
-                                }
-                            >
-                                <DriverHistory driverId={driver.id} />
-                            </Card>
+                            <DriverHistory driverId={driver.id} />
                         </Col>
                     </Row>
                 </Col>
