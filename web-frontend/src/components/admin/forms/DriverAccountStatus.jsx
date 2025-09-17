@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Form, Button, Row, Col, Spinner, Alert } from "react-bootstrap";
 import { axiosInstance } from "../../../lib/axios";
 import toast from "react-hot-toast";
 
@@ -62,11 +61,9 @@ const DriverAccountStatus = ({ driverId, onClose, onUpdateSuccess }) => {
             if (onUpdateSuccess) {
                 onUpdateSuccess(formData);
             }
-
             if (onClose) {
                 onClose();
             }
-
         } catch (err) {
             const msg = err?.response?.data?.message || "Failed to update Account & Status";
             setError(msg);
@@ -78,109 +75,114 @@ const DriverAccountStatus = ({ driverId, onClose, onUpdateSuccess }) => {
 
     if (loading) {
         return (
-            <div className="text-center my-3">
-                <Spinner animation="border" variant="primary" />
+            <div className="flex justify-center items-center my-6">
+                <div className="w-6 h-6 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <Alert variant="danger" className="my-3">
+            <div className="bg-red-100 text-red-700 p-3 rounded-md my-3 text-sm">
                 {error}
-            </Alert>
+            </div>
         );
     }
 
     return (
-        <div className="mb-4">
-            <h5 className="mb-3 fw-bold">Account & Status</h5>
-            <Row>
-                <Col md={6}>
-                    <Form.Group className="mb-3" controlId="formRole">
-                        <Form.Label>Role</Form.Label>
-                        <Form.Control
-                            as="select"
-                            name="role"
-                            value={formData.role}
-                            onChange={handleChange}
-                            disabled
-                        >
-                            <option value="driver">Driver</option>
-                            {/* Add more roles if your backend supports */}
-                        </Form.Control>
-                    </Form.Group>
-                </Col>
+        <div className="p-4">
+            <h5 className="mb-4 font-semibold text-lg">Account & Status</h5>
 
-                <Col md={6}>
-                    <Form.Group className="mb-3" controlId="formBackgroundCheckStatus">
-                        <Form.Label>Background Check Status</Form.Label>
-                        <Form.Control
-                            as="select"
-                            name="backgroundCheckStatus"
-                            value={formData.backgroundCheckStatus}
-                            onChange={handleChange}
-                        >
-                            <option value="pending">Pending</option>
-                            <option value="approved">Approved</option>
-                            <option value="rejected">Rejected</option>
-                        </Form.Control>
-                    </Form.Group>
-                </Col>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Role */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Role</label>
+                    <select
+                        name="role"
+                        value={formData.role}
+                        onChange={handleChange}
+                        disabled
+                        className="w-full border rounded-md px-3 py-2 text-sm bg-gray-100 cursor-not-allowed"
+                    >
+                        <option value="driver">Driver</option>
+                    </select>
+                </div>
 
-                <Col md={3}>
-                    <Form.Group className="mb-3" controlId="formIsAvailable">
-                        <Form.Label>Is Available</Form.Label>
-                        <Form.Check
-                            type="switch"
-                            name="isAvailable"
-                            checked={formData.isAvailable}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                </Col>
+                {/* Background Check */}
+                <div>
+                    <label className="block text-sm font-medium mb-1">Background Check Status</label>
+                    <select
+                        name="backgroundCheckStatus"
+                        value={formData.backgroundCheckStatus}
+                        onChange={handleChange}
+                        className="w-full border rounded-md px-3 py-2 text-sm"
+                    >
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                        <option value="rejected">Rejected</option>
+                    </select>
+                </div>
+            </div>
 
-                <Col md={3}>
-                    <Form.Group className="mb-3" controlId="formIsActive">
-                        <Form.Label>Is Active</Form.Label>
-                        <Form.Check
-                            type="switch"
-                            name="isActive"
-                            checked={formData.isActive}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                </Col>
+            {/* Toggles */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+                <div className="flex items-center space-x-2">
+                    <input
+                        type="checkbox"
+                        name="isAvailable"
+                        checked={formData.isAvailable}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-blue-600"
+                    />
+                    <label className="text-sm">Is Available</label>
+                </div>
 
-                <Col md={3}>
-                    <Form.Group className="mb-3" controlId="formIsOnline">
-                        <Form.Label>Is Online</Form.Label>
-                        <Form.Check
-                            type="switch"
-                            name="isOnline"
-                            checked={formData.isOnline}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                </Col>
+                <div className="flex items-center space-x-2">
+                    <input
+                        type="checkbox"
+                        name="isActive"
+                        checked={formData.isActive}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-blue-600"
+                    />
+                    <label className="text-sm">Is Active</label>
+                </div>
 
-                <Col md={3}>
-                    <Form.Group className="mb-3" controlId="formIsDocumentVerified">
-                        <Form.Label>Document Verified</Form.Label>
-                        <Form.Check
-                            type="switch"
-                            name="isDocumentVerified"
-                            checked={formData.isDocumentVerified}
-                            onChange={handleChange}
-                        />
-                    </Form.Group>
-                </Col>
-            </Row>
+                <div className="flex items-center space-x-2">
+                    <input
+                        type="checkbox"
+                        name="isOnline"
+                        checked={formData.isOnline}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-blue-600"
+                    />
+                    <label className="text-sm">Is Online</label>
+                </div>
 
-            <div className="d-flex justify-content-end mt-4">
-                <Button variant="primary" onClick={handleUpdate} disabled={updating}>
+                <div className="flex items-center space-x-2">
+                    <input
+                        type="checkbox"
+                        name="isDocumentVerified"
+                        checked={formData.isDocumentVerified}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-blue-600"
+                    />
+                    <label className="text-sm">Document Verified</label>
+                </div>
+            </div>
+
+            {/* Submit button */}
+            <div className="flex justify-end mt-6">
+                <button
+                    onClick={handleUpdate}
+                    disabled={updating}
+                    className={`px-4 py-2 rounded text-white text-sm font-medium transition ${updating
+                            ? "bg-gray-400 cursor-not-allowed"
+                            : "bg-blue-600 hover:bg-blue-700"
+                        }`}
+                >
                     {updating ? "Updating..." : "Update Account & Status"}
-                </Button>
+                </button>
             </div>
         </div>
     );
