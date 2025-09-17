@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import USER_ROLES from '../enums/userRoles.js';
 
 // CREATE VALIDATOR - With defaults
 const validateUser = (req, res, next) => {
@@ -21,7 +22,7 @@ const validateUser = (req, res, next) => {
     
     addresses: Joi.array().items(Joi.string().max(350)).max(20).default([]),
     
-    role: Joi.string().valid('user').default('user'),
+    role: Joi.string().valid(USER_ROLES.USER).default(USER_ROLES.USER),
     googleId: Joi.string().allow('').default(''),
     isActive: Joi.boolean().default(true),
     isAccountCompleted: Joi.boolean().default(false),
@@ -73,38 +74,10 @@ const validateUserUpdate = (req, res, next) => {
   }
   
   const schema = Joi.object({
-    email: Joi.string().email().lowercase().optional(),
-    password: Joi.string().min(6).max(128).optional(),
-    firstName: Joi.string().min(2).max(50).optional(),
-    lastName: Joi.string().min(2).max(50).optional(),
-    phone: Joi.string().pattern(/^(?:\+?\d{9,15})$/).min(9).trim().optional(),
-    nic_number: Joi.string().min(12).max(12).optional(),
-    dateOfBirth: Joi.alternatives().try(
-      Joi.date(),
-      Joi.string().isoDate(),
-      Joi.valid(null)
-    ).optional(),
-
-    addresses: Joi.array().items(Joi.string().max(350)).max(20).optional(),
-    
-    role: Joi.string().valid('user').optional(),
-    googleId: Joi.string().allow('').optional(),
+    role: Joi.string().valid(USER_ROLES.USER).optional(),
     isActive: Joi.boolean().optional(),
     isAccountCompleted: Joi.boolean().optional(),
-    
-    verifyOtp: Joi.string().allow('').optional(),
-    verifyOtpExpiredAt: Joi.alternatives().try(
-      Joi.date(),
-      Joi.string().isoDate(),
-      Joi.valid(null)
-    ).optional(),
     isAccountVerified: Joi.boolean().optional(),
-    resetOtp: Joi.string().allow('').optional(),
-    resetOtpExpiredAt: Joi.alternatives().try(
-      Joi.date(),
-      Joi.string().isoDate(),
-      Joi.valid(null)
-    ).optional(),
   })
   .min(1) // Require at least one field to update
   .options({ stripUnknown: true });; 
