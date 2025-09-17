@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { Table, Typography, Spin, Tag, Card } from "antd";
+import { HistoryOutlined } from '@ant-design/icons';
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
 
@@ -8,9 +9,11 @@ const { Title } = Typography;
 const DriverHistory = ({ driverId }) => {
     const [loading, setLoading] = useState(false);
     const [orders, setOrders] = useState([]);
+    const didFetch = useRef(false);
 
     useEffect(() => {
-        if (!driverId) return;
+        if (!driverId || didFetch.current) return;
+        didFetch.current = true;
 
         const fetchHistory = async () => {
             setLoading(true);
@@ -90,10 +93,18 @@ const DriverHistory = ({ driverId }) => {
     ];
 
     return (
-        <Card className="shadow-md rounded-lg">
-            <Title level={4}>Driver Order History</Title>
+        <Card
+            title={
+                <div className="flex items-center">
+                    <HistoryOutlined className="mr-2" />
+                    <span>Driver History</span>
+                </div>
+            }
+        >
             {loading ? (
-                <Spin size="large" />
+                <div className="flex justify-center items-center py-10">
+                    <Spin size="large" />
+                </div>
             ) : (
                 <Table
                     dataSource={orders}
