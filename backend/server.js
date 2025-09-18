@@ -61,8 +61,15 @@ const initializeDefaults = async () => {
 
 initializeDefaults();
 
+
+// Simple array of allowed origins
+const allowedOrigins = [
+  process.env.PRODUCTION_WEB_URL,
+  process.env.DEVELOPMENT_WEB_URL
+].filter(Boolean); // Remove undefined values
+
 const app = express();
-app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:3000", credentials: true }));
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json({ limit: '100mb' }));
 app.use(express.urlencoded({ limit: '100mb', extended: true }));
 app.use(cookieParser());

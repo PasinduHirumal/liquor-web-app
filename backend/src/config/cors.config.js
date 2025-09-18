@@ -7,9 +7,9 @@ const corsOptions = {
         
         // Define allowed origins
         const allowedOrigins = [
-            process.env.FRONTEND_URL,
-            "http://localhost:3000",
-            "http://localhost:4000", // If you have multiple frontend ports
+            process.env.DEVELOPMENT_WEB_URL,
+            //"http://localhost:3000",
+            //"http://localhost:4000", // If you have multiple frontend ports
             process.env.PRODUCTION_WEB_URL, // Production web URL
             // Add more web origins as needed
         ].filter(Boolean);
