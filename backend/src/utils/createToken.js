@@ -7,11 +7,17 @@ const generateToken = (payload, res) => {
         { expiresIn: '1d' }
     );
 
+    const isDevelopment = process.env.NODE_ENV === 'development';
+
     res.cookie("jwt", token, {
         maxAge: 1 * 24 * 60 * 60 * 1000, // MS
-        httpOnly: true, // prevent XSS attacks cross-site scripting attacks 
-        sameSite: "strict", // CSRF attacks cross-site request forgery attacks
-        secure: process.env.NODE_ENV != "development"
+        // prevent XSS attacks cross-site scripting attacks
+        httpOnly: true,  
+        // CSRF attacks cross-site request forgery attacks
+        // Allow cross-origin in production
+        sameSite: isDevelopment ? "strict" : "none", 
+        secure: !isDevelopment,
+        domain: isDevelopment ? undefined : '.sivdesanews.lk'
     });
 
     return token;
