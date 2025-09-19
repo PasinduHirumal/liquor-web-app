@@ -37,17 +37,57 @@ const useAdminAuthStore = create((set) => ({
   // LOGOUT
   logout: async () => {
     try {
-      await axiosInstance.post('/auth/admin/logout');
+      // Try to call backend logout first
+      try {
+        await axiosInstance.post('/auth/admin/logout');
+      // eslint-disable-next-line no-unused-vars
+      } catch (err) {
+        console.warn('Backend logout failed, proceeding with frontend cleanup');
+      }
+
+      // Manual cookie clearing for cross-origin scenarios
+      const cookiesToClear = [
+        'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;',
+        'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.liquor-dash.sivdesanews.lk;',
+        'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=liquor-dash.sivdesanews.lk;',
+        'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.sivdesanews.lk;',
+        'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=sivdesanews.lk;'
+      ];
+
+      cookiesToClear.forEach(cookie => {
+        document.cookie = cookie;
+      });
+
+      // Clear any stored tokens in localStorage/sessionStorage as backup
+      localStorage.removeItem('jwt');
+      localStorage.removeItem('authToken');
+      sessionStorage.removeItem('jwt');
+      sessionStorage.removeItem('authToken');
+
       set({
         user: null,
         isAuthenticated: false,
         loading: false,
         error: null
       });
+
       toast.success('Logged out successfully');
+
+      // Force page reload to ensure clean state
+      setTimeout(() => {
+        window.location.href = '/admin/login';
+      }, 500);
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Logout failed';
       toast.error(errorMsg);
+
+      // Even if logout fails, clear frontend state
+      set({
+        user: null,
+        isAuthenticated: false,
+        loading: false,
+        error: null
+      });
     }
   },
 
@@ -65,6 +105,10 @@ const useAdminAuthStore = create((set) => ({
     } catch (err) {
       const errorMsg = err.response?.data?.message || 'Session expired';
       console.warn('Auth check failed:', errorMsg);
+
+      // Clear any remaining cookies on auth failure
+      document.cookie = 'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      
       set({
         user: null,
         isAuthenticated: false,

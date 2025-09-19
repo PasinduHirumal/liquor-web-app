@@ -105,17 +105,28 @@ const logout = async (req, res) => {
         const isDevelopment = process.env.NODE_ENV === 'development';
         const cookieDomain = process.env.PRODUCTION_COOKIE_DOMAIN;
 
-        return res.cookie("jwt", "", {
+        const cookieOptions = {
             maxAge: 0,
-            httpOnly: true, 
+            httpOnly: true,
             sameSite: isDevelopment ? "strict" : "none",
             secure: !isDevelopment,
             domain: isDevelopment ? undefined : cookieDomain,
-            path: '/' 
-        }).status(200).json({
-            success: true,
-            message: "Logout successful"
-        });
+            path: '/'
+        };
+
+        res.cookie("jwt", "", cookieOptions);
+
+        if (!isDevelopment) {
+            res.cookie("jwt", "", {
+                ...cookieOptions,
+                domain: undefined
+            });
+        }
+
+        return res.status(200).json({
+                success: true,
+                message: "Logout successful"
+            });
     } catch (error) {
         console.error('Logout error:', error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
