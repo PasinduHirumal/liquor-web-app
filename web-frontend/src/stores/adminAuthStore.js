@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { axiosInstance } from '../lib/axios';
 import toast from 'react-hot-toast';
+import { clearCookiesForAllDomains } from '../config/domainConfig';
 
 const useAdminAuthStore = create((set) => ({
   user: null,
@@ -46,17 +47,7 @@ const useAdminAuthStore = create((set) => ({
       }
 
       // Manual cookie clearing for cross-origin scenarios
-      const cookiesToClear = [
-        'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;',
-        'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.liquor-dash.sivdesanews.lk;',
-        'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=liquor-dash.sivdesanews.lk;',
-        'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=.sivdesanews.lk;',
-        'jwt=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=sivdesanews.lk;'
-      ];
-
-      cookiesToClear.forEach(cookie => {
-        document.cookie = cookie;
-      });
+      clearCookiesForAllDomains('jwt');
 
       // Clear any stored tokens in localStorage/sessionStorage as backup
       localStorage.removeItem('jwt');
