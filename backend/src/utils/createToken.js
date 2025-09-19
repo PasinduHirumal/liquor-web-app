@@ -8,6 +8,7 @@ const generateToken = (payload, res) => {
     );
 
     const isDevelopment = process.env.NODE_ENV === 'development';
+    const cookieDomain = process.env.PRODUCTION_COOKIE_DOMAIN;
 
     res.cookie("jwt", token, {
         maxAge: 1 * 24 * 60 * 60 * 1000, // MS
@@ -17,6 +18,7 @@ const generateToken = (payload, res) => {
         // Allow cross-origin in production
         sameSite: isDevelopment ? "strict" : "none", 
         secure: !isDevelopment,
+        domain: isDevelopment ? undefined : cookieDomain
     });
 
     return token;

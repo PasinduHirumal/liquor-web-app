@@ -102,11 +102,15 @@ const login = async (req, res) => {
 
 const logout = async (req, res) => {
     try {
+        const isDevelopment = process.env.NODE_ENV === 'development';
+        const cookieDomain = process.env.PRODUCTION_COOKIE_DOMAIN;
+
         return res.cookie("jwt", "", {
             maxAge: 0,
             httpOnly: true, 
-            secure: process.env.NODE_ENV === 'production', 
-            sameSite: 'strict', 
+            sameSite: isDevelopment ? "strict" : "none",
+            secure: !isDevelopment,
+            domain: isDevelopment ? undefined : cookieDomain,
             path: '/' 
         }).status(200).json({
             success: true,
