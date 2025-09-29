@@ -5,6 +5,7 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
+import Footer from "./components/Footer";
 
 import AdminLogin from "./pages/admin/AdminLogin";
 import AdminRegister from "./pages/admin/AdminRegister";
@@ -108,6 +109,7 @@ function App() {
 
           </Route>
         </Routes>
+        <Footer />
       </Router>
     </div>
   );
