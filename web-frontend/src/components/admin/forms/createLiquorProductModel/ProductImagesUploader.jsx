@@ -6,9 +6,16 @@ import ImagePreview from "../../../../common/ImagePreview";
 const ProductImagesUploader = ({ images, mainImage, handleImageChange, removeImage, setMainImage, touched, loading }) => (
     <>
         <Form.Group className="mb-3">
-            <Form.Label>Product Images *</Form.Label>
+            <Form.Label>
+                Product Images *
+                <span className="text-muted d-block mt-1">Main Image (Height: 420px | Width: 220px)</span>
+                <span className="text-muted d-block mt-1">Other Images (Height: 320px | Width: 320px)</span>
+            </Form.Label>
             <div className="border rounded p-3 text-center">
-                <label htmlFor="product-images" className="btn btn-outline-primary">
+                <label htmlFor="product-images"
+                    className="btn btn-outline-primary d-flex align-items-center justify-content-center"
+                    style={{ cursor: loading ? "not-allowed" : "pointer" }}
+                >
                     <FaUpload className="me-2" />
                     {images.length > 0 ? "Add More Images" : "Upload Images"}
                     <input
