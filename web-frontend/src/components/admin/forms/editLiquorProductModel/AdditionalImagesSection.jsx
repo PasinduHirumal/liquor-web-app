@@ -13,6 +13,7 @@ const AdditionalImagesSection = ({
         <Card>
             <Card.Header>
                 <h5 className="mb-0">Additional Product Images</h5>
+                <span className="text-muted d-block mt-1">(Height: 320px | Width: 320px)</span>
             </Card.Header>
             <Card.Body>
                 <div className="mb-3">

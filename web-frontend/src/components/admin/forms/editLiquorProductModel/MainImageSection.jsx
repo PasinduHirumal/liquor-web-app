@@ -13,6 +13,7 @@ const MainImageSection = ({
         <Card className="mb-4">
             <Card.Header>
                 <h5 className="mb-0">Main Product Image</h5>
+                <span className="text-muted d-block mt-1">(Height: 420px | Width: 220px)</span>
             </Card.Header>
             <Card.Body>
                 <div className="mb-3">

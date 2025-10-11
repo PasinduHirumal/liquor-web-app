@@ -116,7 +116,7 @@ const BasicInfoSection = ({ formData, setFormData, isSubmitting, mainImage, setM
 
             {/* Main Image */}
             <Form.Group controlId="main_image" className="mb-3">
-                <Form.Label>Main Product Image</Form.Label>
+                <Form.Label>Main Product Image <span className="text-muted d-block mt-1">(Height: 420px | Width: 220px)</span></Form.Label>
                 <div className="border rounded p-3 text-center mb-3">
                     {mainImage ? (
                         <div className="position-relative d-inline-block">
@@ -133,7 +133,10 @@ const BasicInfoSection = ({ formData, setFormData, isSubmitting, mainImage, setM
                         </div>
                     ) : (
                         <>
-                            <label htmlFor="main-image-upload" style={{ cursor: "pointer" }}>
+                            <label htmlFor="main-image-upload"
+                                className="w-100 d-flex align-items-center justify-content-center gap-2"
+                                style={{ cursor: "pointer" }}
+                            >
                                 <FiUpload /> Click to upload
                             </label>
                             <Form.Control
@@ -151,9 +154,12 @@ const BasicInfoSection = ({ formData, setFormData, isSubmitting, mainImage, setM
 
             {/* Multiple Images */}
             <Form.Group controlId="images" className="mb-3">
-                <Form.Label>Other Product Images</Form.Label>
+                <Form.Label>Other Product Images <span className="text-muted d-block mt-1">(Height: 320px | Width: 320px)</span></Form.Label>
                 <div className="border rounded p-3 text-center mb-3">
-                    <label htmlFor="product-images-upload" style={{ cursor: "pointer" }}>
+                    <label htmlFor="product-images-upload"
+                        className="w-100 d-flex align-items-center justify-content-center gap-2"
+                        style={{ cursor: "pointer" }}
+                    >
                         <FiUpload /> Upload Images
                     </label>
                     <Form.Control

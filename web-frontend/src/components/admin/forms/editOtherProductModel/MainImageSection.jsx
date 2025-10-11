@@ -5,7 +5,10 @@ import { UploadCloud, XCircle, Image as ImageIcon } from "react-feather";
 const MainImageSection = ({ formData, onUploadMain, onRemoveMain }) => {
     return (
         <Card className="mb-4">
-            <Card.Header><h5>Main Image</h5></Card.Header>
+            <Card.Header>
+                <h5>Main Image</h5>
+                <span className="text-muted d-block mt-1">(Height: 420px | Width: 220px)</span>
+            </Card.Header>
             <Card.Body>
                 {formData.main_image ? (
                     <div className="position-relative mb-3">
@@ -40,7 +43,12 @@ const MainImageSection = ({ formData, onUploadMain, onRemoveMain }) => {
                         id="mainImageUpload"
                         onChange={onUploadMain}
                     />
-                    <Button variant="outline-primary" as="label" htmlFor="mainImageUpload" className="w-100">
+                    <Button
+                        variant="outline-primary"
+                        as="label"
+                        htmlFor="mainImageUpload"
+                        className="w-100 d-flex align-items-center justify-content-center"
+                    >
                         <UploadCloud className="me-2" />
                         {formData.main_image ? "Change Main Image" : "Upload Main Image"}
                     </Button>

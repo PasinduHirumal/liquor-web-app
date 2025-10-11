@@ -5,7 +5,10 @@ import { UploadCloud, XCircle } from "react-feather";
 const GalleryImagesSection = ({ formData, onUploadGallery, onRemoveGallery, onPickAsMain }) => {
     return (
         <Card>
-            <Card.Header><h5>Gallery Images</h5></Card.Header>
+            <Card.Header>
+                <h5>Gallery Images</h5>
+                <span className="text-muted d-block mt-1">(Height: 320px | Width: 320px)</span>
+            </Card.Header>
             <Card.Body>
                 {formData.images?.length > 0 ? (
                     <div className="d-flex flex-wrap gap-2 mb-3">
@@ -43,7 +46,12 @@ const GalleryImagesSection = ({ formData, onUploadGallery, onRemoveGallery, onPi
                         id="galleryImageUpload"
                         onChange={onUploadGallery}
                     />
-                    <Button variant="outline-secondary" as="label" htmlFor="galleryImageUpload" className="w-100">
+                    <Button
+                        variant="outline-secondary"
+                        as="label"
+                        htmlFor="galleryImageUpload"
+                        className="w-100 d-flex align-items-center justify-content-center"
+                    >
                         <UploadCloud className="me-2" /> Add Gallery Images
                     </Button>
                 </Form.Group>
