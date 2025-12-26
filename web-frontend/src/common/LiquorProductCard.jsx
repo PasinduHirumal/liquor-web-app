@@ -91,24 +91,6 @@ const LiquorProductCard = ({ product, adminOnly = false, userOnly = true }) => {
             </div>
           )}
 
-          {product.product_from && (
-            <span
-              style={{
-                position: "absolute",
-                top: "10px",
-                right: "10px",
-                backgroundColor: "#ffb703",
-                color: "#000",
-                padding: "2px 6px",
-                borderRadius: "4px",
-                fontSize: "0.8rem",
-                fontWeight: "bold",
-              }}
-            >
-              {product.product_from.charAt(0).toUpperCase() +
-                product.product_from.slice(1)}
-            </span>
-          )}
         </div>
 
         {combinedImages.length > 1 && (
