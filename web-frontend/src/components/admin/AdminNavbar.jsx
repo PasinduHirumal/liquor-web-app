@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
-    AppBar, Toolbar, IconButton, Button, useMediaQuery, useTheme, Collapse, 
+    AppBar, Toolbar, IconButton, Button, useMediaQuery, useTheme, Collapse,
     List, ListItemButton, ListItemText, ListSubheader, Badge, Slide,
 } from "@mui/material";
 import {
@@ -206,7 +206,7 @@ const AdminNavbar = () => {
                             <Badge
                                 badgeContent={pendingCount}
                                 color="error"
-                                classes={{ badge: "bg-yellow-400 text-black right-[-10px] top-[6px]" }}
+                                classes={{ badge: "bg-warning text-black right-[-10px] top-[6px]" }}
                             >
                                 Orders
                             </Badge>
@@ -365,7 +365,7 @@ const AdminNavbar = () => {
                             <Badge
                                 badgeContent={pendingCount}
                                 color="error"
-                                classes={{ badge: "bg-yellow-400 text-black right-[-10px] top-[6px]" }}
+                                classes={{ badge: "bg-warning text-black right-[-10px] top-[6px]" }}
                             >
                                 Orders
                             </Badge>
