@@ -218,23 +218,30 @@ const DriverList = () => {
             key: 'documents',
             render: (_, record) => (
                 <Space direction="vertical">
+                    <Tag color={record.isAccountVerified ? 'blue' : 'default'}>
+                        {record.isAccountVerified ? 'Account Verified' : 'Account Not Verified'}
+                    </Tag>
+
                     <Tag color={record.isDocumentVerified ? 'green' : 'orange'}>
                         {record.isDocumentVerified ? 'Verified' : 'Pending'}
                     </Tag>
+
                     {record.backgroundCheckStatus && (
-                        <Tag color={
-                            record.backgroundCheckStatus === 'approved'
-                                ? 'green'
-                                : record.backgroundCheckStatus === 'pending'
-                                    ? 'orange'
-                                    : 'red'
-                        }>
+                        <Tag
+                            color={
+                                record.backgroundCheckStatus === 'approved'
+                                    ? 'green'
+                                    : record.backgroundCheckStatus === 'pending'
+                                        ? 'orange'
+                                        : 'red'
+                            }
+                        >
                             {record.backgroundCheckStatus}
                         </Tag>
                     )}
                 </Space>
             ),
-            width: 140,
+            width: 170,
         },
         {
             title: 'Actions',

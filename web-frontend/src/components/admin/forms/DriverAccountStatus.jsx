@@ -13,6 +13,7 @@ const DriverAccountStatus = ({ driverId, onClose, onUpdateSuccess }) => {
         isActive: false,
         isOnline: false,
         isDocumentVerified: false,
+        isAccountVerified: false,
         backgroundCheckStatus: "pending",
     });
 
@@ -21,51 +22,88 @@ const DriverAccountStatus = ({ driverId, onClose, onUpdateSuccess }) => {
         const fetchAccountStatus = async () => {
             setLoading(true);
             setError(null);
+
             try {
                 const response = await axiosInstance.get(`/drivers/getDriverById/${driverId}`);
                 const data = response.data.data;
 
                 setFormData({
                     role: data.role || "driver",
-                    isAvailable: data.isAvailable || false,
-                    isActive: data.isActive || false,
-                    isOnline: data.isOnline || false,
-                    isDocumentVerified: data.isDocumentVerified || false,
+                    isAvailable: data.isAvailable ?? false,
+                    isActive: data.isActive ?? false,
+                    isOnline: data.isOnline ?? false,
+                    isDocumentVerified: data.isDocumentVerified ?? false,
+                    isAccountVerified: data.isAccountVerified ?? false,
                     backgroundCheckStatus: data.backgroundCheckStatus || "pending",
                 });
             } catch (err) {
-                setError("Failed to load account and status information");
+                setError(
+                    err?.response?.data?.message || "Failed to load account and status information"
+                );
             } finally {
                 setLoading(false);
             }
         };
 
-        fetchAccountStatus();
+        if (driverId) {
+            fetchAccountStatus();
+        }
     }, [driverId]);
 
     const handleChange = (e) => {
         const { name, value, type, checked } = e.target;
         const finalValue = type === "checkbox" ? checked : value;
-        setFormData((prev) => ({ ...prev, [name]: finalValue }));
+
+        setFormData((prev) => ({
+            ...prev,
+            [name]: finalValue,
+        }));
     };
 
     const handleUpdate = async () => {
         setUpdating(true);
         setError(null);
+
         try {
-            const payload = { ...formData };
-            await axiosInstance.patch(`/drivers/update/${driverId}`, payload);
+            const payload = {
+                isActive: formData.isActive,
+                isAvailable: formData.isAvailable,
+                isAccountVerified: formData.isAccountVerified,
+                isDocumentVerified: formData.isDocumentVerified,
+                backgroundCheckStatus: formData.backgroundCheckStatus,
+            };
+
+            const response = await axiosInstance.patch(
+                `/drivers/update-qualifications/${driverId}`,
+                payload
+            );
+
+            const updatedDriver = response?.data?.data;
 
             toast.success("Account & Status updated successfully");
 
             if (onUpdateSuccess) {
-                onUpdateSuccess(formData);
+                onUpdateSuccess({
+                    isActive: updatedDriver?.isActive ?? formData.isActive,
+                    isAvailable: updatedDriver?.isAvailable ?? formData.isAvailable,
+                    isOnline: formData.isOnline,
+                    isDocumentVerified:
+                        updatedDriver?.isDocumentVerified ?? formData.isDocumentVerified,
+                    isAccountVerified:
+                        updatedDriver?.isAccountVerified ?? formData.isAccountVerified,
+                    backgroundCheckStatus:
+                        updatedDriver?.backgroundCheckStatus ?? formData.backgroundCheckStatus,
+                });
             }
+
             if (onClose) {
                 onClose();
             }
         } catch (err) {
-            const msg = err?.response?.data?.message || "Failed to update Account & Status";
+            const msg =
+                err?.response?.data?.message ||
+                err?.response?.data?.errors?.[0]?.message ||
+                "Failed to update Account & Status";
             setError(msg);
             toast.error(msg);
         } finally {
@@ -110,7 +148,9 @@ const DriverAccountStatus = ({ driverId, onClose, onUpdateSuccess }) => {
 
                 {/* Background Check */}
                 <div>
-                    <label className="block text-sm font-medium mb-1">Background Check Status</label>
+                    <label className="block text-sm font-medium mb-1">
+                        Background Check Status
+                    </label>
                     <select
                         name="backgroundCheckStatus"
                         value={formData.backgroundCheckStatus}
@@ -125,7 +165,18 @@ const DriverAccountStatus = ({ driverId, onClose, onUpdateSuccess }) => {
             </div>
 
             {/* Toggles */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
+            <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
+                <div className="flex items-center space-x-2">
+                    <input
+                        type="checkbox"
+                        name="isAccountVerified"
+                        checked={formData.isAccountVerified}
+                        onChange={handleChange}
+                        className="w-4 h-4 text-blue-600"
+                    />
+                    <label className="text-sm">Account Verified</label>
+                </div>
+
                 <div className="flex items-center space-x-2">
                     <input
                         type="checkbox"
@@ -177,8 +228,8 @@ const DriverAccountStatus = ({ driverId, onClose, onUpdateSuccess }) => {
                     onClick={handleUpdate}
                     disabled={updating}
                     className={`px-4 py-2 rounded text-white text-sm font-medium transition ${updating
-                            ? "bg-gray-400 cursor-not-allowed"
-                            : "bg-blue-600 hover:bg-blue-700"
+                        ? "bg-gray-400 cursor-not-allowed"
+                        : "bg-blue-600 hover:bg-blue-700"
                         }`}
                 >
                     {updating ? "Updating..." : "Update Account & Status"}

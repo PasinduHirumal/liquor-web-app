@@ -67,13 +67,14 @@ const DriverDetailPage = () => {
     }, [id]);
 
     const handleUpdateSuccess = (updatedData) => {
-        setDriver(prev => ({
+        setDriver((prev) => ({
             ...prev,
             isActive: updatedData.isActive,
             isDocumentVerified: updatedData.isDocumentVerified,
+            isAccountVerified: updatedData.isAccountVerified,
             isAvailable: updatedData.isAvailable,
             isOnline: updatedData.isOnline,
-            backgroundCheckStatus: updatedData.backgroundCheckStatus
+            backgroundCheckStatus: updatedData.backgroundCheckStatus,
         }));
     };
 
@@ -112,9 +113,16 @@ const DriverDetailPage = () => {
                             <Tag color={driver.isActive ? "green" : "red"} className="px-3 py-1 text-sm rounded-full">
                                 {driver.isActive ? "Active" : "Inactive"}
                             </Tag>
+
                             {driver.isDocumentVerified && (
                                 <Tag color="blue" icon={<SafetyCertificateOutlined />} className="px-3 py-1 text-sm rounded-full">
                                     Verified
+                                </Tag>
+                            )}
+
+                            {driver.isAccountVerified && (
+                                <Tag color="purple" className="px-3 py-1 text-sm rounded-full">
+                                    Account Verified
                                 </Tag>
                             )}
                         </Space>
