@@ -67,6 +67,7 @@ const useUserAuthStore = create((set) => ({
                 loading: false,
                 error: null,
             });
+        // eslint-disable-next-line no-unused-vars
         } catch (error) {
             set({
                 user: null,
