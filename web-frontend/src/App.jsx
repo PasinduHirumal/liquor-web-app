@@ -5,10 +5,6 @@ import {
   Route,
   Navigate,
 } from "react-router-dom";
-import Footer from "./components/Footer";
-
-import AdminLogin from "./pages/admin/AdminLogin";
-import AdminRegister from "./pages/admin/AdminRegister";
 
 import ToastProvider from "./common/ToastProvider";
 import Login from "./routes/Login";
@@ -46,7 +42,7 @@ function App() {
         <ToastProvider />
         <ScrollToTop />
         <ScrollTopButton />
-        
+
         <Routes>
           <Route path="/" element={<MainLayout />}>
 
@@ -60,20 +56,6 @@ function App() {
                 ) : (
                   <PublicHome />
                 )
-              }
-            />
-
-            <Route
-              path="login"
-              element={
-                adminAuth || userAuth ? <Navigate to="/" replace /> : <Login />
-              }
-            />
-
-            <Route
-              path="register"
-              element={
-                adminAuth || userAuth ? <Navigate to="/" replace /> : <Register />
               }
             />
 
@@ -108,8 +90,20 @@ function App() {
             />
 
           </Route>
+          <Route
+            path="login"
+            element={
+              adminAuth || userAuth ? <Navigate to="/" replace /> : <Login />
+            }
+          />
+
+          <Route
+            path="register"
+            element={
+              adminAuth || userAuth ? <Navigate to="/" replace /> : <Register />
+            }
+          />
         </Routes>
-        <Footer />
       </Router>
     </div>
   );

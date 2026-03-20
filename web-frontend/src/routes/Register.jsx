@@ -18,10 +18,7 @@ const Register = () => {
 
   return (
     <>
-      <div className="d-flex flex-column align-items-center justify-content-center min-vh-100 bg-white">
-        <h3 className="mt-3 text-center fw-semibold" style={{ letterSpacing: '0.05em' }}>
-          Register
-        </h3>
+      <div className="d-flex flex-column min-h-screen align-items-center justify-content-center bg-white">
 
         <div
           className="card border-0 p-4"

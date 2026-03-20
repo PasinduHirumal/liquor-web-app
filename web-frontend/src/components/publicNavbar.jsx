@@ -168,7 +168,6 @@ const PublicNavbar = () => {
                 Grocery Items
               </StyledNavLink>
 
-              {/* 
               <Button
                 fullWidth
                 variant="contained"
@@ -185,7 +184,6 @@ const PublicNavbar = () => {
               >
                 Login
               </Button>
-              */}
 
             </Box>
           </Slide>
