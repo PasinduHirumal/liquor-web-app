@@ -1,12 +1,12 @@
 
 const getDomainConfig = () => {
-  const baseDomain = import.meta.env.VITE_BASE_DOMAIN;
-  const appDomain = import.meta.env.VITE_APP_DOMAIN;
-  
-  // Optional: Add validation
-  if (import.meta.env.DEV === 'development') {
-    console.log('Domain Config:', { baseDomain, appDomain });
-  }
+  const baseDomain = import.meta.env.VITE_APP_NODE_ENV === "production" 
+    ? import.meta.env.VITE_BASE_DOMAIN_PRODUCTION
+    : import.meta.env.VITE_BASE_DOMAIN_DEVELOPMENT;
+
+  const appDomain = import.meta.env.VITE_APP_NODE_ENV === "production"
+    ? import.meta.env.VITE_APP_DOMAIN_PRODUCTION
+    : import.meta.env.VITE_APP_DOMAIN_DEVELOPMENT;
   
   return {
     baseDomain,
