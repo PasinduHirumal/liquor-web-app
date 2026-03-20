@@ -20,33 +20,47 @@ import {
 } from "@mui/icons-material";
 import SearchModal from "../common/SearchModal";
 
-// Styled NavLink for dark theme
+const NAV_ITEMS = [
+  { label: "Home", to: "/" },
+  { label: "Liquor Items", to: "/liquor-all" },
+  { label: "Grocery Items", to: "/other-product-all" },
+];
+
 const StyledNavLink = styled(NavLink)(({ theme }) => ({
-  color: theme.palette.common.white,
+  color: "#fff",
   textDecoration: "none",
   padding: theme.spacing(1, 2),
   borderRadius: theme.shape.borderRadius,
-  transition: "background-color 0.3s ease",
+  transition: "0.25s ease",
+  display: "inline-flex",
+  alignItems: "center",
+  fontWeight: 500,
   "&.active": {
-    backgroundColor: "#490101ff",
-    fontWeight: "bold",
+    backgroundColor: "#490101",
+    fontWeight: 700,
   },
   "&:hover": {
-    backgroundColor: "#5f0404ff",
+    backgroundColor: "#5f0404",
   },
 }));
 
-// Styled Search IconButton for hover effect
-const StyledSearchButton = styled(IconButton)(({ theme }) => ({
-  color: theme.palette.common.white,
-  borderRadius: theme.shape.borderRadius,
-  transition: "background-color 0.3s ease",
+const StyledSearchButton = styled(IconButton)({
+  color: "#fff",
   "&:hover": {
-    backgroundColor: "#5f0404ff",
+    backgroundColor: "#5f0404",
   },
-}));
+});
 
-const PublicNavbar = () => {
+const BrandLink = styled(NavLink)({
+  textDecoration: "none",
+  color: "#fff",
+  display: "flex",
+  alignItems: "center",
+  fontSize: "1.3rem",
+  fontWeight: "bold",
+});
+
+export default function PublicNavbar() {
   const navigate = useNavigate();
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("md"));
@@ -54,146 +68,121 @@ const PublicNavbar = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
 
-  const handleLogin = () => navigate("/login");
-  const toggleMobileMenu = () => setMobileMenuOpen(!mobileMenuOpen);
+  const loginButtonSx = {
+    backgroundColor: theme.palette.info.main,
+    color: "#fff",
+    textTransform: "none",
+    fontWeight: 600,
+    boxShadow: "none",
+    "&:hover": {
+      backgroundColor: theme.palette.info.dark,
+      boxShadow: "none",
+    },
+  };
+
   const closeMobileMenu = () => setMobileMenuOpen(false);
 
-  const openSearchModal = () => setSearchModalOpen(true);
-  const closeSearchModal = () => setSearchModalOpen(false);
+  const navLinks = (fullWidth = false) =>
+    NAV_ITEMS.map(({ label, to }) => (
+      <StyledNavLink
+        key={to}
+        to={to}
+        onClick={closeMobileMenu}
+        style={fullWidth ? { width: "100%" } : undefined}
+      >
+        {label}
+      </StyledNavLink>
+    ));
 
   return (
     <>
-      <AppBar position="fixed" elevation={4} sx={{ backgroundColor: "#a30000ff" }}>
-        <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2 } }}>
-          <Box
-            component={NavLink}
-            to="/"
-            onClick={closeMobileMenu}
-            style={{ textDecoration: "none", color: "white" }}
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              fontSize: "1.3rem",
-              fontWeight: "bold",
-            }}
-          >
+      <AppBar position="fixed" elevation={4} sx={{ backgroundColor: "#a30000" }}>
+        <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2, sm: 3 } }}>
+          <BrandLink to="/" onClick={closeMobileMenu}>
             🍷 Liquor Web App
-          </Box>
+          </BrandLink>
 
-          {/* Desktop Navigation */}
-          <Box sx={{ display: { xs: "none", md: "flex" }, alignItems: "center" }}>
-            <StyledNavLink to="/" onClick={closeMobileMenu}>
-              Home
-            </StyledNavLink>
-
-            <StyledNavLink to="/liquor-all" onClick={closeMobileMenu}>
-              Liquor Items
-            </StyledNavLink>
-
-            <StyledNavLink to="/other-product-all" onClick={closeMobileMenu}>
-              Grocery Items
-            </StyledNavLink>
-
-            {/* ✅ Search Icon for Desktop */}
-            <StyledSearchButton onClick={openSearchModal}>
-              <SearchIcon />
-            </StyledSearchButton>
-
-            <Button
-              variant="contained"
-              sx={{
-                ml: 2,
-                backgroundColor: theme.palette.info.main,
-                color: "#fff",
-                "&:hover": { backgroundColor: theme.palette.info.dark },
-              }}
-              startIcon={<LoginIcon />}
-              onClick={handleLogin}
-            >
-              Login
-            </Button>
-          </Box>
-
-          {/* ✅ Mobile: Search button + Menu button grouped */}
-          {isMobile && (
+          {isMobile ? (
             <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-              <StyledSearchButton onClick={openSearchModal}>
+              <StyledSearchButton onClick={() => setSearchModalOpen(true)}>
                 <SearchIcon />
               </StyledSearchButton>
 
               <IconButton
                 color="inherit"
-                edge="end"
-                onClick={toggleMobileMenu}
-                aria-label="menu"
+                onClick={() => setMobileMenuOpen((prev) => !prev)}
+                sx={{ position: "relative", width: 40, height: 40 }}
               >
                 <Fade in={!mobileMenuOpen} unmountOnExit>
-                  <MenuIcon sx={{ color: "white", fontSize: 28 }} />
+                  <MenuIcon sx={{ position: "absolute", color: "#fff" }} />
                 </Fade>
                 <Fade in={mobileMenuOpen} unmountOnExit>
-                  <CloseIcon sx={{ color: "white", fontSize: 28 }} />
+                  <CloseIcon sx={{ position: "absolute", color: "#fff" }} />
                 </Fade>
               </IconButton>
+            </Box>
+          ) : (
+            <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+              {navLinks()}
+
+              <StyledSearchButton onClick={() => setSearchModalOpen(true)}>
+                <SearchIcon />
+              </StyledSearchButton>
+
+              <Button
+                variant="contained"
+                startIcon={<LoginIcon />}
+                onClick={() => navigate("/login")}
+                sx={loginButtonSx}
+              >
+                Login
+              </Button>
             </Box>
           )}
         </Toolbar>
 
-        {/* Mobile Slide-down Menu */}
         {isMobile && (
           <Slide direction="left" in={mobileMenuOpen} mountOnEnter unmountOnExit>
             <Box
               sx={{
                 position: "fixed",
                 top: { xs: 56, sm: 64 },
-                height: { xs: "calc(100vh - 56px)", sm: "calc(100vh - 64px)" },
                 right: 0,
-                width: "75vw",
-                maxWidth: 300,
-                bgcolor: "#7e0303ff",
+                width: "78vw",
+                maxWidth: 320,
+                height: { xs: "calc(100vh - 56px)", sm: "calc(100vh - 64px)" },
+                bgcolor: "#7e0303",
                 zIndex: theme.zIndex.drawer + 1,
                 p: 3,
                 display: "flex",
                 flexDirection: "column",
+                gap: 1.5,
+                boxShadow: "-8px 0 24px rgba(0,0,0,0.25)",
               }}
             >
-              <StyledNavLink to="/" onClick={closeMobileMenu}>
-                Home
-              </StyledNavLink>
-
-              <StyledNavLink to="/liquor-all" onClick={closeMobileMenu}>
-                Liquor Items
-              </StyledNavLink>
-
-              <StyledNavLink to="/other-product-all" onClick={closeMobileMenu}>
-                Grocery Items
-              </StyledNavLink>
+              {navLinks(true)}
 
               <Button
                 fullWidth
                 variant="contained"
                 startIcon={<LoginIcon />}
-                sx={{
-                  backgroundColor: theme.palette.info.main,
-                  color: "#fff",
-                  "&:hover": { backgroundColor: theme.palette.info.dark },
-                }}
                 onClick={() => {
-                  handleLogin();
                   closeMobileMenu();
+                  navigate("/login");
                 }}
+                sx={loginButtonSx}
               >
                 Login
               </Button>
-
             </Box>
           </Slide>
         )}
       </AppBar>
 
-      {/* ✅ Separated Search Modal */}
-      <SearchModal open={searchModalOpen} onClose={closeSearchModal} />
+      <SearchModal
+        open={searchModalOpen}
+        onClose={() => setSearchModalOpen(false)}
+      />
     </>
   );
-};
-
-export default PublicNavbar;
+}
