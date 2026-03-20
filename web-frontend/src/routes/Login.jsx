@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import UserLogin from '../pages/user/UserLogin';
 import AdminLogin from '../pages/admin/AdminLogin';
-import PublicNavbar from '../components/publicNavbar';
 
 const Login = () => {
     const [activeComponent, setActiveComponent] = useState('UserLogin');
@@ -10,8 +9,8 @@ const Login = () => {
         switch (activeComponent) {
             case 'AdminLogin':
                 return <AdminLogin />;
-           {/*  case 'UserLogin':
-                return <UserLogin />; */}
+            case 'UserLogin':
+                return <UserLogin />;
             default:
                 return <AdminLogin />;
         }
@@ -26,14 +25,12 @@ const Login = () => {
                 <div className="card border-0 p-4" style={{ minWidth: '350px', maxWidth: '450px', width: '100%' }}>
                     <div className="btn-group w-100 gap-1 mb-4" role="group" aria-label="Login Toggle">
                         
-                        {/*
                         <button
                             className={`btn ${activeComponent === 'UserLogin' ? 'btn-primary' : 'btn-outline-primary'}`}
                             onClick={() => setActiveComponent('UserLogin')}
                         >
                             User Login
                         </button>
-                        */}
                         <button
                             className={`btn ${activeComponent === 'AdminLogin' ? 'btn-primary' : 'btn-outline-primary'}`}
                             onClick={() => setActiveComponent('AdminLogin')}

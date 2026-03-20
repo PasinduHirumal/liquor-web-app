@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import AdminRegister from '../pages/admin/AdminRegister';
 import UserRegister from '../pages/user/UserRegister';
-import PublicNavbar from '../components/publicNavbar';
 
 const Register = () => {
   const [activeComponent, setActiveComponent] = useState('UserRegister');
@@ -10,8 +9,8 @@ const Register = () => {
     switch (activeComponent) {
       case 'AdminRegister':
         return <AdminRegister />;
-    {/*  case 'UserRegister':
-        return <UserRegister />; */}
+    case 'UserRegister':
+        return <UserRegister />;
       default:
         return <AdminRegister />;
     }
@@ -31,14 +30,12 @@ const Register = () => {
           {/* Toggle Buttons */}
           <div className="btn-group w-100 gap-1 mb-4" role="group" aria-label="Register Toggle">
             
-            {/*
             <button
               className={`btn ${activeComponent === 'UserRegister' ? 'btn-primary' : 'btn-outline-primary'}`}
               onClick={() => setActiveComponent('UserRegister')}
             >
               User Register
             </button> 
-            */}
 
             <button
               className={`btn ${activeComponent === 'AdminRegister' ? 'btn-primary' : 'btn-outline-primary'}`}

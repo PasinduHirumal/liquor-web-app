@@ -99,7 +99,6 @@ const PublicNavbar = () => {
               <SearchIcon />
             </StyledSearchButton>
 
-            {/* 
             <Button
               variant="contained"
               sx={{
@@ -113,8 +112,6 @@ const PublicNavbar = () => {
             >
               Login
             </Button>
-            */}
-
           </Box>
 
           {/* ✅ Mobile: Search button + Menu button grouped */}
