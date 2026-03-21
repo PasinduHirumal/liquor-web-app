@@ -2,7 +2,7 @@ import express from 'express';
 import USER_ROLES from '../enums/userRoles.js';
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import { authenticateUser, authorizeRoles } from '../middleware/authMiddleware.js';
-import { isInCart } from '../controller/cart.controller.js';
+import { addToCart, isInCart } from '../controller/cart.controller.js';
 
 const router = express.Router();
 
@@ -13,5 +13,6 @@ const super_admin = ADMIN_ROLES.SUPER_ADMIN;
 // http://localhost:5000/api/cart
 
 router.get('/check/product/:product_id', authenticateUser, authorizeRoles(user), isInCart);
+router.post('/add/product/:product_id', authenticateUser, authorizeRoles(user), addToCart);
 
 export default router;
