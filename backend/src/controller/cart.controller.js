@@ -118,3 +118,21 @@ export const removeFromCart = async (req, res) => {
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 }
+
+export const getMyCart = async (req, res) => {
+    try {
+        const userId = req.user.id;
+
+        const items = await cartService.findAllByUserId(userId);
+
+        return res.status(200).json({
+            success: true,
+            count: items.length,
+            message: "My cart fetched successfully",
+            data: items
+        })
+    } catch (error) {
+        console.error("Get my cart error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+}

@@ -2,7 +2,7 @@ import express from 'express';
 import USER_ROLES from '../enums/userRoles.js';
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import { authenticateUser, authorizeRoles } from '../middleware/authMiddleware.js';
-import { addToCart, isInCart, removeFromCart } from '../controller/cart.controller.js';
+import { addToCart, getMyCart, isInCart, removeFromCart } from '../controller/cart.controller.js';
 
 const router = express.Router();
 
@@ -12,7 +12,9 @@ const super_admin = ADMIN_ROLES.SUPER_ADMIN;
 
 // http://localhost:5000/api/cart
 
-router.get('/check/product/:product_id', authenticateUser, authorizeRoles(user), isInCart);
+router.get('/check/is-in-cart/product/:product_id', authenticateUser, authorizeRoles(user), isInCart);
+router.get('/my', authenticateUser, authorizeRoles(user), getMyCart);
+
 router.post('/add/product/:product_id', authenticateUser, authorizeRoles(user), addToCart);
 router.delete('/remove/:cart_item_id', authenticateUser, authorizeRoles(user), removeFromCart);
 
