@@ -86,3 +86,35 @@ export const addToCart = async (req, res) => {
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 }
+
+export const removeFromCart = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const cartItemId = req.params.cart_item_id;
+
+        const cartItem = await cartService.findById(userId, cartItemId);
+
+        if (!cartItem) {
+            return res.status(404).json({
+                success: false,
+                message: "Cart item not found"
+            });
+        }
+
+        const isDeleted = await cartService.deleteById(userId, cartItemId);
+        if (!isDeleted) {
+            return res.status(400).json({
+                success: false,
+                message: "Failed to remove item from cart"
+            });
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Item removed from cart successfully"
+        });
+    } catch (error) {
+        console.error("Remove from cart error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+}

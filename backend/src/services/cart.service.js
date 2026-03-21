@@ -21,10 +21,10 @@ class CartService extends BaseService {
     }
 
     // Override BaseService methods to work with sub-collections
-    async findById(userId, addressId) {
+    async findById(userId, cartId) {
         try {
             const collection = this.getCollection(userId);
-            const doc = await collection.doc(addressId).get();
+            const doc = await collection.doc(cartId).get();
             
             if (!doc.exists) {
                 return null;
@@ -120,10 +120,10 @@ class CartService extends BaseService {
         }
     }
 
-    async updateById(userId, addressId, updateData) {
+    async updateById(userId, cartId, updateData) {
         try {
             const collection = this.getCollection(userId);
-            const doc = await collection.doc(addressId).get();
+            const doc = await collection.doc(cartId).get();
 
             if (!doc.exists) {
                 return false;
@@ -131,25 +131,25 @@ class CartService extends BaseService {
             
             updateData[this.timestampFields.updatedAt] = new Date().toISOString();
         
-            await collection.doc(addressId).update(updateData);
+            await collection.doc(cartId).update(updateData);
         
-            const updatedData = await this.findById(userId, addressId);
+            const updatedData = await this.findById(userId, cartId);
             return updatedData;
         } catch (error) {
             throw error;
         }
     }
 
-    async deleteById(userId, addressId) {
+    async deleteById(userId, cartId) {
         try {
             const collection = this.getCollection(userId);
-            const doc = await collection.doc(addressId).get();
+            const doc = await collection.doc(cartId).get();
 
             if (!doc.exists) {
                 return false;
             }
 
-            await collection.doc(addressId).delete();
+            await collection.doc(cartId).delete();
             return true;
         } catch (error) {
             throw error;
