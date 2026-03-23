@@ -8,6 +8,7 @@ import Address from "../../pages/user/Address";
 import PublicHome from "../PublicHome";
 import Cart from "../../pages/user/Cart";
 import LocationPickerPage from "../../pages/LocationPickerPage";
+import CheckoutSummary from "../../pages/user/CheckoutSummary";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -72,6 +73,14 @@ export const userRoutes = [
         element: (
             <UserProtectedRoute>
                 <LocationPickerPage />
+            </UserProtectedRoute>
+        ),
+    },
+    {
+        path: "/checkout/summary",
+        element: (
+            <UserProtectedRoute>
+                <CheckoutSummary />
             </UserProtectedRoute>
         ),
     },

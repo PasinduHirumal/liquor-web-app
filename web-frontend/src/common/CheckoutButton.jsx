@@ -24,7 +24,7 @@ export default function CheckoutButton({ addressId, disabled }) {
             const res = await axiosInstance.get(`/cart/checkout/order/address/${addressId}`);
 
             if (res.data.success) {
-                toast.success("Proceeding to checkout!");
+                toast.success("Checkout preview ready!");
                 
                 navigate("/checkout/summary", {
                     state: {
@@ -34,7 +34,7 @@ export default function CheckoutButton({ addressId, disabled }) {
                     }
                 });
             } else {
-                toast.error(res.data.message || "Checkout failed");
+                toast.error(res.data.message || "Checkout preview failed");
             }
         } catch (error) {
             console.error("Checkout error:", error);
