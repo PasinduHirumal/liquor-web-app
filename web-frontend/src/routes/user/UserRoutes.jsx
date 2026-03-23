@@ -6,6 +6,7 @@ import UserProfile from "../../pages/user/UserProfile";
 import useUserAuthStore from "../../stores/userAuthStore";
 import Address from "../../pages/user/Address";
 import PublicHome from "../PublicHome";
+import Cart from "../../pages/user/Cart";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -42,11 +43,27 @@ export const userRoutes = [
         ),
     },
     {
-        path: "/profile/:profileId",
-        element: <UserProfile />
+        path: "/cart",
+        element: (
+            <UserProtectedRoute>
+                <Cart />
+            </UserProtectedRoute>
+        ),
+    },
+    {
+        path: "/user/profile/:profileId",
+        element: (
+            <UserProtectedRoute>
+                <UserProfile />
+            </UserProtectedRoute>
+        ),
     },
     {
         path: "/address",
-        element: <Address />
+        element: (
+            <UserProtectedRoute>
+                <Address />
+            </UserProtectedRoute>
+        ),
     },
 ];

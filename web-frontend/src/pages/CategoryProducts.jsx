@@ -131,7 +131,6 @@ const CategoryProducts = () => {
                             <LiquorProductCard
                                 key={product.product_id}
                                 product={product}
-                                detailButton={false}
                             />
                         ))
                     ) : (

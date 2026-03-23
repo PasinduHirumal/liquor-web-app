@@ -211,7 +211,7 @@ const OtherProductList = () => {
             ) : products.length > 0 ? (
                 <div className="row g-4">
                     {products.map((product) => (
-                        <OtherProductCard key={product.product_id} product={product} adminOnly={true} userOnly={false} />
+                        <OtherProductCard key={product.product_id} product={product} adminOnly={true} />
                     ))}
                 </div>
             ) : (

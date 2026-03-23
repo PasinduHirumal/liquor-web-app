@@ -263,7 +263,6 @@ const LiquorList = () => {
                                 key={product.product_id}
                                 product={product}
                                 adminOnly={true}
-                                userOnly={false}
                             />
                         ))
                     ) : (

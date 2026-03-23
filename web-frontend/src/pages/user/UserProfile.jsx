@@ -1,157 +1,323 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { axiosInstance } from "../../lib/axios";
 import useUserAuthStore from "../../stores/userAuthStore";
 import UserProfileEdit from "./EditUserProfile";
-import { Modal } from "react-bootstrap";
 
 const UserProfile = () => {
     const { user } = useUserAuthStore();
     const { profileId } = useParams();
+
     const [profile, setProfile] = useState(null);
     const [loading, setLoading] = useState(true);
-    const [error, setError] = useState(null);
-    const [showEditModal, setShowEditModal] = useState(false);
+    const [error, setError] = useState("");
 
-    const fetchUserProfile = async (targetId) => {
+    const targetId = profileId || user?.id;
+
+    const formatDateOfBirth = (dob) => {
+        if (!dob) return "-";
+
+        if (typeof dob === "string") {
+            const date = new Date(dob);
+            return isNaN(date.getTime()) ? "-" : date.toLocaleDateString();
+        }
+
+        if (dob?._seconds) {
+            const date = new Date(dob._seconds * 1000);
+            return isNaN(date.getTime()) ? "-" : date.toLocaleDateString();
+        }
+
+        return "-";
+    };
+
+    const formatRole = (role) => {
+        if (!role) return "-";
+        return String(role).replace(/_/g, " ").toUpperCase();
+    };
+
+    const fetchUserProfile = useCallback(async () => {
+        if (!targetId) {
+            setError("User ID not found.");
+            setLoading(false);
+            return;
+        }
+
         try {
             setLoading(true);
+            setError("");
+
             const res = await axiosInstance.get(`/users/getUserById/${targetId}`);
-            setProfile(res.data.data);
-            setError(null);
+            setProfile(res?.data?.data || null);
         } catch (err) {
             console.error("Error fetching user profile:", err);
-            setError("Failed to fetch user profile.");
+            setError(
+                err?.response?.data?.message || "Failed to fetch user profile."
+            );
+            setProfile(null);
         } finally {
             setLoading(false);
         }
-    };
+    }, [targetId]);
 
     useEffect(() => {
-        const targetId = profileId || user?.id;
-        if (targetId) {
-            fetchUserProfile(targetId);
-        } else {
-            setLoading(false);
-            setError("User ID not found.");
-        }
-    }, [profileId, user?.id]);
-
-    const handleEditClick = () => setShowEditModal(true);
-    const handleCloseEditModal = () => setShowEditModal(false);
-
-    const handleProfileUpdated = () => {
-        const targetId = profileId || user?.id;
-        if (targetId) {
-            fetchUserProfile(targetId);
-        }
-        setShowEditModal(false);
-    };
+        fetchUserProfile();
+    }, [fetchUserProfile]);
 
     if (loading) {
         return (
-            <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
-                <div className="spinner-border text-primary" role="status" />
-                <span className="ms-2">Loading Profile...</span>
+            <div className="container py-5">
+                <div className="d-flex flex-column justify-content-center align-items-center text-center py-5">
+                    <div
+                        className="spinner-border text-primary mb-3"
+                        style={{ width: "3rem", height: "3rem" }}
+                        role="status"
+                    />
+                    <h5 className="mb-1 fw-semibold text-dark">Loading Profile...</h5>
+                    <p className="text-muted mb-0">Please wait a moment</p>
+                </div>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="text-center mt-4 text-danger">
-                <strong>{error}</strong>
+            <div className="container py-5">
+                <div className="row justify-content-center">
+                    <div className="col-lg-8">
+                        <div className="alert alert-danger shadow-sm border-0 rounded-4 text-center py-4">
+                            <h5 className="fw-bold mb-2">Something went wrong</h5>
+                            <p className="mb-0">{error}</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
 
     if (!profile) {
         return (
-            <div className="text-center mt-4 text-danger">
-                <strong>Profile not found.</strong>
+            <div className="container py-5">
+                <div className="row justify-content-center">
+                    <div className="col-lg-8">
+                        <div className="alert alert-warning shadow-sm border-0 rounded-4 text-center py-4">
+                            <h5 className="fw-bold mb-2">Profile not found</h5>
+                            <p className="mb-0">The requested user profile could not be loaded.</p>
+                        </div>
+                    </div>
+                </div>
             </div>
         );
     }
 
     return (
         <>
-            <div className="container mt-4">
+            <div className="container py-4">
                 <div className="row justify-content-center">
-                    <div className="col-md-8">
-                        <div className="card shadow-lg border-0 rounded-4">
-                            <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center rounded-top-4">
-                                <h3 className="mb-0">User Profile</h3>
-                                {(!profileId || profileId === user?.id) && (
-                                    <button
-                                        className="btn btn-light btn-sm"
-                                        onClick={handleEditClick}
-                                    >
-                                        <i className="bi bi-pencil-square me-1"></i> Edit
-                                    </button>
-                                )}
+                    <div className="col-xl-9 col-lg-10">
+                        <div
+                            className="card border-0 shadow-lg rounded-4 overflow-hidden"
+                            style={{
+                                background:
+                                    "linear-gradient(180deg, #f8fbff 0%, #ffffff 55%, #ffffff 100%)",
+                            }}
+                        >
+                            {/* Top Banner */}
+                            <div
+                                className="position-relative"
+                                style={{
+                                    background:
+                                        "linear-gradient(135deg, #0d6efd 0%, #3d8bfd 45%, #6ea8fe 100%)",
+                                    minHeight: "180px",
+                                }}
+                            >
+                                <div className="position-relative p-4 p-md-5 text-white">
+                                    <div className="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3">
+                                        <div className="d-flex flex-column flex-md-row align-items-center align-items-md-end gap-4">
+                                            <img
+                                                src={
+                                                    profile.profilePicUrl ||
+                                                    "https://via.placeholder.com/140x140.png?text=User"
+                                                }
+                                                alt={`${profile.firstName || "User"} profile`}
+                                                className="rounded-circle border border-4 border-white shadow"
+                                                style={{
+                                                    width: "130px",
+                                                    height: "130px",
+                                                    objectFit: "cover",
+                                                    backgroundColor: "#fff",
+                                                }}
+                                            />
+
+                                            <div className="text-center text-md-start">
+                                                <h2 className="fw-bold mb-1">
+                                                    {profile.firstName} {profile.lastName}
+                                                </h2>
+                                                <p className="mb-2 opacity-75">{profile.email}</p>
+                                                <div className="d-flex flex-wrap justify-content-center justify-content-md-start gap-2">
+                                                    <span className="badge bg-light text-primary px-3 py-2 rounded-pill fw-semibold">
+                                                        {formatRole(profile.role)}
+                                                    </span>
+                                                    <span
+                                                        className={`badge px-3 py-2 rounded-pill fw-semibold ${profile.isActive
+                                                            ? "bg-success"
+                                                            : "bg-danger"
+                                                            }`}
+                                                    >
+                                                        {profile.isActive ? "Active" : "Inactive"}
+                                                    </span>
+                                                    <span
+                                                        className={`badge px-3 py-2 rounded-pill fw-semibold ${profile.isAccountVerified
+                                                            ? "bg-info text-dark"
+                                                            : "bg-warning text-dark"
+                                                            }`}
+                                                    >
+                                                        {profile.isAccountVerified
+                                                            ? "Verified"
+                                                            : "Not Verified"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div className="card-body p-4">
-                                <ul className="list-group list-group-flush">
-                                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                                        <strong>Name:</strong>
-                                        <span>{profile.firstName} {profile.lastName}</span>
-                                    </li>
-                                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                                        <strong>NIC Number:</strong>
-                                        <span>{profile.nic_number}</span>
-                                    </li>
-                                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                                        <strong>Phone:</strong>
-                                        <span>{profile.phone}</span>
-                                    </li>
-                                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                                        <strong>Email:</strong>
-                                        <span>{profile.email}</span>
-                                    </li>
-                                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                                        <strong>Role:</strong>
-                                        <span className="badge bg-secondary text-uppercase">{profile.role}</span>
-                                    </li>
-                                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                                        <strong>Account Completed:</strong>
-                                        <span className={`badge ${profile.isAccountCompleted ? "bg-success" : "bg-warning text-dark"}`}>
-                                            {profile.isAccountCompleted ? "Yes" : "No"}
-                                        </span>
-                                    </li>
-                                    <li className="list-group-item d-flex justify-content-between align-items-center">
-                                        <strong>Active:</strong>
-                                        <span className={`badge ${profile.isActive ? "bg-success" : "bg-danger"}`}>
-                                            {profile.isActive ? "Yes" : "No"}
-                                        </span>
-                                    </li>
-                                </ul>
+
+                            {/* Body */}
+                            <div className="card-body p-4 p-md-5">
+                                <div className="row g-4">
+                                    <div className="col-md-6">
+                                        <div className="card border-0 shadow-sm rounded-4 h-100">
+                                            <div className="card-body p-4">
+                                                <h5 className="fw-bold mb-4 text-primary">
+                                                    <i className="bi bi-person-lines-fill me-2"></i>
+                                                    Personal Information
+                                                </h5>
+
+                                                <div className="d-flex justify-content-between py-2 border-bottom">
+                                                    <span className="text-muted">Name</span>
+                                                    <span className="fw-semibold">
+                                                        {profile.firstName || "-"} {profile.lastName || "-"}
+                                                    </span>
+                                                </div>
+
+                                                <div className="d-flex justify-content-between py-2 border-bottom">
+                                                    <span className="text-muted">NIC Number</span>
+                                                    <span className="fw-semibold">
+                                                        {profile.nic_number || "-"}
+                                                    </span>
+                                                </div>
+
+                                                <div className="d-flex justify-content-between py-2">
+                                                    <span className="text-muted">Date of Birth</span>
+                                                    <span className="fw-semibold">
+                                                        {formatDateOfBirth(profile.dateOfBirth)}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-md-6">
+                                        <div className="card border-0 shadow-sm rounded-4 h-100">
+                                            <div className="card-body p-4">
+                                                <h5 className="fw-bold mb-4 text-primary">
+                                                    <i className="bi bi-shield-check me-2"></i>
+                                                    Account Information
+                                                </h5>
+
+                                                <div className="d-flex justify-content-between py-2 border-bottom">
+                                                    <span className="text-muted">Email</span>
+                                                    <span className="fw-semibold text-break text-end ms-3">
+                                                        {profile.email || "-"}
+                                                    </span>
+                                                </div>
+
+                                                <div className="d-flex justify-content-between py-2 border-bottom">
+                                                    <span className="text-muted">Phone Number</span>
+                                                    <span className="fw-semibold">
+                                                        {profile.phoneNumber || "-"}
+                                                    </span>
+                                                </div>
+
+                                                <div className="d-flex justify-content-between py-2 border-bottom">
+                                                    <span className="text-muted">Account Completed</span>
+                                                    <span
+                                                        className={`badge ${profile.isAccountCompleted
+                                                            ? "bg-success"
+                                                            : "bg-warning text-dark"
+                                                            }`}
+                                                    >
+                                                        {profile.isAccountCompleted ? "Yes" : "No"}
+                                                    </span>
+                                                </div>
+
+                                                <div className="d-flex justify-content-between py-2 border-bottom">
+                                                    <span className="text-muted">Enterprise Member</span>
+                                                    <span
+                                                        className={`badge ${profile.isEnterpriseMember
+                                                            ? "bg-primary"
+                                                            : "bg-secondary"
+                                                            }`}
+                                                    >
+                                                        {profile.isEnterpriseMember ? "Yes" : "No"}
+                                                    </span>
+                                                </div>
+
+                                                <div className="d-flex justify-content-between py-2">
+                                                    <span className="text-muted">Pending Membership</span>
+                                                    <span
+                                                        className={`badge ${profile.havePendingMembership
+                                                            ? "bg-warning text-dark"
+                                                            : "bg-success"
+                                                            }`}
+                                                    >
+                                                        {profile.havePendingMembership ? "Yes" : "No"}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="col-12">
+                                        <div className="card border-0 shadow-sm rounded-4">
+                                            <div className="card-body p-4">
+                                                <h5 className="fw-bold mb-4 text-primary">
+                                                    <i className="bi bi-geo-alt-fill me-2"></i>
+                                                    Addresses
+                                                </h5>
+
+                                                {Array.isArray(profile.addresses) &&
+                                                    profile.addresses.length > 0 ? (
+                                                    <div className="row g-3">
+                                                        {profile.addresses.map((address, index) => (
+                                                            <div className="col-md-6" key={index}>
+                                                                <div className="p-3 bg-light rounded-4 border h-100">
+                                                                    <span className="fw-semibold d-block mb-1">
+                                                                        Address {index + 1}
+                                                                    </span>
+                                                                    <span className="text-muted">
+                                                                        {typeof address === "string"
+                                                                            ? address
+                                                                            : JSON.stringify(address)}
+                                                                    </span>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+                                                ) : (
+                                                    <div className="text-muted">
+                                                        No addresses added yet.
+                                                    </div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
-
-            {/* Edit Profile Modal */}
-            <Modal
-                show={showEditModal}
-                onHide={handleCloseEditModal}
-                size="lg"
-                centered
-                backdrop="static"
-            >
-                <Modal.Header closeButton className="bg-primary text-white">
-                    <Modal.Title>Edit Profile</Modal.Title>
-                </Modal.Header>
-                <Modal.Body>
-                    {profile && (
-                        <UserProfileEdit
-                            id={profileId || user?.id}
-                            onClose={handleCloseEditModal}
-                            onUpdate={handleProfileUpdated}
-                        />
-                    )}
-                </Modal.Body>
-            </Modal>
         </>
     );
 };
