@@ -136,3 +136,38 @@ export const getMyCart = async (req, res) => {
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 }
+
+export const changeQuantity = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const cartItemId = req.params.cart_item_id;
+        const { quantity } = req.body;
+
+        const cartItem = await cartService.findById(userId, cartItemId);
+
+        if (!cartItem) {
+            return res.status(404).json({
+                success: false,
+                message: "Cart item not found"
+            });
+        }
+
+        const updatedCartItem = await cartService.updateById(userId, cartItemId, { quantity });
+
+        if (!updatedCartItem) {
+            return res.status(400).json({
+                success: false,
+                message: "Failed to update quantity"
+            })
+        }
+
+        return res.status(200).json({
+            success: true,
+            message: "Quantity updated successfully",
+            data: updatedCartItem
+        })
+    } catch (error) {
+        console.error("Change item quantity in cart error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+}
