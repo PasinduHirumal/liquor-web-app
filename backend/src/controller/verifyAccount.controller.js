@@ -1,8 +1,11 @@
+import ADMIN_ROLES from '../enums/adminRoles.js';
+import USER_ROLES from '../enums/userRoles.js';
 import AdminUserService from '../services/adminUsers.service.js';
+import UserService from '../services/users.service.js';
 import sendOtp from '../utils/sendOtp.js';
 
 const adminService = new AdminUserService();
-
+const userService = new UserService();
 
 const sendVerifyOtp = async (req, res) => {
     try {
@@ -91,9 +94,22 @@ const sendResetOtp = async (req, res) => {
     try {
         const { email } = req.body;
 
-        const user = await adminService.findByEmail(email);
+        const user = email !== undefined
+            ? await adminService.findByEmail(email)
+            : await userService.findByEmail(email);
+
         if (!user) {
             return res.status(404).json({success: false, message: "User not found"});
+        }
+
+        const isDriver = user.role === USER_ROLES.DRIVER;
+        const isPendingAdmin = user.role === ADMIN_ROLES.PENDING;
+
+        if (isDriver || isPendingAdmin) {
+            return res.status(400).json({
+                success: false,
+                message: "Driver account or Pending admin account not eligible for this",
+            })
         }
 
         // create otp
@@ -104,7 +120,12 @@ const sendResetOtp = async (req, res) => {
         userData.resetOtp = otp;
         userData.resetOtpExpiredAt = new Date(Date.now() + 2.5 * 60 * 1000).toISOString(); // expires at 2 minutes 30 seconds from now
 
-        const updatedUser = await adminService.updateById(user.id, userData);
+        const isAdmin = user.role === ADMIN_ROLES.ADMIN || user.role === ADMIN_ROLES.SUPER_ADMIN;
+
+        const updatedUser = isAdmin
+            ? await adminService.updateById(user.id, userData)
+            : await userService.updateById(user.id, userData);
+
         if (!updatedUser) {
             return res.status(400).json({success: false, message: "OTP creation failed"});
         }
@@ -134,7 +155,10 @@ const resetPassword = async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
 
-        const user = await adminService.findByEmail(email);
+        const user = email !== undefined
+            ? await adminService.findByEmail(email)
+            : await userService.findByEmail(email);
+
         if(!user) {
             return res.status(404).json({success: false, message: "User not available"});
         }
@@ -153,7 +177,18 @@ const resetPassword = async (req, res) => {
             resetOtpExpiredAt: new Date().toISOString(),
         };
 
-        await adminService.updateById(user.id, updateUserData);
+        const isAdmin = 
+            user.role === ADMIN_ROLES.ADMIN || 
+            user.role === ADMIN_ROLES.SUPER_ADMIN ||
+            user.role === ADMIN_ROLES.PENDING;
+
+        const updatedUser = isAdmin
+            ? await adminService.updateById(user.id, updateUserData)
+            : await userService.updateById(user.id, updateUserData);
+
+        if (!updatedUser) {
+            return res.status(400).json({success: false, message: "Failed to reset password"});
+        }
 
         return res.status(201).json({success: true, message: "Password has been reset successfully"})
     } catch (error) {
