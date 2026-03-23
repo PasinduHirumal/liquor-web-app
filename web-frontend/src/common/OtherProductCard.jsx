@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import RatingStars from "./RatingStars";
 import useAdminAuthStore from "../stores/adminAuthStore";
+import CartButton from "./CartButton";
 
 const OtherProductCard = ({ product, adminOnly = false }) => {
 
@@ -242,13 +243,7 @@ const OtherProductCard = ({ product, adminOnly = false }) => {
                             </button>
                         )}
                         {showBuyNow && (
-                            <button
-                                className="btn btn-warning btn-sm w-100"
-                                style={{ fontWeight: "bold", color: "#000" }}
-                                onClick={() => { console.log("navigate to application") }}
-                            >
-                                Add to cart
-                            </button>
+                            <CartButton productId={product.product_id || product.id} />
                         )}
                     </div>
                 </div>
