@@ -2,13 +2,19 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
+import CheckoutButton from "../../common/CheckoutButton";
+import useUserAuthStore from "../../stores/userAuthStore";
 
 const money = (value) => `Rs: ${Number(value || 0).toFixed(2)}`;
 
 export default function Cart() {
+    const { user } = useUserAuthStore();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [actionId, setActionId] = useState("");
+    const [addresses, setAddresses] = useState([]);
+    const [selectedAddress, setSelectedAddress] = useState(null);
+    const [addressLoading, setAddressLoading] = useState(false);
 
     const fetchCart = useCallback(async () => {
         try {
@@ -23,9 +29,39 @@ export default function Cart() {
         }
     }, []);
 
+    const fetchAddresses = useCallback(async () => {
+        if (!user?.user_id) {
+            return;
+        }
+
+        try {
+            setAddressLoading(true);
+            const res = await axiosInstance.get(`/addresses/getAddressesByUserId/${user.user_id}`);
+            const userAddresses = res.data.data || [];
+            setAddresses(userAddresses);
+
+            // Set default address: first active address or first address
+            if (userAddresses.length > 0) {
+                const defaultAddress = userAddresses.find(addr => addr.isDefault) || userAddresses[0];
+                setSelectedAddress(defaultAddress);
+            }
+        } catch (error) {
+            console.error("Error fetching addresses:", error);
+            toast.error("Failed to load addresses");
+        } finally {
+            setAddressLoading(false);
+        }
+    }, [user?.user_id]);
+
     useEffect(() => {
         fetchCart();
     }, [fetchCart]);
+
+    useEffect(() => {
+        if (user?.user_id) {
+            fetchAddresses();
+        }
+    }, [fetchAddresses, user?.user_id]);
 
     const changeQuantity = async (cartItemId, quantity) => {
         try {
@@ -232,6 +268,59 @@ export default function Cart() {
                             <div className="card-body">
                                 <h5 className="mb-3">Order Summary</h5>
 
+                                {/* Address Selection Section */}
+                                <div className="mb-4">
+                                    <label className="form-label text-secondary mb-2">
+                                        <strong>Delivery Address</strong>
+                                    </label>
+
+                                    {addressLoading ? (
+                                        <div className="text-center py-2">
+                                            <div className="spinner-border spinner-border-sm text-light" />
+                                            <span className="ms-2">Loading addresses...</span>
+                                        </div>
+                                    ) : addresses.length === 0 ? (
+                                        <div className="alert alert-warning py-2">
+                                            <small>
+                                                No addresses found.{" "}
+                                                <Link to="/address" className="text-decoration-none">
+                                                    Add address
+                                                </Link>
+                                            </small>
+                                        </div>
+                                    ) : (
+                                        <select
+                                            className="form-select bg-dark text-light border-secondary"
+                                            value={selectedAddress?.id || ""}
+                                            onChange={(e) => {
+                                                const address = addresses.find(addr => addr.id === e.target.value);
+                                                setSelectedAddress(address);
+                                            }}
+                                        >
+                                            {addresses.map((address) => (
+                                                <option key={address.id} value={address.id}>
+                                                    {address.streetAddress}, {address.city}, {address.state} - {address.postalCode}
+                                                    {address.isDefault && " (Default)"}
+                                                    {!address.isActive && " (Inactive)"}
+                                                </option>
+                                            ))}
+                                        </select>
+                                    )}
+
+                                    {selectedAddress && (
+                                        <div className="mt-2 p-2 bg-dark rounded" style={{ backgroundColor: "#0b0d17 !important" }}>
+                                            <small className="text-secondary">Selected address:</small>
+                                            <p className="mb-0 small">
+                                                {selectedAddress.streetAddress}<br />
+                                                {selectedAddress.city}, {selectedAddress.state}<br />
+                                                {selectedAddress.postalCode}, {selectedAddress.country}
+                                            </p>
+                                        </div>
+                                    )}
+                                </div>
+
+                                <hr style={{ borderColor: "#1c1f2b" }} />
+
                                 <div className="d-flex justify-content-between mb-2">
                                     <span className="text-secondary">Items</span>
                                     <span>{items.length}</span>
@@ -254,14 +343,16 @@ export default function Cart() {
                                     <strong>{money(subtotal)}</strong>
                                 </div>
 
-                                <button
-                                    className="btn btn-warning w-100"
-                                    onClick={() =>
-                                        toast("Connect your address + checkout flow when backend is completed")
-                                    }
-                                >
-                                    Proceed to Checkout
-                                </button>
+                                <CheckoutButton
+                                    addressId={selectedAddress?.id}
+                                    disabled={!selectedAddress || !selectedAddress.isActive || addresses.length === 0}
+                                />
+
+                                {selectedAddress && !selectedAddress.isActive && (
+                                    <small className="text-danger d-block mt-2 text-center">
+                                        Selected address is inactive. Please choose an active address.
+                                    </small>
+                                )}
                             </div>
                         </div>
                     </div>
