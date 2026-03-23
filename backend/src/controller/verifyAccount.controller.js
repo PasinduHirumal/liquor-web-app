@@ -124,7 +124,7 @@ const sendResetOtp = async (req, res) => {
 
         const updatedUser = isAdmin
             ? await adminService.updateById(user.id, userData)
-            : await userService.updateById(user.id, userData);
+            : await userService.updateById(user.user_id, userData);
 
         if (!updatedUser) {
             return res.status(400).json({success: false, message: "OTP creation failed"});
@@ -184,7 +184,7 @@ const resetPassword = async (req, res) => {
 
         const updatedUser = isAdmin
             ? await adminService.updateById(user.id, updateUserData)
-            : await userService.updateById(user.id, updateUserData);
+            : await userService.updateById(user.user_id, updateUserData);
 
         if (!updatedUser) {
             return res.status(400).json({success: false, message: "Failed to reset password"});

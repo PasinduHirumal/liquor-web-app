@@ -1,17 +1,32 @@
 import UserService from '../services/users.service.js';
 import generateToken from '../utils/createToken.js';
+import { uploadSingleImage } from '../utils/firebaseStorage.js';
 
 const userService = new UserService();
 
 const register = async (req, res) => {
     try {
-        const { email, phone } = req.body;
+        const { email, phoneNumber, profilePicUrl } = req.body;
 
         const userByEmail  = await userService.findByEmail(email);
-        const userByPhone = await userService.findByPhone(phone);
+        const userByPhone = await userService.findByPhone(phoneNumber);
 
         if (userByEmail || userByPhone) {
             return res.status(400).json({ success: false, message: "User already exists" });
+        }
+
+        if (profilePicUrl !== undefined) {
+            try {
+                const imageUrls = await uploadSingleImage(profilePicUrl, 'products');
+                req.body.profilePicUrl = imageUrls;
+                console.log('✅ Images uploaded successfully:', imageUrls);
+            } catch (uploadError) {
+                console.error('Image upload failed:', uploadError);
+                return res.status(500).json({ 
+                    success: false, 
+                    message: "Failed to upload images" 
+                });
+            }
         }
 
         const user = await userService.create(req.body);
@@ -28,17 +43,17 @@ const register = async (req, res) => {
 
 const login = async (req, res) => {
     try {
-        const { email, phone, password } = req.body;
+        const { email, phoneNumber, password } = req.body;
 
-        if (!email && !phone) {
+        if (!email && !phoneNumber) {
             return res.status(400).json({ success: false, message: "Either Email or Phone is required"});
         }
     
         let user;
         if (email !== undefined) {
             user = await userService.findByEmail(email);
-        } else if (phone !== undefined) {
-            user = await userService.findByPhone(phone);
+        } else if (phoneNumber !== undefined) {
+            user = await userService.findByPhone(phoneNumber);
         }
         
         if (!user) {
@@ -52,6 +67,9 @@ const login = async (req, res) => {
 
         if (!user.isAccountVerified) {
             return res.status(400).json({ success: false, message: "Your account is not verified" });
+        }
+        if (!user.isAccountCompleted) {
+            return res.status(400).json({ success: false, message: "Your account is not completed" });
         }
 
         // create JWT token

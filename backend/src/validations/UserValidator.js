@@ -1,5 +1,6 @@
 import Joi from 'joi';
 import USER_ROLES from '../enums/userRoles.js';
+import { requiredImageSchema } from './imageValidationSchemas.js';
 
 // CREATE VALIDATOR - With defaults
 const validateUser = (req, res, next) => {
@@ -12,20 +13,25 @@ const validateUser = (req, res, next) => {
     password: Joi.string().min(6).max(128).required(),
     firstName: Joi.string().min(2).max(50).required(),
     lastName: Joi.string().min(2).max(50).required(),
-    phone: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).min(10).max(18).trim().required(),
+    phoneNumber: Joi.string().pattern(/^\+\d{1,3}\d{4,14}$/).min(10).max(18).trim().required(),
     nic_number: Joi.string().min(12).max(12).required(),
     dateOfBirth: Joi.alternatives().try(
       Joi.date(),
       Joi.string().isoDate(),
       Joi.valid(null)
     ).required(),
+    profilePicUrl: requiredImageSchema,
     
     addresses: Joi.array().items(Joi.string().max(350)).max(20).default([]),
     
     role: Joi.string().valid(USER_ROLES.USER).default(USER_ROLES.USER),
-    googleId: Joi.string().allow('').default(''),
+    google_id: Joi.string().allow('').default(''),
+    
     isActive: Joi.boolean().default(true),
-    isAccountCompleted: Joi.boolean().default(false),
+    isAccountCompleted: Joi.boolean().default(true),
+    isAccountVerified: Joi.boolean().default(true),
+    havePendingMembership: Joi.boolean().default(false),
+    isEnterpriseMember: Joi.boolean().default(false),
 
     verifyOtp: Joi.string().allow('').default(''),
     verifyOtpExpiredAt: Joi.alternatives().try(
@@ -33,7 +39,7 @@ const validateUser = (req, res, next) => {
       Joi.string().isoDate(),
       Joi.valid(null)
     ).default(null),
-    isAccountVerified: Joi.boolean().default(false),
+    
     resetOtp: Joi.string().allow('').default(''),
     resetOtpExpiredAt: Joi.alternatives().try(
       Joi.date(),

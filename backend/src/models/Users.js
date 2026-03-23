@@ -7,17 +7,21 @@ class Users {
         this.password = data.password;
         this.firstName = data.firstName;
         this.lastName = data.lastName;
-        this.phone = data.phone;
+        this.phoneNumber = data.phoneNumber;
         this.nic_number = data.nic_number;
         this.dateOfBirth = data.dateOfBirth;
-
+        this.profilePicUrl = data.profilePicUrl || null;
         this.addresses = data.addresses;
 
         this.role = data.role;
-        this.googleId = data.googleId;
+        this.google_id = data.google_id;
+
         this.isActive = data.isActive;
-        this.isAccountCompleted = data.isAccountCompleted;
-        
+        this.isAccountCompleted = data.isAccountCompleted || false;
+        this.havePendingMembership = data.havePendingMembership || false;
+        this.isAccountVerified = data.isAccountVerified || false;
+        this.isEnterpriseMember = data.isEnterpriseMember || false;
+
         this.verifyOtp = data.verifyOtp;
         this.verifyOtpExpiredAt = data.verifyOtpExpiredAt;
         this.isAccountVerified = data.isAccountVerified;
