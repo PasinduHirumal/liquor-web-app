@@ -1,11 +1,13 @@
 import AddressService from "../services/address.service.js";
 import CartService from "../services/cart.service.js";
 import CompanyService from "../services/company.service.js";
+import OtherProductService from "../services/otherProduct.service.js";
 import ProductService from "../services/product.service.js";
 import SuperMarketService from "../services/superMarket.service.js";
 
 const cartService = new CartService();
-const productService = new ProductService();
+const liquorProductService = new ProductService();
+const groceryProductService = new OtherProductService();
 const addressService = new AddressService();
 const warehouseService = new CompanyService();
 const superMarketService = new SuperMarketService();
@@ -43,7 +45,12 @@ export const addToCart = async (req, res) => {
             });
         }
 
-        const product = await productService.findById(productId);
+        let tempProduct = await liquorProductService.findById(productId);
+        if (!tempProduct) {
+            tempProduct = await groceryProductService.findById(productId);
+        }
+
+        const product = tempProduct;
 
         if (!product) {
             return res.status(404).json({
@@ -158,7 +165,12 @@ export const changeQuantity = async (req, res) => {
             });
         }
 
-        const updatedCartItem = await cartService.updateById(userId, cartItemId, { quantity });
+        const updateData = { quantity: quantity };
+        const updatedCartItem = await cartService.updateById(
+            userId, 
+            cartItemId, 
+            updateData
+        );
 
         if (!updatedCartItem) {
             return res.status(400).json({
