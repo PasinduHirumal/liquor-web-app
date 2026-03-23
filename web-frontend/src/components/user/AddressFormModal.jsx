@@ -11,15 +11,91 @@ const AddressFormModal = ({
     submitLoading,
 }) => {
     return (
-        <Modal show={show} onHide={handleClose} centered>
+        <Modal show={show} onHide={handleClose} centered size="lg">
             <Modal.Header closeButton>
-                <Modal.Title>{editingId ? "Edit Address" : "Add New Address"}</Modal.Title>
+                <Modal.Title>
+                    {editingId ? "Edit Address" : "Add New Address"}
+                </Modal.Title>
             </Modal.Header>
+
             <Modal.Body>
                 <Form onSubmit={handleSubmit}>
-                    <Row className="g-2">
+                    <Row className="g-3">
+
+                        {/* FULL NAME */}
                         <Col md={6}>
-                            <Form.Group controlId="city">
+                            <Form.Group>
+                                <Form.Label>Full Name</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="fullName"
+                                    value={formData.fullName || ""}
+                                    onChange={handleInputChange}
+                                    placeholder="John Doe"
+                                />
+                            </Form.Group>
+                        </Col>
+
+                        {/* PHONE */}
+                        <Col md={6}>
+                            <Form.Group>
+                                <Form.Label>Phone Number</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="phoneNumber"
+                                    value={formData.phoneNumber || ""}
+                                    onChange={handleInputChange}
+                                    placeholder="+947XXXXXXXX"
+                                />
+                            </Form.Group>
+                        </Col>
+
+                        {/* STREET ADDRESS (REQUIRED) */}
+                        <Col xs={12}>
+                            <Form.Group>
+                                <Form.Label>Street Address</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="streetAddress"
+                                    value={formData.streetAddress || ""}
+                                    onChange={handleInputChange}
+                                    placeholder="No 123, Main Street"
+                                    required
+                                />
+                            </Form.Group>
+                        </Col>
+
+                        {/* BUILDING */}
+                        <Col md={6}>
+                            <Form.Group>
+                                <Form.Label>Building / Apartment</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="buildingName"
+                                    value={formData.buildingName || ""}
+                                    onChange={handleInputChange}
+                                    placeholder="Apartment, Suite, etc."
+                                />
+                            </Form.Group>
+                        </Col>
+
+                        {/* LANDMARK */}
+                        <Col md={6}>
+                            <Form.Group>
+                                <Form.Label>Landmark</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    name="landmark"
+                                    value={formData.landmark || ""}
+                                    onChange={handleInputChange}
+                                    placeholder="Near school, temple..."
+                                />
+                            </Form.Group>
+                        </Col>
+
+                        {/* CITY */}
+                        <Col md={6}>
+                            <Form.Group>
                                 <Form.Label>City</Form.Label>
                                 <Form.Control
                                     type="text"
@@ -30,9 +106,11 @@ const AddressFormModal = ({
                                 />
                             </Form.Group>
                         </Col>
+
+                        {/* STATE */}
                         <Col md={6}>
-                            <Form.Group controlId="state">
-                                <Form.Label>State/Province</Form.Label>
+                            <Form.Group>
+                                <Form.Label>State / Province</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="state"
@@ -42,8 +120,10 @@ const AddressFormModal = ({
                                 />
                             </Form.Group>
                         </Col>
+
+                        {/* POSTAL */}
                         <Col md={6}>
-                            <Form.Group controlId="postalCode">
+                            <Form.Group>
                                 <Form.Label>Postal Code</Form.Label>
                                 <Form.Control
                                     type="text"
@@ -54,8 +134,10 @@ const AddressFormModal = ({
                                 />
                             </Form.Group>
                         </Col>
+
+                        {/* COUNTRY */}
                         <Col md={6}>
-                            <Form.Group controlId="country">
+                            <Form.Group>
                                 <Form.Label>Country</Form.Label>
                                 <Form.Control
                                     type="text"
@@ -66,6 +148,23 @@ const AddressFormModal = ({
                                 />
                             </Form.Group>
                         </Col>
+
+                        {/* NOTES */}
+                        <Col xs={12}>
+                            <Form.Group>
+                                <Form.Label>Delivery Notes</Form.Label>
+                                <Form.Control
+                                    as="textarea"
+                                    rows={2}
+                                    name="notes"
+                                    value={formData.notes || ""}
+                                    onChange={handleInputChange}
+                                    placeholder="Leave at gate, call before delivery..."
+                                />
+                            </Form.Group>
+                        </Col>
+
+                        {/* ACTIVE */}
                         <Col xs={12}>
                             <Form.Check
                                 type="checkbox"
@@ -75,6 +174,8 @@ const AddressFormModal = ({
                                 label="Set as active shipping address"
                             />
                         </Col>
+
+                        {/* SUBMIT */}
                         <Col xs={12}>
                             <Button
                                 variant="primary"
@@ -84,11 +185,7 @@ const AddressFormModal = ({
                             >
                                 {submitLoading ? (
                                     <>
-                                        <span
-                                            className="spinner-border spinner-border-sm me-2"
-                                            role="status"
-                                            aria-hidden="true"
-                                        ></span>
+                                        <span className="spinner-border spinner-border-sm me-2" />
                                         {editingId ? "Updating..." : "Saving..."}
                                     </>
                                 ) : (
@@ -96,6 +193,7 @@ const AddressFormModal = ({
                                 )}
                             </Button>
                         </Col>
+
                     </Row>
                 </Form>
             </Modal.Body>
