@@ -1,16 +1,13 @@
 import AddressService from "../services/address.service.js";
 import CartService from "../services/cart.service.js";
-import CompanyService from "../services/company.service.js";
 import OtherProductService from "../services/otherProduct.service.js";
 import ProductService from "../services/product.service.js";
-import SuperMarketService from "../services/superMarket.service.js";
+import { buildItemsSnapshot, calculateFinancial, resolveWarehouseAndDistance, splitAndValidateCartItems } from "./checkout.controller.js";
 
 const cartService = new CartService();
 const liquorProductService = new ProductService();
 const groceryProductService = new OtherProductService();
 const addressService = new AddressService();
-const warehouseService = new CompanyService();
-const superMarketService = new SuperMarketService();
 
 export const isInCart = async (req, res) => {
     try {
@@ -192,112 +189,64 @@ export const changeQuantity = async (req, res) => {
 
 export const checkoutCart = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId    = req.user.id;
         const addressId = req.params.address_id;
 
-        // get address
+        // 1. Get address
         const address = await addressService.findById(userId, addressId);
         if (!address) {
-            return res.status(404).json({
-                success: false,
-                message: "Address not found"
-            });
+            return res.status(404).json({ success: false, message: "Address not found" });
         }
 
-        // get cart items
+        // 2. Get cart items
         const cartItems = await cartService.findAllByUserId(userId);
         if (!cartItems || cartItems.length === 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Cart is empty"
-            });
+            return res.status(400).json({ success: false, message: "Cart is empty" });
         }
 
-        // ── Split cart items into liquor / grocery ──────────────────────────
-        // Fetch all products in parallel to check is_liquor flag
-        const productsWithType = await Promise.all(
-            cartItems.map(async (item) => {
-                // try liquor collection first, then grocery
-                let product = await liquorProductService.findById(item.product_id);
-                if (product) return { item, product, is_liquor: true };
-
-                product = await groceryProductService.findById(item.product_id);
-                if (product) return { item, product, is_liquor: false };
-
-                return { item, product: null, is_liquor: null }; // not found
-            })
-        );
-
-        // Check if any product was not found in either collection
-        const notFound = productsWithType.filter(p => p.product === null);
-        if (notFound.length > 0) {
-            return res.status(404).json({
-                success: false,
-                message: "Some products not found",
-                data: notFound.map(p => ({
-                    cart_item_id: p.item.cart_item_id,
-                    product_id: p.item.product_id,
-                    productName: p.item.productName,
-                }))
-            });
+        // 3. Split & validate
+        const validation = await splitAndValidateCartItems(cartItems);
+        if (!validation.success) {
+            return res.status(validation.status).json(validation);
         }
+        const { productsWithType, liquorItems } = validation;
 
-        const liquorItems   = productsWithType.filter(p => p.is_liquor).map(p => ({ ...p.item, product: p.product }));
-        const groceryItems  = productsWithType.filter(p => !p.is_liquor).map(p => ({ ...p.item, product: p.product }));
-
-        // ── Validate separately ─────────────────────────────────────────────
-        const [liquorValidation, groceryValidation] = await Promise.all([
-            liquorItems.length  > 0 ? liquorProductService.validateCartItems(liquorItems)  : { isValid: true, errors: [], updatedItems: [] },
-            groceryItems.length > 0 ? groceryProductService.validateCartItems(groceryItems) : { isValid: true, errors: [], updatedItems: [] },
-        ]);
-
-        const allErrors      = [...liquorValidation.errors,      ...groceryValidation.errors];
-        const allUpdatedItems = [...liquorValidation.updatedItems, ...groceryValidation.updatedItems];
-
-        if (allErrors.length > 0) {
-            return res.status(400).json({
-                success: false,
-                message: "Some cart items have issues",
-                errors: allErrors,
-                updatedItems: allUpdatedItems,
-            });
+        // 4. Warehouse + distance
+        const routeResult = await resolveWarehouseAndDistance(address, cartItems, liquorItems);
+        if (!routeResult.success) {
+            return res.status(routeResult.status).json({ success: false, message: routeResult.message });
         }
+        const { warehouse, distance, supermarketLocations } = routeResult;
 
-        // ── Get nearest warehouse ───────────────────────────────────────────
-        const warehouse = await warehouseService.getNearestWarehouse(address);
-        if (warehouse.distanceMeters === Infinity) {
-            return res.status(400).json({
-                success: false,
-                message: "Cannot calculate distance to any warehouse"
-            });
-        }
-
-        // Check if warehouse supports liquor (if cart has liquor items)
-        if (liquorItems.length > 0 && !warehouse.warehouse.isLiquorActive) {
-            return res.status(400).json({
-                success: false,
-                message: "Nearest warehouse does not support liquor delivery"
-            });
-        }
-
-        // ── Get supermarket locations ───────────────────────────────────────
-        const supermarketLocations = await superMarketService.getSupermarketLocations(cartItems);
-
-        // ── Calculate total distance ────────────────────────────────────────
-        const distance = await cartService.calculateTotalDistance(warehouse, supermarketLocations, address);
-
-        // ── Checkout ────────────────────────────────────────────────────────
-        const details = await cartService.checkoutCart(cartItems, warehouse, distance);
+        // 5. Financial + items
+        const finance = calculateFinancial(cartItems, productsWithType, warehouse, distance);
+        const items   = buildItemsSnapshot(cartItems, productsWithType);
 
         return res.status(200).json({
             success: true,
-            message: "Checkout successful",
+            message: "Checkout preview successful",
             data: {
-                ...details,
+                finance,
+                distance: {
+                    totalDistanceKm:   distance.totalDistanceKm,
+                    totalDurationText: distance.totalDurationText,
+                    legs:              distance.legs,
+                },
+                estimated_delivery: new Date(Date.now() + distance.totalDurationSeconds * 1000),
+                warehouse: {
+                    id:   warehouse.id,
+                    name: warehouse.where_house_name,
+                },
+                supermarkets: supermarketLocations.map(sm => ({
+                    id:   sm.superMarket_id,
+                    name: sm.superMarket_Name,
+                })),
+                updatedItems: validation.updatedItems, // price change warnings
+                items,
                 summary: {
                     total_items:   cartItems.length,
                     liquor_items:  liquorItems.length,
-                    grocery_items: groceryItems.length,
+                    grocery_items: validation.groceryItems.length,
                 }
             }
         });
@@ -306,4 +255,4 @@ export const checkoutCart = async (req, res) => {
         console.error("Checkout cart error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
-}
+};
