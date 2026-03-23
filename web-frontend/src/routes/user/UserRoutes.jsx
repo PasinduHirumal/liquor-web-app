@@ -44,14 +44,26 @@ export const userRoutes = [
     },
     {
         path: "/cart",
-        element: <Cart />
+        element: (
+            <UserProtectedRoute>
+                <Cart />
+            </UserProtectedRoute>
+        ),
     },
     {
         path: "/profile/:profileId",
-        element: <UserProfile />
+        element: (
+            <UserProtectedRoute>
+                <UserProfile />
+            </UserProtectedRoute>
+        ),
     },
     {
         path: "/address",
-        element: <Address />
+        element: (
+            <UserProtectedRoute>
+                <Address />
+            </UserProtectedRoute>
+        ),
     },
 ];

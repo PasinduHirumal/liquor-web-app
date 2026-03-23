@@ -66,6 +66,7 @@ export default function UserNavbar() {
   const [searchModalOpen, setSearchModalOpen] = useState(false);
 
   const closeMenu = () => setMobileMenuOpen(false);
+  const profileId = user?.id || user?.user_id;
 
   const navItems = useMemo(
     () => [
@@ -74,9 +75,9 @@ export default function UserNavbar() {
       { label: "Grocery Items", to: "/other-product-all" },
       { label: "Address", to: "/address" },
       { label: "Cart", to: "/cart" },
-      { label: "Profile", to: `/profile/${user.id}` },
+      ...(profileId ? [{ label: "Profile", to: `/profile/${profileId}` }] : []),
     ],
-    [user?.id]
+    [profileId]
   );
 
   const handleLogout = async () => {
