@@ -28,11 +28,11 @@ const StyledNavLink = styled(NavLink)(({ theme }) => ({
   display: "inline-flex",
   alignItems: "center",
   "&.active": {
-    backgroundColor: "#333",
+    backgroundColor: "#a30404",
     fontWeight: 700,
   },
   "&:hover": {
-    backgroundColor: "#444",
+    backgroundColor: "#a30404",
   },
 }));
 
@@ -82,7 +82,7 @@ export default function UserNavbar() {
     ));
 
   return (
-    <AppBar position="fixed" elevation={4} sx={{ backgroundColor: "#121212" }}>
+    <AppBar position="fixed" elevation={4} style={{ backgroundColor: "#7e0303" }}>
       <Toolbar sx={{ justifyContent: "space-between", px: 2 }}>
         <BrandLink to="/" onClick={closeMenu}>
           🍷 Liquor Web App
@@ -128,7 +128,7 @@ export default function UserNavbar() {
               width: "75vw",
               maxWidth: 300,
               height: { xs: "calc(100vh - 56px)", sm: "calc(100vh - 64px)" },
-              bgcolor: "#1e1e1e",
+              bgcolor: "#7e0303",
               zIndex: theme.zIndex.drawer + 1,
               p: 3,
               display: "flex",

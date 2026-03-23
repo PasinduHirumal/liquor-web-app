@@ -2,8 +2,13 @@ import React, { useEffect, useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
+import useAdminAuthStore from "../stores/adminAuthStore";
+import useUserAuthStore from "../stores/userAuthStore";
 
 const VerifyOtpPage = () => {
+    const adminAuth = useAdminAuthStore((state) => state.isAuthenticated);
+    const userAuth = useUserAuthStore((state) => state.isAuthenticated);
+
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -109,7 +114,9 @@ const VerifyOtpPage = () => {
             toast.success(res.data.message || "Email verified successfully.");
             localStorage.removeItem("otpEmail");
 
-            setTimeout(() => navigate("/login"), 2000);
+            setTimeout(() => {
+                navigate(adminAuth ? "/admin-users-list" : "/login");
+            }, 2000);
         } catch (err) {
             toast.error(err.response?.data?.message || "Verification failed.");
         } finally {

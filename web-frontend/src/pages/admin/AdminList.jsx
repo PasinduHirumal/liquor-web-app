@@ -4,11 +4,13 @@ import toast from 'react-hot-toast';
 import AdminUserRowEditable from '../../components/admin/AdminUserRowEditable';
 import { Select, Button, Space, Spin, Typography, Table, Tag } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
 const { Title } = Typography;
 const { Option } = Select;
 
 const AdminUserList = () => {
+  const navigate = useNavigate()
   const [admins, setAdmins] = useState([]);
   const [loading, setLoading] = useState(true);
   const [warehouses, setWarehouses] = useState([]);
@@ -220,9 +222,15 @@ const AdminUserList = () => {
               icon={<ReloadOutlined />}
               onClick={fetchAdmins}
               loading={loading}
-              type="primary"
             >
               Refresh
+            </Button>
+
+            <Button
+              onClick={() => navigate('/register-admin')}
+              type="primary"
+            >
+              Add Admin
             </Button>
           </div>
         </div>

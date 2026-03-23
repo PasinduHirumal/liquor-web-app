@@ -14,6 +14,7 @@ import ResetPassword from "./components/ResetPassword";
 import PublicHome from "./routes/PublicHome";
 import CategoryProducts from "./pages/CategoryProducts";
 
+import UserRegister from "./pages/user/UserRegister";
 import useAdminAuthStore from "./stores/adminAuthStore";
 import useUserAuthStore from "./stores/userAuthStore";
 
@@ -100,7 +101,7 @@ function App() {
           <Route
             path="register"
             element={
-              adminAuth || userAuth ? <Navigate to="/" replace /> : <Register />
+              adminAuth || userAuth ? <Navigate to="/" replace /> : <UserRegister />
             }
           />
         </Routes>

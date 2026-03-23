@@ -174,32 +174,22 @@ const AdminLogin = () => {
                     </div>
 
                     {/* Error Alert with Forgot Password */}
-                        <div className="mt-2 d-flex justify-content-between align-items-center">
-                            <span className="text-secondary">Forgot password?</span>
-                            <button
-                                type="button"
-                                className="btn btn-link p-0 text-decoration-none ms-2"
-                                onClick={() => navigate("/reset-password")}
-                            >
-                                Click here
-                            </button>
-                        </div>
+                    <div className="mt-2 d-flex justify-content-between align-items-center">
+                        <span className="text-secondary">Forgot password?</span>
+                        <button
+                            type="button"
+                            className="btn btn-link p-0 text-decoration-none ms-2"
+                            onClick={() => navigate("/reset-password")}
+                        >
+                            Click here
+                        </button>
+                    </div>
                 </div>
 
                 <button type="submit" className="btn btn-primary w-100" disabled={loading}>
                     {loading ? "Logging in..." : "Login"}
                 </button>
             </form>
-
-            <div className="text-center mt-4">
-                Don't have an account?{" "}
-                <button
-                    className="btn btn-link p-0 text-decoration-none"
-                    onClick={() => navigate("/register")}
-                >
-                    Register here
-                </button>
-            </div>
             {/* Render Modal */}
             <VerifyEmailEnterModel
                 show={showVerifyModal}
