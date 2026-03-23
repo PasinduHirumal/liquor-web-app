@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
 import CheckoutButton from "../../common/CheckoutButton";
@@ -9,6 +9,8 @@ const money = (value) => `Rs: ${Number(value || 0).toFixed(2)}`;
 
 export default function Cart() {
     const { user } = useUserAuthStore();
+    const navigate = useNavigate();
+    const location = useLocation();
     const [items, setItems] = useState([]);
     const [loading, setLoading] = useState(true);
     const [actionId, setActionId] = useState("");
@@ -40,9 +42,18 @@ export default function Cart() {
             const userAddresses = res.data.data || [];
             setAddresses(userAddresses);
 
-            // Set default address: first active address or first address
-            if (userAddresses.length > 0) {
-                const defaultAddress = userAddresses.find(addr => addr.isDefault) || userAddresses[0];
+            // Check if we have a new address from navigation state
+            if (location.state?.newAddress) {
+                const newAddress = location.state.newAddress;
+                setSelectedAddress(newAddress);
+                // Clear the state to prevent reselection on refresh
+                window.history.replaceState({}, document.title);
+            } 
+            // Set default address if no address is selected
+            else if (!selectedAddress && userAddresses.length > 0) {
+                const defaultAddress = userAddresses.find(addr => addr.isDefault && addr.isActive) || 
+                                      userAddresses.find(addr => addr.isActive) || 
+                                      userAddresses[0];
                 setSelectedAddress(defaultAddress);
             }
         } catch (error) {
@@ -51,7 +62,7 @@ export default function Cart() {
         } finally {
             setAddressLoading(false);
         }
-    }, [user?.user_id]);
+    }, [user?.user_id, location.state, selectedAddress]);
 
     useEffect(() => {
         fetchCart();
@@ -62,6 +73,13 @@ export default function Cart() {
             fetchAddresses();
         }
     }, [fetchAddresses, user?.user_id]);
+
+    // Show success message if address was created
+    useEffect(() => {
+        if (location.state?.addressCreated) {
+            toast.success("Address created successfully!");
+        }
+    }, [location.state]);
 
     const changeQuantity = async (cartItemId, quantity) => {
         try {
@@ -120,6 +138,10 @@ export default function Cart() {
         changeQuantity(cartItemId, Number(item.quantity || 0) + 1);
     };
 
+    const handlePickLocation = () => {
+        navigate("/location-picker");
+    };
+
     const subtotal = useMemo(
         () =>
             items.reduce(
@@ -140,7 +162,7 @@ export default function Cart() {
     return (
         <div
             className="container-fluid py-4"
-            style={{ minHeight: "100vh", color: "#fff" }}
+            style={{ minHeight: "100vh", color: "#fff", backgroundColor: "#0b0d17" }}
         >
             <div className="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
                 <div>
@@ -270,9 +292,17 @@ export default function Cart() {
 
                                 {/* Address Selection Section */}
                                 <div className="mb-4">
-                                    <label className="form-label text-secondary mb-2">
-                                        <strong>Delivery Address</strong>
-                                    </label>
+                                    <div className="d-flex justify-content-between align-items-center mb-2">
+                                        <label className="form-label text-secondary mb-0">
+                                            <strong>Delivery Address</strong>
+                                        </label>
+                                        <button
+                                            className="btn btn-sm btn-outline-warning"
+                                            onClick={handlePickLocation}
+                                        >
+                                            📍 Pick Location
+                                        </button>
+                                    </div>
 
                                     {addressLoading ? (
                                         <div className="text-center py-2">
@@ -283,39 +313,53 @@ export default function Cart() {
                                         <div className="alert alert-warning py-2">
                                             <small>
                                                 No addresses found.{" "}
+                                                <button 
+                                                    className="btn btn-link btn-sm p-0 text-decoration-none"
+                                                    onClick={handlePickLocation}
+                                                >
+                                                    Add address via map
+                                                </button>
+                                                {" or "}
                                                 <Link to="/address" className="text-decoration-none">
-                                                    Add address
+                                                    manage addresses
                                                 </Link>
                                             </small>
                                         </div>
                                     ) : (
-                                        <select
-                                            className="form-select bg-dark text-light border-secondary"
-                                            value={selectedAddress?.id || ""}
-                                            onChange={(e) => {
-                                                const address = addresses.find(addr => addr.id === e.target.value);
-                                                setSelectedAddress(address);
-                                            }}
-                                        >
-                                            {addresses.map((address) => (
-                                                <option key={address.id} value={address.id}>
-                                                    {address.streetAddress}, {address.city}, {address.state} - {address.postalCode}
-                                                    {address.isDefault && " (Default)"}
-                                                    {!address.isActive && " (Inactive)"}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    )}
+                                        <>
+                                            <select
+                                                className="form-select bg-dark text-light border-secondary"
+                                                value={selectedAddress?.id || ""}
+                                                onChange={(e) => {
+                                                    const address = addresses.find(addr => addr.id === e.target.value);
+                                                    setSelectedAddress(address);
+                                                }}
+                                            >
+                                                {addresses.map((address) => (
+                                                    <option key={address.id} value={address.id}>
+                                                        {address.streetAddress.substring(0, 50)}...
+                                                        {address.isDefault && " (Default)"}
+                                                        {!address.isActive && " (Inactive)"}
+                                                    </option>
+                                                ))}
+                                            </select>
 
-                                    {selectedAddress && (
-                                        <div className="mt-2 p-2 bg-dark rounded" style={{ backgroundColor: "#0b0d17 !important" }}>
-                                            <small className="text-secondary">Selected address:</small>
-                                            <p className="mb-0 small">
-                                                {selectedAddress.streetAddress}<br />
-                                                {selectedAddress.city}, {selectedAddress.state}<br />
-                                                {selectedAddress.postalCode}, {selectedAddress.country}
-                                            </p>
-                                        </div>
+                                            {selectedAddress && (
+                                                <div className="mt-2 p-2 rounded" style={{ backgroundColor: "#0b0d17" }}>
+                                                    <small className="text-secondary">Selected address:</small>
+                                                    <p className="mb-0 small">
+                                                        {selectedAddress.streetAddress}<br />
+                                                        {selectedAddress.city}, {selectedAddress.state}<br />
+                                                        {selectedAddress.postalCode}, {selectedAddress.country}
+                                                        {selectedAddress.latitude && selectedAddress.longitude && (
+                                                            <span className="text-info d-block mt-1">
+                                                                📍 Coordinates: {selectedAddress.latitude.toFixed(6)}, {selectedAddress.longitude.toFixed(6)}
+                                                            </span>
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            )}
+                                        </>
                                     )}
                                 </div>
 

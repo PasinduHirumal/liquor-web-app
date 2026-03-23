@@ -21,6 +21,7 @@ import {
 } from "@mui/icons-material";
 import useUserAuthStore from "../../stores/userAuthStore";
 import SearchModal from "../../common/SearchModal";
+import ConfirmLogoutDialog from "../../common/ConfirmLogoutDialog"; // <-- import confirm modal
 
 const StyledNavLink = styled(NavLink)(({ theme }) => ({
   color: "#fff",
@@ -80,7 +81,15 @@ export default function UserNavbar() {
     [profileId]
   );
 
+  // --- UPDATED: logout with confirmation ---
   const handleLogout = async () => {
+    const confirmed = await ConfirmLogoutDialog({
+      title: "Confirm Logout",
+      html: "Are you sure you want to log out?",
+      icon: "warning",
+    });
+    if (!confirmed) return;
+
     try {
       await logout();
     } finally {
