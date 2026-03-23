@@ -1,18 +1,45 @@
 import UserService from '../services/users.service.js';
+import getDateFromTimestamp from '../utils/convertFirestoreTimeStrapToDate.js';
 import generateToken from '../utils/createToken.js';
 import { uploadSingleImage } from '../utils/firebaseStorage.js';
 
 const userService = new UserService();
 
+const calculateAge = (dateOfBirth) => {
+    const today = new Date();
+    const dob = new Date(dateOfBirth);
+
+    let age = today.getFullYear() - dob.getFullYear();
+    const monthDiff = today.getMonth() - dob.getMonth();
+
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+        age--;
+    }
+
+    return age;
+};
+
 const register = async (req, res) => {
     try {
-        const { email, phoneNumber, profilePicUrl } = req.body;
+        const { email, phoneNumber, profilePicUrl, dateOfBirth } = req.body;
 
         const userByEmail  = await userService.findByEmail(email);
         const userByPhone = await userService.findByPhone(phoneNumber);
 
         if (userByEmail || userByPhone) {
             return res.status(400).json({ success: false, message: "User already exists" });
+        }
+
+        if (!dateOfBirth) {
+            return res.status(400).json({ success: false, message: "Date of birth is required" });
+        }
+
+        const age = calculateAge(dateOfBirth);
+        if (age < 18) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "You must be at least 18 years old to register" 
+            });
         }
 
         if (profilePicUrl !== undefined) {
@@ -84,6 +111,8 @@ const login = async (req, res) => {
 
         // block password displaying
         user.password = undefined;
+
+        user.dateOfBirth = getDateFromTimestamp(user.dateOfBirth);
 
         return res.status(200).json({ success: true, message: "Login successful", data: user });
     } catch (error) {

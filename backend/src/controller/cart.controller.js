@@ -206,39 +206,102 @@ export const checkoutCart = async (req, res) => {
 
         // get cart items
         const cartItems = await cartService.findAllByUserId(userId);
-
-        // validate products
-        const result = await productService.validateCartItems(cartItems);
-        if (!result.isValid) {
-            return res.status(404).json({
+        if (!cartItems || cartItems.length === 0) {
+            return res.status(400).json({
                 success: false,
-                message: result.errors || result.updatedItems
+                message: "Cart is empty"
             });
         }
 
-        // get nearest warehouse
+        // ── Split cart items into liquor / grocery ──────────────────────────
+        // Fetch all products in parallel to check is_liquor flag
+        const productsWithType = await Promise.all(
+            cartItems.map(async (item) => {
+                // try liquor collection first, then grocery
+                let product = await liquorProductService.findById(item.product_id);
+                if (product) return { item, product, is_liquor: true };
+
+                product = await groceryProductService.findById(item.product_id);
+                if (product) return { item, product, is_liquor: false };
+
+                return { item, product: null, is_liquor: null }; // not found
+            })
+        );
+
+        // Check if any product was not found in either collection
+        const notFound = productsWithType.filter(p => p.product === null);
+        if (notFound.length > 0) {
+            return res.status(404).json({
+                success: false,
+                message: "Some products not found",
+                data: notFound.map(p => ({
+                    cart_item_id: p.item.cart_item_id,
+                    product_id: p.item.product_id,
+                    productName: p.item.productName,
+                }))
+            });
+        }
+
+        const liquorItems   = productsWithType.filter(p => p.is_liquor).map(p => ({ ...p.item, product: p.product }));
+        const groceryItems  = productsWithType.filter(p => !p.is_liquor).map(p => ({ ...p.item, product: p.product }));
+
+        // ── Validate separately ─────────────────────────────────────────────
+        const [liquorValidation, groceryValidation] = await Promise.all([
+            liquorItems.length  > 0 ? liquorProductService.validateCartItems(liquorItems)  : { isValid: true, errors: [], updatedItems: [] },
+            groceryItems.length > 0 ? groceryProductService.validateCartItems(groceryItems) : { isValid: true, errors: [], updatedItems: [] },
+        ]);
+
+        const allErrors      = [...liquorValidation.errors,      ...groceryValidation.errors];
+        const allUpdatedItems = [...liquorValidation.updatedItems, ...groceryValidation.updatedItems];
+
+        if (allErrors.length > 0) {
+            return res.status(400).json({
+                success: false,
+                message: "Some cart items have issues",
+                errors: allErrors,
+                updatedItems: allUpdatedItems,
+            });
+        }
+
+        // ── Get nearest warehouse ───────────────────────────────────────────
         const warehouse = await warehouseService.getNearestWarehouse(address);
         if (warehouse.distanceMeters === Infinity) {
             return res.status(400).json({
                 success: false,
-                message: "Cannot calculate distance"
+                message: "Cannot calculate distance to any warehouse"
             });
         }
 
-        // get supermarket locations
+        // Check if warehouse supports liquor (if cart has liquor items)
+        if (liquorItems.length > 0 && !warehouse.warehouse.isLiquorActive) {
+            return res.status(400).json({
+                success: false,
+                message: "Nearest warehouse does not support liquor delivery"
+            });
+        }
+
+        // ── Get supermarket locations ───────────────────────────────────────
         const supermarketLocations = await superMarketService.getSupermarketLocations(cartItems);
 
-        // calculate total distance
+        // ── Calculate total distance ────────────────────────────────────────
         const distance = await cartService.calculateTotalDistance(warehouse, supermarketLocations, address);
 
-        // checkout cart
+        // ── Checkout ────────────────────────────────────────────────────────
         const details = await cartService.checkoutCart(cartItems, warehouse, distance);
 
         return res.status(200).json({
             success: true,
-            message: "checkout successful",
-            data: details
-        })
+            message: "Checkout successful",
+            data: {
+                ...details,
+                summary: {
+                    total_items:   cartItems.length,
+                    liquor_items:  liquorItems.length,
+                    grocery_items: groceryItems.length,
+                }
+            }
+        });
+
     } catch (error) {
         console.error("Checkout cart error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });

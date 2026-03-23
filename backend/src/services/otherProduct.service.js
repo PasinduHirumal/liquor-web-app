@@ -128,6 +128,97 @@ class OtherProductService extends BaseService {
             throw error;
         }
     }
+
+
+    // helper methods
+    async validateCartItems(cartItems) {
+        const errors = [];
+        const updatedItems = [];
+
+        await Promise.all(
+            cartItems.map(async (cartItem) => {
+                // Fetch product from DB
+                const product = await this.findById(cartItem.product_id);
+
+                // 1. Product still exists
+                if (!product) {
+                    errors.push({
+                        cart_item_id: cartItem.cart_item_id,
+                        product_id: cartItem.product_id,
+                        productName: cartItem.productName,
+                        issue: 'PRODUCT_NOT_FOUND',
+                        message: `"${cartItem.productName}" is no longer available`,
+                    });
+                    return;
+                }
+
+                // 2. Product is active
+                if (!product.is_active) {
+                    errors.push({
+                        cart_item_id: cartItem.cart_item_id,
+                        product_id: cartItem.product_id,
+                        productName: cartItem.productName,
+                        issue: 'PRODUCT_INACTIVE',
+                        message: `"${product.name}" is currently unavailable`,
+                    });
+                    return;
+                }
+
+                // 3. Product is in stock
+                if (!product.is_in_stock) {
+                    errors.push({
+                        cart_item_id: cartItem.cart_item_id,
+                        product_id: cartItem.product_id,
+                        productName: cartItem.productName,
+                        issue: 'OUT_OF_STOCK',
+                        message: `"${product.name}" is out of stock`,
+                    });
+                    return;
+                }
+
+                // 4. Requested quantity is available
+                if (product.stock_quantity < cartItem.quantity) {
+                    errors.push({
+                        cart_item_id: cartItem.cart_item_id,
+                        product_id: cartItem.product_id,
+                        productName: cartItem.productName,
+                        issue: 'INSUFFICIENT_STOCK',
+                        message: `Only ${product.stock_quantity} unit(s) of "${product.name}" available`,
+                        available_quantity: product.stock_quantity,
+                        requested_quantity: cartItem.quantity,
+                    });
+                    return;
+                }
+
+                // 5. Price has changed since added to cart
+                if (product.selling_price !== cartItem.unit_price) {
+                    updatedItems.push({
+                        cart_item_id: cartItem.cart_item_id,
+                        product_id: cartItem.product_id,
+                        productName: product.name,
+                        issue: 'PRICE_CHANGED',
+                        message: `Price of "${product.name}" has changed`,
+                        old_price: cartItem.unit_price,
+                        new_price: product.selling_price,
+                    });
+                }
+            })
+        );
+
+        if (errors.length > 0) {
+            return {
+                isValid: false,
+                errors,           // ← blocking issues (stop checkout)
+                updatedItems,     // ← non-blocking (price changes, warn user)
+            };
+        }
+
+        return {
+            isValid: true,
+            errors: [],
+            updatedItems,         // ← still notify about price changes even if valid
+        };
+    }
 }
 
 export default OtherProductService;
