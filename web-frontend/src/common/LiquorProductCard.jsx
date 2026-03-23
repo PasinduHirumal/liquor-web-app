@@ -1,9 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import RatingStars from "./RatingStars";
+import useAdminAuthStore from "../stores/adminAuthStore";
 
-const LiquorProductCard = ({ product, adminOnly = false, userOnly = true }) => {
+const LiquorProductCard = ({ product, adminOnly = false }) => {
   const navigate = useNavigate();
+
+  const adminAuth = useAdminAuthStore((state) => state.isAuthenticated);
+  const showBuyNow = !adminOnly && !adminAuth;
 
   const combinedImages = [
     ...(product.main_image ? [product.main_image] : []),
@@ -90,7 +94,6 @@ const LiquorProductCard = ({ product, adminOnly = false, userOnly = true }) => {
               <small className="text-muted">No Image Available</small>
             </div>
           )}
-
         </div>
 
         {combinedImages.length > 1 && (
@@ -166,8 +169,7 @@ const LiquorProductCard = ({ product, adminOnly = false, userOnly = true }) => {
           <div className="d-flex justify-content-between align-items-center mb-2">
             <small
               style={{
-                color:
-                  product.stock_quantity > 0 ? "#22c55e" : "#ef4444",
+                color: product.stock_quantity > 0 ? "#22c55e" : "#ef4444",
                 fontWeight: "bold",
               }}
             >
@@ -183,36 +185,35 @@ const LiquorProductCard = ({ product, adminOnly = false, userOnly = true }) => {
           {adminOnly && (
             <div className="mb-2">
               <span
-                className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"
-                  }`}
+                className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"}`}
               >
                 {product.is_active ? "Active" : "Inactive"}
               </span>
               <span
-                className={`badge ${product.is_in_stock
-                  ? "bg-primary"
-                  : "bg-warning text-dark"
-                  }`}
+                className={`badge ${product.is_in_stock ? "bg-primary" : "bg-warning text-dark"}`}
               >
                 {product.is_in_stock ? "Available" : "Unavailable"}
               </span>
             </div>
           )}
 
-          <div className="card-footer mt-auto text-center" style={{ background: "transparent", borderTop: "1px solid #1c1f2b" }}>
+          <div
+            className="card-footer mt-auto text-center"
+            style={{ background: "transparent", borderTop: "1px solid #1c1f2b" }}
+          >
             {adminOnly && (
               <button
-                className="btn btn-outline-light btn-sm w-100"
+                className="btn btn-outline-light btn-sm w-100 mb-2"
                 onClick={handleViewDetail}
               >
                 View Details
               </button>
             )}
-            {userOnly && (
+
+            {showBuyNow && (
               <button
                 className="btn btn-warning btn-sm w-100"
                 style={{ fontWeight: "bold", color: "#000" }}
-                onClick={() => console.log("navigate to application")}
               >
                 Buy Now
               </button>

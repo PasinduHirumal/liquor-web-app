@@ -204,9 +204,9 @@ const SearchModal = ({ open, onClose }) => {
                 {searchResults.map((product) => (
                   <React.Fragment key={product.id || product.product_id}>
                     {product.is_liquor ? (
-                      <LiquorProductCard product={product} userOnly={true} />
+                      <LiquorProductCard product={product} />
                     ) : (
-                      <OtherProductCard product={product} userOnly={true} />
+                      <OtherProductCard product={product} />
                     )}
                   </React.Fragment>
                 ))}

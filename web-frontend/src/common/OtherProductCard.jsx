@@ -1,8 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import RatingStars from "./RatingStars";
+import useAdminAuthStore from "../stores/adminAuthStore";
 
-const OtherProductCard = ({ product, adminOnly = false, userOnly = true }) => {
+const OtherProductCard = ({ product, adminOnly = false }) => {
+
+    const adminAuth = useAdminAuthStore((state) => state.isAuthenticated);
+    const showBuyNow = !adminOnly && !adminAuth;
+
     const combinedImages = React.useMemo(() => {
         const imgs = product.images ? [...product.images] : [];
         if (product.main_image && !imgs.includes(product.main_image)) {
@@ -236,7 +241,7 @@ const OtherProductCard = ({ product, adminOnly = false, userOnly = true }) => {
                                 View Details
                             </button>
                         )}
-                        {userOnly && (
+                        {showBuyNow && (
                             <button
                                 className="btn btn-warning btn-sm w-100"
                                 style={{ fontWeight: "bold", color: "#000" }}
