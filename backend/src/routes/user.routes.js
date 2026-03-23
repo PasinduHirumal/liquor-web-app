@@ -12,7 +12,7 @@ const super_admin = ADMIN_ROLES.SUPER_ADMIN;
 // http://localhost:5000/api/users
 
 router.get('/getUserById/:id', authenticateUser, getUserById);
-router.get('/getAll', authenticateUser, authorizeRoles(super_admin), getAllUsers)
+router.get('/getAll', authenticateUser, authorizeRoles(super_admin), getAllUsers);
 router.patch('/update/:id', authenticateUser, authorizeRoles(super_admin), validateUserUpdate, updateUser);
 router.delete('/delete/:id', authenticateUser, authorizeRoles(super_admin), deleteUser);
 

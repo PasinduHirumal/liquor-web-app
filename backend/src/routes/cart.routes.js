@@ -16,7 +16,7 @@ const super_admin = ADMIN_ROLES.SUPER_ADMIN;
 router.get('/check/is-in-cart/product/:product_id', authenticateUser, authorizeRoles(user), isInCart);
 
 router.get('/my', authenticateUser, authorizeRoles(user), getMyCart);
-router.get('/checkout/address/:address_id', authenticateUser, authorizeRoles(user), checkoutCart);
+router.get('/checkout/order/address/:address_id', authenticateUser, authorizeRoles(user), checkoutCart);
 
 router.post('/add/product/:product_id', authenticateUser, authorizeRoles(user), addToCart);
 router.patch('/change/quantity/:cart_item_id', validateCartQuantityUpdate, authenticateUser, authorizeRoles(user), changeQuantity);
