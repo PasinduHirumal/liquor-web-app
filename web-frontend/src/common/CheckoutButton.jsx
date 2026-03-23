@@ -26,7 +26,6 @@ export default function CheckoutButton({ addressId, disabled }) {
             if (res.data.success) {
                 toast.success("Proceeding to checkout!");
                 
-                // Navigate to checkout summary with order data
                 navigate("/checkout/summary", {
                     state: {
                         orderData: res.data.data,
@@ -40,7 +39,6 @@ export default function CheckoutButton({ addressId, disabled }) {
         } catch (error) {
             console.error("Checkout error:", error);
             
-            // Handle specific error cases
             if (error.response?.status === 404) {
                 toast.error("Cart is empty or address not found");
             } else if (error.response?.status === 400) {
