@@ -17,7 +17,7 @@ const register = async (req, res) => {
 
         if (profilePicUrl !== undefined) {
             try {
-                const imageUrls = await uploadSingleImage(profilePicUrl, 'products');
+                const imageUrls = await uploadSingleImage(profilePicUrl, 'profile_pics');
                 req.body.profilePicUrl = imageUrls;
                 console.log('✅ Images uploaded successfully:', imageUrls);
             } catch (uploadError) {
