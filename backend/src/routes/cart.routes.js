@@ -13,13 +13,13 @@ const super_admin = ADMIN_ROLES.SUPER_ADMIN;
 
 // http://localhost:5000/api/cart
 
-router.get('/check/is-in-cart/product/:product_id', authenticateUser, authorizeRoles(user), isInCart);
+router.get('/check/is-in-cart/product/:product_id', authenticateUser, authorizeRoles(user), isInCart); // done in frontend
 
-router.get('/my', authenticateUser, authorizeRoles(user), getMyCart);
+router.get('/my', authenticateUser, authorizeRoles(user), getMyCart); // done in frontend
 router.get('/checkout/order/address/:address_id', authenticateUser, authorizeRoles(user), checkoutCart);
 
-router.post('/add/product/:product_id', authenticateUser, authorizeRoles(user), addToCart);
-router.patch('/change/quantity/:cart_item_id', validateCartQuantityUpdate, authenticateUser, authorizeRoles(user), changeQuantity);
-router.delete('/remove/:cart_item_id', authenticateUser, authorizeRoles(user), removeFromCart);
+router.post('/add/product/:product_id', authenticateUser, authorizeRoles(user), addToCart); // done in frontend
+router.patch('/change/quantity/:cart_item_id', validateCartQuantityUpdate, authenticateUser, authorizeRoles(user), changeQuantity); // done in frontend
+router.delete('/remove/:cart_item_id', authenticateUser, authorizeRoles(user), removeFromCart); // done in frontend
 
 export default router;
