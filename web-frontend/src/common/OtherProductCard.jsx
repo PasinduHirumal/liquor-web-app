@@ -1,46 +1,43 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RatingStars from "./RatingStars";
 import useAdminAuthStore from "../stores/adminAuthStore";
 import CartButton from "./CartButton";
 
-const OtherProductCard = ({ product, adminOnly = false }) => {
+const formatPrice = (value) => `Rs: ${Number(value || 0).toFixed(2)}`;
 
+const OtherProductCard = ({ product, adminOnly = false }) => {
+    const navigate = useNavigate();
     const adminAuth = useAdminAuthStore((state) => state.isAuthenticated);
     const showBuyNow = !adminOnly && !adminAuth;
 
-    const combinedImages = React.useMemo(() => {
-        const imgs = product.images ? [...product.images] : [];
-        if (product.main_image && !imgs.includes(product.main_image)) {
-            imgs.unshift(product.main_image);
-        }
-        return imgs;
-    }, [product.images, product.main_image]);
+    const productId = product.product_id || product.id;
 
-    const [activeImage, setActiveImage] = useState(null);
-    const navigate = useNavigate();
+    const combinedImages = useMemo(() => {
+        const imgs = [
+            ...(product.main_image ? [product.main_image] : []),
+            ...(product.images || []),
+        ];
+        return imgs.filter((img, index, arr) => img && arr.indexOf(img) === index);
+    }, [product.main_image, product.images]);
+
+    const [activeImage, setActiveImage] = useState(combinedImages[0] || "");
 
     useEffect(() => {
-        if (product.main_image) {
-            setActiveImage(product.main_image);
-        } else if (combinedImages.length > 0) {
-            setActiveImage(combinedImages[0]);
-        } else {
-            setActiveImage(null);
-        }
-    }, [product.main_image, combinedImages]);
+        setActiveImage(combinedImages[0] || "");
+    }, [combinedImages]);
 
     const handleViewDetail = () => {
-        navigate(`/other-products/${product.product_id}`);
+        navigate(`/other-products/${productId}`);
     };
 
-    const displayPrice =
-        product.discount_percentage > 0
-            ? product.selling_price
-            : product.marked_price;
+    const hasDiscount = Number(product.discount_percentage) > 0;
+    const sellingPrice = Number(product.selling_price || 0);
+    const markedPrice = Number(product.marked_price || product.price || 0);
+    const displayPrice = hasDiscount ? sellingPrice : markedPrice;
 
     return (
-        <div className="col-12 col-sm-6 col-md-4 col-lg-2 mb-4">
+        <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
             <div
                 className="card h-100 shadow-sm border-secondary"
                 style={{
@@ -52,7 +49,6 @@ const OtherProductCard = ({ product, adminOnly = false }) => {
                 onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(1.02)")}
                 onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
             >
-
                 {adminOnly && (
                     <div
                         className="header d-flex justify-content-between align-items-center px-2 py-1"
@@ -64,22 +60,23 @@ const OtherProductCard = ({ product, adminOnly = false }) => {
                             color: "#fff",
                         }}
                     >
-                        <span>
-                            {product.isProfit ? (
-                                <span style={{ color: "#22c55e" }}>Profit</span>
-                            ) : (
-                                <span style={{ color: "#ef4444" }}>No Profit</span>
-                            )}
+                        <span style={{ color: product.isProfit ? "#22c55e" : "#ef4444" }}>
+                            {product.isProfit ? "Profit" : "No Profit"}
                         </span>
+
                         <span>
                             Profit Value:{" "}
                             <span style={{ color: "#ffb703" }}>
-                                Rs: {Number(product.profit_value || 0).toFixed(2)}
+                                {formatPrice(product.profit_value)}
                             </span>
                         </span>
                     </div>
                 )}
-                <div style={{ position: "relative" }}>
+
+                <div
+                    style={{ position: "relative", cursor: "pointer" }}
+                    onClick={handleViewDetail}
+                >
                     {activeImage ? (
                         <img
                             src={activeImage}
@@ -129,7 +126,7 @@ const OtherProductCard = ({ product, adminOnly = false }) => {
                     <div className="d-flex justify-content-center gap-1 py-2 px-1 flex-wrap">
                         {combinedImages.map((img, idx) => (
                             <img
-                                key={idx}
+                                key={img || idx}
                                 src={img}
                                 alt={`Thumbnail ${idx + 1}`}
                                 onClick={() => setActiveImage(img)}
@@ -150,11 +147,16 @@ const OtherProductCard = ({ product, adminOnly = false }) => {
                 )}
 
                 <div className="card-body d-flex flex-column">
-                    <h6 className="card-title text-truncate mb-1" style={{ color: "#fff" }}>
+                    <h6
+                        className="card-title text-truncate mb-1"
+                        style={{ color: "#fff", cursor: "pointer" }}
+                        onClick={handleViewDetail}
+                        title={product.name}
+                    >
                         {product.name}
                     </h6>
 
-                    <RatingStars productId={product.product_id || product.id} />
+                    <RatingStars productId={productId} />
 
                     <p className="card-text mb-1">
                         <small style={{ color: "#9ca3af" }}>
@@ -163,17 +165,17 @@ const OtherProductCard = ({ product, adminOnly = false }) => {
                     </p>
 
                     <div className="mb-1">
-                        {product.discount_percentage > 0 ? (
+                        {hasDiscount ? (
                             <>
                                 <span style={{ color: "#ef4444", fontWeight: "bold" }}>
-                                    Rs: {displayPrice.toFixed(2)}
+                                    {formatPrice(sellingPrice)}
                                 </span>
                                 <br />
                                 <span
                                     className="text-decoration-line-through"
                                     style={{ color: "#6b7280", fontSize: "0.85rem" }}
                                 >
-                                    Rs: {product.marked_price.toFixed(2)}
+                                    {formatPrice(markedPrice)}
                                 </span>
                                 <span
                                     className="ms-2"
@@ -185,12 +187,12 @@ const OtherProductCard = ({ product, adminOnly = false }) => {
                                         fontSize: "0.75rem",
                                     }}
                                 >
-                                    {product.discount_percentage}% OFF
+                                    {Number(product.discount_percentage)}% OFF
                                 </span>
                             </>
                         ) : (
                             <span style={{ fontWeight: "bold", color: "#fff" }}>
-                                Rs: {displayPrice.toFixed(2)}
+                                {formatPrice(displayPrice)}
                             </span>
                         )}
                     </div>
@@ -198,15 +200,15 @@ const OtherProductCard = ({ product, adminOnly = false }) => {
                     <div className="d-flex justify-content-between align-items-center mb-2">
                         <small
                             style={{
-                                color:
-                                    product.stock_quantity > 0 ? "#22c55e" : "#ef4444",
+                                color: Number(product.stock_quantity) > 0 ? "#22c55e" : "#ef4444",
                                 fontWeight: "bold",
                             }}
                         >
-                            {product.stock_quantity > 0
+                            {Number(product.stock_quantity) > 0
                                 ? `${product.stock_quantity} in stock`
                                 : "Out of stock"}
                         </small>
+
                         <small style={{ color: "#9ca3af" }}>
                             {product.weight ? `${product.weight}g` : ""}
                         </small>
@@ -215,17 +217,18 @@ const OtherProductCard = ({ product, adminOnly = false }) => {
                     {adminOnly && (
                         <div className="mb-2">
                             <span
-                                className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"}`}
+                                className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"
+                                    }`}
                             >
                                 {product.is_active ? "Active" : "Inactive"}
                             </span>
+
                             {product.is_liquor && (
                                 <span className="badge bg-danger me-1">Liquor</span>
                             )}
+
                             <span
-                                className={`badge ${product.is_in_stock
-                                    ? "bg-primary"
-                                    : "bg-warning text-dark"
+                                className={`badge ${product.is_in_stock ? "bg-primary" : "bg-warning text-dark"
                                     }`}
                             >
                                 {product.is_in_stock ? "Available" : "Unavailable"}
@@ -233,18 +236,23 @@ const OtherProductCard = ({ product, adminOnly = false }) => {
                         </div>
                     )}
 
-                    <div className="card-footer mt-auto text-center" style={{ background: "transparent", borderTop: "1px solid #1c1f2b" }}>
-                        {adminOnly && (
+                    <div
+                        className="card-footer mt-auto text-center"
+                        style={{ background: "transparent", borderTop: "1px solid #1c1f2b" }}
+                    >
+                        {adminOnly ? (
                             <button
                                 className="btn btn-outline-light btn-sm w-100"
                                 onClick={handleViewDetail}
                             >
                                 View Details
                             </button>
-                        )}
-                        {showBuyNow && (
-                            <CartButton productId={product.product_id || product.id} />
-                        )}
+                        ) : showBuyNow ? (
+                            <CartButton
+                                productId={productId}
+                                disabled={!product.is_active || !product.is_in_stock}
+                            />
+                        ) : null}
                     </div>
                 </div>
             </div>
