@@ -1,11 +1,14 @@
 import React from "react";
 import { Modal, Button, Form, Row, Col } from "react-bootstrap";
+import { FaMapMarkerAlt } from "react-icons/fa";
 
 const AddressFormModal = ({
     show,
     handleClose,
     handleSubmit,
     handleInputChange,
+    handleLatitudeChange,
+    handleLongitudeChange,
     formData,
     editingId,
     submitLoading,
@@ -33,6 +36,9 @@ const AddressFormModal = ({
                                     onChange={handleInputChange}
                                     placeholder="John Doe"
                                 />
+                                <Form.Text className="text-muted">
+                                    Optional - Name of recipient
+                                </Form.Text>
                             </Form.Group>
                         </Col>
 
@@ -41,19 +47,22 @@ const AddressFormModal = ({
                             <Form.Group>
                                 <Form.Label>Phone Number</Form.Label>
                                 <Form.Control
-                                    type="text"
+                                    type="tel"
                                     name="phoneNumber"
                                     value={formData.phoneNumber || ""}
                                     onChange={handleInputChange}
                                     placeholder="+947XXXXXXXX"
                                 />
+                                <Form.Text className="text-muted">
+                                    International format starting with +
+                                </Form.Text>
                             </Form.Group>
                         </Col>
 
                         {/* STREET ADDRESS (REQUIRED) */}
                         <Col xs={12}>
                             <Form.Group>
-                                <Form.Label>Street Address</Form.Label>
+                                <Form.Label>Street Address *</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="streetAddress"
@@ -93,10 +102,10 @@ const AddressFormModal = ({
                             </Form.Group>
                         </Col>
 
-                        {/* CITY */}
+                        {/* CITY (REQUIRED) */}
                         <Col md={6}>
                             <Form.Group>
-                                <Form.Label>City</Form.Label>
+                                <Form.Label>City *</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="city"
@@ -107,10 +116,10 @@ const AddressFormModal = ({
                             </Form.Group>
                         </Col>
 
-                        {/* STATE */}
+                        {/* STATE (REQUIRED) */}
                         <Col md={6}>
                             <Form.Group>
-                                <Form.Label>State / Province</Form.Label>
+                                <Form.Label>State / Province *</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="state"
@@ -121,24 +130,26 @@ const AddressFormModal = ({
                             </Form.Group>
                         </Col>
 
-                        {/* POSTAL */}
+                        {/* POSTAL CODE (REQUIRED) */}
                         <Col md={6}>
                             <Form.Group>
-                                <Form.Label>Postal Code</Form.Label>
+                                <Form.Label>Postal Code *</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="postalCode"
                                     value={formData.postalCode}
                                     onChange={handleInputChange}
                                     required
+                                    pattern="[A-Za-z0-9\s\-]{3,10}"
+                                    title="Postal code must be 3-10 characters long and can contain letters, numbers, spaces, and hyphens"
                                 />
                             </Form.Group>
                         </Col>
 
-                        {/* COUNTRY */}
+                        {/* COUNTRY (REQUIRED) */}
                         <Col md={6}>
                             <Form.Group>
-                                <Form.Label>Country</Form.Label>
+                                <Form.Label>Country *</Form.Label>
                                 <Form.Control
                                     type="text"
                                     name="country"
@@ -146,6 +157,52 @@ const AddressFormModal = ({
                                     onChange={handleInputChange}
                                     required
                                 />
+                            </Form.Group>
+                        </Col>
+
+                        {/* LATITUDE & LONGITUDE */}
+                        <Col xs={12}>
+                            <hr className="my-2" />
+                            <div className="d-flex align-items-center mb-2">
+                                <FaMapMarkerAlt className="text-primary me-2" />
+                                <h6 className="mb-0">Geolocation (Optional)</h6>
+                            </div>
+                            <Form.Text className="text-muted mb-2 d-block">
+                                Add precise location coordinates for better delivery accuracy
+                            </Form.Text>
+                        </Col>
+
+                        <Col md={6}>
+                            <Form.Group>
+                                <Form.Label>Latitude</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    step="any"
+                                    name="latitude"
+                                    value={formData.latitude !== null && formData.latitude !== "" ? formData.latitude : ""}
+                                    onChange={handleLatitudeChange}
+                                    placeholder="-90 to 90"
+                                />
+                                <Form.Text className="text-muted">
+                                    Range: -90 to 90 (e.g., 40.7128)
+                                </Form.Text>
+                            </Form.Group>
+                        </Col>
+
+                        <Col md={6}>
+                            <Form.Group>
+                                <Form.Label>Longitude</Form.Label>
+                                <Form.Control
+                                    type="number"
+                                    step="any"
+                                    name="longitude"
+                                    value={formData.longitude !== null && formData.longitude !== "" ? formData.longitude : ""}
+                                    onChange={handleLongitudeChange}
+                                    placeholder="-180 to 180"
+                                />
+                                <Form.Text className="text-muted">
+                                    Range: -180 to 180 (e.g., -74.0060)
+                                </Form.Text>
                             </Form.Group>
                         </Col>
 
@@ -164,12 +221,23 @@ const AddressFormModal = ({
                             </Form.Group>
                         </Col>
 
-                        {/* ACTIVE */}
+                        {/* IS DEFAULT */}
+                        <Col xs={12}>
+                            <Form.Check
+                                type="checkbox"
+                                name="isDefault"
+                                checked={formData.isDefault || false}
+                                onChange={handleInputChange}
+                                label="Set as default shipping address"
+                            />
+                        </Col>
+
+                        {/* IS ACTIVE */}
                         <Col xs={12}>
                             <Form.Check
                                 type="checkbox"
                                 name="isActive"
-                                checked={formData.isActive}
+                                checked={formData.isActive !== undefined ? formData.isActive : true}
                                 onChange={handleInputChange}
                                 label="Set as active shipping address"
                             />
