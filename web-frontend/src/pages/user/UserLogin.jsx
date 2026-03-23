@@ -1,84 +1,94 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import useUserAuthStore from "../../stores/userAuthStore";
+
+const initialForm = {
+    email: "",
+    phoneNumber: "",
+    password: "",
+};
 
 const UserLogin = () => {
     const navigate = useNavigate();
 
     const [showPassword, setShowPassword] = useState(false);
     const [loginMethod, setLoginMethod] = useState("email");
-    const [formData, setFormData] = useState({
-        email: "",
-        phone: "",
-        password: "",
-    });
+    const [formData, setFormData] = useState(initialForm);
 
     const login = useUserAuthStore((state) => state.login);
     const loading = useUserAuthStore((state) => state.loading);
     const isAuthenticated = useUserAuthStore((state) => state.isAuthenticated);
     const resetError = useUserAuthStore((state) => state.resetError);
     const checkAuth = useUserAuthStore((state) => state.checkAuth);
+    const error = useUserAuthStore((state) => state.error);
 
     useEffect(() => {
         checkAuth();
     }, [checkAuth]);
 
     useEffect(() => {
-        if (isAuthenticated) {
-            navigate("/");
-        }
+        if (isAuthenticated) navigate("/");
     }, [isAuthenticated, navigate]);
 
     useEffect(() => {
-        setFormData({ email: "", phone: "", password: "" });
+        setFormData(initialForm);
         setShowPassword(false);
         resetError();
-    }, [loginMethod]);
+    }, [loginMethod, resetError]);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        setFormData((prev) => ({ ...prev, [name]: value }));
         resetError();
+    };
+
+    const setStoreError = (message) => {
+        useUserAuthStore.setState({ error: message });
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        resetError();
 
-        const credential = loginMethod === "email" ? formData.email.trim() : formData.phone.trim();
+        const email = formData.email.trim().toLowerCase();
+        const phoneNumber = formData.phoneNumber.trim();
+        const password = formData.password;
+
+        const credential = loginMethod === "email" ? email : phoneNumber;
         const credentialLabel = loginMethod === "email" ? "Email" : "Phone number";
 
         if (!credential) {
-            useUserAuthStore.setState({ error: `${credentialLabel} is required.` });
+            setStoreError(`${credentialLabel} is required.`);
             return;
         }
 
-        if (!formData.password) {
-            useUserAuthStore.setState({ error: "Password is required." });
+        if (!password.trim()) {
+            setStoreError("Password is required.");
             return;
         }
 
-        // Email format check
         if (loginMethod === "email") {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(credential)) {
-                useUserAuthStore.setState({ error: "Invalid email format." });
+            if (!emailRegex.test(email)) {
+                setStoreError("Invalid email format.");
                 return;
             }
         }
 
-        // Phone format check
         if (loginMethod === "phone") {
-            const phoneRegex = /^\+?\d{7,15}$/;
-            if (!phoneRegex.test(credential)) {
-                useUserAuthStore.setState({ error: "Invalid phone number format." });
+            const phoneRegex = /^\+\d{1,3}\d{4,14}$/;
+            if (!phoneRegex.test(phoneNumber)) {
+                setStoreError("Phone number must include country code, e.g. +94771234567.");
                 return;
             }
         }
 
         const payload = {
-            password: formData.password,
-            ...(loginMethod === "email" ? { email: credential } : { phone: credential }),
+            password,
+            ...(loginMethod === "email"
+                ? { email }
+                : { phoneNumber }),
         };
 
         await login(payload);
@@ -88,7 +98,6 @@ const UserLogin = () => {
         <div className="card p-4 shadow login-card">
             <h3 className="mb-4 text-center text-primary">👤 User Login</h3>
 
-            {/* Method Switch */}
             <div className="d-flex justify-content-center mb-3">
                 <div className="btn-group gap-1" role="group" aria-label="Login Method Switch">
                     <button
@@ -108,11 +117,12 @@ const UserLogin = () => {
                 </div>
             </div>
 
-            {/* Form */}
             <form onSubmit={handleSubmit} noValidate>
                 {loginMethod === "email" ? (
                     <div className="mb-3">
-                        <label className="form-label">Email <span className="text-danger">*</span></label>
+                        <label className="form-label">
+                            Email <span className="text-danger">*</span>
+                        </label>
                         <input
                             type="email"
                             name="email"
@@ -126,16 +136,18 @@ const UserLogin = () => {
                     </div>
                 ) : (
                     <div className="mb-3">
-                        <label className="form-label">Phone <span className="text-danger">*</span></label>
+                        <label className="form-label">
+                            Phone <span className="text-danger">*</span>
+                        </label>
                         <input
                             type="tel"
-                            name="phone"
+                            name="phoneNumber"
                             className="form-control"
-                            value={formData.phone}
+                            value={formData.phoneNumber}
                             onChange={handleChange}
-                            placeholder="+947XXXXXXXX"
+                            placeholder="+94771234567"
                             autoComplete="tel"
-                            pattern="^\+?\d{7,15}$"
+                            pattern="^\+\d{1,3}\d{4,14}$"
                             title="Phone number must include country code"
                             autoFocus
                         />
@@ -143,7 +155,9 @@ const UserLogin = () => {
                 )}
 
                 <div className="mb-3">
-                    <label className="form-label">Password <span className="text-danger">*</span></label>
+                    <label className="form-label">
+                        Password <span className="text-danger">*</span>
+                    </label>
                     <div className="input-group">
                         <input
                             type={showPassword ? "text" : "password"}
@@ -152,21 +166,21 @@ const UserLogin = () => {
                             className="form-control"
                             value={formData.password}
                             onChange={handleChange}
-                            required
                             autoComplete="current-password"
+                            required
                         />
                         <button
                             type="button"
                             className="btn border"
-                            onClick={() => setShowPassword(!showPassword)}
+                            onClick={() => setShowPassword((prev) => !prev)}
                             tabIndex={-1}
+                            title={showPassword ? "Hide password" : "Show password"}
                         >
                             {showPassword ? <FaEyeSlash /> : <FaEye />}
                         </button>
                     </div>
                 </div>
 
-                {/* Error Alert with Forgot Password */}
                 <div className="mt-2 mb-4 d-flex justify-content-between align-items-center">
                     <span className="text-secondary">Forgot password?</span>
                     <button
@@ -190,6 +204,7 @@ const UserLogin = () => {
             <div className="text-center mt-4">
                 Don't have an account?{" "}
                 <button
+                    type="button"
                     className="btn btn-link p-0 text-decoration-none"
                     onClick={() => navigate("/register")}
                 >
