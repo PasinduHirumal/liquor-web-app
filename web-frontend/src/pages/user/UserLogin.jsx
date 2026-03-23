@@ -166,6 +166,18 @@ const UserLogin = () => {
                     </div>
                 </div>
 
+                {/* Error Alert with Forgot Password */}
+                <div className="mt-2 mb-4 d-flex justify-content-between align-items-center">
+                    <span className="text-secondary">Forgot password?</span>
+                    <button
+                        type="button"
+                        className="btn btn-link p-0 text-decoration-none ms-2"
+                        onClick={() => navigate("/reset-password")}
+                    >
+                        Click here
+                    </button>
+                </div>
+
                 <button
                     type="submit"
                     className="btn btn-primary w-100"
