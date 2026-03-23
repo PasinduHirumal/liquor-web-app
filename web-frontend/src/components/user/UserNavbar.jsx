@@ -75,7 +75,7 @@ export default function UserNavbar() {
       { label: "Grocery Items", to: "/other-product-all" },
       { label: "Address", to: "/address" },
       { label: "Cart", to: "/cart" },
-      ...(profileId ? [{ label: "Profile", to: `/profile/${profileId}` }] : []),
+      ...(profileId ? [{ label: "Profile", to: `/user/profile/${profileId}` }] : []),
     ],
     [profileId]
   );

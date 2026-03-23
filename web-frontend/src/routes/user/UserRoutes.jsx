@@ -51,7 +51,7 @@ export const userRoutes = [
         ),
     },
     {
-        path: "/profile/:profileId",
+        path: "/user/profile/:profileId",
         element: (
             <UserProtectedRoute>
                 <UserProfile />
