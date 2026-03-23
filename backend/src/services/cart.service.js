@@ -159,14 +159,26 @@ class CartService extends BaseService {
 
     // helper methods
     async isItemInCart(userId, productId) {
-        const items = await this.findByFilter(userId, 'product_id', '==', productId);
+        try {
+            const items = await this.findByFilter(userId, 'product_id', '==', productId);
         
-        let is_item_in_cart = false;
-        if (items.length > 0) {
-            is_item_in_cart = true;
-        }
+            let is_item_in_cart = false;
+            if (items.length > 0) {
+                is_item_in_cart = true;
+            }
 
-        return is_item_in_cart;
+            return is_item_in_cart;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    async validateCartItems(cartItems) {
+        
+    }
+
+    async checkoutCart(userId, service_charge, tax_amount, delivery_fee) {
+
     }
 };
 

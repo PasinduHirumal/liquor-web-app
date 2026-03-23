@@ -1,5 +1,6 @@
 import BaseService from "./BaseService.js";
 import CompanyDetails from "../models/CompanyDetails.js";
+import { getDistanceMatrix } from "../utils/googleMaps.js";
 
 
 class CompanyService extends BaseService {
@@ -59,6 +60,53 @@ class CompanyService extends BaseService {
         }
     }
 
+
+    // helper methods
+    async getNearestWarehouse(address) {
+        try {
+            const { latitude, longitude } = address;
+
+            const warehouses = await this.findByFilter('isActive', '==', true);
+
+            if (!warehouses || warehouses.length === 0) {
+                throw new Error('No active warehouses found');
+            }
+
+            const origins = warehouses.map(w => w.where_house_location);  // [{ lat, lng }, ...]
+            const destination = `${latitude},${longitude}`;
+
+            const data = await getDistanceMatrix(origins, destination);
+
+            const warehouseDistances = warehouses.map((warehouse, index) => {
+                const element = data.rows[index].elements[0];
+
+                if (element.status !== 'OK') {
+                    return { warehouse, distanceMeters: Infinity, distanceText: 'N/A', durationText: 'N/A' };
+                }
+
+                return {
+                    warehouse,
+                    distanceMeters: element.distance.value,
+                    distanceText: element.distance.text,
+                    durationText: element.duration.text,
+                };
+            });
+
+            warehouseDistances.sort((a, b) => a.distanceMeters - b.distanceMeters);
+
+            const nearest = warehouseDistances[0];
+
+            return {
+                warehouse: nearest.warehouse,
+                distanceText: nearest.distanceText,
+                durationText: nearest.durationText,
+                distanceMeters: nearest.distanceMeters,
+            };
+
+        } catch (error) {
+            throw error;
+        }
+    }
 }
 
 export default CompanyService;

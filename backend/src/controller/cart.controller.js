@@ -1,8 +1,12 @@
+import AddressService from "../services/address.service.js";
 import CartService from "../services/cart.service.js";
+import CompanyService from "../services/company.service.js";
 import ProductService from "../services/product.service.js";
 
 const cartService = new CartService();
 const productService = new ProductService();
+const addressService = new AddressService();
+const warehouseService = new CompanyService();
 
 export const isInCart = async (req, res) => {
     try {
@@ -168,6 +172,32 @@ export const changeQuantity = async (req, res) => {
         })
     } catch (error) {
         console.error("Change item quantity in cart error:", error.message);
+        return res.status(500).json({ success: false, message: "Server Error" });
+    }
+}
+
+export const checkoutCart = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const addressId = req.params.address_id;
+
+        // get address
+        const address = await addressService.findById(userId, addressId);
+        if (!address) {
+            return res.status(404).json({
+                success: false,
+                message: "Address not found"
+            })
+        }
+
+        // get cart items
+        const cartItems = await cartService.findAllByUserId(userId);
+
+        // validate products
+
+        const warehouse = await warehouseService.getNearestWarehouse(address);
+    } catch (error) {
+        console.error("Checkout cart error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });
     }
 }

@@ -94,9 +94,12 @@ const sendResetOtp = async (req, res) => {
     try {
         const { email } = req.body;
 
-        const user = email !== undefined
-            ? await adminService.findByEmail(email)
-            : await userService.findByEmail(email);
+        let tempUser = await adminService.findByEmail(email);
+        if (!tempUser) {
+            tempUser = await userService.findByEmail(email);
+        }
+
+        const user = tempUser;
 
         if (!user) {
             return res.status(404).json({success: false, message: "User not found"});
@@ -155,9 +158,12 @@ const resetPassword = async (req, res) => {
     try {
         const { email, otp, newPassword } = req.body;
 
-        const user = email !== undefined
-            ? await adminService.findByEmail(email)
-            : await userService.findByEmail(email);
+        let tempUser = await adminService.findByEmail(email);
+        if (!tempUser) {
+            tempUser = await userService.findByEmail(email);
+        }
+
+        const user = tempUser;
 
         if(!user) {
             return res.status(404).json({success: false, message: "User not available"});
