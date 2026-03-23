@@ -41,7 +41,7 @@ class UserService extends BaseService {
 
     async findByPhone(phone) {
         try {
-            const docs = await this.findByFilter('phone', '==', phone);
+            const docs = await this.findByFilter('phoneNumber', '==', phone);
             
             if (docs.length === 0){
                 return null;
