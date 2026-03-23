@@ -1,9 +1,10 @@
 import express from 'express';
 import ADMIN_ROLES from '../enums/adminRoles.js';
 import { authenticateUser, authorizeRoles } from '../middleware/authMiddleware.js';
-import { validateOrderAssignedDriverUpdate, validateOrderStatusUpdate } from '../validations/OrdersValidator.js';
+import { validateOrder, validateOrderAssignedDriverUpdate, validateOrderStatusUpdate } from '../validations/OrdersValidator.js';
 import { assignDriverForOrderById, getAllOrders, getOrderById, updateOrderStatusById } from '../controller/orders.controller.js';
 import USER_ROLES from '../enums/userRoles.js';
+import { createOrder } from '../controller/order.controller.js';
 
 const router = express.Router();
 
@@ -19,5 +20,5 @@ router.patch('/update-status/:id', authenticateUser, authorizeRoles(admin, super
 router.patch('/update-assigned_driver/:id', authenticateUser, authorizeRoles(admin, super_admin), validateOrderAssignedDriverUpdate, assignDriverForOrderById);
 
 // user part
-//router.post('/create', authenticateUser, authorizeRoles(user), )
+router.post('/create', authenticateUser, authorizeRoles(user), validateOrder, createOrder);
 export default router;
