@@ -2,11 +2,13 @@ import AddressService from "../services/address.service.js";
 import CartService from "../services/cart.service.js";
 import CompanyService from "../services/company.service.js";
 import ProductService from "../services/product.service.js";
+import SuperMarketService from "../services/superMarket.service.js";
 
 const cartService = new CartService();
 const productService = new ProductService();
 const addressService = new AddressService();
 const warehouseService = new CompanyService();
+const superMarketService = new SuperMarketService();
 
 export const isInCart = async (req, res) => {
     try {
@@ -187,15 +189,44 @@ export const checkoutCart = async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: "Address not found"
-            })
+            });
         }
 
         // get cart items
         const cartItems = await cartService.findAllByUserId(userId);
 
         // validate products
+        const result = await productService.validateCartItems(cartItems);
+        if (!result.isValid) {
+            return res.status(404).json({
+                success: false,
+                message: result.errors || result.updatedItems
+            });
+        }
 
+        // get nearest warehouse
         const warehouse = await warehouseService.getNearestWarehouse(address);
+        if (warehouse.distanceMeters === Infinity) {
+            return res.status(400).json({
+                success: false,
+                message: "Cannot calculate distance"
+            });
+        }
+
+        // get supermarket locations
+        const supermarketLocations = await superMarketService.getSupermarketLocations(cartItems);
+
+        // calculate total distance
+        const distance = await cartService.calculateTotalDistance(warehouse, supermarketLocations, address);
+
+        // checkout cart
+        const details = await cartService.checkoutCart(cartItems, warehouse, distance);
+
+        return res.status(200).json({
+            success: true,
+            message: "checkout successful",
+            data: details
+        })
     } catch (error) {
         console.error("Checkout cart error:", error.message);
         return res.status(500).json({ success: false, message: "Server Error" });

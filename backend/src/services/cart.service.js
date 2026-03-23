@@ -1,6 +1,7 @@
 import initializeFirebase from "../config/firebase.config.js";
 import BaseService from "./BaseService.js";
 import Cart from "../models/Cart.js";
+import { getRouteDistance } from "../utils/googleMaps.js";
 
 const { db } = initializeFirebase();
 
@@ -173,12 +174,63 @@ class CartService extends BaseService {
         }
     }
 
-    async validateCartItems(cartItems) {
-        
+    async calculateTotalDistance(warehouse, supermarketLocations, address) {
+        try {
+            const route = await getRouteDistance(warehouse, supermarketLocations, address);
+            return route;
+        } catch (error) {
+            throw error;
+        }
     }
 
-    async checkoutCart(userId, service_charge, tax_amount, delivery_fee) {
+    async checkoutCart(cartItems, warehouse, distance) {
+        try {
+            // --- Finance calculations ---
+            const subtotal = cartItems.reduce((sum, item) => {
+                return sum + (item.selling_price * item.quantity);
+            }, 0);
 
+            const total_cost_price = cartItems.reduce((sum, item) => {
+                return sum + (item.cost_price * item.quantity);
+            }, 0);
+
+            const service_charge  = parseFloat(((subtotal * warehouse.service_charge) / 100).toFixed(2));
+            const tax_amount      = parseFloat(((subtotal * warehouse.tax_charge) / 100).toFixed(2));
+            const delivery_fee    = parseFloat((distance.totalDistanceKm * warehouse.delivery_charge_for_1KM).toFixed(2));
+            const total_amount    = parseFloat((subtotal + service_charge + tax_amount + delivery_fee).toFixed(2));
+
+            // --- Items snapshot ---
+            const items = cartItems.map(item => ({
+                cart_item_id:  item.cart_item_id,
+                product_id:    item.product_id,
+                productName:   item.productName,
+                productImage:  item.productImage,
+                quantity:      item.quantity,
+                unit_price:    item.selling_price,
+                total_price:   parseFloat((item.selling_price * item.quantity).toFixed(2)),
+            }));
+
+            return {
+                finance: {
+                    subtotal,
+                    service_charge,
+                    tax_amount,
+                    delivery_fee,
+                    total_amount,
+                    total_cost_price,
+                },
+                distance: {
+                    totalDistanceKm:  distance.totalDistanceKm,
+                    totalDurationText: distance.totalDurationText,
+                    legs:             distance.legs,
+                },
+                estimated_delivery: distance.totalDurationText,
+                items,
+            };
+
+        } catch (error) {
+            throw error;
+        }
     }
 };
 
