@@ -1,36 +1,42 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import RatingStars from "./RatingStars";
 import useAdminAuthStore from "../stores/adminAuthStore";
+import CartButton from "./CartButton";
+
+const formatPrice = (value) => `Rs: ${Number(value || 0).toFixed(2)}`;
 
 const LiquorProductCard = ({ product, adminOnly = false }) => {
   const navigate = useNavigate();
-
   const adminAuth = useAdminAuthStore((state) => state.isAuthenticated);
   const showBuyNow = !adminOnly && !adminAuth;
 
-  const combinedImages = [
-    ...(product.main_image ? [product.main_image] : []),
-    ...(product.images || []),
-  ].filter((value, index, self) => self.indexOf(value) === index);
+  const productId = product.product_id || product.id;
 
-  const [activeImage, setActiveImage] = useState(combinedImages?.[0]);
+  const combinedImages = useMemo(
+    () =>
+      [
+        ...(product.main_image ? [product.main_image] : []),
+        ...(product.images || []),
+      ].filter((value, index, self) => value && self.indexOf(value) === index),
+    [product.main_image, product.images]
+  );
+
+  const [activeImage, setActiveImage] = useState(combinedImages[0] || "");
 
   useEffect(() => {
-    setActiveImage(combinedImages?.[0]);
-  }, [product]);
+    setActiveImage(combinedImages[0] || "");
+  }, [combinedImages]);
 
-  const handleViewDetail = () => {
-    navigate(`/products/${product.product_id || product.id}`);
-  };
+  const handleViewDetail = () => navigate(`/products/${productId}`);
 
   const displayPrice =
-    product.discount_percentage > 0
-      ? product.selling_price
-      : product.marked_price || product.price;
+    Number(product.discount_percentage) > 0
+      ? Number(product.selling_price || 0)
+      : Number(product.marked_price || product.price || 0);
 
   return (
-    <div className="col-12 col-sm-6 col-md-4 col-lg-2 mb-4">
+    <div className="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 mb-4">
       <div
         className="card h-100 shadow-sm border-secondary"
         style={{
@@ -44,7 +50,7 @@ const LiquorProductCard = ({ product, adminOnly = false }) => {
       >
         {adminOnly && (
           <div
-            className="header d-flex justify-content-between align-items-center px-2 py-1"
+            className="d-flex justify-content-between align-items-center px-2 py-1"
             style={{
               backgroundColor: "#141722",
               borderBottom: "1px solid #1c1f2b",
@@ -53,23 +59,23 @@ const LiquorProductCard = ({ product, adminOnly = false }) => {
               color: "#fff",
             }}
           >
-            <span>
-              {product.isProfit ? (
-                <span style={{ color: "#22c55e" }}>Profit</span>
-              ) : (
-                <span style={{ color: "#ef4444" }}>No Profit</span>
-              )}
+            <span style={{ color: product.isProfit ? "#22c55e" : "#ef4444" }}>
+              {product.isProfit ? "Profit" : "No Profit"}
             </span>
+
             <span>
               Profit Value:{" "}
               <span style={{ color: "#ffb703" }}>
-                Rs: {Number(product.profit_value || 0).toFixed(2)}
+                {formatPrice(product.profit_value)}
               </span>
             </span>
           </div>
         )}
 
-        <div style={{ position: "relative" }}>
+        <div
+          style={{ position: "relative", cursor: "pointer" }}
+          onClick={handleViewDetail}
+        >
           {activeImage ? (
             <img
               src={activeImage}
@@ -100,7 +106,7 @@ const LiquorProductCard = ({ product, adminOnly = false }) => {
           <div className="d-flex justify-content-center gap-1 py-2 px-1 flex-wrap">
             {combinedImages.map((img, idx) => (
               <img
-                key={idx}
+                key={img || idx}
                 src={img}
                 alt={`Thumbnail ${idx + 1}`}
                 onClick={() => setActiveImage(img)}
@@ -121,11 +127,16 @@ const LiquorProductCard = ({ product, adminOnly = false }) => {
         )}
 
         <div className="card-body d-flex flex-column">
-          <h6 className="card-title text-truncate mb-1" style={{ color: "#fff" }}>
+          <h6
+            className="card-title text-truncate mb-1"
+            style={{ color: "#fff", cursor: "pointer" }}
+            onClick={handleViewDetail}
+            title={product.name}
+          >
             {product.name}
           </h6>
 
-          <RatingStars productId={product.product_id || product.id} />
+          <RatingStars productId={productId} />
 
           <p className="card-text mb-1">
             <small style={{ color: "#9ca3af" }}>
@@ -134,17 +145,17 @@ const LiquorProductCard = ({ product, adminOnly = false }) => {
           </p>
 
           <div className="mb-1">
-            {product.discount_percentage > 0 ? (
+            {Number(product.discount_percentage) > 0 ? (
               <>
                 <span style={{ color: "#ef4444", fontWeight: "bold" }}>
-                  Rs: {product.selling_price?.toFixed(2)}
-                </span>{" "}
+                  {formatPrice(product.selling_price)}
+                </span>
                 <br />
                 <span
                   className="text-decoration-line-through"
                   style={{ color: "#6b7280", fontSize: "0.85rem" }}
                 >
-                  Rs: {product.marked_price?.toFixed(2)}
+                  {formatPrice(product.marked_price)}
                 </span>
                 <span
                   className="ms-2"
@@ -156,12 +167,12 @@ const LiquorProductCard = ({ product, adminOnly = false }) => {
                     fontSize: "0.75rem",
                   }}
                 >
-                  {product.discount_percentage}% OFF
+                  {Number(product.discount_percentage)}% OFF
                 </span>
               </>
             ) : (
               <span style={{ fontWeight: "bold", color: "#fff" }}>
-                Rs: {displayPrice?.toFixed(2) || "0.00"}
+                {formatPrice(displayPrice)}
               </span>
             )}
           </div>
@@ -169,14 +180,15 @@ const LiquorProductCard = ({ product, adminOnly = false }) => {
           <div className="d-flex justify-content-between align-items-center mb-2">
             <small
               style={{
-                color: product.stock_quantity > 0 ? "#22c55e" : "#ef4444",
+                color: Number(product.stock_quantity) > 0 ? "#22c55e" : "#ef4444",
                 fontWeight: "bold",
               }}
             >
-              {product.stock_quantity > 0
+              {Number(product.stock_quantity) > 0
                 ? `${product.stock_quantity} in stock`
                 : "Out of stock"}
             </small>
+
             <small style={{ color: "#9ca3af" }}>
               {product.volume ? `${product.volume}ml` : ""}
             </small>
@@ -185,12 +197,15 @@ const LiquorProductCard = ({ product, adminOnly = false }) => {
           {adminOnly && (
             <div className="mb-2">
               <span
-                className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"}`}
+                className={`badge me-1 ${product.is_active ? "bg-success" : "bg-secondary"
+                  }`}
               >
                 {product.is_active ? "Active" : "Inactive"}
               </span>
+
               <span
-                className={`badge ${product.is_in_stock ? "bg-primary" : "bg-warning text-dark"}`}
+                className={`badge ${product.is_in_stock ? "bg-primary" : "bg-warning text-dark"
+                  }`}
               >
                 {product.is_in_stock ? "Available" : "Unavailable"}
               </span>
@@ -201,23 +216,19 @@ const LiquorProductCard = ({ product, adminOnly = false }) => {
             className="card-footer mt-auto text-center"
             style={{ background: "transparent", borderTop: "1px solid #1c1f2b" }}
           >
-            {adminOnly && (
+            {adminOnly ? (
               <button
-                className="btn btn-outline-light btn-sm w-100 mb-2"
+                className="btn btn-outline-light btn-sm w-100"
                 onClick={handleViewDetail}
               >
                 View Details
               </button>
-            )}
-
-            {showBuyNow && (
-              <button
-                className="btn btn-warning btn-sm w-100"
-                style={{ fontWeight: "bold", color: "#000" }}
-              >
-                Add to cart
-              </button>
-            )}
+            ) : showBuyNow ? (
+              <CartButton
+                productId={productId}
+                disabled={!product.is_active || !product.is_in_stock}
+              />
+            ) : null}
           </div>
         </div>
       </div>
