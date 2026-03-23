@@ -215,7 +215,7 @@ const LiquorProductCard = ({ product, adminOnly = false }) => {
                 className="btn btn-warning btn-sm w-100"
                 style={{ fontWeight: "bold", color: "#000" }}
               >
-                Buy Now
+                Add to cart
               </button>
             )}
           </div>

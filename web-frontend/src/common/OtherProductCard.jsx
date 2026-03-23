@@ -247,7 +247,7 @@ const OtherProductCard = ({ product, adminOnly = false }) => {
                                 style={{ fontWeight: "bold", color: "#000" }}
                                 onClick={() => { console.log("navigate to application") }}
                             >
-                                Buy Now
+                                Add to cart
                             </button>
                         )}
                     </div>
