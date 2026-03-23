@@ -197,6 +197,7 @@ export const checkoutCart = async (req, res) => {
         if (!address) {
             return res.status(404).json({ success: false, message: "Address not found" });
         }
+        const normalizedAddress = { ...address, lat: address.latitude, lng: address.longitude };
 
         // 2. Get cart items
         const cartItems = await cartService.findAllByUserId(userId);
@@ -212,7 +213,7 @@ export const checkoutCart = async (req, res) => {
         const { productsWithType, liquorItems } = validation;
 
         // 4. Warehouse + distance
-        const routeResult = await resolveWarehouseAndDistance(address, cartItems, liquorItems);
+        const routeResult = await resolveWarehouseAndDistance(normalizedAddress, cartItems, liquorItems);
         if (!routeResult.success) {
             return res.status(routeResult.status).json({ success: false, message: routeResult.message });
         }

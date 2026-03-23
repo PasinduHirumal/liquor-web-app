@@ -25,19 +25,22 @@ export async function getDistanceMatrix(origins, destination) {
 // Get total route distance and duration using waypoints
 // Route: Warehouse → Supermarket(s) → Customer Address → Warehouse
 export async function getRouteDistance(warehouse, supermarketLocations, address) {
-    const warehouseCoord  = `${warehouse.location.lat},${warehouse.location.lng}`;
+    const warehouseCoord  = `${warehouse.where_house_location.lat},${warehouse.where_house_location.lng}`;
     const customerCoord   = `${address.latitude},${address.longitude}`;
 
     // Waypoints: all supermarkets between warehouse and customer
-    const waypoints = supermarketLocations
-        .map(sm => `${sm.location.lat},${sm.location.lng}`)
-        .join('|');
+    const waypointParts = [
+        ...supermarketLocations.map(sm => `${sm.where_house_location.lat},${sm.where_house_location.lng}`),
+        customerCoord,
+    ];
+
+    const waypoints = waypointParts.join('|');
 
     // Final leg: customer → back to warehouse
     const url = `https://maps.googleapis.com/maps/api/directions/json` +
         `?origin=${encodeURIComponent(warehouseCoord)}` +
-        `&destination=${encodeURIComponent(warehouseCoord)}` +       // returns to warehouse
-        `&waypoints=${encodeURIComponent(waypoints + '|' + customerCoord)}` +
+        `&destination=${encodeURIComponent(warehouseCoord)}` +
+        `&waypoints=${encodeURIComponent(waypoints)}` +
         `&mode=driving` +
         `&key=${GOOGLE_MAPS_API_KEY}`;
 
