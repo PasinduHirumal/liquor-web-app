@@ -113,7 +113,10 @@ export const createOrder = async (req, res) => {
             })
         );
 
-        // 9. Clear cart
+        // 9. degrees quantity
+        await cartService.degreesQuantity(cartItems);
+
+        // 10. Clear cart
         await cartService.clearCart(userId);
 
         return res.status(201).json({

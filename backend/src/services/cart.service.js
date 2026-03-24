@@ -287,6 +287,56 @@ class CartService extends BaseService {
             )
         ];
     }
+
+    async degreesQuantity(cartItems) {
+        try {
+            await Promise.all(
+                cartItems.map(async (item) => {
+                    // Find product (liquor or grocery)
+                    const [liquor, grocery] = await Promise.all([
+                        this.liquorService.findById(item.product_id),
+                        this.groceryService.findById(item.product_id)
+                    ]);
+
+                    const product = liquor || grocery;
+
+                    if (!product) {
+                        console.warn(`Product not found: ${item.product_id}`);
+                        return;
+                    }
+
+                    // 3. Calculate new values
+                    const newStock = (product.stock_quantity || 0) - item.quantity;
+                    const newWithdrawQty = (product.withdraw_quantity || 0) + item.quantity;
+
+                    // Prevent negative stock
+                    if (newStock < 0) {
+                        console.warn(`Insufficient stock for product: ${product.product_id}`);
+                        return;
+                    }
+
+                    const updateData = {
+                        stock_quantity: newStock,
+                        withdraw_quantity: newWithdrawQty,
+                        is_in_stock: newStock > 0,
+                        updated_at: new Date().toISOString()
+                    };
+
+                    // 4. Update correct service
+                    if (liquor) {
+                        await this.liquorService.updateById(product.product_id, updateData);
+                    } else {
+                        await this.groceryService.updateById(product.product_id, updateData);
+                    }
+                })
+            );
+
+            return true;
+        } catch (error) {
+            console.error("Error decreasing quantity:", error.message);
+            throw error;
+        }
+    }
 };
 
 export default CartService;
