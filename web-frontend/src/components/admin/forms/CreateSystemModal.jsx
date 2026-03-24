@@ -1,23 +1,18 @@
 import React, { useState, useEffect } from 'react';
-import { Modal, Form, Input, InputNumber, Switch, Button, Row, Col } from 'antd';
+import { Modal, Form, Input, InputNumber, Switch, Button, Row, Col, Spin } from 'antd';
 import { MapContainer, TileLayer, Marker, useMapEvents } from 'react-leaflet';
 import L from "leaflet";
 import { axiosInstance } from '../../../lib/axios';
 import toast from 'react-hot-toast';
 import "leaflet/dist/leaflet.css";
 
-// Fix default marker icon issue - MORE ROBUST SOLUTION
-const DefaultIcon = L.icon({
+// Fix default marker icon issue
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
     iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
     iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
     shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
-    iconSize: [25, 41],
-    iconAnchor: [12, 41],
-    popupAnchor: [1, -34],
-    shadowSize: [41, 41]
 });
-
-L.Marker.prototype.options.icon = DefaultIcon;
 
 const defaultCenter = [7.2083, 79.8358]; // Negombo, Sri Lanka
 
@@ -26,12 +21,12 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
     const [loading, setLoading] = useState(false);
     const [marker, setMarker] = useState(null);
     const [fetchingAddress, setFetchingAddress] = useState(false);
-    const [mapKey, setMapKey] = useState(0); // Force map re-render
+    const [mapReady, setMapReady] = useState(false);
 
     // Reset map when modal opens
     useEffect(() => {
         if (show) {
-            setMapKey(prev => prev + 1);
+            // Reset form values
             form.setFieldsValue({
                 delivery_charge_for_1KM: 0.01,
                 service_charge: 0,
@@ -41,9 +36,16 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                 where_house_location: {
                     lat: null,
                     lng: null
-                }
+                },
+                address: ""
             });
             setMarker(null);
+
+            // Delay map initialization to ensure modal is fully rendered
+            setMapReady(false);
+            setTimeout(() => {
+                setMapReady(true);
+            }, 100);
         }
     }, [show, form]);
 
@@ -214,6 +216,7 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
             afterClose={() => {
                 form.resetFields();
                 setMarker(null);
+                setMapReady(false);
             }}
             footer={[
                 <Button key="back" onClick={handleCancel}>
@@ -253,9 +256,9 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                             label="Delivery Charge (per 1KM)"
                             rules={[{ required: true, message: 'Please input delivery charge!' }]}
                         >
-                            <InputNumber 
-                                min={0.01} 
-                                step={0.01} 
+                            <InputNumber
+                                min={0.01}
+                                step={0.01}
                                 style={{ width: '100%' }}
                                 precision={2}
                             />
@@ -267,59 +270,81 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                 <Row gutter={16}>
                     <Col span={24}>
                         <div style={{ marginBottom: 16 }}>
-                            <Button 
+                            <Button
                                 onClick={getCurrentLocation}
-                                style={{ marginBottom: 12 }}
                                 icon={<span>📍</span>}
                             >
                                 Use My Current Location
                             </Button>
                         </div>
-                        
+
                         <Form.Item label="Pick Location on Map">
-                            <div 
-                                key={mapKey}
-                                style={{ 
-                                    height: '400px', 
-                                    width: '100%', 
-                                    borderRadius: '8px', 
+                            <div
+                                style={{
+                                    height: '400px',
+                                    width: '100%',
+                                    borderRadius: '8px',
                                     overflow: 'hidden',
                                     position: 'relative',
-                                    zIndex: 1
+                                    backgroundColor: '#f0f2f5'
                                 }}
                             >
-                                <MapContainer
-                                    key={mapKey}
-                                    center={marker || defaultCenter}
-                                    zoom={13}
-                                    style={{ height: "100%", width: "100%" }}
-                                    zoomControl={true}
-                                    scrollWheelZoom={true}
-                                    doubleClickZoom={true}
-                                >
-                                    <TileLayer
-                                        attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-                                        url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-                                    />
-                                    <MapClickHandler />
-                                    {marker && (
-                                        <Marker
-                                            position={marker}
-                                            draggable={true}
-                                            eventHandlers={{
-                                                dragend: (e) => {
-                                                    const { lat, lng } = e.target.getLatLng();
-                                                    setMarker([lat, lng]);
-                                                    updateLocationFields(lat, lng);
-                                                }
-                                            }}
+                                {!mapReady ? (
+                                    <div
+                                        style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            backgroundColor: '#f0f2f5',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            flexDirection: 'column',
+                                            gap: '12px',
+                                            zIndex: 1000
+                                        }}
+                                    >
+                                        <Spin size="large" />
+                                        <span style={{ color: '#666', fontSize: '14px' }}>
+                                            Loading map...
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <MapContainer
+                                        center={marker || defaultCenter}
+                                        zoom={13}
+                                        style={{ height: "100%", width: "100%" }}
+                                        zoomControl={true}
+                                        scrollWheelZoom={true}
+                                        doubleClickZoom={true}
+                                    >
+                                        <TileLayer
+                                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
                                         />
-                                    )}
-                                </MapContainer>
+                                        <MapClickHandler />
+                                        {marker && (
+                                            <Marker
+                                                position={marker}
+                                                draggable={true}
+                                                eventHandlers={{
+                                                    dragend: (e) => {
+                                                        const { lat, lng } = e.target.getLatLng();
+                                                        setMarker([lat, lng]);
+                                                        updateLocationFields(lat, lng);
+                                                    }
+                                                }}
+                                            />
+                                        )}
+                                    </MapContainer>
+                                )}
                             </div>
                             {fetchingAddress && (
                                 <div style={{ textAlign: 'center', marginTop: 8 }}>
-                                    <span>Fetching address details...</span>
+                                    <Spin size="small" />
+                                    <span style={{ marginLeft: 8 }}>Fetching address details...</span>
                                 </div>
                             )}
                             <div style={{ marginTop: 8, fontSize: '12px', color: '#666' }}>
@@ -340,8 +365,8 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                                 { min: 2, max: 350, message: 'Address must be between 2 and 350 characters' }
                             ]}
                         >
-                            <Input.TextArea 
-                                placeholder="123 Main St, City, Country" 
+                            <Input.TextArea
+                                placeholder="123 Main St, City, Country"
                                 rows={3}
                                 autoComplete="off"
                             />
@@ -357,16 +382,16 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                             label="Latitude"
                             rules={[
                                 { required: true, message: 'Latitude is required!' },
-                                { 
-                                    type: 'number', 
-                                    min: -90, 
-                                    max: 90, 
-                                    message: 'Latitude must be between -90 and 90' 
+                                {
+                                    type: 'number',
+                                    min: -90,
+                                    max: 90,
+                                    message: 'Latitude must be between -90 and 90'
                                 }
                             ]}
                         >
-                            <InputNumber 
-                                placeholder="Latitude" 
+                            <InputNumber
+                                placeholder="Latitude"
                                 style={{ width: '100%' }}
                                 precision={6}
                                 step={0.000001}
@@ -379,16 +404,16 @@ const CreateSystemModal = ({ show, onHide, onCreateSuccess }) => {
                             label="Longitude"
                             rules={[
                                 { required: true, message: 'Longitude is required!' },
-                                { 
-                                    type: 'number', 
-                                    min: -180, 
-                                    max: 180, 
-                                    message: 'Longitude must be between -180 and 180' 
+                                {
+                                    type: 'number',
+                                    min: -180,
+                                    max: 180,
+                                    message: 'Longitude must be between -180 and 180'
                                 }
                             ]}
                         >
-                            <InputNumber 
-                                placeholder="Longitude" 
+                            <InputNumber
+                                placeholder="Longitude"
                                 style={{ width: '100%' }}
                                 precision={6}
                                 step={0.000001}

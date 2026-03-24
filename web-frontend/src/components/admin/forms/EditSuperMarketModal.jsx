@@ -326,20 +326,20 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
                 <Row gutter={16}>
                     <Col span={24}>
                         <div style={{ marginBottom: 16 }}>
-                            <Button 
+                            <Button
                                 onClick={getCurrentLocation}
                                 icon={<span>📍</span>}
                             >
                                 Use My Current Location
                             </Button>
                         </div>
-                        
+
                         <Form.Item label="Pick Location on Map">
-                            <div 
-                                style={{ 
-                                    height: '400px', 
-                                    width: '100%', 
-                                    borderRadius: '8px', 
+                            <div
+                                style={{
+                                    height: '400px',
+                                    width: '100%',
+                                    borderRadius: '8px',
                                     overflow: 'hidden',
                                     position: 'relative',
                                     backgroundColor: '#f0f2f5'
@@ -400,14 +400,14 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
                                     </MapContainer>
                                 )}
                             </div>
-                            
+
                             {fetchingAddress && (
                                 <div style={{ textAlign: 'center', marginTop: 8 }}>
                                     <Spin size="small" />
                                     <span style={{ marginLeft: 8 }}>Fetching address details...</span>
                                 </div>
                             )}
-                            
+
                             <div style={{ marginTop: 8, fontSize: '12px', color: '#666' }}>
                                 <small>💡 Tip: Click on the map to select location, or drag the marker to adjust</small>
                             </div>
