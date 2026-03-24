@@ -7,8 +7,8 @@ import { buildItemsSnapshot, calculateFinancial, resolveWarehouseAndDistance, sp
 import PAYMENT_STATUS from "../enums/paymentStatus.js";
 
 const orderService = new OrdersService();
-const cartService        = new CartService();
-const addressService     = new AddressService();
+const cartService = new CartService();
+const addressService = new AddressService();
 
 const generateOrderNumber = () => {
     const random = Math.floor(10000000 + Math.random() * 90000000);

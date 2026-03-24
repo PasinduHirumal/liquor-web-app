@@ -20,5 +20,5 @@ router.patch('/update-status/:id', authenticateUser, authorizeRoles(admin, super
 router.patch('/update-assigned_driver/:id', authenticateUser, authorizeRoles(admin, super_admin), validateOrderAssignedDriverUpdate, assignDriverForOrderById);
 
 // user part
-router.post('/create', authenticateUser, authorizeRoles(user), validateOrder, createOrder);
+router.post('/create/address/:address_id', authenticateUser, authorizeRoles(user), validateOrder, createOrder);
 export default router;

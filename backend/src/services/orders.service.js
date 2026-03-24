@@ -1,14 +1,13 @@
 import BaseService from "./BaseService.js";
 import Orders from "../models/Orders.js";
 import ORDER_STATUS from "../enums/orderStatus.js";
-import { ORDER_STATUS_FOR_REPORT } from "../data/OrderStatus.js";
-
 
 class OrdersService extends BaseService {
     constructor () {
         super('orders', Orders, {
             createdAtField: 'created_at',
-            updatedAtField: 'updated_at'
+            updatedAtField: 'updated_at',
+            idField: 'order_id'
         })
     }
 
