@@ -135,6 +135,8 @@ export const getMyCart = async (req, res) => {
 
         const items = await cartService.findAllByUserId(userId);
 
+        const supermarketIds = [];
+
         return res.status(200).json({
             success: true,
             count: items.length,
@@ -223,6 +225,15 @@ export const checkoutCart = async (req, res) => {
         const finance = calculateFinancial(cartItems, productsWithType, warehouse, distance);
         const items   = buildItemsSnapshot(cartItems, productsWithType);
 
+        // 6. Supermarket ids
+        const productIds = [
+            ...new Set(cartItems.map(
+                item => item.product_id
+            ))
+        ];
+
+        const supermarketIds = await cartService.getSupermarketIds(productIds);
+
         return res.status(200).json({
             success: true,
             message: "Checkout preview successful",
@@ -238,10 +249,7 @@ export const checkoutCart = async (req, res) => {
                     id:   warehouse.id,
                     name: warehouse.where_house_name,
                 },
-                supermarkets: supermarketLocations.map(sm => ({
-                    id:   sm.superMarket_id,
-                    name: sm.superMarket_Name,
-                })),
+                supermarkets: supermarketIds,
                 updatedItems: validation.updatedItems, // price change warnings
                 items,
                 summary: {

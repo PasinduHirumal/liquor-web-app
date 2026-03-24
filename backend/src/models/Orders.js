@@ -35,10 +35,10 @@ class Orders {
         this.notes = data.notes;
         this.status = data.status;
         this.warehouse_id = data.warehouse_id;
-        this.superMarket_ids = data.superMarket_ids;
-        this.assigned_driver_id = data.assigned_driver_id;
-        this.driver_earning_id = data.driver_earning_id;
-        this.is_driver_accepted = data.is_driver_accepted;
+        this.superMarket_ids = data.superMarket_ids || [];
+        this.assigned_driver_id = data.assigned_driver_id || null;
+        this.driver_earning_id = data.driver_earning_id || null;
+        this.is_driver_accepted = data.is_driver_accepted || false;
 
         this.created_at = data.created_at;
         this.updated_at = data.updated_at;

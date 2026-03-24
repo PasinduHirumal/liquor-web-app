@@ -25,6 +25,13 @@ export async function getDistanceMatrix(origins, destination) {
 // Get total route distance and duration using waypoints
 // Route: Warehouse → Supermarket(s) → Customer Address → Warehouse
 export async function getRouteDistance(warehouse, supermarketLocations, address) {
+    console.log("warehouse.where_house_location:", warehouse?.where_house_location);
+    console.log("address.latitude:", address?.latitude);
+    console.log("supermarketLocations:", supermarketLocations?.length);
+
+    if (!warehouse?.where_house_location) throw new Error("warehouse.where_house_location is undefined");
+    if (!address?.latitude)               throw new Error("address.latitude is undefined");
+    
     const warehouseCoord  = `${warehouse.where_house_location.lat},${warehouse.where_house_location.lng}`;
     const customerCoord   = `${address.latitude},${address.longitude}`;
 

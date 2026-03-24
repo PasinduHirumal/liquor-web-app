@@ -4,7 +4,7 @@ import { authenticateUser, authorizeRoles } from '../middleware/authMiddleware.j
 import { validateOrder, validateOrderAssignedDriverUpdate, validateOrderStatusUpdate } from '../validations/OrdersValidator.js';
 import { assignDriverForOrderById, getAllOrders, getOrderById, updateOrderStatusById } from '../controller/orders.controller.js';
 import USER_ROLES from '../enums/userRoles.js';
-import { createOrder } from '../controller/order.controller.js';
+import { createOrder, getMyOrders } from '../controller/order.controller.js';
 
 const router = express.Router();
 
@@ -20,5 +20,7 @@ router.patch('/update-status/:id', authenticateUser, authorizeRoles(admin, super
 router.patch('/update-assigned_driver/:id', authenticateUser, authorizeRoles(admin, super_admin), validateOrderAssignedDriverUpdate, assignDriverForOrderById);
 
 // user part
+router.get('/my', authenticateUser, authorizeRoles(user), getMyOrders);
 router.post('/create/address/:address_id', authenticateUser, authorizeRoles(user), validateOrder, createOrder);
+
 export default router;

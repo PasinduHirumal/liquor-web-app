@@ -72,12 +72,20 @@ class CompanyService extends BaseService {
                 throw new Error('No active warehouses found');
             }
 
-            const origins = warehouses.map(w => w.where_house_location);  // [{ lat, lng }, ...]
+            const validWarehouses = warehouses.filter(w => 
+                w.where_house_location?.lat && w.where_house_location?.lng
+            );
+
+            if (validWarehouses.length === 0) {
+                throw new Error('No warehouses with valid location found');
+            }
+
+            const origins = validWarehouses.map(w => w.where_house_location);  // [{ lat, lng }, ...]
             const destination = `${latitude},${longitude}`;
 
             const data = await getDistanceMatrix(origins, destination);
 
-            const warehouseDistances = warehouses.map((warehouse, index) => {
+            const warehouseDistances = validWarehouses.map((warehouse, index) => {
                 const element = data.rows[index].elements[0];
 
                 if (element.status !== 'OK') {

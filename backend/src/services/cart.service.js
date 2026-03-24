@@ -2,8 +2,13 @@ import initializeFirebase from "../config/firebase.config.js";
 import BaseService from "./BaseService.js";
 import Cart from "../models/Cart.js";
 import { getRouteDistance } from "../utils/googleMaps.js";
+import ProductService  from "./product.service.js"
+import OtherProductService  from "./otherProduct.service.js";
 
 const { db } = initializeFirebase();
+
+const liquorService = new ProductService();
+const groceryService = new OtherProductService();
 
 class CartService extends BaseService {
     constructor() {
@@ -12,6 +17,9 @@ class CartService extends BaseService {
             updatedAtField: 'updated_at'
         });
         this.usersCollection = db.collection('users');
+
+        this.liquorService = liquorService;
+        this.groceryService = groceryService;
     }
 
     getCollection(userId) {
@@ -259,6 +267,25 @@ class CartService extends BaseService {
         } catch (error) {
             throw error;
         }
+    }
+
+    async getSupermarketIds(productIds) {
+        const products = await Promise.all(
+            productIds.map(async (id) => {
+                const [liquor, grocery] = await Promise.all([
+                    this.liquorService.findById(id),
+                    this.groceryService.findById(id)
+                ]);
+
+                return liquor || grocery;
+            })
+        );
+
+        return [
+            ...new Set(
+                products.map(p => p?.superMarket_id).filter(Boolean)
+            )
+        ];
     }
 };
 
