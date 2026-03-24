@@ -179,7 +179,9 @@ const AdminNavbar = () => {
 
                                 <DropdownHeader>Manage Others</DropdownHeader>
                                 <DropdownLink to="/category">Category</DropdownLink>
+                                {/* 
                                 <DropdownLink to="/manage-banner">Banner</DropdownLink>
+                                */}
                             </DropdownMenu>
                         </div>
 
@@ -324,9 +326,11 @@ const AdminNavbar = () => {
                                     <StyledNavLink className="block w-full py-2" to="/category">
                                         Category
                                     </StyledNavLink>
+                                    {/*
                                     <StyledNavLink className="block w-full py-2" to="/manage-banner">
                                         Banner
                                     </StyledNavLink>
+                                     */}
                                 </div>
                             </Collapse>
                         </List>
