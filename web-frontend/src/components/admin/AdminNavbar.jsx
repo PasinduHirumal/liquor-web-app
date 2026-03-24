@@ -330,7 +330,7 @@ const AdminNavbar = () => {
                                     <StyledNavLink className="block w-full py-2" to="/manage-banner">
                                         Banner
                                     </StyledNavLink>
-                                     */}
+                                    */}
                                 </div>
                             </Collapse>
                         </List>
