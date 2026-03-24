@@ -43,6 +43,7 @@ import paymentsRoutes from "./src/routes/payments.routes.js";
 import driverEarningRoutes from "./src/routes/driverEarnings.routes.js";
 import financeRoutes from "./src/routes/finance.routes.js";
 import cartRoutes from "./src/routes/cart.routes.js";
+import clearRoutes from "./src/routes/clear.routes.js";
 
 
 // connect DB
@@ -99,6 +100,7 @@ app.use("/api/payment", paymentsRoutes);
 app.use("/api/earning", driverEarningRoutes);
 app.use("/api/finance", financeRoutes);
 app.use("/api/cart", cartRoutes);
+app.use("/api/clear", clearRoutes);
 
 
 //  Route handler for the root path
