@@ -1,15 +1,38 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Form, Input, InputNumber, Switch, Button, message, Space, Row, Col } from "antd";
+import { Modal, Form, Input, InputNumber, Switch, Button, message, Space, Row, Col, Spin } from "antd";
+import { MapContainer, TileLayer, Marker, useMapEvents } from "react-leaflet";
+import L from "leaflet";
 import { axiosInstance } from "../../../lib/axios";
 import toast from "react-hot-toast";
+import "leaflet/dist/leaflet.css";
+
+// Fix default marker icon issue - More robust solution
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+    iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+    iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+    shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+});
+
+const defaultCenter = [7.2083, 79.8358]; // Negombo, Sri Lanka
 
 function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
     const [form] = Form.useForm();
     const [updating, setUpdating] = useState(false);
+    const [marker, setMarker] = useState(null);
+    const [fetchingAddress, setFetchingAddress] = useState(false);
+    const [mapReady, setMapReady] = useState(false);
 
     useEffect(() => {
         if (marketData && open) {
+            // Set marker if coordinates exist
             const location = marketData.location || {};
+            if (location.lat && location.lng) {
+                setMarker([location.lat, location.lng]);
+            } else {
+                setMarker(null);
+            }
+
             form.setFieldsValue({
                 superMarket_Name: marketData.superMarket_Name || "",
                 streetAddress: marketData.streetAddress || "",
@@ -21,12 +44,140 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
                 lat: location.lat ?? null,
                 lng: location.lng ?? null,
             });
+
+            // Reset map ready state and set ready after delay
+            setMapReady(false);
+            setTimeout(() => {
+                setMapReady(true);
+            }, 100);
         }
     }, [marketData, form, open]);
+
+    // Map click handler component
+    function MapClickHandler() {
+        useMapEvents({
+            click(e) {
+                const { lat, lng } = e.latlng;
+                setMarker([lat, lng]);
+                updateLocationFields(lat, lng);
+            },
+        });
+        return null;
+    }
+
+    // Function to get address from coordinates
+    const getAddressFromCoordinates = async (lat, lng) => {
+        setFetchingAddress(true);
+        try {
+            const res = await fetch(
+                `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`
+            );
+            const data = await res.json();
+
+            if (data.display_name) {
+                const address = data.address || {};
+                const streetAddress = address.road || address.pedestrian || address.footway || data.display_name.split(',')[0] || "";
+                const city = address.city || address.town || address.village || "";
+                const state = address.state || address.province || "";
+                const postalCode = address.postcode || "";
+                const country = address.country || "";
+
+                // Update form fields
+                const updates = {
+                    lat: lat,
+                    lng: lng
+                };
+
+                if (streetAddress) updates.streetAddress = streetAddress;
+                if (city) updates.city = city;
+                if (state) updates.state = state;
+                if (postalCode) updates.postalCode = postalCode;
+                if (country) updates.country = country;
+
+                form.setFieldsValue(updates);
+
+                toast.success("Location updated with address details!");
+            } else {
+                // Still set coordinates even if address not found
+                form.setFieldsValue({
+                    lat: lat,
+                    lng: lng
+                });
+                toast.warning("Coordinates updated. Please enter address manually.");
+            }
+        } catch (error) {
+            console.error("Error fetching address:", error);
+            toast.error("Failed to fetch address details. Please enter address manually.");
+            // Still set coordinates
+            form.setFieldsValue({
+                lat: lat,
+                lng: lng
+            });
+        } finally {
+            setFetchingAddress(false);
+        }
+    };
+
+    const updateLocationFields = (lat, lng) => {
+        getAddressFromCoordinates(lat, lng);
+    };
+
+    // Get current location using browser geolocation
+    const getCurrentLocation = () => {
+        if (!navigator.geolocation) {
+            toast.error("Geolocation is not supported by your browser");
+            return;
+        }
+
+        toast.loading("Getting your location...", { id: "getLocation" });
+
+        navigator.geolocation.getCurrentPosition(
+            (pos) => {
+                const lat = pos.coords.latitude;
+                const lng = pos.coords.longitude;
+                setMarker([lat, lng]);
+                updateLocationFields(lat, lng);
+                toast.success("Location detected!", { id: "getLocation" });
+            },
+            (error) => {
+                console.error("Geolocation error:", error);
+                toast.error("Failed to get current location", { id: "getLocation" });
+                switch (error.code) {
+                    case error.PERMISSION_DENIED:
+                        toast.error("Location permission denied. Please enable location access.");
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        toast.error("Location information unavailable");
+                        break;
+                    case error.TIMEOUT:
+                        toast.error("Location request timed out");
+                        break;
+                    default:
+                        toast.error("Failed to get current location");
+                }
+            },
+            {
+                enableHighAccuracy: true,
+                timeout: 10000,
+                maximumAge: 0
+            }
+        );
+    };
 
     const handleUpdate = async (values) => {
         try {
             setUpdating(true);
+
+            // Validate coordinates if provided
+            if (values.lat && (values.lat < -90 || values.lat > 90)) {
+                toast.error("Latitude must be between -90 and 90");
+                return;
+            }
+
+            if (values.lng && (values.lng < -180 || values.lng > 180)) {
+                toast.error("Longitude must be between -180 and 180");
+                return;
+            }
 
             // Merge latitude and longitude into location object
             const payload = {
@@ -37,25 +188,28 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
                 postalCode: values.postalCode,
                 country: values.country,
                 isActive: values.isActive,
-                location: {
-                    ...(values.lat !== undefined && values.lat !== null ? { lat: values.lat } : {}),
-                    ...(values.lng !== undefined && values.lng !== null ? { lng: values.lng } : {}),
-                },
+                location: {}
             };
 
-            // Remove empty objects or fields to avoid validation issues
-            if (Object.keys(payload.location).length === 0) delete payload.location;
-            Object.keys(payload).forEach(key => {
-                if (payload[key] === undefined || payload[key] === null || payload[key] === "") {
-                    delete payload[key];
-                }
-            });
+            // Only add location if coordinates exist
+            if (values.lat !== undefined && values.lat !== null && values.lat !== "") {
+                payload.location.lat = parseFloat(values.lat);
+            }
+            if (values.lng !== undefined && values.lng !== null && values.lng !== "") {
+                payload.location.lng = parseFloat(values.lng);
+            }
+
+            // Remove location object if empty
+            if (Object.keys(payload.location).length === 0) {
+                delete payload.location;
+            }
 
             const res = await axiosInstance.patch(`/superMarket/update/${marketData.id}`, payload);
 
             if (res.data?.success) {
                 toast.success("Supermarket updated successfully");
                 form.resetFields();
+                setMarker(null);
                 onClose();
                 onSuccess();
             } else {
@@ -80,6 +234,7 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
 
     const handleCancel = () => {
         form.resetFields();
+        setMarker(null);
         onClose();
     };
 
@@ -91,7 +246,12 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
             footer={null}
             destroyOnClose
             maskClosable={false}
-            width={700}
+            width={900}
+            bodyStyle={{ maxHeight: '70vh', overflowY: 'auto', padding: '24px' }}
+            afterClose={() => {
+                setMapReady(false);
+                setMarker(null);
+            }}
         >
             <Form
                 layout="vertical"
@@ -162,6 +322,100 @@ function EditSuperMarketModal({ open, onClose, marketData, onSuccess }) {
                     </Col>
                 </Row>
 
+                {/* Location Picker Section */}
+                <Row gutter={16}>
+                    <Col span={24}>
+                        <div style={{ marginBottom: 16 }}>
+                            <Button
+                                onClick={getCurrentLocation}
+                                icon={<span>📍</span>}
+                            >
+                                Use My Current Location
+                            </Button>
+                        </div>
+
+                        <Form.Item label="Pick Location on Map">
+                            <div
+                                style={{
+                                    height: '400px',
+                                    width: '100%',
+                                    borderRadius: '8px',
+                                    overflow: 'hidden',
+                                    position: 'relative',
+                                    backgroundColor: '#f0f2f5'
+                                }}
+                            >
+                                {!mapReady ? (
+                                    <div
+                                        style={{
+                                            position: 'absolute',
+                                            top: 0,
+                                            left: 0,
+                                            right: 0,
+                                            bottom: 0,
+                                            backgroundColor: '#f0f2f5',
+                                            display: 'flex',
+                                            justifyContent: 'center',
+                                            alignItems: 'center',
+                                            flexDirection: 'column',
+                                            gap: '12px',
+                                            zIndex: 1000
+                                        }}
+                                    >
+                                        <Spin size="large" />
+                                        <span style={{ color: '#666', fontSize: '14px' }}>
+                                            Loading map...
+                                        </span>
+                                    </div>
+                                ) : (
+                                    <MapContainer
+                                        center={marker || defaultCenter}
+                                        zoom={13}
+                                        style={{ height: "100%", width: "100%" }}
+                                        zoomControl={true}
+                                        scrollWheelZoom={true}
+                                        doubleClickZoom={true}
+                                        whenReady={() => {
+                                            console.log("Map is ready");
+                                        }}
+                                    >
+                                        <TileLayer
+                                            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                                            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                        />
+                                        <MapClickHandler />
+                                        {marker && (
+                                            <Marker
+                                                position={marker}
+                                                draggable={true}
+                                                eventHandlers={{
+                                                    dragend: (e) => {
+                                                        const { lat, lng } = e.target.getLatLng();
+                                                        setMarker([lat, lng]);
+                                                        updateLocationFields(lat, lng);
+                                                    }
+                                                }}
+                                            />
+                                        )}
+                                    </MapContainer>
+                                )}
+                            </div>
+
+                            {fetchingAddress && (
+                                <div style={{ textAlign: 'center', marginTop: 8 }}>
+                                    <Spin size="small" />
+                                    <span style={{ marginLeft: 8 }}>Fetching address details...</span>
+                                </div>
+                            )}
+
+                            <div style={{ marginTop: 8, fontSize: '12px', color: '#666' }}>
+                                <small>💡 Tip: Click on the map to select location, or drag the marker to adjust</small>
+                            </div>
+                        </Form.Item>
+                    </Col>
+                </Row>
+
+                {/* Latitude / Longitude */}
                 <Row gutter={16}>
                     <Col span={12}>
                         <Form.Item
