@@ -317,7 +317,6 @@ const SystemDetail = () => {
                 onCreateSuccess={(newData) => {
                     setCompanyDetails(prev => [...prev, newData]);
                     setShowCreateModal(false);
-                    toast.success("System configuration created successfully");
                 }}
             />
         </div>

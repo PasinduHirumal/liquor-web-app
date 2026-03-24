@@ -108,19 +108,11 @@ export const adminRoutes = [
     },
     {
         path: "/wharehouse",
-        element: (
-            <AdminProtectedRoute>
-                <SystemDetail />
-            </AdminProtectedRoute>
-        ),
+        element: <SystemDetail />
     },
     {
         path: "/supermarket",
-        element: (
-            <AdminProtectedRoute>
-                <SuperMarket />
-            </AdminProtectedRoute>
-        ),
+        element: <SuperMarket />
     },
     {
         path: "/reports",
