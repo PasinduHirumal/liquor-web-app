@@ -14,6 +14,7 @@ import {
     CloudUpload as CloudUploadIcon
 } from '@mui/icons-material';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import ClearCategoriesButton from '../../components/admin/ClearCategoriesButton';
 
 const theme = createTheme({
     palette: {
@@ -214,20 +215,31 @@ const ManageCategory = () => {
         setOpenCreateDialog(false);
     };
 
+    // Callback function to refresh categories after clearing
+    const handleClearComplete = () => {
+        fetchCategories();
+    };
+
     return (
         <ThemeProvider theme={theme}>
-            <Container maxWidth="lg" sx={{ pt: 4, pb: 4,backgroundColor: 'white', p: 4, borderRadius: 2 }}>
-                <Box sx={{ display: 'flex', justifyContent: 'space-between', mb: 4 }}>
+            <Container maxWidth="lg" sx={{ pt: 4, pb: 4, backgroundColor: 'white', p: 4, borderRadius: 2 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
                     <Typography variant="h4" fontWeight="bold">
                         Manage Categories
                     </Typography>
-                    <Button
-                        variant="contained"
-                        startIcon={<AddIcon />}
-                        onClick={handleOpenCreateDialog}
-                    >
-                        Create Category
-                    </Button>
+                    <Box sx={{ display: 'flex', gap: 2 }}>
+                        <ClearCategoriesButton
+                            onClearComplete={handleClearComplete}
+                            disabled={loading}
+                        />
+                        <Button
+                            variant="contained"
+                            startIcon={<AddIcon />}
+                            onClick={handleOpenCreateDialog}
+                        >
+                            Create Category
+                        </Button>
+                    </Box>
                 </Box>
 
                 {/* Filters */}

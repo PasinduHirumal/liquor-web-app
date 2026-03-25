@@ -3,6 +3,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { axiosInstance } from "../../lib/axios";
 import CheckoutButton from "../../common/CheckoutButton";
+import ClearCartButton from "../../components/user/ClearCartButton";
 import useUserAuthStore from "../../stores/userAuthStore";
 
 const money = (value) => `Rs: ${Number(value || 0).toFixed(2)}`;
@@ -48,12 +49,12 @@ export default function Cart() {
                 setSelectedAddress(newAddress);
                 // Clear the state to prevent reselection on refresh
                 window.history.replaceState({}, document.title);
-            } 
+            }
             // Set default address if no address is selected
             else if (!selectedAddress && userAddresses.length > 0) {
-                const defaultAddress = userAddresses.find(addr => addr.isDefault && addr.isActive) || 
-                                      userAddresses.find(addr => addr.isActive) || 
-                                      userAddresses[0];
+                const defaultAddress = userAddresses.find(addr => addr.isDefault && addr.isActive) ||
+                    userAddresses.find(addr => addr.isActive) ||
+                    userAddresses[0];
                 setSelectedAddress(defaultAddress);
             }
         } catch (error) {
@@ -170,9 +171,19 @@ export default function Cart() {
                     <p className="mb-0 text-secondary">{items.length} item(s)</p>
                 </div>
 
-                <Link to="/products" className="btn btn-outline-light btn-sm">
-                    Continue Shopping
-                </Link>
+                <div className="d-flex gap-2">
+                    {/* Clear Cart Button - Only show if cart has items */}
+                    {items.length > 0 && (
+                        <ClearCartButton
+                            onSuccess={fetchCart}
+                            variant="outline-danger"
+                            className="text-white border-danger"
+                        />
+                    )}
+                    <Link to="/products" className="btn btn-outline-light btn-sm">
+                        Continue Shopping
+                    </Link>
+                </div>
             </div>
 
             {items.length === 0 ? (
@@ -313,7 +324,7 @@ export default function Cart() {
                                         <div className="alert alert-warning py-2">
                                             <small>
                                                 No addresses found.{" "}
-                                                <button 
+                                                <button
                                                     className="btn btn-link btn-sm p-0 text-decoration-none"
                                                     onClick={handlePickLocation}
                                                 >
