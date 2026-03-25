@@ -16,6 +16,8 @@ import { Chip } from "@mui/material";
 import { styled } from "@mui/system";
 import RatingStars from "../../../common/RatingStars";
 import RatingCommentCards from "../../../common/RatingCommentcards";
+import useAdminAuthStore from "../../../stores/adminAuthStore";
+import CartButton from "../../../common/CartButton";
 
 const OriginBadge = styled(Chip)(({ theme, origin }) => ({
     position: "absolute",
@@ -38,6 +40,7 @@ const OtherProductDetail = () => {
     const [activeImage, setActiveImage] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const adminAuth = useAdminAuthStore((state) => state.isAuthenticated);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -237,28 +240,29 @@ const OtherProductDetail = () => {
                             {renderPriceSection()}
 
                             <div className="product-status-section">
+                                {adminAuth &&
+                                    <div className="row m-0 g-2">
+                                        <div className="col-12 col-md-6">
+                                            <div className="profit-box d-flex justify-content-between align-items-center">
+                                                <span className="detail-label">Profit Status</span>
+                                                <span
+                                                    className={`detail-value ${product.isProfit ? "text-success" : "text-danger"}`}
+                                                >
+                                                    {product.isProfit ? "Profit" : "No Profit"}
+                                                </span>
+                                            </div>
+                                        </div>
 
-                                <div className="row m-0 g-2">
-                                    <div className="col-12 col-md-6">
-                                        <div className="profit-box d-flex justify-content-between align-items-center">
-                                            <span className="detail-label">Profit Status</span>
-                                            <span
-                                                className={`detail-value ${product.isProfit ? "text-success" : "text-danger"}`}
-                                            >
-                                                {product.isProfit ? "Profit" : "No Profit"}
-                                            </span>
+                                        <div className="col-12 col-md-6">
+                                            <div className="profit-box d-flex justify-content-between align-items-center">
+                                                <span className="detail-label">Profit Value</span>
+                                                <span className="detail-value text-warning">
+                                                    Rs: {Number(product.profit_value || 0).toFixed(2)}
+                                                </span>
+                                            </div>
                                         </div>
                                     </div>
-
-                                    <div className="col-12 col-md-6">
-                                        <div className="profit-box d-flex justify-content-between align-items-center">
-                                            <span className="detail-label">Profit Value</span>
-                                            <span className="detail-value text-warning">
-                                                Rs: {Number(product.profit_value || 0).toFixed(2)}
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
+                                }
 
                                 <div className={`stock-status ${product.is_in_stock ? 'in-stock' : 'out-of-stock'}`}>
                                     {product.is_in_stock ? (
@@ -346,24 +350,31 @@ const OtherProductDetail = () => {
                                     </span>
                                 </div>
                             </div>
+                            {adminAuth &&
+                                <div className="product-actions">
+                                    <button
+                                        className="btn-edit"
+                                        onClick={() => navigate(`/other-products/edit/${id}`)}
+                                    >
+                                        <FaEdit />
+                                        Edit Product
+                                    </button>
 
-                            <div className="product-actions">
-                                <button
-                                    className="btn-edit"
-                                    onClick={() => navigate(`/other-products/edit/${id}`)}
-                                >
-                                    <FaEdit />
-                                    Edit Product
-                                </button>
+                                    <ViewProductHistory productId={id} productName={product.name} />
 
-                                <ViewProductHistory productId={id} productName={product.name} />
-
-                                <DeleteOtherProductButton
-                                    id={id}
-                                    onSuccess={handleDeleteSuccess}
-                                    className="btn-delete"
+                                    <DeleteOtherProductButton
+                                        id={id}
+                                        onSuccess={handleDeleteSuccess}
+                                        className="btn-delete"
+                                    />
+                                </div>
+                            }
+                            {!adminAuth && (
+                                <CartButton
+                                    productId={id}
+                                    disabled={!product.is_active || !product.is_in_stock}
                                 />
-                            </div>
+                            )}
                         </div>
                     </div>
                     <RatingCommentCards productId={product.product_id || product.id} />

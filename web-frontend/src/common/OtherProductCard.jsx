@@ -9,7 +9,6 @@ const formatPrice = (value) => `Rs: ${Number(value || 0).toFixed(2)}`;
 const OtherProductCard = ({ product, adminOnly = false }) => {
     const navigate = useNavigate();
     const adminAuth = useAdminAuthStore((state) => state.isAuthenticated);
-    const showBuyNow = !adminOnly && !adminAuth;
 
     const productId = product.product_id || product.id;
 
@@ -240,19 +239,18 @@ const OtherProductCard = ({ product, adminOnly = false }) => {
                         className="card-footer mt-auto text-center"
                         style={{ background: "transparent", borderTop: "1px solid #1c1f2b" }}
                     >
-                        {adminOnly ? (
-                            <button
-                                className="btn btn-outline-light btn-sm w-100"
-                                onClick={handleViewDetail}
-                            >
-                                View Details
-                            </button>
-                        ) : showBuyNow ? (
+                        <button
+                            className="btn btn-outline-light btn-sm w-100 mb-2"
+                            onClick={handleViewDetail}
+                        >
+                            View Details
+                        </button>
+                        {!adminAuth && (
                             <CartButton
                                 productId={productId}
                                 disabled={!product.is_active || !product.is_in_stock}
                             />
-                        ) : null}
+                        )}
                     </div>
                 </div>
             </div>

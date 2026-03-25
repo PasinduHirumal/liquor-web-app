@@ -3,7 +3,7 @@ import { ChevronDown, ChevronUp, Pencil } from "lucide-react";
 import FlavorEditModal from "../forms/editLiquorProductModel/FlavorEditModal";
 import "../../../styles/flavorDropdown.css";
 
-const FlavorDropDown = ({ flavour }) => {
+const FlavorDropDown = ({ flavour, adminAuth }) => {
     const [open, setOpen] = useState(false);
     const [showModal, setShowModal] = useState(false);
 
@@ -18,7 +18,7 @@ const FlavorDropDown = ({ flavour }) => {
                     {open ? <ChevronUp size={20} /> : <ChevronDown size={20} />}
                 </button>
 
-                {open && (
+                {open && adminAuth && (
                     <button
                         className="edit-btn"
                         onClick={() => setShowModal(true)}

@@ -46,18 +46,8 @@ export default function CartButton({ productId, disabled = false }) {
             setIsInCart(true);
             toast.success(res.data?.message || "Product added to cart");
         } catch (error) {
-            const message =
-                error.response?.data?.message ||
-                error.response?.data?.errors?.[0]?.message ||
-                "Failed to add to cart";
-
-            if (error.response?.status === 401 || error.response?.status === 403) {
-                toast.error("Please log in as a user to use cart");
-                navigate("/login");
-                return;
-            }
-
-            toast.error(message);
+            toast.error("Please log in as a user to use cart");
+            navigate("/login");
         } finally {
             setLoading(false);
         }

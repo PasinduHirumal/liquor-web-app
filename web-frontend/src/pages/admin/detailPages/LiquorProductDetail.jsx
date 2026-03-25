@@ -16,6 +16,8 @@ import ViewProductHistory from "../../../common/ViewProductHistory";
 import FlavorDropDown from "../../../components/admin/buttons/FlavorDropDown";
 import RatingStars from "../../../common/RatingStars";
 import RatingCommentCards from "../../../common/RatingCommentcards";
+import useAdminAuthStore from "../../../stores/adminAuthStore";
+import CartButton from "../../../common/CartButton";
 
 const OriginBadge = styled(Chip)(({ theme, origin }) => ({
     position: "absolute",
@@ -42,6 +44,7 @@ const LiquorProductDetail = () => {
     const [product, setProduct] = useState(null);
     const [activeImage, setActiveImage] = useState(null);
     const [loading, setLoading] = useState(true);
+    const adminAuth = useAdminAuthStore((state) => state.isAuthenticated);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -222,28 +225,29 @@ const LiquorProductDetail = () => {
                                 </div>
                             </div>
 
+                            {adminAuth &&
+                                <div className="row m-0 g-2">
+                                    <div className="col-12 col-md-6">
+                                        <div className="profit-box d-flex justify-content-between align-items-center">
+                                            <span className="detail-label">Profit Status</span>
+                                            <span
+                                                className={`detail-value ${product.isProfit ? "text-success" : "text-danger"}`}
+                                            >
+                                                {product.isProfit ? "Profit" : "No Profit"}
+                                            </span>
+                                        </div>
+                                    </div>
 
-                            <div className="row m-0 g-2">
-                                <div className="col-12 col-md-6">
-                                    <div className="profit-box d-flex justify-content-between align-items-center">
-                                        <span className="detail-label">Profit Status</span>
-                                        <span
-                                            className={`detail-value ${product.isProfit ? "text-success" : "text-danger"}`}
-                                        >
-                                            {product.isProfit ? "Profit" : "No Profit"}
-                                        </span>
+                                    <div className="col-12 col-md-6">
+                                        <div className="profit-box d-flex justify-content-between align-items-center">
+                                            <span className="detail-label">Profit Value</span>
+                                            <span className="detail-value text-warning">
+                                                Rs: {Number(product.profit_value || 0).toFixed(2)}
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div className="col-12 col-md-6">
-                                    <div className="profit-box d-flex justify-content-between align-items-center">
-                                        <span className="detail-label">Profit Value</span>
-                                        <span className="detail-value text-warning">
-                                            Rs: {Number(product.profit_value || 0).toFixed(2)}
-                                        </span>
-                                    </div>
-                                </div>
-                            </div>
+                            }
 
                             <div className="rating">
                                 <RatingStars productId={product.product_id || product.id} />
@@ -255,7 +259,7 @@ const LiquorProductDetail = () => {
                                 <p>{product.description || "No description provided."}</p>
                             </div>
 
-                            <FlavorDropDown flavour={product.flavour} />
+                            <FlavorDropDown flavour={product.flavour} adminAuth={adminAuth} />
 
                             {/* Metadata Grid */}
                             <div className="details-grid m-0">
@@ -296,22 +300,30 @@ const LiquorProductDetail = () => {
                             </div>
 
                             {/* Action Buttons */}
-                            <div className="action-buttons d-flex gap-3 flex-wrap m-0">
-                                <button
-                                    className="edit-button d-flex align-items-center gap-2 px-3 py-2"
-                                    onClick={() => navigate(`/products/edit/${id}`)}
-                                >
-                                    <FaEdit />
-                                    Edit
-                                </button>
+                            {adminAuth &&
+                                <div className="action-buttons d-flex gap-3 flex-wrap m-0">
+                                    <button
+                                        className="edit-button d-flex align-items-center gap-2 px-3 py-2"
+                                        onClick={() => navigate(`/products/edit/${id}`)}
+                                    >
+                                        <FaEdit />
+                                        Edit
+                                    </button>
 
-                                <ViewProductHistory productId={id} productName={product.name} />
+                                    <ViewProductHistory productId={id} productName={product.name} />
 
-                                <DeleteLiquorButton
-                                    id={id}
-                                    onSuccess={handleDeleteSuccess}
+                                    <DeleteLiquorButton
+                                        id={id}
+                                        onSuccess={handleDeleteSuccess}
+                                    />
+                                </div>
+                            }
+                            {!adminAuth && (
+                                <CartButton
+                                    productId={id}
+                                    disabled={!product.is_active || !product.is_in_stock}
                                 />
-                            </div>
+                            )}
                         </div>
                     </div>
                     <RatingCommentCards productId={product.product_id || product.id} />
