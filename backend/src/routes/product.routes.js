@@ -13,8 +13,8 @@ const super_admin = ADMIN_ROLES.SUPER_ADMIN;
 // http://localhost:5000/api/products
 
 router.get('/getAll', getAllProducts);
+router.get('/getProductById/:id', getProductById);
 router.get('/getAll/dashboard', authenticateUser, authorizeRoles(admin, super_admin), getAllProducts);
-router.get('/getProductById/:id', authenticateUser, authorizeRoles(admin, super_admin), getProductById);
 router.post('/create', authenticateUser, authorizeRoles(admin, super_admin), validateProduct, createProduct);
 router.patch('/update/:id', authenticateUser, authorizeRoles(admin, super_admin), validateProductUpdate, updateProductById);
 router.patch('/update-price/:id', authenticateUser, authorizeRoles(admin, super_admin), validatePriceOperation, updatePriceById);
