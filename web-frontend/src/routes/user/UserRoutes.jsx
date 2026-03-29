@@ -9,6 +9,7 @@ import PublicHome from "../PublicHome";
 import Cart from "../../pages/user/Cart";
 import LocationPickerPage from "../../pages/LocationPickerPage";
 import CheckoutSummary from "../../pages/user/CheckoutSummary";
+import MyOrders from "../../pages/user/MyOrders";
 
 const Loader = () => (
     <div className="d-flex justify-content-center align-items-center mt-5 pt-5">
@@ -46,42 +47,26 @@ export const userRoutes = [
     },
     {
         path: "/cart",
-        element: (
-            <UserProtectedRoute>
-                <Cart />
-            </UserProtectedRoute>
-        ),
+        element: <Cart />
     },
     {
         path: "/user-profile/:profileId",
-        element: (
-            <UserProtectedRoute>
-                <UserProfile />
-            </UserProtectedRoute>
-        ),
+        element: <UserProfile />
     },
     {
         path: "/address",
-        element: (
-            <UserProtectedRoute>
-                <Address />
-            </UserProtectedRoute>
-        ),
+        element: <Address />
     },
     {
         path: "/location-picker",
-        element: (
-            <UserProtectedRoute>
-                <LocationPickerPage />
-            </UserProtectedRoute>
-        ),
+        element: <LocationPickerPage />
     },
     {
         path: "/checkout/summary",
-        element: (
-            <UserProtectedRoute>
-                <CheckoutSummary />
-            </UserProtectedRoute>
-        ),
+        element: <CheckoutSummary />
+    },
+    {
+        path: "/my-orders",
+        element: <MyOrders />
     },
 ];

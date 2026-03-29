@@ -4,6 +4,7 @@ import toast from "react-hot-toast";
 import { FaEdit, FaCheckCircle, FaPlusCircle, FaMapMarkerAlt } from "react-icons/fa";
 import AddressFormModal from "../../components/user/AddressFormModal";
 import SetActiveButton from "../../components/user/SetActiveButton";
+import ClearAddressesButton from "../../components/user/ClearAddressesButton";
 import useUserAuthStore from "../../stores/userAuthStore";
 
 const Address = () => {
@@ -239,18 +240,26 @@ const Address = () => {
                         {/* HEADER */}
                         <div className="card-header bg-primary text-white d-flex justify-content-between align-items-center">
                             <h4 className="mb-0">My Addresses</h4>
-                            <button
-                                className="btn btn-light text-primary d-flex align-items-center"
-                                onClick={() => {
-                                    resetForm();
-                                    setEditingId(null);
-                                    setShowForm(true);
-                                }}
-                                disabled={!user?.user_id}
-                            >
-                                <FaPlusCircle className="me-2" />
-                                Add Address
-                            </button>
+                            <div className="d-flex gap-2">
+                                {addresses.length > 0 && (
+                                    <ClearAddressesButton
+                                        onSuccess={fetchAddresses}
+                                        variant="outline-light"
+                                    />
+                                )}
+                                <button
+                                    className="btn btn-light text-primary d-flex align-items-center"
+                                    onClick={() => {
+                                        resetForm();
+                                        setEditingId(null);
+                                        setShowForm(true);
+                                    }}
+                                    disabled={!user?.user_id}
+                                >
+                                    <FaPlusCircle className="me-2" />
+                                    Add Address
+                                </button>
+                            </div>
                         </div>
 
                         {/* BODY */}
@@ -258,7 +267,7 @@ const Address = () => {
 
                             {/* FILTER */}
                             {addresses.length > 0 && (
-                                <div className="d-flex justify-content-end mb-3">
+                                <div className="d-flex justify-content-between align-items-center mb-3">
                                     <select
                                         className="form-select w-auto"
                                         value={filter}
@@ -280,10 +289,6 @@ const Address = () => {
                                 <div className="text-center py-5">
                                     <div className="spinner-border text-primary" />
                                     <p className="mt-2 text-muted">Loading addresses...</p>
-                                </div>
-                            ) : !user?.user_id ? (
-                                <div className="alert alert-warning text-center">
-                                    Please log in to view your addresses.
                                 </div>
                             ) : filteredAddresses.length === 0 ? (
                                 <div className="alert alert-info text-center">
@@ -357,7 +362,7 @@ const Address = () => {
 
                                                         {(address.latitude || address.longitude) && (
                                                             <p className="mb-1 text-muted">
-                                                                <strong>Coordinates:</strong> 
+                                                                <strong>Coordinates:</strong>
                                                                 {address.latitude && ` ${address.latitude.toFixed(6)}°`}
                                                                 {address.latitude && address.longitude && ","}
                                                                 {address.longitude && ` ${address.longitude.toFixed(6)}°`}

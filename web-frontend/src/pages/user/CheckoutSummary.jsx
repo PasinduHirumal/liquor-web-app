@@ -42,41 +42,47 @@ export default function CheckoutSummary() {
     } = checkoutData;
 
     const handleCreateOrder = async () => {
-    if (!addressId) {
-        toast.error("Address not found. Please go back and select an address.");
-        return;
-    }
-
-    try {
-        setLoading(true);
-
-        // Include notes and payment method
-        const payload = {
-            payment_method: paymentMethod,
-            notes: notes.trim(),
-            address_id: addressId  // send address_id in body
-        };
-
-        const response = await axiosInstance.post(`/orders/create`, payload);
-
-        if (response.data.success) {
-            toast.success("Order created successfully!");
-            navigate("/user"); // Redirect after order creation
-        } else {
-            toast.error(response.data.message || "Failed to create order");
+        if (!addressId) {
+            toast.error("Address not found. Please go back and select an address.");
+            return;
         }
-    } catch (error) {
-        console.error("Create order error:", error);
 
-        if (error.response?.data?.errors) {
-            error.response.data.errors.forEach(err => toast.error(err.message));
-        } else {
-            toast.error(error.response?.data?.message || "Failed to create order. Please try again.");
+        try {
+            setLoading(true);
+
+            const payload = {
+                payment_method: paymentMethod,
+                notes: notes.trim()
+            };
+
+            const response = await axiosInstance.post(
+                `/orders/create/address/${addressId}`,
+                payload
+            );
+
+            if (response.data.success) {
+                toast.success("Order created successfully!");
+                navigate("/my-orders");
+            } else {
+                toast.error(response.data.message || "Failed to create order");
+            }
+        } catch (error) {
+            console.error("Create order error:", error);
+
+            if (error.response?.data?.errors) {
+                error.response.data.errors.forEach(err =>
+                    toast.error(err.message)
+                );
+            } else {
+                toast.error(
+                    error.response?.data?.message ||
+                    "Failed to create order. Please try again."
+                );
+            }
+        } finally {
+            setLoading(false);
         }
-    } finally {
-        setLoading(false);
-    }
-};
+    };
 
     const formatDate = (dateString) => {
         const date = new Date(dateString);
