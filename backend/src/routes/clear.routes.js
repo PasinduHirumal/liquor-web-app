@@ -15,6 +15,9 @@ const super_admin = ADMIN_ROLES.SUPER_ADMIN;
 router.delete('/cart/my', authenticateUser, authorizeRoles(user), clearController.clearCart);
 router.delete('/addresses/my', authenticateUser, authorizeRoles(user), clearController.clearAddresses);
 
+router.delete('/orders', authenticateUser, authorizeRoles(super_admin), clearController.clearOrders);
+router.delete('/order-items', authenticateUser, authorizeRoles(super_admin), clearController.clearOrderItems);
+router.delete('/money-withdraws', authenticateUser, authorizeRoles(super_admin), clearController.clearMoneyWithdraws);
 router.delete('/categories', authenticateUser, authorizeRoles(admin, super_admin), clearController.clearCategories);
 
 export default router;
