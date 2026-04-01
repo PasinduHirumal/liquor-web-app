@@ -1,22 +1,17 @@
 import React, { useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Button,
-  Box,
-  useMediaQuery,
-  useTheme,
-  styled,
-  Slide,
-  Fade,
+  AppBar, Toolbar, IconButton, Button, Box, useMediaQuery, useTheme,
+  styled, Slide, Fade, Menu, MenuItem, ListItemIcon, ListItemText,
 } from "@mui/material";
 import {
   Menu as MenuIcon,
   Close as CloseIcon,
   Search as SearchIcon,
   Login as LoginIcon,
+  PhoneAndroid as PhoneAndroidIcon,
+  DirectionsCar as DirectionsCarIcon,
+  ArrowDropDown as ArrowDropDownIcon,
 } from "@mui/icons-material";
 import SearchModal from "../common/SearchModal";
 
@@ -25,6 +20,9 @@ const NAV_ITEMS = [
   { label: "Liquor Items", to: "/liquor-all" },
   { label: "Grocery Items", to: "/other-product-all" },
 ];
+
+const USER_APP_URL = import.meta.env.VITE_USER_APP_DOWNLOAD_URL;
+const DRIVER_APP_URL = import.meta.env.VITE_DRIVER_APP_DOWNLOAD_URL;
 
 const StyledNavLink = styled(NavLink)(({ theme }) => ({
   color: "#fff",
@@ -51,6 +49,15 @@ const StyledSearchButton = styled(IconButton)({
   },
 });
 
+const DownloadButton = styled(Button)({
+  color: "#fff",
+  textTransform: "none",
+  fontWeight: 500,
+  "&:hover": {
+    backgroundColor: "#5f0404",
+  },
+});
+
 const BrandLink = styled(NavLink)({
   textDecoration: "none",
   color: "#fff",
@@ -67,6 +74,24 @@ export default function PublicNavbar() {
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchModalOpen, setSearchModalOpen] = useState(false);
+  const [downloadAnchorEl, setDownloadAnchorEl] = useState(null);
+
+  const handleDownloadMenuOpen = (event) => {
+    setDownloadAnchorEl(event.currentTarget);
+  };
+
+  const handleDownloadMenuClose = () => {
+    setDownloadAnchorEl(null);
+  };
+
+  const handleDownload = (url) => {
+    if (url) {
+      window.open(url, "_blank");
+    } else {
+      console.error("Download URL not configured");
+    }
+    handleDownloadMenuClose();
+  };
 
   const loginButtonSx = {
     backgroundColor: theme.palette.info.main,
@@ -125,6 +150,55 @@ export default function PublicNavbar() {
             <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
               {navLinks()}
 
+              {/* Download Apps Dropdown */}
+              <DownloadButton
+                onClick={handleDownloadMenuOpen}
+                endIcon={<ArrowDropDownIcon style={{ fontSize: "1.2rem" }} />}
+              >
+                Download Apps
+              </DownloadButton>
+              <Menu
+                anchorEl={downloadAnchorEl}
+                open={Boolean(downloadAnchorEl)}
+                onClose={handleDownloadMenuClose}
+                anchorOrigin={{
+                  vertical: "bottom",
+                  horizontal: "center",
+                }}
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "center",
+                }}
+                PaperProps={{
+                  elevation: 4,
+                  sx: {
+                    mt: 1,
+                    minWidth: 150,
+                    borderRadius: 2,
+                    backgroundColor: "#7e0303",
+                    "& .MuiMenuItem-root": {
+                      color: "#fff",
+                      "&:hover": {
+                        backgroundColor: "#5f0404",
+                      },
+                    },
+                  },
+                }}
+              >
+                <MenuItem onClick={() => handleDownload(USER_APP_URL)}>
+                  <ListItemIcon>
+                    <PhoneAndroidIcon sx={{ color: "#fff" }} />
+                  </ListItemIcon>
+                  <ListItemText primary="User App" />
+                </MenuItem>
+                <MenuItem onClick={() => handleDownload(DRIVER_APP_URL)}>
+                  <ListItemIcon>
+                    <DirectionsCarIcon sx={{ color: "#fff" }} />
+                  </ListItemIcon>
+                  <ListItemText primary="Driver App" />
+                </MenuItem>
+              </Menu>
+
               <StyledSearchButton onClick={() => setSearchModalOpen(true)}>
                 <SearchIcon />
               </StyledSearchButton>
@@ -161,6 +235,53 @@ export default function PublicNavbar() {
               }}
             >
               {navLinks(true)}
+
+              {/* Download Apps Section for Mobile */}
+              <Box sx={{ mt: 1 }}>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  sx={{
+                    color: "#fff",
+                    borderColor: "#fff",
+                    textTransform: "none",
+                    justifyContent: "flex-start",
+                    mb: 1,
+                    "&:hover": {
+                      borderColor: "#fff",
+                      backgroundColor: "#5f0404",
+                    },
+                  }}
+                  onClick={() => {
+                    closeMobileMenu();
+                    handleDownload(USER_APP_URL);
+                  }}
+                >
+                  <PhoneAndroidIcon sx={{ mr: 1, fontSize: 20 }} />
+                  Download User App
+                </Button>
+                <Button
+                  fullWidth
+                  variant="outlined"
+                  sx={{
+                    color: "#fff",
+                    borderColor: "#fff",
+                    textTransform: "none",
+                    justifyContent: "flex-start",
+                    "&:hover": {
+                      borderColor: "#fff",
+                      backgroundColor: "#5f0404",
+                    },
+                  }}
+                  onClick={() => {
+                    closeMobileMenu();
+                    handleDownload(DRIVER_APP_URL);
+                  }}
+                >
+                  <DirectionsCarIcon sx={{ mr: 1, fontSize: 20 }} />
+                  Download Driver App
+                </Button>
+              </Box>
 
               <Button
                 fullWidth
