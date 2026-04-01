@@ -4,6 +4,8 @@ import {
     Table, Tabs, Typography, Spin, Alert, Card, Switch, Tag, Button, InputNumber,
 } from "antd";
 import { EditOutlined, SaveOutlined } from "@ant-design/icons";
+import { FaCarSide } from "react-icons/fa";
+import { MdSmartphone } from "react-icons/md";
 import toast from "react-hot-toast";
 
 // Components
@@ -196,31 +198,73 @@ function AppInfo() {
                     </div>
                 </div>
 
-                {/* Commission Update Section */}
-                <div className="flex flex-col md:flex-row items-start md:items-center gap-3 mb-6 p-4 bg-gray-100 rounded-lg">
-                    <Title level={5} className="m-0 text-sm md:text-base whitespace-nowrap">
-                        Update Commission Rate (Drivers):
-                    </Title>
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-3 w-full md:w-auto">
-                        <InputNumber
-                            min={0}
-                            max={100}
-                            value={commissionRate}
-                            onChange={setCommissionRate}
-                            formatter={(value) => `${value}%`}
-                            parser={(value) => value.replace("%", "")}
-                            className="w-full md:w-32"
-                        />
-                        <Button
-                            type="primary"
-                            icon={<SaveOutlined />}
-                            loading={commissionLoading}
-                            onClick={handleCommissionUpdate}
-                            className="w-full md:w-auto"
-                        >
-                            <span className="hidden md:inline">Save</span>
-                            <span className="md:hidden">Save Commission</span>
-                        </Button>
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
+                    {/* Apps Download Section */}
+                    <div className="bg-white border rounded-xl p-4 shadow-sm flex flex-col gap-4">
+                        <Title level={5} className="!m-0 text-base">
+                            Our Apps
+                        </Title>
+
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <Button
+                                type="primary"
+                                size="large"
+                                className="flex-1 !bg-blue-600 hover:!bg-blue-700 !border-blue-600 text-white py-2.5 px-4 rounded-3 transition-all duration-200"
+                                onClick={() =>
+                                    window.open(
+                                        "https://drive.google.com/uc?export=download&id=1s8rpcumqnGe93GuJByU8u6YGA-3NJGgA",
+                                        "_blank"
+                                    )
+                                }
+                            >
+                                <MdSmartphone size={18} /> Download User App
+                            </Button>
+
+                            <Button
+                                type="primary"
+                                size="large"
+                                className="flex-1 !bg-green-600 hover:!bg-green-700 !border-green-600 text-white py-2.5 px-4 rounded-lg transition-all duration-200"
+                                onClick={() =>
+                                    window.open(
+                                        "https://drive.google.com/uc?export=download&id=1i2QZos7lyZ3EkNrIkfbCQtBVyle0GZFz",
+                                        "_blank"
+                                    )
+                                }
+                            >
+                                <FaCarSide size={18} /> Download Driver App
+                            </Button>
+                        </div>
+                    </div>
+
+                    {/* Commission Section */}
+                    <div className="bg-white border rounded-xl p-4 shadow-sm flex flex-col gap-4">
+                        <Title level={5} className="!m-0 text-base">
+                            Driver Commission Rate
+                        </Title>
+
+                        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                            <InputNumber
+                                min={0}
+                                max={100}
+                                value={commissionRate}
+                                onChange={setCommissionRate}
+                                formatter={(value) => `${value}%`}
+                                parser={(value) => value.replace("%", "")}
+                                className="w-full sm:w-32"
+                                size="large"
+                            />
+
+                            <Button
+                                type="primary"
+                                icon={<SaveOutlined />}
+                                loading={commissionLoading}
+                                onClick={handleCommissionUpdate}
+                                className="w-full sm:w-auto"
+                                size="large"
+                            >
+                                Save
+                            </Button>
+                        </div>
                     </div>
                 </div>
 

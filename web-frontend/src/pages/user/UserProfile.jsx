@@ -116,21 +116,12 @@ const UserProfile = () => {
                     <div className="col-xl-9 col-lg-10">
                         <div
                             className="card border-0 shadow-lg rounded-4 overflow-hidden"
-                            style={{
-                                background:
-                                    "linear-gradient(180deg, #f8fbff 0%, #ffffff 55%, #ffffff 100%)",
-                            }}
                         >
                             {/* Top Banner */}
                             <div
-                                className="position-relative"
-                                style={{
-                                    background:
-                                        "linear-gradient(135deg, #0d6efd 0%, #3d8bfd 45%, #6ea8fe 100%)",
-                                    minHeight: "180px",
-                                }}
+                                className="position-relative bg-light"
                             >
-                                <div className="position-relative p-4 p-md-5 text-white">
+                                <div className="position-relative p-4 p-md-5 text-dark">
                                     <div className="d-flex flex-column flex-md-row align-items-md-end justify-content-between gap-3">
                                         <div className="d-flex flex-column flex-md-row align-items-center align-items-md-end gap-4">
                                             <img
@@ -154,7 +145,7 @@ const UserProfile = () => {
                                                 </h2>
                                                 <p className="mb-2 opacity-75">{profile.email}</p>
                                                 <div className="d-flex flex-wrap justify-content-center justify-content-md-start gap-2">
-                                                    <span className="badge bg-light text-primary px-3 py-2 rounded-pill fw-semibold">
+                                                    <span className="badge bg-primary text-white px-3 py-2 rounded-pill fw-semibold">
                                                         {formatRole(profile.role)}
                                                     </span>
                                                     <span
@@ -176,6 +167,17 @@ const UserProfile = () => {
                                                             : "Not Verified"}
                                                     </span>
                                                 </div>
+                                                <button
+                                                    className="btn btn-dark mt-3"
+                                                    onClick={() => {
+                                                        window.open(
+                                                            "https://drive.google.com/uc?export=download&id=1s8rpcumqnGe93GuJByU8u6YGA-3NJGgA",
+                                                            "_blank"
+                                                        );
+                                                    }}
+                                                >
+                                                    Download App
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
@@ -274,41 +276,6 @@ const UserProfile = () => {
                                                         {profile.havePendingMembership ? "Yes" : "No"}
                                                     </span>
                                                 </div>
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    <div className="col-12">
-                                        <div className="card border-0 shadow-sm rounded-4">
-                                            <div className="card-body p-4">
-                                                <h5 className="fw-bold mb-4 text-primary">
-                                                    <i className="bi bi-geo-alt-fill me-2"></i>
-                                                    Addresses
-                                                </h5>
-
-                                                {Array.isArray(profile.addresses) &&
-                                                    profile.addresses.length > 0 ? (
-                                                    <div className="row g-3">
-                                                        {profile.addresses.map((address, index) => (
-                                                            <div className="col-md-6" key={index}>
-                                                                <div className="p-3 bg-light rounded-4 border h-100">
-                                                                    <span className="fw-semibold d-block mb-1">
-                                                                        Address {index + 1}
-                                                                    </span>
-                                                                    <span className="text-muted">
-                                                                        {typeof address === "string"
-                                                                            ? address
-                                                                            : JSON.stringify(address)}
-                                                                    </span>
-                                                                </div>
-                                                            </div>
-                                                        ))}
-                                                    </div>
-                                                ) : (
-                                                    <div className="text-muted">
-                                                        No addresses added yet.
-                                                    </div>
-                                                )}
                                             </div>
                                         </div>
                                     </div>
