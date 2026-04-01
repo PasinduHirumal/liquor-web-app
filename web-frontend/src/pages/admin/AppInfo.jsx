@@ -17,6 +17,9 @@ import GroceryMigrate from "../../components/admin/buttons/migrate/GroceryMigrat
 const { Title } = Typography;
 const { TabPane } = Tabs;
 
+const USER_APP_URL = import.meta.env.VITE_USER_APP_DOWNLOAD_URL;
+const DRIVER_APP_URL = import.meta.env.VITE_DRIVER_APP_DOWNLOAD_URL;
+
 function AppInfo() {
     const [mainAppData, setMainAppData] = useState(null);
     const [allAppData, setAllAppData] = useState([]);
@@ -31,6 +34,7 @@ function AppInfo() {
     // Modal state
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedRecord, setSelectedRecord] = useState(null);
+
 
     useEffect(() => {
         const fetchData = async () => {
@@ -210,12 +214,7 @@ function AppInfo() {
                                 type="primary"
                                 size="large"
                                 className="flex-1 !bg-blue-600 hover:!bg-blue-700 !border-blue-600 text-white py-2.5 px-4 rounded-3 transition-all duration-200"
-                                onClick={() =>
-                                    window.open(
-                                        "https://drive.google.com/uc?export=download&id=1s8rpcumqnGe93GuJByU8u6YGA-3NJGgA",
-                                        "_blank"
-                                    )
-                                }
+                                onClick={() => window.open(USER_APP_URL, "_blank")}
                             >
                                 <MdSmartphone size={18} /> Download User App
                             </Button>
@@ -224,12 +223,7 @@ function AppInfo() {
                                 type="primary"
                                 size="large"
                                 className="flex-1 !bg-green-600 hover:!bg-green-700 !border-green-600 text-white py-2.5 px-4 rounded-lg transition-all duration-200"
-                                onClick={() =>
-                                    window.open(
-                                        "https://drive.google.com/uc?export=download&id=1i2QZos7lyZ3EkNrIkfbCQtBVyle0GZFz",
-                                        "_blank"
-                                    )
-                                }
+                                onClick={() => window.open(DRIVER_APP_URL, "_blank")}
                             >
                                 <FaCarSide size={18} /> Download Driver App
                             </Button>

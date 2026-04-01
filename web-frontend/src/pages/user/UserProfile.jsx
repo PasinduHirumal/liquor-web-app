@@ -4,6 +4,8 @@ import { axiosInstance } from "../../lib/axios";
 import useUserAuthStore from "../../stores/userAuthStore";
 import UserProfileEdit from "./EditUserProfile";
 
+const USER_APP_URL = import.meta.env.VITE_USER_APP_DOWNLOAD_URL;
+
 const UserProfile = () => {
     const { user } = useUserAuthStore();
     const { profileId } = useParams();
@@ -169,12 +171,7 @@ const UserProfile = () => {
                                                 </div>
                                                 <button
                                                     className="btn btn-dark mt-3"
-                                                    onClick={() => {
-                                                        window.open(
-                                                            "https://drive.google.com/uc?export=download&id=1s8rpcumqnGe93GuJByU8u6YGA-3NJGgA",
-                                                            "_blank"
-                                                        );
-                                                    }}
+                                                    onClick={() => window.open(USER_APP_URL, "_blank")}
                                                 >
                                                     Download App
                                                 </button>
