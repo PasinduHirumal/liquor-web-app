@@ -10,6 +10,7 @@ import {
 import useAdminAuthStore from "../../stores/adminAuthStore";
 import { getPendingOrdersCount } from "../../lib/orderApi";
 import ConfirmLogoutDialog from "../../common/ConfirmLogoutDialog";
+import logo from "../../assets/logo.png"
 
 const StyledNavLink = ({ to, children, onClick, className = "" }) => (
     <NavLink
@@ -142,7 +143,12 @@ const AdminNavbar = () => {
                     className="flex items-center text-lg font-bold text-white"
                     style={{ textDecoration: "none" }}
                 >
-                    🍷 Liquor Web App
+                    <img
+                        src={logo} alt="Logo"
+                        className="border-2 border-yellow-300 rounded-lg"
+                        style={{ height: "40px", marginRight: "8px" }}
+                    />
+                    bothale<span className="text-yellow-300">.com</span>
                 </NavLink>
 
                 {/* Desktop Menu */}

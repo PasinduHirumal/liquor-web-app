@@ -14,6 +14,7 @@ import {
   ArrowDropDown as ArrowDropDownIcon,
 } from "@mui/icons-material";
 import SearchModal from "../common/SearchModal";
+import logo from "../assets/logo.png"
 
 const NAV_ITEMS = [
   { label: "Home", to: "/" },
@@ -124,7 +125,12 @@ export default function PublicNavbar() {
       <AppBar position="fixed" elevation={4} sx={{ backgroundColor: "#a30000" }}>
         <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2, sm: 3 } }}>
           <BrandLink to="/" onClick={closeMobileMenu}>
-            🍷 Liquor Web App
+            <img
+              src={logo} alt="Logo"
+              className="border-2 border-yellow-300 rounded-lg"
+              style={{ height: "40px", marginRight: "8px" }}
+            />
+            bothale<span className="text-yellow-300">.com</span>
           </BrandLink>
 
           {isMobile ? (

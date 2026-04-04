@@ -1,27 +1,17 @@
 import React, { useMemo, useState } from "react";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
-  AppBar,
-  Toolbar,
-  IconButton,
-  Button,
-  Box,
-  useMediaQuery,
-  useTheme,
-  styled,
-  Slide,
-  Fade,
-  Backdrop,
+  AppBar, Toolbar, IconButton, Button,
+  Box, useMediaQuery, useTheme, styled, Slide, Fade, Backdrop,
 } from "@mui/material";
 import {
-  Menu as MenuIcon,
-  Close as CloseIcon,
-  Logout as LogoutIcon,
-  Search as SearchIcon,
+  Menu as MenuIcon, Close as CloseIcon,
+  Logout as LogoutIcon, Search as SearchIcon,
 } from "@mui/icons-material";
 import useUserAuthStore from "../../stores/userAuthStore";
 import SearchModal from "../../common/SearchModal";
-import ConfirmLogoutDialog from "../../common/ConfirmLogoutDialog"; // <-- import confirm modal
+import ConfirmLogoutDialog from "../../common/ConfirmLogoutDialog";
+import logo from "../../assets/logo.png"
 
 const StyledNavLink = styled(NavLink)(({ theme }) => ({
   color: "#fff",
@@ -116,7 +106,12 @@ export default function UserNavbar() {
       <AppBar position="fixed" elevation={4} sx={{ backgroundColor: "#7e0303" }}>
         <Toolbar sx={{ justifyContent: "space-between", px: { xs: 2, sm: 3 } }}>
           <BrandLink to="/user" onClick={closeMenu}>
-            🍷 Liquor Web App
+            <img
+              src={logo} alt="Logo"
+              className="border-2 border-yellow-300 rounded-lg"
+              style={{ height: "40px", marginRight: "8px" }}
+            />
+            bothale<span className="text-yellow-300">.com</span>
           </BrandLink>
 
           {isMobile ? (
